@@ -55,7 +55,7 @@ exports.cwebp = (input_image, output_image, option, logging = '-quiet') => {
             if (error) {
                 reject(error);
             } else if (stderr){
-                reject(stderr);
+                resolve(stderr);
             } else {
                 resolve(stdout);
             }
@@ -82,7 +82,7 @@ exports.dwebp = (input_image, output_image, option, logging = '-quiet') => {
             if (error) {
                 reject(error);
             } else if (stderr){
-                reject(stderr);
+                resolve(stderr);
             } else {
                 resolve(stdout);
             }
@@ -110,7 +110,7 @@ exports.gwebp = (input_image, output_image, option, logging = '-quiet') => {
             if (error) {
                 reject(error);
             } else if (stderr){
-                reject(stderr);
+                resolve(stderr);
             } else {
                 resolve(stdout);
             }
@@ -138,7 +138,7 @@ exports.webpmux_add = (input_image, output_image, icc_profile, option, logging =
             if (error) {
                 reject(error);
             } else if (stderr){
-                reject(stderr);
+                resolve(stderr);
             } else {
                 resolve(stdout);
             }
@@ -162,7 +162,7 @@ exports.webpmux_extract = (input_image, icc_profile, option, logging = '-quiet')
             if (error) {
                 reject(error);
             } else if (stderr){
-                reject(stderr);
+                resolve(stderr);
             } else {
                 resolve(stdout);
             }
@@ -186,7 +186,7 @@ exports.webpmux_strip = (input_image, output_image, option, logging = '-quiet') 
             if (error) {
                 reject(error);
             } else if (stderr){
-                reject(stderr);
+                resolve(stderr);
             } else {
                 resolve(stdout);
             }
@@ -220,7 +220,7 @@ exports.webpmux_animate = (input_images, output_image, loop, bgcolor, logging = 
             if (error) {
                 reject(error);
             } else if (stderr){
-                reject(stderr);
+                resolve(stderr);
             } else {
                 resolve(stdout);
             }
@@ -245,7 +245,7 @@ exports.webpmux_getframe = (input_image, output_image, frame_number, logging = '
             if (error) {
                 reject(error);
             } else if (stderr){
-                reject(stderr);
+                resolve(stderr);
             } else {
                 resolve(stdout);
             }
