@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "declaration": true, // 生成 .d.ts 定义文件
+    "removeComments": false, // 去除注释
+    "noEmitHelpers": true,// 不在输出文件中生成帮助
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "stripInternal": true
+  },
+  "exclude": [
+    "./node_modules",
+    "bin"
+  ]
+}

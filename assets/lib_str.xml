@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <!-- 等待处理 -->
+  <string name="WAITING" id="1000">Waiting...</string>
+  <!-- 进入游戏中 -->
+  <string name="LOADING" id="1001">Loading...</string>
+  <!-- 游戏暂停中 -->
+  <string name="GAME_OFF" id="1002">The game is under testing, pls wait.</string>
+  <!-- 投注金币大于最大值 -->
+  <string name="ANTE_MAX_MONEY" id="1003">Bet the maximum amount can not be more than {0}</string>
+  <!-- 还需XX秒才可以再次发言 -->
+  <string name="SEND_CHAT_TIMER_ERROR" id="1004">Send your next message in {0} seconds</string>
+  <!-- 网络访问失败，请检查网络 -->
+  <string name="NET_ERROR" id="1005">Unable to connect to the Internet! Please check and try again</string>
+  <!-- 当前不可投注 -->
+  <string name="CANNOT_BET" id="1006">You cannot bet right now</string>
+  <!-- 未登陆，请先登陆 -->
+  <string name="FIRST_LOG" id="1007">Please log in first</string>
+  <!-- 中奖结果正在计算中 -->
+  <string name="WINING_RESULTS" id="1008">Loading wining results...</string>
+  <!-- 游戏错误 退出游戏 -->
+  <string name="GAME_ERROR" id="1009">Network error, please enter game again</string>
+  <!-- 押注失败 -->
+  <string name="BET_FAIL" id="1010">Failed to bet due to network delay. Please make sure you have good Internet connection.</string>
+  <!-- 获取游戏开奖超时 -->
+  <string name="GET_GAME_RESULTS_TIME_OUT" id="1011">It took too long to get the results, the game will exit!</string>
+  <!-- 你离开游戏太久了，将你剔除游戏 -->
+  <string name="SYSTEM_BACK_LOBBY" id="1012">You have left too long, system has removed you from the game.</string>
+  <!-- demo 游戏币无法提现  提示 -->
+  <string name="PROMPT_GUEST" id="1013">The money in this DEMO account is not withdrawable, it is for practise purposes only</string>
+  <!-- 当前版本过低 -->
+  <string name="APP_VERSION_TOO_LOW" id="1014">You are now using an old version, please download the newest version via our official website. {0}</string>
+  <!-- 提示玩家玩真钱场 -->
+  <string name="SHOW_INVITE_REAL_MONEY" id="1015">Already experienced several times, try playing in Real Money games and Win more. First deposit to get 200% Bonus.</string>
+  <!-- 提示玩家没有满足使用优惠券的需要 -->
+  <string name="REQUIREMENT_STAKE" id="1016">Requirement of stake: {0}</string>
+  <!-- 未找到游戏 -->
+  <string name="GAME_NOT_FOUND" id="1017">Game is under maintenance, please try later</string>
+  <!-- 充值成功提示语 -->
+  <string name="RECHARGE_SUCCESS" id="1018">Deposit successful, the amount is: {0}</string>
+  <!-- 需要押注的最大钱 -->
+  <string name="NEED_BET_BONUS" id="1019">You still need to bet {0} more to get the Bonus balance</string>
+  <!-- 错误 -->
+  <string name="ERR" id="1020">err</string>
+  <!-- 钱不够了 快充值 -->
+  <string name="RECHARGE" id="1021">Oops,insufficient funds! Please deposit to proceed.</string>
+  <!-- 余额不足 -->
+  <string name="INSUFFICIENT" id="1022">Insufficient balance! Please Top up.</string>
+  <!-- 登录 -->
+  <string name="LOGIN" id="1023">More exciting please login .</string>
+  <!-- 踢出游戏 -->
+  <string name="OUT_GAME" id="1024">You didn't make a move in {0} seconds, so you're out of the game now</string>
+  <!-- 提示玩法 -->
+  <string name="TIPS_FOR_PLAYING" id="1025">Make your move in {0} seconds</string>
+  <!-- 赢钱数 -->
+  <string name="WON_MONEY" id="1026">YOU WON！{0}</string>
+  <!-- coins 赢钱数 -->
+  <string name="WON_COINS" id="1027">YOU WON！COINS {0}</string>
+  <!-- 输钱了 -->
+  <string name="LOST" id="1028">You lost</string>
+  <!-- 硬币不足 -->
+  <string name="INSUFFICIENT_COINS" id="1029">Insufficient coins</string>
+  <!-- 输入 PIN 继续充值 -->
+  <string name="ENTER_PIN_CONTINUE" id="1030">Enter PIN to continue</string>
+  <!-- 下载app提示 -->
+  <string name="DOWNLOAD_MSG" id="1031">Oops! This feature is not available for web version. To enjoy the full feature, please download APP.</string>
+  <!-- 礼包不可用 -->
+  <string name="GIFT_NOT_AVAILABLE" id="1032">Current gift is not available</string>
+  <!-- 提供可用礼包 -->
+  <string name="CASH_GIFTS_AVAILABLE" id="1033">Cash gifts available</string>
+  <!-- 退出app -->
+  <string name="EXIT_APP" id="1034">Press again to exit.</string>
+  <!-- 存款玩游戏 -->
+  <string name="DEPOSIT_PLAY" id="1035">Deposit to Play</string>
+  <!-- 登录玩游戏 -->
+  <string name="LOGIN_PLAY" id="1036">Login to Play</string>
+  <!-- 当前投注额 -->
+  <string name="CURRENT_BET_AMOUNT" id="1037">Current Betting Amount:&amp;nbsp;[color=#fde41a]{0}[/color]</string>
+  <!-- gift投注提示 -->
+  <string name="GIFT_BET_TIP" id="1038">You need to bet&amp;nbsp;[color=#fde41a]{0}[/color]&amp;nbsp;more to win&amp;nbsp;[color=#fde41a]1[/color]&amp;nbsp;more gift</string>
+  <!-- 中奖通告 -->
+  <string name="WIN_NOTICE" id="1039">Congratulations!&amp;nbsp;[color=#FFF337]{0} WON {unit}.{1}[/color]&amp;nbsp;in {2}.</string>
+  <!-- 当前没有可用gift -->
+  <string name="NOT_GIFT" id="1040">Currently no available gifts.</string>
+  <!-- 正在使用的劵 -->
+  <string name="USE_IN_GIFT" id="1041">{unit} {0} Available</string>
+  <!-- gift消费提示 -->
+  <string name="DEDUCT_TIP" id="1042">Get one can deduct {0} {unit}.</string>
+  <!-- gift拒绝消费提示 -->
+  <string name="DEDUCT_REFUSE_TIP" id="1043">Available for stakes equal or over {unit} {0}</string>
+  <!-- 赌注限制 -->
+  <string name="STAKES_RESTRICT" id="1044">No Stakes Restrict</string>
+  <!-- 赌注需求 -->
+  <string name="STAKES_NEEDS" id="1045">On Stakes of {0} or More</string>
+  <!-- 获得更多礼包 -->
+  <string name="GET_MORE_GIFT" id="1046">Get More Gifts</string>
+  <string name="HOW_TO_PLAY" id="1047">HOW TO PLAY</string>
+  <!-- 点击按钮 -->
+  <string name="PRESS_BET_BUTTONS" id="1048">Press any Bet Buttons</string>
+  <string name="GIFT_HELP" id="1049">1.Every time your betting amount increased by {unit} {0}, you can get a gift. When you claim the gift, your betting amount will be cleared for your next betting amount accumulation.&#x000A;&#x000A;2.The betting amount in each game is independent, the amount can’t be shared.&#x000A;&#x000A;3.Every gift has an expiry date for 3 days. After 3 days, it will be cleared automatically.&#x000A;&#x000A;4.The accumulate betting amount just valid for the day. It will be cleared next day</string>
+  <string name="FREE_SPIN" id="1050">FREE SPIN</string>
+  <string name="WILD_RESPIN" id="1051">Wild Respin</string>
+  <!-- bonus 游戏 -->
+  <string name="BONUS_GAME" id="1052">Bonus Game</string>
+  <!-- 总赢 -->
+  <string name="TOTAL_WIN" id="1053">TOTAL WIN</string>
+  <!-- 需要支付 -->
+  <string name="ABOUT_TO_PAY" id="1054">About to Pay {0}</string>
+  <!-- 欢迎提示 -->
+  <string name="WELCOME_TO_GAME" id="1055">Welcome to {0}</string>
+  <!-- 赢的线 -->
+  <string name="WON_LINE" id="1056">YOU WON LINE {0} !</string>
+  <!-- 自动spin -->
+  <string name="AUTO_SPINS" id="1057">AUTO SPINS: {0} of {1}</string>
+  <!-- 充值 -->
+  <string name="DEPOSIT" id="1058">Deposit</string>
+  <!-- 提示切换余额会导致倍数归零 -->
+  <string name="CHANGE_BET_PROMPT" id="1059">Changing bets before the Ornament Bomb Countdown reaches 0 will reset the Bombs on the reels. &#x000A;Are you sure?</string>
+  <!-- 再来一次 -->
+  <string name="TRY_AGAIN" id="1060">TRY AGAIN!</string>
+  <!-- 货币单位 -->
+  <string name="UNIT" id="1061">{unit}</string>
+  <!-- 金币单位 -->
+  <string name="COINS" id="1062">COINS</string>
+  <!-- stop -->
+  <string name="STOP" id="1063">Stop</string>
+  <!-- Confirm Use -->
+  <string name="CONFIRM_USE" id="1064">Confirm Use</string>
+  <!-- 继续 -->
+  <string name="CONTINUE" id="1065">Continue</string>
+  <!-- OK -->
+  <string name="OK" id="1066">OK</string>
+  <!-- 取消 -->
+  <string name="CANCEL" id="1067">Cancel</string>
+  <!-- 重发 -->
+  <string name="RESEND" id="1068">Resend</string>
+  <!-- 赢钱展示 -->
+  <string name="WINS" id="1069">Wins</string>
+</resources>

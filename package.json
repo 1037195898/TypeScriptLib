@@ -1,0 +1,36 @@
+{
+  "name": "game-lib",
+  "version": "1.0.0",
+  "main": "webp/ToWebp.js",
+  "scripts": {
+    "build": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/bogegit/TypeScriptLib.git"
+  },
+  "keywords": [
+    "webp",
+    "webpconverter",
+    "webp-converter",
+    "cwebp",
+    "dwebp",
+    "gif2webp",
+    "webpmux"
+  ],
+
+  "files": [
+    "bin/gameCore.d.ts",
+    "bin/gameCore.js",
+    "bin/gameCore.min.js",
+    "bin/webp/",
+    "ToWebp.js",
+    "webp/buffer_utils.js",
+    "webp/cwebp.js",
+    "webp/dwebp.js",
+    "webp/gwebp.js",
+    "webp/temp_path.js",
+    "webp/webpmux.js"
+  ]
+
+}
