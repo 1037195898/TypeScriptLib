@@ -20,6 +20,8 @@
   ],
 
   "files": [
+    "assets/",
+    "version_info.txt",
     "bin/gameCore.d.ts",
     "bin/gameCore.js",
     "bin/gameCore.min.js",

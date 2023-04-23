@@ -53,9 +53,12 @@ exports.cwebp = (input_image, output_image, option, logging = '-quiet') => {
         //execute command
         exec(`"${enwebp()}"`, query.split(/\s+/), {shell: true}, (error, stdout, stderr) => {
             if (error) {
-                console.warn(error);
+                reject(error);
+            } else if (stderr){
+                reject(stderr);
+            } else {
+                resolve(stdout);
             }
-            resolve(stdout ? stdout : stderr);
         });
     });
 };
@@ -77,9 +80,12 @@ exports.dwebp = (input_image, output_image, option, logging = '-quiet') => {
         //execute command
         exec(`"${dewebp()}"`, query.split(/\s+/), {shell: true}, (error, stdout, stderr) => {
             if (error) {
-                console.warn(error);
+                reject(error);
+            } else if (stderr){
+                reject(stderr);
+            } else {
+                resolve(stdout);
             }
-            resolve(stdout ? stdout : stderr);
         });
     });
 
@@ -102,9 +108,12 @@ exports.gwebp = (input_image, output_image, option, logging = '-quiet') => {
         //execute command
         exec(`"${gifwebp()}"`, query.split(/\s+/), {shell: true}, (error, stdout, stderr) => {
             if (error) {
-                console.warn(error);
+                reject(error);
+            } else if (stderr){
+                reject(stderr);
+            } else {
+                resolve(stdout);
             }
-            resolve(stdout ? stdout : stderr);
         });
     });
 };
@@ -127,9 +136,12 @@ exports.webpmux_add = (input_image, output_image, icc_profile, option, logging =
         //execute command
         exec(`"${webpmux()}"`, query.split(/\s+/), {shell: true}, (error, stdout, stderr) => {
             if (error) {
-                console.warn(error);
+                reject(error);
+            } else if (stderr){
+                reject(stderr);
+            } else {
+                resolve(stdout);
             }
-            resolve(stdout ? stdout : stderr);
         });
     });
 };
@@ -148,9 +160,12 @@ exports.webpmux_extract = (input_image, icc_profile, option, logging = '-quiet')
         //execute command
         exec(`"${webpmux()}"`, query.split(/\s+/), {shell: true}, (error, stdout, stderr) => {
             if (error) {
-                console.warn(error);
+                reject(error);
+            } else if (stderr){
+                reject(stderr);
+            } else {
+                resolve(stdout);
             }
-            resolve(stdout ? stdout : stderr);
         });
     });
 };
@@ -169,9 +184,12 @@ exports.webpmux_strip = (input_image, output_image, option, logging = '-quiet') 
         //execute command
         exec(`"${webpmux()}"`, query.split(/\s+/), {shell: true}, (error, stdout, stderr) => {
             if (error) {
-                console.warn(error);
+                reject(error);
+            } else if (stderr){
+                reject(stderr);
+            } else {
+                resolve(stdout);
             }
-            resolve(stdout ? stdout : stderr);
         });
     });
 };
@@ -200,9 +218,12 @@ exports.webpmux_animate = (input_images, output_image, loop, bgcolor, logging = 
         //execute command
         exec(`"${webpmux()}"`, query.split(/\s+/), {shell: true}, (error, stdout, stderr) => {
             if (error) {
-                console.warn(error);
+                reject(error);
+            } else if (stderr){
+                reject(stderr);
+            } else {
+                resolve(stdout);
             }
-            resolve(stdout ? stdout : stderr);
         });
     });
 };
@@ -222,9 +243,12 @@ exports.webpmux_getframe = (input_image, output_image, frame_number, logging = '
         //execute command
         exec(`"${webpmux()}"`, query.split(/\s+/), {shell: true}, (error, stdout, stderr) => {
             if (error) {
-                console.warn(error);
+                reject(error);
+            } else if (stderr){
+                reject(stderr);
+            } else {
+                resolve(stdout);
             }
-            resolve(stdout ? stdout : stderr);
         });
     });
 };
