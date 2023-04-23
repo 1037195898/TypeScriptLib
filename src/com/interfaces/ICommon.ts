@@ -91,12 +91,33 @@ export interface ISkeletonData {
     y?: number,
     /** 关联对象 */
     relation?: ISKRelation,
+    /** 播放数据 */
+    play?: ISkeletonPlay,
     scaleX?: number,
     scaleY?: number,
     /** xy 公用的缩放值 */
     scale?: number,
     rot?
 
+}
+
+export interface ISkeletonPlay {
+    /**
+     * 播放某个动画
+     * @default 0
+     */
+    nameOrIndex?: string | number | (string | number)[],
+    /** 自动播放
+     * @default true
+     * */
+    loop?: boolean,
+    playComplete?: ParamHandler,
+    loaderComplete?: ParamHandler,
+    /**
+     * 是否支持换皮  -1 不设置
+     * @default -1
+     */
+    aniMode?: number
 }
 
 export interface ISKRelation {

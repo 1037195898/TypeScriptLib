@@ -79,7 +79,12 @@ export class SpineUtils {
         SkeletonClass ??= Laya.Utils.getFileExtension(url) === "json" ? GSpineSkeleton : GSkeleton
 
         const skeleton = new SkeletonClass()
-        SpineUtils.playSpine(skeleton, url)
+
+        optional.play ??= {}
+        optional.play.nameOrIndex ??= 0
+        optional.play.loop ??= true
+
+        SpineUtils.playSpine(skeleton, url, optional.play.nameOrIndex, optional.play.loop, optional.play.playComplete, optional.play.loaderComplete, optional.play.aniMode)
 
         optional.scaleX ??= skeleton.scaleX
         optional.scaleY ??= skeleton.scaleY

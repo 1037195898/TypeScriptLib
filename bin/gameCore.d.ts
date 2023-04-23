@@ -726,14 +726,6 @@ declare namespace coreLib {
         /** 更新bounds信息 */
         GAME_UPDATE_BOUNDS_INFO = "game_update_bounds_info"
     }
-    /** 加载资源配置 */
-    export class LoaderConfig {
-        /**
-         * 清理资源
-         * @param res 要清理的资源数组
-         */
-        static clear(res: LoadRes[]): void;
-    }
     export class BaseButton extends fgui.GButton implements IView {
         constructor();
         regAction(action: string, caller: any, method: Function, group?: string): void;
@@ -1774,6 +1766,14 @@ declare namespace coreLib {
         protected completeHandler(list: fgui.GList): void;
         dispose(): void;
     }
+    /** 加载资源配置 */
+    export class LoaderConfig {
+        /**
+         * 清理资源
+         * @param res 要清理的资源数组
+         */
+        static clear(res: LoadRes[]): void;
+    }
     export class GoldEffect extends View {
         private golds;
         private count;
@@ -2062,11 +2062,31 @@ declare namespace coreLib {
         y?: number;
         /** 关联对象 */
         relation?: ISKRelation;
+        /** 播放数据 */
+        play?: ISkeletonPlay;
         scaleX?: number;
         scaleY?: number;
         /** xy 公用的缩放值 */
         scale?: number;
         rot?: any;
+    }
+    export interface ISkeletonPlay {
+        /**
+         * 播放某个动画
+         * @default 0
+         */
+        nameOrIndex?: string | number | (string | number)[];
+        /** 自动播放
+         * @default true
+         * */
+        loop?: boolean;
+        playComplete?: ParamHandler;
+        loaderComplete?: ParamHandler;
+        /**
+         * 是否支持换皮  -1 不设置
+         * @default -1
+         */
+        aniMode?: number;
     }
     export interface ISKRelation {
         /** 上下左右关联对象 */
@@ -2454,291 +2474,6 @@ declare namespace coreLib {
         getView<T>(key: string | {
             new (): T;
         }): T;
-    }
-    /** 通信命令 */
-    export enum Cmd {
-        /** 大厅socket房间号 */
-        PROT_HOME = 999999,
-        /** 聊天内容 */
-        SOCKET_CHAT_MESSAGE = 1,
-        /** 中奖信息公告 */
-        SOCKET_WIN_INFO = 2,
-        /** 在线人数 */
-        SOCKET_ROOM_MONEY_MESSAGE = 3,
-        /** 充值状态 */
-        SOCKET_RECHARGE_STATUS = 4,
-        /** 余额变化 */
-        SOCKET_MONEY_CHANGE = 1001,
-        /** 黄金变化 */
-        SOCKET_GOLD_CHANGE = 1002,
-        /** 充值成功 */
-        SOCKET_TOP_UP_CHANGE = 1004,
-        /** 显示广播消息 */
-        SOCKET_SHOW_NOTICE = 12
-    }
-    /** 公用信息处理 */
-    export enum CommonCmd {
-        /** 游戏首页 */
-        GAME_HOME = 999999,
-        /** 水果 */
-        GAME_FRUIT = 1,
-        /** 大转盘 */
-        GAME_WHEEL = 2,
-        /** 百家乐 低倍 */
-        GAME_LOW_BACCARAT = 30,
-        /** 百家乐 高倍 */
-        GAME_HIGH_BACCARAT = 3,
-        /** 单机水果 低倍 */
-        GAME_ALONE_LOW_FRUIT = 1001,
-        /** 单机水果 高倍 */
-        GAME_ALONE_HIGH_FRUIT = 1002,
-        /** 刮刮奖 */
-        GAME_SCRATCHER = 1003,
-        /** 单机大转盘 低倍 */
-        GAME_ALONE_LOW_WHEEL = 2001,
-        /** 单机大转盘 高倍 */
-        GAME_ALONE_HIGH_WHEEL = 2002,
-        /** 翻牌机 */
-        GAME_FACE_UP = 3001,
-        /** 单机轮盘 */
-        GAME_ALONE_ROULETTE = 3002,
-        /** 动物园 */
-        GAME_ZOO = 3003,
-        /** 轮盘 */
-        GAME_ROULETTE = 3005,
-        /** 百家乐单机版 */
-        GAME_ALONE_BACCARAT = 3006,
-        /** 翻牌机单机版 */
-        GAME_ALONE_FACEUP = 3007,
-        /** 49游戏 */
-        GAME_FOUR_NINE = 3008,
-        /** 捕鱼游戏 */
-        GAME_FISHING = 3009,
-        /** 足球老虎机 */
-        GAME_FOOTBALL_SLOT_MACHINES = 3010,
-        /** 体育足彩 */
-        GAME_SPORTS = 10000,
-        /** 虚拟体育 */
-        GAME_VIRTUAL_SPORTS = 10001,
-        /** 游客模式玩游戏到达最大值 提示玩真钱 */
-        GUEST_MAX_PLAY_COUNT = 15,
-        /** web端玩游戏到达最大值 提示下载app */
-        WEB_MAX_PLAY_COUNT = 100,
-        /** 水果机最大下注值 */
-        FRUIT_MAX_BET = 1000,
-        /** 大转盘最大下注值 */
-        WHEEL_MAX_BET = 1000,
-        /** 百家乐最大下注值 */
-        BACCARAT_MAX_BET = 5000,
-        /** 动物园最大下注值 */
-        ZOO_MAX_BET = 1000,
-        /** 大满贯  全部中大的（除苹果核BAR）*/
-        GRAND_SLAM = 1,
-        /** 大火车   5节火车*/
-        MAX_CHOOCHOO = 2,
-        /** 小火车   3节火车*/
-        MIN_CHOOCHOO = 3,
-        /** 大三元   中三个大结果*/
-        DA_SAN_YUAN = 4,
-        /** 小满贯  全部中小的（除苹果核BAR）*/
-        LITTLE_SLAM = 5,
-        /** 小三元 */
-        XIAO_SAN_YUAN = 6,
-        /** 大四喜  中四个苹果*/
-        DA_SI_XI = 7,
-        /** 随机送灯  随机反弹一个结果*/
-        RANDOM = 8,
-        /** 金币 */
-        GAME_MONEY_TYPE_COINS = 2,
-        /** 赠送金 */
-        GAME_MONEY_TYPE_GIFT = 3
-    }
-    export class GameHttpRequest extends Laya.HttpRequest {
-        /** 请求数据完成 */
-        private completeHandler;
-        /** 请求错误 */
-        private errorHandler;
-        /** 超时 */
-        private timerOutHandler;
-        /** 超时时间 */
-        private overtime;
-        /**
-         * 创建一个请求
-         */
-        constructor();
-        onComplete(value: ParamHandler): void;
-        onTimerOut(value: ParamHandler): void;
-        onError(value: ParamHandler): void;
-        setOvertime(value: number): void;
-        send(url: string, data?: any, method?: string, responseType?: string, headers?: string[] | null): void;
-        private httpErrorHandler;
-        /** 请求返回结果数据 */
-        private resultHandler;
-        private timeOut;
-        /**
-         * 终止请求
-         */
-        abort(): void;
-    }
-    export class GameSocket extends Laya.EventDispatcher {
-        static SOCKET_CLASS_PATH: string;
-        protected MAX_CONNECT_TIME: number;
-        protected DELAY: number;
-        protected socket: any;
-        protected options: any;
-        protected auth: boolean;
-        alive: boolean;
-        /**
-         * 创建一个socket
-         * @param options 参数 url 连接地址 notify 回调方法 auth 认证
-         */
-        constructor(options: any);
-        createConnect(): void;
-        protected connect(): void;
-        closeHandler(msg?: any): void;
-        messageHandler(evt: any): void;
-        errorHandler(e: any): void;
-        openHandler(): void;
-        protected reConnect(): void;
-        protected heartbeat(): void;
-        protected getAuth(): void;
-        send(data: any): void;
-        close(): void;
-    }
-    export enum HttpCode {
-        /** 正确返回代码 */
-        OK = 200
-    }
-    export interface IHttpFilter {
-        /**
-         * 解析发送数据
-         * @param url 访问地址
-         * @param value 发送的数据
-         * @return 发送的数据
-         */
-        filterSendData(url: string, value: any): any;
-        /**
-         * 解析返回的数据
-         * @param url 访问地址
-         * @param value 返回的数据
-         * @return 返回的数据
-         */
-        filterResultData(url: string, value: any): any;
-        /**
-         * 拦截器 返回true 表示拦截不再继续执行后续的处理   false 表示继续执行后续的处理
-         * @param url 访问地址
-         * @param value 数据
-         * @param complete 成功数据
-         * @param error 失败数据
-         * @param timeout 超时
-         */
-        interceptSend(url: string, value: any, complete?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler): boolean;
-        /**
-         * 错误调用
-         * @param error
-         */
-        errorResult(error: any): void;
-        /** 自己解析通信数据 url->Handler   需要有返回方法 false 表示继续默认的处理模式 true 表示中止继续处理 */
-        customResult: {
-            [key: string]: ((url: string, value: any, complete?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler) => boolean) | Laya.Handler;
-        };
-        /**
-         * 解析服务器的时间 返回服务器时间毫秒
-         * @param data
-         */
-        parseData(data: any): number;
-    }
-    /** socket管理 */
-    export class SocketManager extends BaseSocket {
-        private static _instance;
-        static get inst(): SocketManager;
-        /** 当前连接的房间号 */
-        private _roomId;
-        /** 接受到的消息 */
-        private receiveData;
-        private _client;
-        static SocketClass: typeof GameSocket;
-        constructor();
-        /**
-         * 链接服务器socket
-         * @param roomId 房间号
-         * @param token token
-         * @param userId 用户id 默认 110
-         * @param url 连接地址 如果不存在 会使用 window.socketUrl
-         */
-        connect(roomId: number, token: string, userId?: number, url?: string): void;
-        private sendData;
-        /** 关闭链接 */
-        close(): void;
-        /** 服务器发来消息 */
-        onMessageReveived(data: any): void;
-        closeHandler(msg?: any): void;
-        messageHandler(evt: any): void;
-        errorHandler(e: any): void;
-        openHandler(): void;
-        get roomId(): number;
-        test(value: string): void;
-    }
-    /**
-     * url 参数
-     */
-    export class UrlParam {
-        private _amount;
-        private _inviteCode;
-        private openGame;
-        /** 国家 'ke'肯尼亚；'ug'乌干达, 'ng'尼日尼亚 */
-        private _country;
-        /** 语言 en zh-CN */
-        private _language;
-        /** 渠道平台 */
-        channel: string;
-        /** 0:ai  1:people 2:friend */
-        private _playWith;
-        private _roomId;
-        /** 1 守门员  2 踢球 */
-        private _role;
-        /** 是否是赠送金 0 没有 1 有 */
-        private _isGift;
-        /** 是否是debug模式 */
-        debug: boolean;
-        constructor();
-        parseData(json: any): void;
-        getValue(json: any, key: string): string;
-        get amount(): string;
-        get inviteCode(): string;
-        /**
-         * 是否是直接指定页面
-         * @return
-         */
-        isJumpPage(): boolean;
-        /**
-         * 清理跳转记录
-         */
-        clearJumpPage(): void;
-        get country(): string;
-        get language(): string;
-        get playWith(): string;
-        set playWith(value: string);
-        set roomId(value: string);
-        get roomId(): string;
-        get role(): number;
-        set role(value: number);
-        get isGift(): number;
-        set isGift(value: number);
-    }
-    export enum Urls {
-        /** 获取服务器时间 */
-        GAME_SERVER_TIME = "/game/server-time",
-        /** 优惠券投注 */
-        URL_COUPON_BET = "/game/coupon/bet",
-        /** 获取用户信息 */
-        URL_USER_INFO = "/user/info",
-        /** 获取用户账户金额 */
-        URL_USER_ACCOUNT_ASSET = "/account/asset",
-        /** gift 抽奖开奖结果 */
-        URL_GAME_SCRATCHER_LOTTERY = "/game/scratcher/handle",
-        /** 获取所有优惠券 */
-        URL_GAME_ALL_COUPON = "/coupon/all?"
     }
     /**
      * 统计管理器
@@ -3193,64 +2928,290 @@ declare namespace coreLib {
          */
         sendErrorLog(data: any): void;
     }
-    /** 卡牌 */
-    export class Card extends BaseLabel {
-        /** 卡牌的id */
-        code: number;
-        /** 卡牌面值 */
-        value: number;
-        /** 卡牌名字 */
-        nameCard: string;
-        /** 卡牌花色 */
-        suit: number;
-        /** 卡牌花色名字 */
-        _suitName: string;
-        /** 初始化X */
-        initX: number;
-        /** 初始化Y */
-        initY: number;
-        /** XY偏移量 */
-        offset: number;
-        /** 偏移倍数 */
-        offsetMultiple: number;
-        /** 中心点 */
-        tempPivot: Laya.Point;
-        constructor();
-        init(id: number): void;
-        protected suitName(value: number): string;
-        createUI(): void;
+    /** 通信命令 */
+    export enum Cmd {
+        /** 大厅socket房间号 */
+        PROT_HOME = 999999,
+        /** 聊天内容 */
+        SOCKET_CHAT_MESSAGE = 1,
+        /** 中奖信息公告 */
+        SOCKET_WIN_INFO = 2,
+        /** 在线人数 */
+        SOCKET_ROOM_MONEY_MESSAGE = 3,
+        /** 充值状态 */
+        SOCKET_RECHARGE_STATUS = 4,
+        /** 余额变化 */
+        SOCKET_MONEY_CHANGE = 1001,
+        /** 黄金变化 */
+        SOCKET_GOLD_CHANGE = 1002,
+        /** 充值成功 */
+        SOCKET_TOP_UP_CHANGE = 1004,
+        /** 显示广播消息 */
+        SOCKET_SHOW_NOTICE = 12
     }
-    export class Deck {
-        /** 存放的卡牌 */
-        cards: Card[];
-        /** 已经完成了动画个数 */
-        private completeNum;
-        /** 动画执行次数 */
-        private executeNum;
-        /** 是否正在运行动画 */
-        private isRun;
-        private handler;
-        createCard(): void;
+    /** 公用信息处理 */
+    export enum CommonCmd {
+        /** 游戏首页 */
+        GAME_HOME = 999999,
+        /** 水果 */
+        GAME_FRUIT = 1,
+        /** 大转盘 */
+        GAME_WHEEL = 2,
+        /** 百家乐 低倍 */
+        GAME_LOW_BACCARAT = 30,
+        /** 百家乐 高倍 */
+        GAME_HIGH_BACCARAT = 3,
+        /** 单机水果 低倍 */
+        GAME_ALONE_LOW_FRUIT = 1001,
+        /** 单机水果 高倍 */
+        GAME_ALONE_HIGH_FRUIT = 1002,
+        /** 刮刮奖 */
+        GAME_SCRATCHER = 1003,
+        /** 单机大转盘 低倍 */
+        GAME_ALONE_LOW_WHEEL = 2001,
+        /** 单机大转盘 高倍 */
+        GAME_ALONE_HIGH_WHEEL = 2002,
+        /** 翻牌机 */
+        GAME_FACE_UP = 3001,
+        /** 单机轮盘 */
+        GAME_ALONE_ROULETTE = 3002,
+        /** 动物园 */
+        GAME_ZOO = 3003,
+        /** 轮盘 */
+        GAME_ROULETTE = 3005,
+        /** 百家乐单机版 */
+        GAME_ALONE_BACCARAT = 3006,
+        /** 翻牌机单机版 */
+        GAME_ALONE_FACEUP = 3007,
+        /** 49游戏 */
+        GAME_FOUR_NINE = 3008,
+        /** 捕鱼游戏 */
+        GAME_FISHING = 3009,
+        /** 足球老虎机 */
+        GAME_FOOTBALL_SLOT_MACHINES = 3010,
+        /** 体育足彩 */
+        GAME_SPORTS = 10000,
+        /** 虚拟体育 */
+        GAME_VIRTUAL_SPORTS = 10001,
+        /** 游客模式玩游戏到达最大值 提示玩真钱 */
+        GUEST_MAX_PLAY_COUNT = 15,
+        /** web端玩游戏到达最大值 提示下载app */
+        WEB_MAX_PLAY_COUNT = 100,
+        /** 水果机最大下注值 */
+        FRUIT_MAX_BET = 1000,
+        /** 大转盘最大下注值 */
+        WHEEL_MAX_BET = 1000,
+        /** 百家乐最大下注值 */
+        BACCARAT_MAX_BET = 5000,
+        /** 动物园最大下注值 */
+        ZOO_MAX_BET = 1000,
+        /** 大满贯  全部中大的（除苹果核BAR）*/
+        GRAND_SLAM = 1,
+        /** 大火车   5节火车*/
+        MAX_CHOOCHOO = 2,
+        /** 小火车   3节火车*/
+        MIN_CHOOCHOO = 3,
+        /** 大三元   中三个大结果*/
+        DA_SAN_YUAN = 4,
+        /** 小满贯  全部中小的（除苹果核BAR）*/
+        LITTLE_SLAM = 5,
+        /** 小三元 */
+        XIAO_SAN_YUAN = 6,
+        /** 大四喜  中四个苹果*/
+        DA_SI_XI = 7,
+        /** 随机送灯  随机反弹一个结果*/
+        RANDOM = 8,
+        /** 金币 */
+        GAME_MONEY_TYPE_COINS = 2,
+        /** 赠送金 */
+        GAME_MONEY_TYPE_GIFT = 3
+    }
+    export class GameHttpRequest extends Laya.HttpRequest {
+        /** 请求数据完成 */
+        private completeHandler;
+        /** 请求错误 */
+        private errorHandler;
+        /** 超时 */
+        private timerOutHandler;
+        /** 超时时间 */
+        private overtime;
         /**
-         * 收集牌
-         * @param handler
-         * @param sort 是否需要排序
+         * 创建一个请求
          */
-        sort(handler?: ParamHandler, sort?: boolean): void;
-        /** 展示牌 铺开 */
-        bySuit(handler?: Laya.Handler): void;
-        /** 展示牌 */
-        fan(handler?: Laya.Handler): void;
+        constructor();
+        onComplete(value: ParamHandler): void;
+        onTimerOut(value: ParamHandler): void;
+        onError(value: ParamHandler): void;
+        setOvertime(value: number): void;
+        send(url: string, data?: any, method?: string, responseType?: string, headers?: string[] | null): void;
+        private httpErrorHandler;
+        /** 请求返回结果数据 */
+        private resultHandler;
+        private timeOut;
         /**
-         * 洗牌
-         * @param handler 执行完成回调
-         * @param num 执行次数 暂未实现
+         * 终止请求
          */
-        shuffle(handler?: Laya.Handler, num?: number): void;
-        private moveHandler;
-        private plusMinus;
-        setChildIndexHandler(card: Card, index: number): void;
-        dispose(): void;
+        abort(): void;
+    }
+    export class GameSocket extends Laya.EventDispatcher {
+        static SOCKET_CLASS_PATH: string;
+        protected MAX_CONNECT_TIME: number;
+        protected DELAY: number;
+        protected socket: any;
+        protected options: any;
+        protected auth: boolean;
+        alive: boolean;
+        /**
+         * 创建一个socket
+         * @param options 参数 url 连接地址 notify 回调方法 auth 认证
+         */
+        constructor(options: any);
+        createConnect(): void;
+        protected connect(): void;
+        closeHandler(msg?: any): void;
+        messageHandler(evt: any): void;
+        errorHandler(e: any): void;
+        openHandler(): void;
+        protected reConnect(): void;
+        protected heartbeat(): void;
+        protected getAuth(): void;
+        send(data: any): void;
+        close(): void;
+    }
+    export enum HttpCode {
+        /** 正确返回代码 */
+        OK = 200
+    }
+    export interface IHttpFilter {
+        /**
+         * 解析发送数据
+         * @param url 访问地址
+         * @param value 发送的数据
+         * @return 发送的数据
+         */
+        filterSendData(url: string, value: any): any;
+        /**
+         * 解析返回的数据
+         * @param url 访问地址
+         * @param value 返回的数据
+         * @return 返回的数据
+         */
+        filterResultData(url: string, value: any): any;
+        /**
+         * 拦截器 返回true 表示拦截不再继续执行后续的处理   false 表示继续执行后续的处理
+         * @param url 访问地址
+         * @param value 数据
+         * @param complete 成功数据
+         * @param error 失败数据
+         * @param timeout 超时
+         */
+        interceptSend(url: string, value: any, complete?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler): boolean;
+        /**
+         * 错误调用
+         * @param error
+         */
+        errorResult(error: any): void;
+        /** 自己解析通信数据 url->Handler   需要有返回方法 false 表示继续默认的处理模式 true 表示中止继续处理 */
+        customResult: {
+            [key: string]: ((url: string, value: any, complete?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler) => boolean) | Laya.Handler;
+        };
+        /**
+         * 解析服务器的时间 返回服务器时间毫秒
+         * @param data
+         */
+        parseData(data: any): number;
+    }
+    /** socket管理 */
+    export class SocketManager extends BaseSocket {
+        private static _instance;
+        static get inst(): SocketManager;
+        /** 当前连接的房间号 */
+        private _roomId;
+        /** 接受到的消息 */
+        private receiveData;
+        private _client;
+        static SocketClass: typeof GameSocket;
+        constructor();
+        /**
+         * 链接服务器socket
+         * @param roomId 房间号
+         * @param token token
+         * @param userId 用户id 默认 110
+         * @param url 连接地址 如果不存在 会使用 window.socketUrl
+         */
+        connect(roomId: number, token: string, userId?: number, url?: string): void;
+        private sendData;
+        /** 关闭链接 */
+        close(): void;
+        /** 服务器发来消息 */
+        onMessageReveived(data: any): void;
+        closeHandler(msg?: any): void;
+        messageHandler(evt: any): void;
+        errorHandler(e: any): void;
+        openHandler(): void;
+        get roomId(): number;
+        test(value: string): void;
+    }
+    /**
+     * url 参数
+     */
+    export class UrlParam {
+        private _amount;
+        private _inviteCode;
+        private openGame;
+        /** 国家 'ke'肯尼亚；'ug'乌干达, 'ng'尼日尼亚 */
+        private _country;
+        /** 语言 en zh-CN */
+        private _language;
+        /** 渠道平台 */
+        channel: string;
+        /** 0:ai  1:people 2:friend */
+        private _playWith;
+        private _roomId;
+        /** 1 守门员  2 踢球 */
+        private _role;
+        /** 是否是赠送金 0 没有 1 有 */
+        private _isGift;
+        /** 是否是debug模式 */
+        debug: boolean;
+        constructor();
+        parseData(json: any): void;
+        getValue(json: any, key: string): string;
+        get amount(): string;
+        get inviteCode(): string;
+        /**
+         * 是否是直接指定页面
+         * @return
+         */
+        isJumpPage(): boolean;
+        /**
+         * 清理跳转记录
+         */
+        clearJumpPage(): void;
+        get country(): string;
+        get language(): string;
+        get playWith(): string;
+        set playWith(value: string);
+        set roomId(value: string);
+        get roomId(): string;
+        get role(): number;
+        set role(value: number);
+        get isGift(): number;
+        set isGift(value: number);
+    }
+    export enum Urls {
+        /** 获取服务器时间 */
+        GAME_SERVER_TIME = "/game/server-time",
+        /** 优惠券投注 */
+        URL_COUPON_BET = "/game/coupon/bet",
+        /** 获取用户信息 */
+        URL_USER_INFO = "/user/info",
+        /** 获取用户账户金额 */
+        URL_USER_ACCOUNT_ASSET = "/account/asset",
+        /** gift 抽奖开奖结果 */
+        URL_GAME_SCRATCHER_LOTTERY = "/game/scratcher/handle",
+        /** 获取所有优惠券 */
+        URL_GAME_ALL_COUPON = "/coupon/all?"
     }
     export interface IConchRenderObject {
         drawSubmesh(submesh: any, drawType: number, renderMode: number, offset: number, count: number): void;
@@ -3401,6 +3362,829 @@ declare namespace coreLib {
         static conchMarket: IMarket;
         /**@private PlatformClass类，只有加速器模式下才有值 */
         static PlatformClass: ICPlatformClass;
+    }
+    /** 卡牌 */
+    export class Card extends BaseLabel {
+        /** 卡牌的id */
+        code: number;
+        /** 卡牌面值 */
+        value: number;
+        /** 卡牌名字 */
+        nameCard: string;
+        /** 卡牌花色 */
+        suit: number;
+        /** 卡牌花色名字 */
+        _suitName: string;
+        /** 初始化X */
+        initX: number;
+        /** 初始化Y */
+        initY: number;
+        /** XY偏移量 */
+        offset: number;
+        /** 偏移倍数 */
+        offsetMultiple: number;
+        /** 中心点 */
+        tempPivot: Laya.Point;
+        constructor();
+        init(id: number): void;
+        protected suitName(value: number): string;
+        createUI(): void;
+    }
+    export class Deck {
+        /** 存放的卡牌 */
+        cards: Card[];
+        /** 已经完成了动画个数 */
+        private completeNum;
+        /** 动画执行次数 */
+        private executeNum;
+        /** 是否正在运行动画 */
+        private isRun;
+        private handler;
+        createCard(): void;
+        /**
+         * 收集牌
+         * @param handler
+         * @param sort 是否需要排序
+         */
+        sort(handler?: ParamHandler, sort?: boolean): void;
+        /** 展示牌 铺开 */
+        bySuit(handler?: Laya.Handler): void;
+        /** 展示牌 */
+        fan(handler?: Laya.Handler): void;
+        /**
+         * 洗牌
+         * @param handler 执行完成回调
+         * @param num 执行次数 暂未实现
+         */
+        shuffle(handler?: Laya.Handler, num?: number): void;
+        private moveHandler;
+        private plusMinus;
+        setChildIndexHandler(card: Card, index: number): void;
+        dispose(): void;
+    }
+    export class ActivityButton extends BaseButton {
+        private tempValue;
+        private clickInvalid;
+        callback: ParamHandler;
+        private contentText;
+        /** 当没有优惠卷使用的时候 是否自动隐藏 */
+        isAutoHide: boolean;
+        /** 自定义更新文字显示 */
+        updateText: ParamHandler;
+        constructor();
+        protected constructFromXML(xml: any): void;
+        private stopUseActivityHandler;
+        private useActivityHandler;
+        private updateShow;
+        /**
+         * 设置角标
+         * @param value 剩余数量
+         */
+        setCorner(value: number): void;
+        private clickHandler;
+        private addedHandler;
+        /** 打开拖动 */
+        openDrag(): void;
+        private onDragEnd;
+        private onDragStart;
+    }
+    /**
+     * 弹窗层
+     * @author boge
+     */
+    export class AlertPanel extends fgui.GComponent {
+        private static _instance;
+        static get inst(): AlertPanel;
+        constructor();
+        private __winResize;
+    }
+    /**
+     * 洗牌的牌
+     * @author boge
+     *
+     */
+    export class CardDeck extends BaseView {
+        static NAME: string;
+        private load;
+        /** 在数组中的位置 */
+        pos: number;
+        constructor();
+        protected constructFromXML(xml: any): void;
+        shuffle(func: ParamHandler): void;
+        private plusMinus;
+        setUrl(url: string): void;
+        revert(): void;
+        static create(): CardDeck;
+    }
+    export class GamePopupMenu extends fgui.PopupMenu {
+        private target;
+        closeHandler: ParamHandler;
+        constructor(resourceURL?: string);
+        private onUnDisplay;
+        show(target?: fgui.GObject, dir?: fgui.PopupDirection | boolean): void;
+        addIconItem(caption: string, handler?: Laya.Handler): fairygui.GButton;
+        addIconTitleItem(title: string, caption: string, select: string, handler?: Laya.Handler): fairygui.GButton;
+        dispose(): void;
+    }
+    export class GGraphicsAni extends Laya.GraphicsAni {
+        boneSlotName: string;
+        static create(): GGraphicsAni;
+        drawTexture(texture: Laya.Texture | null, x?: number, y?: number, width?: number, height?: number, matrix?: Laya.Matrix | null, alpha?: number, color?: string | null, blendMode?: string | null, uv?: number[]): Laya.DrawTextureCmd | null;
+        clear(recoverCmds?: boolean): void;
+    }
+    export class GLoader3D extends fgui.GObject {
+        private _url;
+        private _align;
+        private _verticalAlign;
+        private _autoSize;
+        private _fill;
+        private _shrinkOnly;
+        private _playing;
+        private _frame;
+        private _loop;
+        private _animationName;
+        private _skinName;
+        private _color;
+        private _contentItem;
+        private _container;
+        private _content;
+        private _updatingLayout;
+        private loadSkeleton;
+        /** 是否有描点 */
+        isAnchor: boolean;
+        constructor();
+        protected createDisplayObject(): void;
+        dispose(): void;
+        get url(): string;
+        set url(value: string);
+        get icon(): string;
+        set icon(value: string);
+        get align(): string;
+        set align(value: string);
+        get verticalAlign(): string;
+        set verticalAlign(value: string);
+        get fill(): number;
+        set fill(value: number);
+        get shrinkOnly(): boolean;
+        set shrinkOnly(value: boolean);
+        get autoSize(): boolean;
+        set autoSize(value: boolean);
+        get playing(): boolean;
+        set playing(value: boolean);
+        get frame(): number;
+        set frame(value: number);
+        get animationName(): string;
+        set animationName(value: string);
+        get skinName(): string;
+        set skinName(value: string);
+        get loop(): boolean;
+        set loop(value: boolean);
+        get color(): string;
+        set color(value: string);
+        get content(): Laya.Sprite;
+        protected loadContent(): void;
+        setSkeleton(skeleton: Laya.Skeleton, anchor?: Laya.Point): void;
+        private onPlayed;
+        private onStopped;
+        private onPaused;
+        private onLabel;
+        /**
+         * 播放动画
+         * @param    nameOrIndex    动画名字或者索引
+         * @param    loop        是否循环播放
+         */
+        play(nameOrIndex: string | number, loop: boolean): void;
+        /**
+         * 停止动画
+         */
+        stop(): void;
+        private onChange;
+        protected loadExternal(): void;
+        private loadEndHandler;
+        private updateLayout;
+        private clearContent;
+        protected handleSizeChanged(): void;
+    }
+    export class GlobalWaiting extends fgui.GComponent {
+        /** 显示内容 */
+        private messageText;
+        constructor();
+        protected constructFromXML(xml: any): void;
+        private onInit;
+        set text(value: string);
+    }
+    export class GSkeleton extends fgui.GComponent {
+        /** 骨骼更新  cmd:DrawTextureCmd  */
+        static readonly UPDATE_BONE_SLOT = "update_bone_slot";
+        /** 经过时间 */
+        private _t;
+        private p1;
+        private p2;
+        private p3;
+        private p4;
+        /** 是否使用混合模式 */
+        isBlendModeAdd: boolean;
+        /** 使用混合模式的插槽 */
+        blendBoneSlotNames: string[];
+        /** 指定的骨骼忽略XY偏移量 */
+        readonly clearBoneSlotOffset: string[];
+        /** 指定的骨骼忽略X偏移量 */
+        readonly clearBoneSlotOffsetX: string[];
+        /** 指定的骨骼忽略Y偏移量 */
+        readonly clearBoneSlotOffsetY: string[];
+        aniMode: number;
+        private _aniPath;
+        private _complete;
+        private _loadAniMode;
+        /** 播放动画组 */
+        private playGroup;
+        private playGroupIndex;
+        /** 播放数组 附带参数 */
+        private playGroupArgs;
+        /** 自定义缓存的Templet名字 */
+        cacheName: string;
+        /** 缓存每次播放的名字或下标 */
+        nameOrIndex: string | number;
+        /** 播放结束执行函数 */
+        private stoppedHandler;
+        /**
+         * 动画播放速率 1为标准速率
+         */
+        playbackRate: number;
+        constructor(aniMode?: number);
+        protected createDisplayObject(): void;
+        get asSkeleton(): Laya.Skeleton;
+        /**
+         * 通过加载直接创建动画
+         * @param    url        要加载的动画文件路径
+         * @param    handler    加载完成的回调函数
+         * @param    aniMode        与<code>Skeleton.init</code>的<code>aniMode</code>作用一致
+         */
+        load(url: string, handler: ParamHandler, aniMode?: number): void;
+        /**
+         * 加载完成
+         */
+        private _onLoaded;
+        /**
+         * 解析完成
+         */
+        private _parseComplete;
+        /**
+         * 解析失败
+         */
+        private _parseFail;
+        /**
+         * 播放动画
+         *
+         * @param    nameOrIndex    动画名字或者索引
+         * @param    loop        是否循环播放
+         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
+         * @param    start        起始时间
+         * @param    end            结束时间
+         * @param    freshSkin    是否刷新皮肤数据
+         */
+        play(nameOrIndex: string | number | (string | number)[], loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
+        /**
+         * 延迟播放动画
+         * @param    playDelay    延迟时间
+         * @param    nameOrIndex    动画名字或者索引
+         * @param    loop        是否循环播放
+         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
+         * @param    start        起始时间
+         * @param    end            结束时间
+         * @param    freshSkin    是否刷新皮肤数据
+         */
+        playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[], loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
+        private onPlayStopped;
+        private startPlay;
+        paused(): void;
+        resume(): void;
+        stop(): void;
+        /**
+         * 通过名字显示一套皮肤
+         * @param    name    皮肤的名字
+         * @param    freshSlotIndex    是否将插槽纹理重置到初始化状态
+         */
+        showSkinByName(name: string, freshSlotIndex?: boolean): void;
+        /**
+         * 通过索引显示一套皮肤
+         * @param    skinIndex    皮肤索引
+         * @param    freshSlotIndex    是否将插槽纹理重置到初始化状态
+         */
+        showSkinByIndex(skinIndex: number, freshSlotIndex?: boolean): void;
+        getAniIndexByName(name: string): any;
+        getAniNameByIndex(index: number): string;
+        getAnimation(index: number): AnimationContent;
+        get currAniIndex(): number;
+        /**
+         * 根据动作名和插槽骨骼名,来获取该骨骼在该动作播放时,每一帧该骨骼坐标位置,返回所有帧数骨骼坐标位置组成的列表
+         * @param nameOrIndex
+         * @param boneName
+         */
+        getBoneCoords(nameOrIndex: string | number, boneName: string): number[];
+        getSlotXByName(name: string): number;
+        getSlotYByName(name: string): number;
+        getSlotPointByName(name: string): Laya.Point;
+        getBoneSlotByName(name: string): Laya.BoneSlot;
+        private static _emptyTexture;
+        static get emptyTexture(): Laya.Texture;
+        /**
+         * 设置插槽的某个皮肤
+         * @param slotName 插槽名字
+         * @param skin Laya.Texture 或 fairygui 的路径  如：//package/skin
+         */
+        setSlotSkin(slotName: string, skin?: Laya.Texture | string): void;
+        /**
+         * 换装的时候，需要清一下缓冲区
+         */
+        private clearCache;
+        on(type: string, thisObject: any, listener: Function, args?: any[]): void;
+        off(type: string, thisObject: any, listener: Function): void;
+        offAll(type?: string): void;
+        dispose(): void;
+        get t(): number;
+        set t(value: number);
+        getX(): number;
+        getY(): number;
+        setStartPoint(tempX: number, tempY: number): void;
+        setMiddlePoint(tempX: number, tempY: number): void;
+        setMiddlePoint2(tempX: number, tempY: number, tempX2: number, tempY2: number): void;
+        setEndPoint(tempX: number, tempY: number): void;
+    }
+    export class AnimationNodeContent {
+        name: string;
+        parentIndex: number;
+        parent: AnimationNodeContent;
+        keyframeWidth: number;
+        lerpType: number;
+        interpolationMethod: any[];
+        childs: any[];
+        keyFrame: Laya.KeyFramesContent[];
+        playTime: number;
+        extenData: ArrayBuffer;
+        dataOffset: number;
+    }
+    export class AnimationContent {
+        nodes: AnimationNodeContent[];
+        name: string;
+        playTime: number;
+        bone3DMap: any;
+        totalKeyframeDatasLength: number;
+    }
+    export class GSpineSkeleton extends fgui.GComponent {
+        /** 经过时间 */
+        private _t;
+        private p1;
+        private p2;
+        private p3;
+        private p4;
+        private _aniPath;
+        private _complete;
+        /** 播放动画组 */
+        private playGroup;
+        private playGroupIndex;
+        /** 播放结束执行函数 */
+        private stoppedHandler;
+        private readonly ver;
+        private spineSkeleton;
+        private template;
+        constructor(ver?: Laya.SpineVersion);
+        protected createDisplayObject(): void;
+        get asSkeleton(): Laya.SpineSkeleton;
+        /**
+         * 加载json 或 skel格式的骨骼文件
+         * @param jsonOrSkelUrl
+         * @param handler 回调方法
+         */
+        load(jsonOrSkelUrl: string, handler: ParamHandler): void;
+        get aniPath(): string;
+        private onComplete;
+        set touchable(value: boolean);
+        get touchable(): boolean;
+        /**
+         * 播放动画
+         *
+         * @param    nameOrIndex    动画名字或者索引
+         * @param    loop        是否循环播放
+         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
+         * @param    start        起始时间
+         * @param    end            结束时间
+         * @param    freshSkin    是否刷新皮肤数据
+         * @param    playAudio    是否播放音频
+         */
+        play(nameOrIndex: string | number | (string | number)[], loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
+        private onPlayStopped;
+        paused(): void;
+        resume(): void;
+        stop(): void;
+        /**
+         * 通过名字显示一套皮肤
+         * @param    name    皮肤的名字
+         */
+        showSkinByName(name: string): void;
+        /**
+         * 通过索引显示一套皮肤
+         * @param    skinIndex    皮肤索引
+         */
+        showSkinByIndex(skinIndex: number): void;
+        /**
+         * 得到指定动画的索引
+         * @param aniName 动画名字
+         */
+        getAniIndexByName(aniName: string): number;
+        getAniNameByIndex(index: number): string;
+        get currAniIndex(): number;
+        set hitArea(rec: Laya.Rectangle);
+        on(type: string, thisObject: any, listener: Function, args?: any[]): void;
+        off(type: string, thisObject: any, listener: Function): void;
+        offAll(type?: string): void;
+        get t(): number;
+        set t(value: number);
+        getX(): number;
+        getY(): number;
+        setStartPoint(tempX: number, tempY: number): void;
+        setMiddlePoint(tempX: number, tempY: number): void;
+        setMiddlePoint2(tempX: number, tempY: number, tempX2: number, tempY2: number): void;
+        setEndPoint(tempX: number, tempY: number): void;
+        dispose(): void;
+    }
+    /** 提示框 */
+    export class HomePrompt extends BaseWindow {
+        private static _instance;
+        static get instance(): HomePrompt;
+        /** 当前显示面板控制器 */
+        private controller;
+        /** ok按钮 */
+        private okBtn;
+        /** 取消 */
+        private cancelBtn;
+        /** 显示的内容 */
+        private message;
+        private callback;
+        private cancelCallback;
+        constructor();
+        protected onInit(): void;
+        private cancelHandler;
+        private okHandler;
+        protected onShown(): void;
+        /**
+         * 显示提示框
+         * @param code 0 公告提示框 1两个选择按钮提示
+         * @param content 显示内容 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
+         * @param callback 确定调用函数
+         * @param cancelCallback 取消调用函数
+         * @param obj 附带设置 (okName:'', cancelName:'')
+         *
+         */
+        showTip(code: number, content: string | number | any[], callback?: Function, cancelCallback?: Function, obj?: any): void;
+        hideRecord(): void;
+    }
+    export class HtmlWindow extends fgui.Window implements IRecord {
+        private static _instance;
+        static get inst(): HtmlWindow;
+        private closeHandler;
+        /** 页面名字 */
+        private htmlText;
+        private btn;
+        private obj;
+        private tempX;
+        private tempY;
+        /** 加载动画控制器 */
+        private loadMovieClip;
+        constructor();
+        protected onInit(): void;
+        protected onShown(): void;
+        private sizeChangeHandler;
+        /**
+         * 新打开一个html浏览窗口
+         * @param url 加载地址
+         * @param full 是否全屏
+         * @param closeHandler 此界面关闭后回调
+         */
+        openHtml(url: string, full?: boolean, closeHandler?: ParamHandler): void;
+        /**
+         * 弹出一个html浏览窗口
+         * @param url 加载地址
+         * @param full 是否全屏
+         * @param closeHandler 此界面关闭后回调
+         *
+         */
+        showTip(url: string, full?: boolean, closeHandler?: ParamHandler): void;
+        private popFullIframeHandler;
+        /** 修正宽高 */
+        _syncInputTransform(): void;
+        share(type: number, url: string, content: string): void;
+        hide(): void;
+        hideRecord(): void;
+        showRecord(): void;
+    }
+    /** 图片窗口 */
+    export class ImageWindow extends BaseWindow {
+        private static _instance;
+        static get inst(): ImageWindow;
+        constructor();
+        protected onInit(): void;
+        showTip(url: string): void;
+    }
+    /** 加载界面 */
+    export class LoadingWindow extends BaseView {
+        private static _instance;
+        static get inst(): LoadingWindow;
+        private headText;
+        private loader;
+        private mesText;
+        /** 当前进度 */
+        private tempValue;
+        private dian;
+        private controller;
+        constructor();
+        protected onInit(): void;
+        /**
+         * 显示
+         * @param index 显示的形式
+         * @param headText 使用头文本
+         *
+         */
+        show(index?: number, headText?: string): void;
+        private changeHandler;
+        /**
+         * 更新进度
+         * @param value 当前模块进度值
+         * @param tempCount 当前加载进度模块 1 开始
+         * @param totalCount 总共要加载的模块数
+         */
+        updateMsg(value: number, tempCount?: number, totalCount?: number): void;
+        /**
+         * 更新进度
+         * @param value 当前模块进度值
+         * @param tempCount 当前加载进度模块 1 开始
+         * @param totalCount 总共要加载的模块数
+         */
+        static getProgress(value: number, tempCount?: number, totalCount?: number): number;
+        /**
+         * 显示加载错误提示
+         * @param value
+         *
+         */
+        showError(value: string): void;
+        private getMsg;
+        /** 替换加载图片 */
+        loaderUrl(url: string): void;
+        hide(): void;
+    }
+    /** 消息提示框 */
+    export class MessageTip extends fgui.GComponent {
+        private static NAME;
+        /** 使用中的 */
+        private static usePool;
+        /** 缓存的内容 */
+        private static cacheContent;
+        /** 展示时间 */
+        static displayTime: number;
+        content: fgui.GTextField;
+        tween: Laya.Tween;
+        /** 缓存的字体大小 */
+        tempFontSize: number;
+        constructor();
+        protected constructFromXML(xml: any): void;
+        /**
+         * 设置显示文本字体大小
+         * @param value 大小
+         */
+        set fontSize(value: number);
+        get fontSize(): number;
+        /**
+         * 显示文本提示框
+         * @see LibStr
+         * @param value 内容 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
+         */
+        static showTip(value: string | number | any[]): void;
+        private static createHandler;
+        /**
+         * 显示弹窗内容
+         */
+        private static showMes;
+        private static movePoint;
+        private static showEnd;
+        private static hideEnd;
+        /** 清楚所有提示 */
+        static clearAll(): void;
+    }
+    export class MyGLoader extends fgui.GLoader {
+        constructor();
+        protected onExternalLoadSuccess(texture: Laya.Texture): void;
+        protected loadFromPackage(itemURL: string): void;
+        protected onExternalLoadFailed(): void;
+    }
+    export class NoticeView extends BaseView {
+        static NAME: string;
+        private richText;
+        private tempX;
+        /** 是否在滚动 */
+        private isRun;
+        private gameData;
+        constructor();
+        protected onInit(): void;
+        protected addedHandler(): void;
+        showText(values: any[]): void;
+        /** 开始滚动 */
+        private startRun;
+        private loopHandler;
+        /** 更新内容 并重置位置 */
+        private updateNoticeContent;
+        private stopRun;
+        /** 重置位置 */
+        private resetMsgPosition;
+        dispose(): void;
+    }
+    export class NumButton extends BaseButton {
+        private component;
+        private cornerMarker;
+        /** 绑定位置对象 */
+        bindObject: any;
+        /** 偏移位置 */
+        offX: number;
+        /** 偏移位置 */
+        offY: number;
+        private tempValue;
+        constructor();
+        protected constructFromXML(xml: any): void;
+        private stateChangedHandler;
+        /** 更新绑定位置 */
+        updateBindPoint(): void;
+        /**
+         * 设置角标
+         * @param value 剩余数量
+         */
+        setCorner(value: number): void;
+    }
+    export class ProgressBar extends fgui.GProgressBar {
+        constructor();
+        protected constructFromXML(xml: any): void;
+        tweenValue2(value: number, duration: number, complete?: ParamHandler): fgui.GTweener;
+        regAction(action: string, caller: any, method: Function, group?: string): void;
+        regActionHandler(action: string, handler: Laya.Handler, group?: string): void;
+        removeAllAction(...arge: any[]): void;
+        removeGroup(group: string): void;
+        removeGroupActions(group: string, ...arge: any[]): void;
+        removeActionHandler(action: string, method: Function, group?: string): void;
+        sendAction(action: string, ...arge: any[]): void;
+        sendGroupAction(group: string, action: string, ...arge: any[]): void;
+        /** 注册游戏数据 */
+        regGameAction(action: string, caller: any, method: Function): void;
+        addView(key: string, view: View): boolean;
+        removeView(key: string): void;
+        getView(key: string): unknown;
+        getProxy(name: string): Proxys;
+    }
+    /** 文案提示 */
+    export class PromptTip extends BaseLabel {
+        private target;
+        private downward;
+        constructor();
+        protected constructFromXML(xml: any): void;
+        static createPromptTip(): PromptTip;
+        /**
+         * 显示提示文本
+         * @param comp 绑定显示按钮位置
+         * @param downward 是否在下面
+         */
+        show(comp: fgui.GComponent, downward?: any): void;
+        private showViewHandler;
+        hide(): void;
+        private updatePoint;
+        dispose(): void;
+    }
+    /** 提示框 */
+    export class PromptWindow extends BaseWindow {
+        private static _instance;
+        static get inst(): PromptWindow;
+        private content;
+        private callback;
+        /** 确定取消 */
+        private cancelBtn;
+        /** 确定 */
+        private continueBtn;
+        /** 提示框的击中类型 */
+        private controller;
+        private continueFun;
+        /** 缓存的提示框 */
+        private cacheMessage;
+        constructor();
+        protected onInit(): void;
+        private continueHandler;
+        private cancelHandler;
+        protected onHide(): void;
+        /** 结束回调 */
+        endCallHandler(): void;
+        /** 清理缓存 */
+        clearCache(): void;
+        /**
+         * 带确认按钮的提示框
+         * @param msg 显示提示 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
+         * @param callback 确定回调方法
+         * @param isAction 动画显示或关闭
+         *
+         * @deprecated
+         * @see LibStr
+         * @see ActionLib.GAME_SHOW_PROMPT_WINDOW
+         */
+        showTip(msg: string | number | any[], callback?: ParamHandler, isAction?: boolean): void;
+        /**
+         * 带确认 取消按钮的提示框
+         * @param msg 显示提示 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
+         * @param obj 附带设置 (okName:'', cancelName:'')
+         * @param callback 取消回调方法
+         * @param continueFun 确定回调方法
+         * @param isAction 动画显示或关闭
+         * @deprecated
+         * @see LibStr
+         * @see ActionLib.GAME_SHOW_PROMPT_CANCEL_WINDOW
+         */
+        showCancelTip(msg: string | number | any[], obj?: IPromptData, callback?: ParamHandler, continueFun?: ParamHandler, isAction?: boolean): void;
+        protected doShowAnimation(): void;
+        dispose(): void;
+    }
+    /** 提示框 */
+    export class RechargeSuccessWindow extends BaseWindow {
+        private static _instance;
+        static get inst(): RechargeSuccessWindow;
+        private content;
+        private callback;
+        /** 确定 */
+        private continueBtn;
+        /** 缓存的提示框 */
+        private cacheMessage;
+        constructor();
+        protected onInit(): void;
+        private continueHandler;
+        protected onHide(): void;
+        /** 结束回调 */
+        endCallHandler(): void;
+        /** 清理缓存 */
+        clearCache(): void;
+        /**
+         * 带确认按钮的提示框
+         * @param msg
+         * @param callback
+         * @param isAction
+         */
+        showTip(msg: string, callback?: ParamHandler, isAction?: boolean): void;
+        protected doShowAnimation(): void;
+        dispose(): void;
+    }
+    /**
+     * 房间通告
+     * @author boge
+     */
+    export class RoomNotice extends fgui.GComponent {
+        private loader;
+        private userName;
+        private money;
+        constructor();
+        protected constructFromXML(xml: any): void;
+        show(name: string, money: number, url: string): void;
+        hide(): void;
+        dispose(): void;
+    }
+    /**
+     * 上传组件
+     * @author boge
+     */
+    export class Upload {
+        private static _instance;
+        static get inst(): Upload;
+        private _file;
+        private target;
+        private inputWidth;
+        private inputHeight;
+        private target2;
+        constructor();
+        get nativeFile(): any;
+        /**
+         * 在输入期间，如果 Input 实例的位置改变，调用该方法同步输入框的位置。
+         */
+        private _syncInputTransform;
+        private setScale;
+        setSize(w: number, h: number): void;
+        setPos(x: number, y: number): void;
+        hide(): void;
+        show(target: Laya.Sprite, target2: Laya.Sprite): void;
+        private blurHandler;
+        private focusHandler;
+        set focus(value: boolean);
+    }
+    /** 加载 */
+    export class WaitResult extends fgui.GComponent {
+        private static _instance;
+        static get inst(): WaitResult;
+        private img;
+        private graph;
+        constructor();
+        protected constructFromXML(xml: any): void;
+        show(): void;
+        private showContent;
+        hide(): void;
     }
     export class BindInputButton {
         btn: fgui.GButton;
@@ -4641,770 +5425,6 @@ declare namespace coreLib {
         play(target: fgui.GObject, count: number, callback: ParamHandler): void;
         private twinkleHandler;
         dispose(): void;
-    }
-    export class ActivityButton extends BaseButton {
-        private tempValue;
-        private clickInvalid;
-        callback: ParamHandler;
-        private contentText;
-        /** 当没有优惠卷使用的时候 是否自动隐藏 */
-        isAutoHide: boolean;
-        /** 自定义更新文字显示 */
-        updateText: ParamHandler;
-        constructor();
-        protected constructFromXML(xml: any): void;
-        private stopUseActivityHandler;
-        private useActivityHandler;
-        private updateShow;
-        /**
-         * 设置角标
-         * @param value 剩余数量
-         */
-        setCorner(value: number): void;
-        private clickHandler;
-        private addedHandler;
-        /** 打开拖动 */
-        openDrag(): void;
-        private onDragEnd;
-        private onDragStart;
-    }
-    /**
-     * 弹窗层
-     * @author boge
-     */
-    export class AlertPanel extends fgui.GComponent {
-        private static _instance;
-        static get inst(): AlertPanel;
-        constructor();
-        private __winResize;
-    }
-    /**
-     * 洗牌的牌
-     * @author boge
-     *
-     */
-    export class CardDeck extends BaseView {
-        static NAME: string;
-        private load;
-        /** 在数组中的位置 */
-        pos: number;
-        constructor();
-        protected constructFromXML(xml: any): void;
-        shuffle(func: ParamHandler): void;
-        private plusMinus;
-        setUrl(url: string): void;
-        revert(): void;
-        static create(): CardDeck;
-    }
-    export class GamePopupMenu extends fgui.PopupMenu {
-        private target;
-        closeHandler: ParamHandler;
-        constructor(resourceURL?: string);
-        private onUnDisplay;
-        show(target?: fgui.GObject, dir?: fgui.PopupDirection | boolean): void;
-        addIconItem(caption: string, handler?: Laya.Handler): fairygui.GButton;
-        addIconTitleItem(title: string, caption: string, select: string, handler?: Laya.Handler): fairygui.GButton;
-        dispose(): void;
-    }
-    export class GGraphicsAni extends Laya.GraphicsAni {
-        boneSlotName: string;
-        static create(): GGraphicsAni;
-        drawTexture(texture: Laya.Texture | null, x?: number, y?: number, width?: number, height?: number, matrix?: Laya.Matrix | null, alpha?: number, color?: string | null, blendMode?: string | null, uv?: number[]): Laya.DrawTextureCmd | null;
-        clear(recoverCmds?: boolean): void;
-    }
-    export class GLoader3D extends fgui.GObject {
-        private _url;
-        private _align;
-        private _verticalAlign;
-        private _autoSize;
-        private _fill;
-        private _shrinkOnly;
-        private _playing;
-        private _frame;
-        private _loop;
-        private _animationName;
-        private _skinName;
-        private _color;
-        private _contentItem;
-        private _container;
-        private _content;
-        private _updatingLayout;
-        private loadSkeleton;
-        /** 是否有描点 */
-        isAnchor: boolean;
-        constructor();
-        protected createDisplayObject(): void;
-        dispose(): void;
-        get url(): string;
-        set url(value: string);
-        get icon(): string;
-        set icon(value: string);
-        get align(): string;
-        set align(value: string);
-        get verticalAlign(): string;
-        set verticalAlign(value: string);
-        get fill(): number;
-        set fill(value: number);
-        get shrinkOnly(): boolean;
-        set shrinkOnly(value: boolean);
-        get autoSize(): boolean;
-        set autoSize(value: boolean);
-        get playing(): boolean;
-        set playing(value: boolean);
-        get frame(): number;
-        set frame(value: number);
-        get animationName(): string;
-        set animationName(value: string);
-        get skinName(): string;
-        set skinName(value: string);
-        get loop(): boolean;
-        set loop(value: boolean);
-        get color(): string;
-        set color(value: string);
-        get content(): Laya.Sprite;
-        protected loadContent(): void;
-        setSkeleton(skeleton: Laya.Skeleton, anchor?: Laya.Point): void;
-        private onPlayed;
-        private onStopped;
-        private onPaused;
-        private onLabel;
-        /**
-         * 播放动画
-         * @param    nameOrIndex    动画名字或者索引
-         * @param    loop        是否循环播放
-         */
-        play(nameOrIndex: string | number, loop: boolean): void;
-        /**
-         * 停止动画
-         */
-        stop(): void;
-        private onChange;
-        protected loadExternal(): void;
-        private loadEndHandler;
-        private updateLayout;
-        private clearContent;
-        protected handleSizeChanged(): void;
-    }
-    export class GlobalWaiting extends fgui.GComponent {
-        /** 显示内容 */
-        private messageText;
-        constructor();
-        protected constructFromXML(xml: any): void;
-        private onInit;
-        set text(value: string);
-    }
-    export class GSkeleton extends fgui.GComponent {
-        /** 骨骼更新  cmd:DrawTextureCmd  */
-        static readonly UPDATE_BONE_SLOT = "update_bone_slot";
-        /** 经过时间 */
-        private _t;
-        private p1;
-        private p2;
-        private p3;
-        private p4;
-        /** 是否使用混合模式 */
-        isBlendModeAdd: boolean;
-        /** 使用混合模式的插槽 */
-        blendBoneSlotNames: string[];
-        /** 指定的骨骼忽略XY偏移量 */
-        readonly clearBoneSlotOffset: string[];
-        /** 指定的骨骼忽略X偏移量 */
-        readonly clearBoneSlotOffsetX: string[];
-        /** 指定的骨骼忽略Y偏移量 */
-        readonly clearBoneSlotOffsetY: string[];
-        aniMode: number;
-        private _aniPath;
-        private _complete;
-        private _loadAniMode;
-        /** 播放动画组 */
-        private playGroup;
-        private playGroupIndex;
-        /** 播放数组 附带参数 */
-        private playGroupArgs;
-        /** 自定义缓存的Templet名字 */
-        cacheName: string;
-        /** 缓存每次播放的名字或下标 */
-        nameOrIndex: string | number;
-        /** 播放结束执行函数 */
-        private stoppedHandler;
-        /**
-         * 动画播放速率 1为标准速率
-         */
-        playbackRate: number;
-        constructor(aniMode?: number);
-        protected createDisplayObject(): void;
-        get asSkeleton(): Laya.Skeleton;
-        /**
-         * 通过加载直接创建动画
-         * @param    url        要加载的动画文件路径
-         * @param    handler    加载完成的回调函数
-         * @param    aniMode        与<code>Skeleton.init</code>的<code>aniMode</code>作用一致
-         */
-        load(url: string, handler: ParamHandler, aniMode?: number): void;
-        /**
-         * 加载完成
-         */
-        private _onLoaded;
-        /**
-         * 解析完成
-         */
-        private _parseComplete;
-        /**
-         * 解析失败
-         */
-        private _parseFail;
-        /**
-         * 播放动画
-         *
-         * @param    nameOrIndex    动画名字或者索引
-         * @param    loop        是否循环播放
-         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-         * @param    start        起始时间
-         * @param    end            结束时间
-         * @param    freshSkin    是否刷新皮肤数据
-         */
-        play(nameOrIndex: string | number | (string | number)[], loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
-        /**
-         * 延迟播放动画
-         * @param    playDelay    延迟时间
-         * @param    nameOrIndex    动画名字或者索引
-         * @param    loop        是否循环播放
-         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-         * @param    start        起始时间
-         * @param    end            结束时间
-         * @param    freshSkin    是否刷新皮肤数据
-         */
-        playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[], loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
-        private onPlayStopped;
-        private startPlay;
-        paused(): void;
-        resume(): void;
-        stop(): void;
-        /**
-         * 通过名字显示一套皮肤
-         * @param    name    皮肤的名字
-         * @param    freshSlotIndex    是否将插槽纹理重置到初始化状态
-         */
-        showSkinByName(name: string, freshSlotIndex?: boolean): void;
-        /**
-         * 通过索引显示一套皮肤
-         * @param    skinIndex    皮肤索引
-         * @param    freshSlotIndex    是否将插槽纹理重置到初始化状态
-         */
-        showSkinByIndex(skinIndex: number, freshSlotIndex?: boolean): void;
-        getAniIndexByName(name: string): any;
-        getAniNameByIndex(index: number): string;
-        getAnimation(index: number): AnimationContent;
-        get currAniIndex(): number;
-        /**
-         * 根据动作名和插槽骨骼名,来获取该骨骼在该动作播放时,每一帧该骨骼坐标位置,返回所有帧数骨骼坐标位置组成的列表
-         * @param nameOrIndex
-         * @param boneName
-         */
-        getBoneCoords(nameOrIndex: string | number, boneName: string): number[];
-        getSlotXByName(name: string): number;
-        getSlotYByName(name: string): number;
-        getSlotPointByName(name: string): Laya.Point;
-        getBoneSlotByName(name: string): Laya.BoneSlot;
-        private static _emptyTexture;
-        static get emptyTexture(): Laya.Texture;
-        /**
-         * 设置插槽的某个皮肤
-         * @param slotName 插槽名字
-         * @param skin Laya.Texture 或 fairygui 的路径  如：//package/skin
-         */
-        setSlotSkin(slotName: string, skin?: Laya.Texture | string): void;
-        /**
-         * 换装的时候，需要清一下缓冲区
-         */
-        private clearCache;
-        on(type: string, thisObject: any, listener: Function, args?: any[]): void;
-        off(type: string, thisObject: any, listener: Function): void;
-        offAll(type?: string): void;
-        dispose(): void;
-        get t(): number;
-        set t(value: number);
-        getX(): number;
-        getY(): number;
-        setStartPoint(tempX: number, tempY: number): void;
-        setMiddlePoint(tempX: number, tempY: number): void;
-        setMiddlePoint2(tempX: number, tempY: number, tempX2: number, tempY2: number): void;
-        setEndPoint(tempX: number, tempY: number): void;
-    }
-    export class AnimationNodeContent {
-        name: string;
-        parentIndex: number;
-        parent: AnimationNodeContent;
-        keyframeWidth: number;
-        lerpType: number;
-        interpolationMethod: any[];
-        childs: any[];
-        keyFrame: Laya.KeyFramesContent[];
-        playTime: number;
-        extenData: ArrayBuffer;
-        dataOffset: number;
-    }
-    export class AnimationContent {
-        nodes: AnimationNodeContent[];
-        name: string;
-        playTime: number;
-        bone3DMap: any;
-        totalKeyframeDatasLength: number;
-    }
-    export class GSpineSkeleton extends fgui.GComponent {
-        /** 经过时间 */
-        private _t;
-        private p1;
-        private p2;
-        private p3;
-        private p4;
-        private _aniPath;
-        private _complete;
-        /** 播放动画组 */
-        private playGroup;
-        private playGroupIndex;
-        /** 播放结束执行函数 */
-        private stoppedHandler;
-        private readonly ver;
-        private spineSkeleton;
-        private template;
-        constructor(ver?: Laya.SpineVersion);
-        protected createDisplayObject(): void;
-        get asSkeleton(): Laya.SpineSkeleton;
-        /**
-         * 加载json 或 skel格式的骨骼文件
-         * @param jsonOrSkelUrl
-         * @param handler 回调方法
-         */
-        load(jsonOrSkelUrl: string, handler: ParamHandler): void;
-        get aniPath(): string;
-        private onComplete;
-        set touchable(value: boolean);
-        get touchable(): boolean;
-        /**
-         * 播放动画
-         *
-         * @param    nameOrIndex    动画名字或者索引
-         * @param    loop        是否循环播放
-         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-         * @param    start        起始时间
-         * @param    end            结束时间
-         * @param    freshSkin    是否刷新皮肤数据
-         * @param    playAudio    是否播放音频
-         */
-        play(nameOrIndex: string | number | (string | number)[], loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
-        private onPlayStopped;
-        paused(): void;
-        resume(): void;
-        stop(): void;
-        /**
-         * 通过名字显示一套皮肤
-         * @param    name    皮肤的名字
-         */
-        showSkinByName(name: string): void;
-        /**
-         * 通过索引显示一套皮肤
-         * @param    skinIndex    皮肤索引
-         */
-        showSkinByIndex(skinIndex: number): void;
-        /**
-         * 得到指定动画的索引
-         * @param aniName 动画名字
-         */
-        getAniIndexByName(aniName: string): number;
-        getAniNameByIndex(index: number): string;
-        get currAniIndex(): number;
-        set hitArea(rec: Laya.Rectangle);
-        on(type: string, thisObject: any, listener: Function, args?: any[]): void;
-        off(type: string, thisObject: any, listener: Function): void;
-        offAll(type?: string): void;
-        get t(): number;
-        set t(value: number);
-        getX(): number;
-        getY(): number;
-        setStartPoint(tempX: number, tempY: number): void;
-        setMiddlePoint(tempX: number, tempY: number): void;
-        setMiddlePoint2(tempX: number, tempY: number, tempX2: number, tempY2: number): void;
-        setEndPoint(tempX: number, tempY: number): void;
-        dispose(): void;
-    }
-    /** 提示框 */
-    export class HomePrompt extends BaseWindow {
-        private static _instance;
-        static get instance(): HomePrompt;
-        /** 当前显示面板控制器 */
-        private controller;
-        /** ok按钮 */
-        private okBtn;
-        /** 取消 */
-        private cancelBtn;
-        /** 显示的内容 */
-        private message;
-        private callback;
-        private cancelCallback;
-        constructor();
-        protected onInit(): void;
-        private cancelHandler;
-        private okHandler;
-        protected onShown(): void;
-        /**
-         * 显示提示框
-         * @param code 0 公告提示框 1两个选择按钮提示
-         * @param content 显示内容 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
-         * @param callback 确定调用函数
-         * @param cancelCallback 取消调用函数
-         * @param obj 附带设置 (okName:'', cancelName:'')
-         *
-         */
-        showTip(code: number, content: string | number | any[], callback?: Function, cancelCallback?: Function, obj?: any): void;
-        hideRecord(): void;
-    }
-    export class HtmlWindow extends fgui.Window implements IRecord {
-        private static _instance;
-        static get inst(): HtmlWindow;
-        private closeHandler;
-        /** 页面名字 */
-        private htmlText;
-        private btn;
-        private obj;
-        private tempX;
-        private tempY;
-        /** 加载动画控制器 */
-        private loadMovieClip;
-        constructor();
-        protected onInit(): void;
-        protected onShown(): void;
-        private sizeChangeHandler;
-        /**
-         * 新打开一个html浏览窗口
-         * @param url 加载地址
-         * @param full 是否全屏
-         * @param closeHandler 此界面关闭后回调
-         */
-        openHtml(url: string, full?: boolean, closeHandler?: ParamHandler): void;
-        /**
-         * 弹出一个html浏览窗口
-         * @param url 加载地址
-         * @param full 是否全屏
-         * @param closeHandler 此界面关闭后回调
-         *
-         */
-        showTip(url: string, full?: boolean, closeHandler?: ParamHandler): void;
-        private popFullIframeHandler;
-        /** 修正宽高 */
-        _syncInputTransform(): void;
-        share(type: number, url: string, content: string): void;
-        hide(): void;
-        hideRecord(): void;
-        showRecord(): void;
-    }
-    /** 图片窗口 */
-    export class ImageWindow extends BaseWindow {
-        private static _instance;
-        static get inst(): ImageWindow;
-        constructor();
-        protected onInit(): void;
-        showTip(url: string): void;
-    }
-    /** 加载界面 */
-    export class LoadingWindow extends BaseView {
-        private static _instance;
-        static get inst(): LoadingWindow;
-        private headText;
-        private loader;
-        private mesText;
-        /** 当前进度 */
-        private tempValue;
-        private dian;
-        private controller;
-        constructor();
-        protected onInit(): void;
-        /**
-         * 显示
-         * @param index 显示的形式
-         * @param headText 使用头文本
-         *
-         */
-        show(index?: number, headText?: string): void;
-        private changeHandler;
-        /**
-         * 更新进度
-         * @param value 当前模块进度值
-         * @param tempCount 当前加载进度模块 1 开始
-         * @param totalCount 总共要加载的模块数
-         */
-        updateMsg(value: number, tempCount?: number, totalCount?: number): void;
-        /**
-         * 更新进度
-         * @param value 当前模块进度值
-         * @param tempCount 当前加载进度模块 1 开始
-         * @param totalCount 总共要加载的模块数
-         */
-        static getProgress(value: number, tempCount?: number, totalCount?: number): number;
-        /**
-         * 显示加载错误提示
-         * @param value
-         *
-         */
-        showError(value: string): void;
-        private getMsg;
-        /** 替换加载图片 */
-        loaderUrl(url: string): void;
-        hide(): void;
-    }
-    /** 消息提示框 */
-    export class MessageTip extends fgui.GComponent {
-        private static NAME;
-        /** 使用中的 */
-        private static usePool;
-        /** 缓存的内容 */
-        private static cacheContent;
-        /** 展示时间 */
-        static displayTime: number;
-        content: fgui.GTextField;
-        tween: Laya.Tween;
-        /** 缓存的字体大小 */
-        tempFontSize: number;
-        constructor();
-        protected constructFromXML(xml: any): void;
-        /**
-         * 设置显示文本字体大小
-         * @param value 大小
-         */
-        set fontSize(value: number);
-        get fontSize(): number;
-        /**
-         * 显示文本提示框
-         * @see LibStr
-         * @param value 内容 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
-         */
-        static showTip(value: string | number | any[]): void;
-        private static createHandler;
-        /**
-         * 显示弹窗内容
-         */
-        private static showMes;
-        private static movePoint;
-        private static showEnd;
-        private static hideEnd;
-        /** 清楚所有提示 */
-        static clearAll(): void;
-    }
-    export class MyGLoader extends fgui.GLoader {
-        constructor();
-        protected onExternalLoadSuccess(texture: Laya.Texture): void;
-        protected loadFromPackage(itemURL: string): void;
-        protected onExternalLoadFailed(): void;
-    }
-    export class NoticeView extends BaseView {
-        static NAME: string;
-        private richText;
-        private tempX;
-        /** 是否在滚动 */
-        private isRun;
-        private gameData;
-        constructor();
-        protected onInit(): void;
-        protected addedHandler(): void;
-        showText(values: any[]): void;
-        /** 开始滚动 */
-        private startRun;
-        private loopHandler;
-        /** 更新内容 并重置位置 */
-        private updateNoticeContent;
-        private stopRun;
-        /** 重置位置 */
-        private resetMsgPosition;
-        dispose(): void;
-    }
-    export class NumButton extends BaseButton {
-        private component;
-        private cornerMarker;
-        /** 绑定位置对象 */
-        bindObject: any;
-        /** 偏移位置 */
-        offX: number;
-        /** 偏移位置 */
-        offY: number;
-        private tempValue;
-        constructor();
-        protected constructFromXML(xml: any): void;
-        private stateChangedHandler;
-        /** 更新绑定位置 */
-        updateBindPoint(): void;
-        /**
-         * 设置角标
-         * @param value 剩余数量
-         */
-        setCorner(value: number): void;
-    }
-    export class ProgressBar extends fgui.GProgressBar {
-        constructor();
-        protected constructFromXML(xml: any): void;
-        tweenValue2(value: number, duration: number, complete?: ParamHandler): fgui.GTweener;
-        regAction(action: string, caller: any, method: Function, group?: string): void;
-        regActionHandler(action: string, handler: Laya.Handler, group?: string): void;
-        removeAllAction(...arge: any[]): void;
-        removeGroup(group: string): void;
-        removeGroupActions(group: string, ...arge: any[]): void;
-        removeActionHandler(action: string, method: Function, group?: string): void;
-        sendAction(action: string, ...arge: any[]): void;
-        sendGroupAction(group: string, action: string, ...arge: any[]): void;
-        /** 注册游戏数据 */
-        regGameAction(action: string, caller: any, method: Function): void;
-        addView(key: string, view: View): boolean;
-        removeView(key: string): void;
-        getView(key: string): unknown;
-        getProxy(name: string): Proxys;
-    }
-    /** 文案提示 */
-    export class PromptTip extends BaseLabel {
-        private target;
-        private downward;
-        constructor();
-        protected constructFromXML(xml: any): void;
-        static createPromptTip(): PromptTip;
-        /**
-         * 显示提示文本
-         * @param comp 绑定显示按钮位置
-         * @param downward 是否在下面
-         */
-        show(comp: fgui.GComponent, downward?: any): void;
-        private showViewHandler;
-        hide(): void;
-        private updatePoint;
-        dispose(): void;
-    }
-    /** 提示框 */
-    export class PromptWindow extends BaseWindow {
-        private static _instance;
-        static get inst(): PromptWindow;
-        private content;
-        private callback;
-        /** 确定取消 */
-        private cancelBtn;
-        /** 确定 */
-        private continueBtn;
-        /** 提示框的击中类型 */
-        private controller;
-        private continueFun;
-        /** 缓存的提示框 */
-        private cacheMessage;
-        constructor();
-        protected onInit(): void;
-        private continueHandler;
-        private cancelHandler;
-        protected onHide(): void;
-        /** 结束回调 */
-        endCallHandler(): void;
-        /** 清理缓存 */
-        clearCache(): void;
-        /**
-         * 带确认按钮的提示框
-         * @param msg 显示提示 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
-         * @param callback 确定回调方法
-         * @param isAction 动画显示或关闭
-         *
-         * @deprecated
-         * @see LibStr
-         * @see ActionLib.GAME_SHOW_PROMPT_WINDOW
-         */
-        showTip(msg: string | number | any[], callback?: ParamHandler, isAction?: boolean): void;
-        /**
-         * 带确认 取消按钮的提示框
-         * @param msg 显示提示 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
-         * @param obj 附带设置 (okName:'', cancelName:'')
-         * @param callback 取消回调方法
-         * @param continueFun 确定回调方法
-         * @param isAction 动画显示或关闭
-         * @deprecated
-         * @see LibStr
-         * @see ActionLib.GAME_SHOW_PROMPT_CANCEL_WINDOW
-         */
-        showCancelTip(msg: string | number | any[], obj?: IPromptData, callback?: ParamHandler, continueFun?: ParamHandler, isAction?: boolean): void;
-        protected doShowAnimation(): void;
-        dispose(): void;
-    }
-    /** 提示框 */
-    export class RechargeSuccessWindow extends BaseWindow {
-        private static _instance;
-        static get inst(): RechargeSuccessWindow;
-        private content;
-        private callback;
-        /** 确定 */
-        private continueBtn;
-        /** 缓存的提示框 */
-        private cacheMessage;
-        constructor();
-        protected onInit(): void;
-        private continueHandler;
-        protected onHide(): void;
-        /** 结束回调 */
-        endCallHandler(): void;
-        /** 清理缓存 */
-        clearCache(): void;
-        /**
-         * 带确认按钮的提示框
-         * @param msg
-         * @param callback
-         * @param isAction
-         */
-        showTip(msg: string, callback?: ParamHandler, isAction?: boolean): void;
-        protected doShowAnimation(): void;
-        dispose(): void;
-    }
-    /**
-     * 房间通告
-     * @author boge
-     */
-    export class RoomNotice extends fgui.GComponent {
-        private loader;
-        private userName;
-        private money;
-        constructor();
-        protected constructFromXML(xml: any): void;
-        show(name: string, money: number, url: string): void;
-        hide(): void;
-        dispose(): void;
-    }
-    /**
-     * 上传组件
-     * @author boge
-     */
-    export class Upload {
-        private static _instance;
-        static get inst(): Upload;
-        private _file;
-        private target;
-        private inputWidth;
-        private inputHeight;
-        private target2;
-        constructor();
-        get nativeFile(): any;
-        /**
-         * 在输入期间，如果 Input 实例的位置改变，调用该方法同步输入框的位置。
-         */
-        private _syncInputTransform;
-        private setScale;
-        setSize(w: number, h: number): void;
-        setPos(x: number, y: number): void;
-        hide(): void;
-        show(target: Laya.Sprite, target2: Laya.Sprite): void;
-        private blurHandler;
-        private focusHandler;
-        set focus(value: boolean);
-    }
-    /** 加载 */
-    export class WaitResult extends fgui.GComponent {
-        private static _instance;
-        static get inst(): WaitResult;
-        private img;
-        private graph;
-        constructor();
-        protected constructFromXML(xml: any): void;
-        show(): void;
-        private showContent;
-        hide(): void;
     }
     export {};
 }
