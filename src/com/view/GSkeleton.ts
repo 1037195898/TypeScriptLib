@@ -14,6 +14,7 @@ import UIPackage = fgui.UIPackage;
 import BoneSlot = Laya.BoneSlot;
 import TextureFormat = Laya.TextureFormat;
 import KeyFramesContent = Laya.KeyFramesContent;
+import {ISkeletonPlay} from "../interfaces/ICommon";
 
 export class GSkeleton extends GComponent {
 
@@ -42,11 +43,8 @@ export class GSkeleton extends GComponent {
     private _aniPath: string
     private _complete: ParamHandler
     private _loadAniMode = 0
-    /** 播放动画组 */
-    private playGroup: (string | number)[] = []
+    /** 播放动画的id */
     private playGroupIndex = 0
-    /** 播放数组 附带参数 */
-    private playGroupArgs = []
     /** 自定义缓存的Templet名字 */
     cacheName = ""
     /** 缓存每次播放的名字或下标 */
@@ -55,8 +53,13 @@ export class GSkeleton extends GComponent {
     private stoppedHandler: Handler[] = []
     /**
      * 动画播放速率 1为标准速率
+     * @default 1
      */
     playbackRate = 1
+    /**
+     * 播放数据
+     */
+    private skeletonPlay: ISkeletonPlay
 
     constructor(aniMode = 0) {
         super()
@@ -162,20 +165,19 @@ export class GSkeleton extends GComponent {
      * @param    start        起始时间
      * @param    end            结束时间
      * @param    freshSkin    是否刷新皮肤数据
+     * @param playAudio 自动播放声音
      */
-    play(nameOrIndex: string | number | (string | number)[], loop: boolean, force = true, start = 0, end = 0, freshSkin = true) {
+    play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force = true, start = 0, end = 0, freshSkin = true, playAudio?: boolean) {
         if (this.asSkeleton.templet == null) return
-        this.playGroup.length = 0
-        this.playGroupArgs.length = 0
         this.playGroupIndex = 0
-        let playLoop = loop
-        if (Array.isArray(nameOrIndex)) {
-            this.playGroup = nameOrIndex
-            this.playGroupArgs.push(loop, force, freshSkin)
-            nameOrIndex = this.playGroup[this.playGroupIndex]
-            if (this.playGroup.length > 0) playLoop = false
+        if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
+            this.playAni(nameOrIndex)
+            return
         }
-        this.startPlay(nameOrIndex, playLoop, force, start, end, freshSkin)
+        this.playAni({
+            nameOrIndex: nameOrIndex, loop: loop, force: force,
+            start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
+        })
     }
 
     /**
@@ -187,23 +189,36 @@ export class GSkeleton extends GComponent {
      * @param    start        起始时间
      * @param    end            结束时间
      * @param    freshSkin    是否刷新皮肤数据
+     *
+     * @deprecated
      */
-    playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[], loop: boolean, force = true, start = 0, end = 0, freshSkin = true) {
+    playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force = true, start = 0, end = 0, freshSkin = true) {
         if (this.asSkeleton.templet == null) return
         Laya.timer.once(playDelay, this, this.play, [nameOrIndex, loop, force, start, end, freshSkin])
     }
 
     private onPlayStopped() {
-        const loop = this.playGroupArgs.length > 0 ? this.playGroupArgs[0] : false
-        const force = this.playGroupArgs.length > 1 ? this.playGroupArgs[1] : false
-        const freshSkin = this.playGroupArgs.length > 2 ? this.playGroupArgs[2] : false
         // console.log("playEnd")
-        if (this.playGroup.length > 0) {
+        if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
             // 在播放动画数组
             this.playGroupIndex++
-            if (this.playGroup.length > this.playGroupIndex || ((this.playGroupIndex = 0) || loop)) {
-                const nameOrIndex = this.playGroup[this.playGroupIndex]
-                this.startPlay(nameOrIndex, false, force, 0, 0, freshSkin)
+            let isNewPro = false
+            if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex ||
+                (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
+                if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                    Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex])
+                } else {
+                    this.playAni(this.skeletonPlay, this.playGroupIndex)
+                }
+                return
+            }
+        } else {
+            if (this.skeletonPlay.loop) {
+                if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                    Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex])
+                } else {
+                    this.playAni(this.skeletonPlay, this.playGroupIndex)
+                }
                 return
             }
         }
@@ -212,10 +227,42 @@ export class GSkeleton extends GComponent {
         }
     }
 
-    private startPlay(nameOrIndex: number | string, loop: boolean, force = true, start = 0, end = 0, freshSkin = true) {
-        this.nameOrIndex = nameOrIndex
-        this.asSkeleton.playbackRate(this.playbackRate)
-        this.asSkeleton.play(nameOrIndex, loop, force, start, end, freshSkin)
+    // private startPlay(nameOrIndex: number | string, loop: boolean, force = true, start = 0, end = 0, freshSkin = true) {
+    /**
+     * 播放动画
+     * @param skeletonPlay 播放数据
+     * @param playGroupIndex 如果是播放数组动画 需要要播放动画的位置
+     * @private
+     */
+    playAni(skeletonPlay: ISkeletonPlay, playGroupIndex = -1) {
+        if (this.asSkeleton.templet == null) return
+        if (skeletonPlay == null && this.skeletonPlay == null) {
+            console.warn("not found play data " + skeletonPlay)
+            return;
+        }
+        if (skeletonPlay) {
+            skeletonPlay.loop ??= true
+            this.skeletonPlay = skeletonPlay
+        }
+        if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
+            playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex
+            this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex]
+        } else {
+            this.nameOrIndex = this.skeletonPlay.nameOrIndex
+        }
+        this.asSkeleton.playbackRate(this.skeletonPlay.playbackRate ?? this.playbackRate)
+
+        if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
+            Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay])
+        } else {
+            this._play(this.skeletonPlay)
+        }
+    }
+
+    private _play(skeletonPlay: ISkeletonPlay) {
+        this.asSkeleton.play(this.nameOrIndex, false, skeletonPlay.force ?? true,
+            skeletonPlay.start ?? 0, skeletonPlay.end ?? 0,
+            skeletonPlay.freshSkin ?? true, skeletonPlay.playAudio ?? true)
     }
 
     paused() {
@@ -388,6 +435,10 @@ export class GSkeleton extends GComponent {
             return
         }
         this.displayObject.offAll(type)
+    }
+
+    getSkeletonPlay() {
+        return this.skeletonPlay
     }
 
     dispose() {

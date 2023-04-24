@@ -7801,17 +7801,15 @@ window.coreLib = {};
             this.clearBoneSlotOffsetY = [];
             this.aniMode = 0;
             this._loadAniMode = 0;
-            /** 播放动画组 */
-            this.playGroup = [];
+            /** 播放动画的id */
             this.playGroupIndex = 0;
-            /** 播放数组 附带参数 */
-            this.playGroupArgs = [];
             /** 自定义缓存的Templet名字 */
             this.cacheName = "";
             /** 播放结束执行函数 */
             this.stoppedHandler = [];
             /**
              * 动画播放速率 1为标准速率
+             * @default 1
              */
             this.playbackRate = 1;
             this.aniMode = aniMode;
@@ -7914,22 +7912,20 @@ window.coreLib = {};
          * @param    start        起始时间
          * @param    end            结束时间
          * @param    freshSkin    是否刷新皮肤数据
+         * @param playAudio 自动播放声音
          */
-        play(nameOrIndex, loop, force = true, start = 0, end = 0, freshSkin = true) {
+        play(nameOrIndex, loop, force = true, start = 0, end = 0, freshSkin = true, playAudio) {
             if (this.asSkeleton.templet == null)
                 return;
-            this.playGroup.length = 0;
-            this.playGroupArgs.length = 0;
             this.playGroupIndex = 0;
-            let playLoop = loop;
-            if (Array.isArray(nameOrIndex)) {
-                this.playGroup = nameOrIndex;
-                this.playGroupArgs.push(loop, force, freshSkin);
-                nameOrIndex = this.playGroup[this.playGroupIndex];
-                if (this.playGroup.length > 0)
-                    playLoop = false;
+            if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
+                this.playAni(nameOrIndex);
+                return;
             }
-            this.startPlay(nameOrIndex, playLoop, force, start, end, freshSkin);
+            this.playAni({
+                nameOrIndex: nameOrIndex, loop: loop, force: force,
+                start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
+            });
         }
         /**
          * 延迟播放动画
@@ -7940,6 +7936,8 @@ window.coreLib = {};
          * @param    start        起始时间
          * @param    end            结束时间
          * @param    freshSkin    是否刷新皮肤数据
+         *
+         * @deprecated
          */
         playDelay(playDelay, nameOrIndex, loop, force = true, start = 0, end = 0, freshSkin = true) {
             if (this.asSkeleton.templet == null)
@@ -7947,16 +7945,30 @@ window.coreLib = {};
             Laya.timer.once(playDelay, this, this.play, [nameOrIndex, loop, force, start, end, freshSkin]);
         }
         onPlayStopped() {
-            const loop = this.playGroupArgs.length > 0 ? this.playGroupArgs[0] : false;
-            const force = this.playGroupArgs.length > 1 ? this.playGroupArgs[1] : false;
-            const freshSkin = this.playGroupArgs.length > 2 ? this.playGroupArgs[2] : false;
             // console.log("playEnd")
-            if (this.playGroup.length > 0) {
+            if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
                 // 在播放动画数组
                 this.playGroupIndex++;
-                if (this.playGroup.length > this.playGroupIndex || ((this.playGroupIndex = 0) || loop)) {
-                    const nameOrIndex = this.playGroup[this.playGroupIndex];
-                    this.startPlay(nameOrIndex, false, force, 0, 0, freshSkin);
+                let isNewPro = false;
+                if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex ||
+                    (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
+                    if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
+                    }
+                    else {
+                        this.playAni(this.skeletonPlay, this.playGroupIndex);
+                    }
+                    return;
+                }
+            }
+            else {
+                if (this.skeletonPlay.loop) {
+                    if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
+                    }
+                    else {
+                        this.playAni(this.skeletonPlay, this.playGroupIndex);
+                    }
                     return;
                 }
             }
@@ -7964,10 +7976,43 @@ window.coreLib = {};
                 this.stoppedHandler[i].run();
             }
         }
-        startPlay(nameOrIndex, loop, force = true, start = 0, end = 0, freshSkin = true) {
-            this.nameOrIndex = nameOrIndex;
-            this.asSkeleton.playbackRate(this.playbackRate);
-            this.asSkeleton.play(nameOrIndex, loop, force, start, end, freshSkin);
+        // private startPlay(nameOrIndex: number | string, loop: boolean, force = true, start = 0, end = 0, freshSkin = true) {
+        /**
+         * 播放动画
+         * @param skeletonPlay 播放数据
+         * @param playGroupIndex 如果是播放数组动画 需要要播放动画的位置
+         * @private
+         */
+        playAni(skeletonPlay, playGroupIndex = -1) {
+            var _a, _b;
+            if (this.asSkeleton.templet == null)
+                return;
+            if (skeletonPlay == null && this.skeletonPlay == null) {
+                console.warn("not found play data " + skeletonPlay);
+                return;
+            }
+            if (skeletonPlay) {
+                (_a = skeletonPlay.loop) !== null && _a !== void 0 ? _a : (skeletonPlay.loop = true);
+                this.skeletonPlay = skeletonPlay;
+            }
+            if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
+                playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex;
+                this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex];
+            }
+            else {
+                this.nameOrIndex = this.skeletonPlay.nameOrIndex;
+            }
+            this.asSkeleton.playbackRate((_b = this.skeletonPlay.playbackRate) !== null && _b !== void 0 ? _b : this.playbackRate);
+            if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
+                Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay]);
+            }
+            else {
+                this._play(this.skeletonPlay);
+            }
+        }
+        _play(skeletonPlay) {
+            var _a, _b, _c, _d, _e;
+            this.asSkeleton.play(this.nameOrIndex, false, (_a = skeletonPlay.force) !== null && _a !== void 0 ? _a : true, (_b = skeletonPlay.start) !== null && _b !== void 0 ? _b : 0, (_c = skeletonPlay.end) !== null && _c !== void 0 ? _c : 0, (_d = skeletonPlay.freshSkin) !== null && _d !== void 0 ? _d : true, (_e = skeletonPlay.playAudio) !== null && _e !== void 0 ? _e : true);
         }
         paused() {
             this._displayObject.paused();
@@ -8127,6 +8172,9 @@ window.coreLib = {};
             }
             this.displayObject.offAll(type);
         }
+        getSkeletonPlay() {
+            return this.skeletonPlay;
+        }
         dispose() {
             const tTemple = Laya.Templet["TEMPLET_DICTIONARY"][this._aniPath + this.cacheName];
             tTemple === null || tTemple === void 0 ? void 0 : tTemple.destroy();
@@ -8186,11 +8234,14 @@ window.coreLib = {};
             super();
             /** 经过时间 */
             this._t = 0;
-            /** 播放动画组 */
-            this.playGroup = [];
             this.playGroupIndex = 0;
             /** 播放结束执行函数 */
             this.stoppedHandler = [];
+            /**
+             * 动画播放速率 1为标准速率
+             * @default 1
+             */
+            this.playbackRate = 1;
             this.ver = ver;
             this.template = new Laya.SpineTemplet(this.ver);
             this.template.on(Laya.Event.COMPLETE, this, this.onComplete);
@@ -8200,7 +8251,7 @@ window.coreLib = {};
             this.spineSkeleton = this._displayObject = new Laya.SpineSkeleton();
             this._displayObject["$owner"] = this;
             this["_touchable"] = this._displayObject.mouseEnabled = this._displayObject.mouseThrough = false;
-            // this._displayObject.on(Laya.Event.STOPPED, this, this.onPlayStopped)
+            this._displayObject.on(Laya.Event.STOPPED, this, this.onPlayStopped);
             this._container = this._displayObject;
         }
         get asSkeleton() {
@@ -8256,28 +8307,77 @@ window.coreLib = {};
         play(nameOrIndex, loop, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
             if (this.asSkeleton.templet == null)
                 return;
-            if (Array.isArray(nameOrIndex)) {
-                this.playGroup = nameOrIndex;
-                this.asSkeleton.off(Laya.Event.STOPPED, this, this.onPlayStopped);
-                this.asSkeleton.on(Laya.Event.STOPPED, this, this.onPlayStopped, [loop, force, freshSkin]);
-                this.playGroupIndex = 0;
-                nameOrIndex = this.playGroup[this.playGroupIndex];
-                if (this.playGroup.length > 1)
-                    loop = false;
-                console.log(nameOrIndex, loop);
-            }
-            this.asSkeleton.play(nameOrIndex, loop, force, start, end, freshSkin, playAudio);
-        }
-        onPlayStopped(loop, force, freshSkin) {
-            this.playGroupIndex++;
-            console.log("playEnd");
-            if (this.playGroup.length <= this.playGroupIndex) {
+            this.playGroupIndex = 0;
+            if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
+                this.playAni(nameOrIndex);
                 return;
             }
-            if (this.playGroup.length > this.playGroupIndex + 1)
-                loop = false;
-            let nameOrIndex = this.playGroup[this.playGroupIndex];
-            this.asSkeleton.play(nameOrIndex, loop, force, 0, 0, freshSkin);
+            this.playAni({
+                nameOrIndex: nameOrIndex, loop: loop, force: force,
+                start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
+            });
+        }
+        playAni(skeletonPlay, playGroupIndex = -1) {
+            var _a, _b;
+            if (this.asSkeleton.templet == null)
+                return;
+            if (skeletonPlay == null && this.skeletonPlay == null) {
+                console.warn("not found play data " + skeletonPlay);
+                return;
+            }
+            if (skeletonPlay) {
+                (_a = skeletonPlay.loop) !== null && _a !== void 0 ? _a : (skeletonPlay.loop = true);
+                this.skeletonPlay = skeletonPlay;
+            }
+            if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
+                playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex;
+                this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex];
+            }
+            else {
+                this.nameOrIndex = this.skeletonPlay.nameOrIndex;
+            }
+            this.asSkeleton.playbackRate((_b = this.skeletonPlay.playbackRate) !== null && _b !== void 0 ? _b : this.playbackRate);
+            if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
+                Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay]);
+            }
+            else {
+                this._play(this.skeletonPlay);
+            }
+        }
+        _play(skeletonPlay) {
+            var _a, _b, _c, _d, _e;
+            this.asSkeleton.play(this.nameOrIndex, false, (_a = skeletonPlay.force) !== null && _a !== void 0 ? _a : true, (_b = skeletonPlay.start) !== null && _b !== void 0 ? _b : 0, (_c = skeletonPlay.end) !== null && _c !== void 0 ? _c : 0, (_d = skeletonPlay.freshSkin) !== null && _d !== void 0 ? _d : true, (_e = skeletonPlay.playAudio) !== null && _e !== void 0 ? _e : true);
+        }
+        onPlayStopped(loop, force, freshSkin) {
+            if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
+                // 在播放动画数组
+                this.playGroupIndex++;
+                let isNewPro = false;
+                if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex ||
+                    (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
+                    if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
+                    }
+                    else {
+                        this.playAni(this.skeletonPlay, this.playGroupIndex);
+                    }
+                    return;
+                }
+            }
+            else {
+                if (this.skeletonPlay.loop) {
+                    if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
+                    }
+                    else {
+                        this.playAni(this.skeletonPlay, this.playGroupIndex);
+                    }
+                    return;
+                }
+            }
+            for (let i = 0; i < this.stoppedHandler.length; i++) {
+                this.stoppedHandler[i].run();
+            }
         }
         paused() {
             this.asSkeleton.paused();
@@ -8336,42 +8436,42 @@ window.coreLib = {};
             this.displayObject.hitArea = rec;
         }
         on(type, thisObject, listener, args = null) {
-            // if (type == Laya.Event.STOPPED) {
-            //     this.stoppedHandler.push(new Handler(thisObject, listener, args))
-            //     return
-            // }
-            // if (this.spineSkeleton) {
-            //     this.spineSkeleton.on(type, thisObject, listener, args)
-            //     return
-            // }
+            if (type == Laya.Event.STOPPED) {
+                this.stoppedHandler.push(new Laya.Handler(thisObject, listener, args));
+                return;
+            }
+            if (this.spineSkeleton) {
+                this.spineSkeleton.on(type, thisObject, listener, args);
+                return;
+            }
             super.on(type, thisObject, listener, args);
         }
         off(type, thisObject, listener) {
-            // if (type == Laya.Event.STOPPED) {
-            //     for (let i = this.stoppedHandler.length - 1; i > -1; i--) {
-            //         const handler = this.stoppedHandler[i]
-            //         if (handler.caller == thisObject && handler.method == listener) {
-            //             handler.clear()
-            //             this.stoppedHandler.splice(i, 1)
-            //         }
-            //     }
-            //     return
-            // }
-            // if (this.spineSkeleton) {
-            //     this.spineSkeleton.off(type, thisObject, listener)
-            //     return
-            // }
+            if (type == Laya.Event.STOPPED) {
+                for (let i = this.stoppedHandler.length - 1; i > -1; i--) {
+                    const handler = this.stoppedHandler[i];
+                    if (handler.caller == thisObject && handler.method == listener) {
+                        handler.clear();
+                        this.stoppedHandler.splice(i, 1);
+                    }
+                }
+                return;
+            }
+            if (this.spineSkeleton) {
+                this.spineSkeleton.off(type, thisObject, listener);
+                return;
+            }
             super.off(type, thisObject, listener);
         }
         offAll(type = null) {
-            // if (type == Laya.Event.STOPPED) {
-            //     this.stoppedHandler.length = 0
-            //     return
-            // }
-            // if (this.spineSkeleton) {
-            //     this.spineSkeleton.offAll(type)
-            //     return
-            // }
+            if (type == Laya.Event.STOPPED) {
+                this.stoppedHandler.length = 0;
+                return;
+            }
+            if (this.spineSkeleton) {
+                this.spineSkeleton.offAll(type);
+                return;
+            }
             this.displayObject.offAll(type);
         }
         get t() {
@@ -11771,7 +11871,7 @@ window.coreLib = {};
         }
         static parseComplete(skeleton, nameOrIndex, loop, loaderComplete, fac) {
             runFun(loaderComplete);
-            if (skeleton == null || nameOrIndex == null || nameOrIndex < 0)
+            if (skeleton == null || nameOrIndex == null)
                 return;
             skeleton.play(nameOrIndex, loop);
         }
@@ -11795,29 +11895,23 @@ window.coreLib = {};
          * @param SkeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
          */
         static createSpine(url, optional, SkeletonClass) {
-            var _a, _b, _c, _d, _e, _f, _g, _h;
-            var _j, _k;
+            var _a, _b, _c, _d, _e, _f, _g;
             optional || (optional = {});
-            (_a = optional.x) !== null && _a !== void 0 ? _a : (optional.x = 0);
-            (_b = optional.y) !== null && _b !== void 0 ? _b : (optional.y = 0);
             SkeletonClass !== null && SkeletonClass !== void 0 ? SkeletonClass : (SkeletonClass = Laya.Utils.getFileExtension(url) === "json" ? GSpineSkeleton : GSkeleton);
             const skeleton = new SkeletonClass();
-            (_c = optional.play) !== null && _c !== void 0 ? _c : (optional.play = {});
-            (_d = (_j = optional.play).nameOrIndex) !== null && _d !== void 0 ? _d : (_j.nameOrIndex = 0);
-            (_e = (_k = optional.play).loop) !== null && _e !== void 0 ? _e : (_k.loop = true);
-            SpineUtils.playSpine(skeleton, url, optional.play.nameOrIndex, optional.play.loop, optional.play.playComplete, optional.play.loaderComplete, optional.play.aniMode);
-            (_f = optional.scaleX) !== null && _f !== void 0 ? _f : (optional.scaleX = skeleton.scaleX);
-            (_g = optional.scaleY) !== null && _g !== void 0 ? _g : (optional.scaleY = skeleton.scaleY);
-            if (optional.scale)
-                optional.scaleX = optional.scaleY = optional.scale;
-            skeleton.setScale(optional.scaleX, optional.scaleY);
-            skeleton.setXY(optional.x, optional.y);
+            SpineUtils.playSpine(skeleton, url, (_a = optional.play) !== null && _a !== void 0 ? _a : 0);
+            if (optional.scale) {
+                skeleton.setScale(optional.scale, optional.scale);
+            }
+            else {
+                skeleton.setScale((_b = optional.scaleX) !== null && _b !== void 0 ? _b : skeleton.scaleX, (_c = optional.scaleY) !== null && _c !== void 0 ? _c : skeleton.scaleY);
+            }
+            skeleton.setXY((_d = optional.x) !== null && _d !== void 0 ? _d : 0, (_e = optional.y) !== null && _e !== void 0 ? _e : 0);
             if (optional.relation) {
                 let relation = optional.relation;
-                (_h = relation.usePercent) !== null && _h !== void 0 ? _h : (relation.usePercent = true);
                 relation.lr = relation.ud = relation.target;
-                relation.lr && skeleton.addRelation(relation.lr, fgui.RelationType.Center_Center, relation.usePercent);
-                relation.ud && skeleton.addRelation(relation.ud, fgui.RelationType.Middle_Middle, relation.usePercent);
+                relation.lr && skeleton.addRelation(relation.lr, fgui.RelationType.Center_Center, (_f = relation.usePercent) !== null && _f !== void 0 ? _f : true);
+                relation.ud && skeleton.addRelation(relation.ud, fgui.RelationType.Middle_Middle, (_g = relation.usePercent) !== null && _g !== void 0 ? _g : true);
             }
             return skeleton;
         }

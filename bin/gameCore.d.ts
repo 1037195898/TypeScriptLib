@@ -2068,25 +2068,85 @@ declare namespace coreLib {
         scaleY?: number;
         /** xy 公用的缩放值 */
         scale?: number;
+        /**
+         * 动画模式
+         * <table>
+         *    <tr><th>模式</th><th>描述</th></tr>
+         *    <tr>
+         *        <td>0</td> <td>使用模板缓冲的数据，模板缓冲的数据，不允许修改（内存开销小，计算开销小，不支持换装）</td>
+         *    </tr>
+         *    <tr>
+         *        <td>1</td> <td>使用动画自己的缓冲区，每个动画都会有自己的缓冲区，相当耗费内存    （内存开销大，计算开销小，支持换装）</td>
+         *    </tr>
+         *    <tr>
+         *        <td>2</td> <td>使用动态方式，去实时去画（内存开销小，计算开销大，支持换装,不建议使用）</td>
+         * </tr>
+         * </table>
+         * @default GSkeleton.aniMode
+         */
+        aniMode?: number;
         rot?: any;
     }
+    /**
+     * skeleton 播放参数
+     */
     export interface ISkeletonPlay {
         /**
          * 播放某个动画
          * @default 0
          */
         nameOrIndex?: string | number | (string | number)[];
-        /** 自动播放
+        /** 循环播放
          * @default true
          * */
         loop?: boolean;
+        /**
+         * 延迟播放(单位为毫秒)
+         * @default 0
+         */
+        delayPlay?: number;
+        /**
+         * loop 播放延迟(单位为毫秒)
+         * @default 0
+         */
+        delayLoopPlay?: number;
+        /** 播放结束调用 */
         playComplete?: ParamHandler;
+        /** 加载完成调用 */
         loaderComplete?: ParamHandler;
         /**
-         * 是否支持换皮  -1 不设置
-         * @default -1
+         *
+         * false,如果要播的动画跟上一个相同就不生效,
+         * true,强制生效
+         * @default true
          */
-        aniMode?: number;
+        force?: boolean;
+        /**
+         * 起始时间
+         * 只有 nameOrIndex 为非数组才有用
+         * @default 0
+         */
+        start?: number;
+        /**
+         * 结束时间
+         * 只有 nameOrIndex 为非数组才有用
+         * @default 0
+         */
+        end?: number;
+        /**
+         * 是否刷新皮肤数据
+         * @default true
+         */
+        freshSkin?: boolean;
+        /**
+         * 播放速率 默认使用Skeleton的速率1
+         */
+        playbackRate?: number;
+        /**
+         * 是否播放音频
+         * @default true
+         */
+        playAudio?: boolean;
     }
     export interface ISKRelation {
         /** 上下左右关联对象 */
@@ -3596,11 +3656,8 @@ declare namespace coreLib {
         private _aniPath;
         private _complete;
         private _loadAniMode;
-        /** 播放动画组 */
-        private playGroup;
+        /** 播放动画的id */
         private playGroupIndex;
-        /** 播放数组 附带参数 */
-        private playGroupArgs;
         /** 自定义缓存的Templet名字 */
         cacheName: string;
         /** 缓存每次播放的名字或下标 */
@@ -3609,8 +3666,13 @@ declare namespace coreLib {
         private stoppedHandler;
         /**
          * 动画播放速率 1为标准速率
+         * @default 1
          */
         playbackRate: number;
+        /**
+         * 播放数据
+         */
+        private skeletonPlay;
         constructor(aniMode?: number);
         protected createDisplayObject(): void;
         get asSkeleton(): Laya.Skeleton;
@@ -3642,8 +3704,9 @@ declare namespace coreLib {
          * @param    start        起始时间
          * @param    end            结束时间
          * @param    freshSkin    是否刷新皮肤数据
+         * @param playAudio 自动播放声音
          */
-        play(nameOrIndex: string | number | (string | number)[], loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
+        play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
         /**
          * 延迟播放动画
          * @param    playDelay    延迟时间
@@ -3653,10 +3716,19 @@ declare namespace coreLib {
          * @param    start        起始时间
          * @param    end            结束时间
          * @param    freshSkin    是否刷新皮肤数据
+         *
+         * @deprecated
          */
-        playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[], loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
+        playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
         private onPlayStopped;
-        private startPlay;
+        /**
+         * 播放动画
+         * @param skeletonPlay 播放数据
+         * @param playGroupIndex 如果是播放数组动画 需要要播放动画的位置
+         * @private
+         */
+        playAni(skeletonPlay: ISkeletonPlay, playGroupIndex?: number): void;
+        private _play;
         paused(): void;
         resume(): void;
         stop(): void;
@@ -3701,6 +3773,7 @@ declare namespace coreLib {
         on(type: string, thisObject: any, listener: Function, args?: any[]): void;
         off(type: string, thisObject: any, listener: Function): void;
         offAll(type?: string): void;
+        getSkeletonPlay(): ISkeletonPlay;
         dispose(): void;
         get t(): number;
         set t(value: number);
@@ -3738,16 +3811,26 @@ declare namespace coreLib {
         private p2;
         private p3;
         private p4;
-        private _aniPath;
-        private _complete;
-        /** 播放动画组 */
-        private playGroup;
-        private playGroupIndex;
-        /** 播放结束执行函数 */
-        private stoppedHandler;
         private readonly ver;
         private spineSkeleton;
         private template;
+        /** 加载路径 */
+        private _aniPath;
+        private _complete;
+        private playGroupIndex;
+        /** 缓存每次播放的名字或下标 */
+        nameOrIndex: string | number;
+        /** 播放结束执行函数 */
+        private stoppedHandler;
+        /**
+         * 动画播放速率 1为标准速率
+         * @default 1
+         */
+        playbackRate: number;
+        /**
+         * 播放数据
+         */
+        private skeletonPlay;
         constructor(ver?: Laya.SpineVersion);
         protected createDisplayObject(): void;
         get asSkeleton(): Laya.SpineSkeleton;
@@ -3772,7 +3855,9 @@ declare namespace coreLib {
          * @param    freshSkin    是否刷新皮肤数据
          * @param    playAudio    是否播放音频
          */
-        play(nameOrIndex: string | number | (string | number)[], loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
+        play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
+        playAni(skeletonPlay: ISkeletonPlay, playGroupIndex?: number): void;
+        private _play;
         private onPlayStopped;
         paused(): void;
         resume(): void;
@@ -5044,9 +5129,9 @@ declare namespace coreLib {
          * @param loaderComplete
          * @param aniMode
          */
-        static playSpine(skeleton: GSkeleton | GSpineSkeleton, url: string, nameOrIndex?: string | number | (string | number)[], loop?: boolean, playComplete?: ParamHandler, loaderComplete?: ParamHandler, aniMode?: number): void;
+        static playSpine(skeleton: GSkeleton | GSpineSkeleton, url: string, nameOrIndex?: string | number | (string | number)[] | ISkeletonPlay, loop?: boolean, playComplete?: ParamHandler, loaderComplete?: ParamHandler, aniMode?: number): void;
         private static parseComplete;
-        static createSpineSk(spine: GSpineSkeleton, url: string, nameOrIndex?: string | number | (string | number)[], loop?: boolean, playComplete?: ParamHandler, loaderComplete?: ParamHandler): void;
+        static createSpineSk(spine: GSpineSkeleton, url: string, nameOrIndex?: string | number | (string | number)[] | ISkeletonPlay, loop?: boolean, playComplete?: ParamHandler, loaderComplete?: ParamHandler): void;
         /**
          * 创建spine 骨骼动画组件
          * @param url 根据传入的json 或 sk自动创建 GSpineSkeleton、GSkeleton

@@ -6,6 +6,7 @@ import SpineTempletBase = Laya.SpineTempletBase;
 import Point = Laya.Point;
 import SpineSkeleton = Laya.SpineSkeleton;
 import Rectangle = Laya.Rectangle;
+import {ISkeletonPlay} from "../interfaces/ICommon";
 
 export class GSpineSkeleton extends GComponent {
 
@@ -16,19 +17,26 @@ export class GSpineSkeleton extends GComponent {
     private p3: Point
     private p4: Point
 
-    //加载路径
-    private _aniPath: string
-    private _complete: ParamHandler
-    /** 播放动画组 */
-    private playGroup: (string | number)[] = []
-    private playGroupIndex = 0
-
-    /** 播放结束执行函数 */
-    private stoppedHandler: Laya.Handler[] = []
-
     private readonly ver: SpineVersion
     private spineSkeleton: Laya.SpineSkeleton
     private template: Laya.SpineTemplet
+    /** 加载路径 */
+    private _aniPath: string
+    private _complete: ParamHandler
+    private playGroupIndex = 0
+    /** 缓存每次播放的名字或下标 */
+    nameOrIndex: string | number
+    /** 播放结束执行函数 */
+    private stoppedHandler: Laya.Handler[] = []
+    /**
+     * 动画播放速率 1为标准速率
+     * @default 1
+     */
+    playbackRate = 1
+    /**
+     * 播放数据
+     */
+    private skeletonPlay: ISkeletonPlay
 
     constructor(ver: SpineVersion = SpineVersion.v3_8) {
         super()
@@ -43,7 +51,7 @@ export class GSpineSkeleton extends GComponent {
         this.spineSkeleton = this._displayObject = new SpineSkeleton()
         this._displayObject["$owner"] = this
         this["_touchable"] = this._displayObject.mouseEnabled = this._displayObject.mouseThrough = false
-        // this._displayObject.on(Event.STOPPED, this, this.onPlayStopped)
+        this._displayObject.on(Event.STOPPED, this, this.onPlayStopped)
 
         this._container = this._displayObject
 
@@ -106,29 +114,77 @@ export class GSpineSkeleton extends GComponent {
      * @param    freshSkin    是否刷新皮肤数据
      * @param    playAudio    是否播放音频
      */
-    play(nameOrIndex: string | number | (string | number)[], loop: boolean, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
+    play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
         if (this.asSkeleton.templet == null) return
-        if (Array.isArray(nameOrIndex)) {
-            this.playGroup = nameOrIndex
-            this.asSkeleton.off(Event.STOPPED, this, this.onPlayStopped)
-            this.asSkeleton.on(Event.STOPPED, this, this.onPlayStopped, [loop, force, freshSkin])
-            this.playGroupIndex = 0
-            nameOrIndex = this.playGroup[this.playGroupIndex]
-            if (this.playGroup.length > 1) loop = false
-            console.log(nameOrIndex, loop)
+        this.playGroupIndex = 0
+        if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
+            this.playAni(nameOrIndex)
+            return
         }
-        this.asSkeleton.play(nameOrIndex, loop, force, start, end, freshSkin, playAudio)
+        this.playAni({
+            nameOrIndex: nameOrIndex, loop: loop, force: force,
+            start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
+        })
+    }
+
+    playAni(skeletonPlay: ISkeletonPlay, playGroupIndex = -1) {
+        if (this.asSkeleton.templet == null) return
+        if (skeletonPlay == null && this.skeletonPlay == null) {
+            console.warn("not found play data " + skeletonPlay)
+            return;
+        }
+        if (skeletonPlay) {
+            skeletonPlay.loop ??= true
+            this.skeletonPlay = skeletonPlay
+        }
+        if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
+            playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex
+            this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex]
+        } else {
+            this.nameOrIndex = this.skeletonPlay.nameOrIndex
+        }
+        this.asSkeleton.playbackRate(this.skeletonPlay.playbackRate ?? this.playbackRate)
+
+        if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
+            Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay])
+        } else {
+            this._play(this.skeletonPlay)
+        }
+    }
+
+    private _play(skeletonPlay: ISkeletonPlay) {
+        this.asSkeleton.play(this.nameOrIndex, false, skeletonPlay.force ?? true,
+            skeletonPlay.start ?? 0, skeletonPlay.end ?? 0,
+            skeletonPlay.freshSkin ?? true, skeletonPlay.playAudio ?? true)
     }
 
     private onPlayStopped(loop: boolean, force: boolean, freshSkin: boolean) {
-        this.playGroupIndex++
-        console.log("playEnd")
-        if (this.playGroup.length <= this.playGroupIndex) {
-            return
+        if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
+            // 在播放动画数组
+            this.playGroupIndex++
+            let isNewPro = false
+            if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex ||
+                (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
+                if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                    Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex])
+                } else {
+                    this.playAni(this.skeletonPlay, this.playGroupIndex)
+                }
+                return
+            }
+        } else {
+            if (this.skeletonPlay.loop) {
+                if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                    Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex])
+                } else {
+                    this.playAni(this.skeletonPlay, this.playGroupIndex)
+                }
+                return
+            }
         }
-        if (this.playGroup.length > this.playGroupIndex + 1) loop = false
-        let nameOrIndex = this.playGroup[this.playGroupIndex]
-        this.asSkeleton.play(nameOrIndex, loop, force, 0, 0, freshSkin)
+        for (let i = 0; i < this.stoppedHandler.length; i++) {
+            this.stoppedHandler[i].run()
+        }
     }
 
     paused() {
@@ -195,44 +251,44 @@ export class GSpineSkeleton extends GComponent {
     }
 
     on(type: string, thisObject: any, listener: Function, args: any[] = null) {
-        // if (type == Event.STOPPED) {
-        //     this.stoppedHandler.push(new Handler(thisObject, listener, args))
-        //     return
-        // }
-        // if (this.spineSkeleton) {
-        //     this.spineSkeleton.on(type, thisObject, listener, args)
-        //     return
-        // }
+        if (type == Event.STOPPED) {
+            this.stoppedHandler.push(new Laya.Handler(thisObject, listener, args))
+            return
+        }
+        if (this.spineSkeleton) {
+            this.spineSkeleton.on(type, thisObject, listener, args)
+            return
+        }
         super.on(type, thisObject, listener, args)
     }
 
     off(type: string, thisObject: any, listener: Function) {
-        // if (type == Event.STOPPED) {
-        //     for (let i = this.stoppedHandler.length - 1; i > -1; i--) {
-        //         const handler = this.stoppedHandler[i]
-        //         if (handler.caller == thisObject && handler.method == listener) {
-        //             handler.clear()
-        //             this.stoppedHandler.splice(i, 1)
-        //         }
-        //     }
-        //     return
-        // }
-        // if (this.spineSkeleton) {
-        //     this.spineSkeleton.off(type, thisObject, listener)
-        //     return
-        // }
+        if (type == Event.STOPPED) {
+            for (let i = this.stoppedHandler.length - 1; i > -1; i--) {
+                const handler = this.stoppedHandler[i]
+                if (handler.caller == thisObject && handler.method == listener) {
+                    handler.clear()
+                    this.stoppedHandler.splice(i, 1)
+                }
+            }
+            return
+        }
+        if (this.spineSkeleton) {
+            this.spineSkeleton.off(type, thisObject, listener)
+            return
+        }
         super.off(type, thisObject, listener)
     }
 
     offAll(type: string = null) {
-        // if (type == Event.STOPPED) {
-        //     this.stoppedHandler.length = 0
-        //     return
-        // }
-        // if (this.spineSkeleton) {
-        //     this.spineSkeleton.offAll(type)
-        //     return
-        // }
+        if (type == Event.STOPPED) {
+            this.stoppedHandler.length = 0
+            return
+        }
+        if (this.spineSkeleton) {
+            this.spineSkeleton.offAll(type)
+            return
+        }
         this.displayObject.offAll(type)
     }
 
