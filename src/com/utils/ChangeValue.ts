@@ -174,19 +174,20 @@ export class ChangeValue {
     }
 
     private changeAnteHandler(code: number) {
-        if (this.antes == null || this.antes.length == 0) {
+        let antes = this.antes
+        if (antes == null || antes.length == 0) {
             return
         }
         let tempAnte = parseFloat(this.label.text)
         let ante = tempAnte
-        let index = this.antes.indexOf(ante)
+        let index = antes.indexOf(ante)
         if (index == -1) {
-            ante = this.antes[0]
+            ante = antes[0]
         } else {
             if (code == 1) {// 加
                 index++
-                if (index >= this.antes.length) {
-                    index = this.antes.length - 1
+                if (index >= antes.length) {
+                    index = antes.length - 1
                 }
             } else if (code == 2) {// 减
                 index--
@@ -194,7 +195,7 @@ export class ChangeValue {
                     index = 0
                 }
             }
-            ante = this.antes[index]
+            ante = antes[index]
         }
 
         if (this.dateChangeBefore != null) {

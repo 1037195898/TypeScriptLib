@@ -72,8 +72,8 @@ export class LongPressBtn {
 
     private clickHandler(e: Laya.Event) {
         if (e != null) e.stopPropagation()
-        this.args.unshift(this.callback)
-        runFun.apply(null, this.args)
+        let args = [this.callback].concat(this.args)
+        runFun.apply(null, args)
     }
 
     get isApeHold() {
