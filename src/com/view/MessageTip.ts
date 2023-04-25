@@ -12,21 +12,21 @@ import {AlertPanel} from "./AlertPanel"
 /** 消息提示框 */
 export class MessageTip extends GComponent {
 
-    private static NAME: string = "MessageTip"
+    private static NAME = "MessageTip"
     /** 使用中的 */
     private static usePool: MessageTip[] = []
     /** 缓存的内容 */
-    private static cacheContent = []
-    /** 展示时间 */
-    static displayTime = 3000
+    private static cacheContent: { time: number, content: string }[] = []
+    /** 展示时间
+     * @default 1800
+     */
+    static displayTime = 1800
     content: GTextField
     tween: Tween
     /** 缓存的字体大小 */
     tempFontSize: number
-
-    constructor() {
-        super()
-    }
+    /** 当前执行的步骤 */
+    private steps: number
 
     protected constructFromXML(xml: any) {
         super.constructFromXML(xml)
@@ -53,8 +53,9 @@ export class MessageTip extends GComponent {
      * 显示文本提示框
      * @see LibStr
      * @param value 内容 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
+     * @param [duration = 1800ms] 提示内容展示时长
      */
-    static showTip(value: string | number | any[]) {
+    static showTip(value: string | number | any[], duration = MessageTip.displayTime) {
         if (UIPackage.getByName("common") == null || value == null)
             return
         if (Array.isArray(value)) {
@@ -63,83 +64,111 @@ export class MessageTip extends GComponent {
         } else {
             value = LanguageUtils.inst.getStr(value)
         }
-        this.cacheContent.push(value)
-        if (this.cacheContent.length > 5) {// 最多缓存5条
-            this.cacheContent.shift()
+        MessageTip.cacheContent.push({time: duration, content: value})
+        if (MessageTip.cacheContent.length > 5) {// 最多缓存5条
+            MessageTip.cacheContent.shift()
         }
-        this.showMes()
+        MessageTip.createMsgTip()
     }
 
-    private static createHandler(): MessageTip {
+    private static createMsgTip() {
+        if (MessageTip.cacheContent.length < 1) return
+        const tipData = MessageTip.cacheContent.shift()
+        let mt: MessageTip = Pool.getItemByCreateFun(MessageTip.NAME, this.createHandler)
+        mt.showMes(tipData.content, tipData.time)
+
+        // 已经显示2个或以上  加消失
+        if (MessageTip.usePool.length < 2) return
+        let len = MessageTip.usePool.length - 2
+        for (let i = len; i >= 0; i--) {
+            const msg = MessageTip.usePool[i]
+            if (len === i) {
+                if (msg.steps == 1) {
+                    msg.tween?.complete()
+                    msg.movePoint()
+                } else if (msg.steps == 2) {
+                    msg.movePoint()
+                }
+            } else { // 至少有3个值了
+                if (msg.steps < 3) {
+                    Tween.clearAll(msg)
+                    msg.tween = null
+                    msg.movePoint(((AlertPanel.inst.height - msg.height) >> 1) - msg.moveUpStep * 2)
+                    if (msg.steps === 1) msg.alpha = msg.scaleX = 1
+                    msg.showEnd(400)
+                }
+            }
+        }
+
+    }
+
+    private static createHandler() {
         return UIPackage.createObjectFromURL("//common/MessageTip", MessageTip) as MessageTip
     }
 
     /**
      * 显示弹窗内容
      */
-    private static showMes() {
-        let mt: MessageTip = Pool.getItemByCreateFun(MessageTip.NAME, this.createHandler)
-        mt.removeRelation(AlertPanel.inst, RelationType.Width)
-        mt["applyPivot"]()
-        mt.width = AlertPanel.inst.width
-//		mt.fontSize = Math.floor(mt.tempFontSize * AlertPanel.inst.width / mt.initWidth)
-        mt.content.text = this.cacheContent.shift()
-        mt.alpha = .1
-        mt.x = 0
-        mt.y = (AlertPanel.inst.height - mt.height) >> 1
-        mt.scaleX = .5
-        mt.addRelation(AlertPanel.inst, RelationType.Width)
-        AlertPanel.inst.addChild(mt)
-        mt.tween = Tween.to(mt, {
-            alpha: 1,
-            scaleX: 1
-        }, 400, null, Handler.create(mt, this.showEnd, [mt, this.displayTime]))
-        this.usePool.push(mt)
-        switch (this.usePool.length) {
-            case 2:
-                Tween.clear(this.usePool[0].tween)
-                this.showEnd(this.usePool[0], this.displayTime)
-                this.movePoint(this.usePool[0])
-                break
-            case 3:
-                Tween.clear(this.usePool[0].tween)
-                this.showEnd(this.usePool[0])
-                this.movePoint(this.usePool[1])
-                break
-        }
+    private showMes(msg: string, duration: number) {
+        this["applyPivot"]()
+        this.width = AlertPanel.inst.width
+//		this.fontSize = Math.floor(this.tempFontSize * AlertPanel.inst.width / this.initWidth)
+        this.content.text = msg
+        this.alpha = .1
+        this.setXY(0, (AlertPanel.inst.height - this.height) >> 1)
+        this.scaleX = .5
+        this.addRelation(AlertPanel.inst, RelationType.Width)
+        AlertPanel.inst.addChild(this)
+        MessageTip.usePool.push(this)
+        this.steps = 1
+        this.tween = Tween.to(this, {alpha: 1, scaleX: 1}, 400,
+            null, Handler.create(this, this.showEnd, [duration]))
     }
 
-    private static movePoint(mt: MessageTip) {
-        Tween.to(mt, {y: mt.y - mt.height - 5}, 300)
+    /**
+     * 向上移动一次的距离
+     * @private
+     */
+    private get moveUpStep() {
+        return this.height /* + 5 */
     }
 
-    private static showEnd(mt: MessageTip, delay: number = 0) {
-        mt.tween = Tween.to(mt, {
+    private movePoint(moveY = -1) {
+        this.tween?.pause() // 移动过程中先暂停
+        if (moveY === -1) moveY = this.y - this.moveUpStep
+        Tween.to(this, {y: moveY}, 300, null, Handler.create(this, () => {
+            this.tween?.resume()
+        }), 0, false)
+    }
+
+    private showEnd(delay = 0) {
+        this.steps = delay === 0 ? 3 : 2
+        this.tween = Tween.to(this, {
             alpha: 0,
             scaleX: .5,
-            y: mt.y - 100
-        }, 400, null, Handler.create(this, this.hideEnd, [mt]), delay)
+            y: this.y - 100
+        }, 400, null, Handler.create(this, this.hideEnd), delay)
     }
 
-    private static hideEnd(mt: MessageTip) {
-        mt.tween = null
-        mt.removeFromParent()
-        Pool.recover(this.NAME, mt)
-        let index: number = this.usePool.indexOf(mt)
-        this.usePool.splice(index, 1)
-        if (this.cacheContent.length > 0) {
-            this.showMes()
-        }
+    private hideEnd() {
+        this.steps = 3
+        Tween.clearAll(this)
+        this.tween = null
+        this.removeRelation(AlertPanel.inst, RelationType.Width)
+        this.removeFromParent()
+        Pool.recover(MessageTip.NAME, this)
+        let index = MessageTip.usePool.indexOf(this)
+        MessageTip.usePool.splice(index, 1)
+        MessageTip.createMsgTip()
     }
 
     /** 清楚所有提示 */
     static clearAll() {
-        this.cacheContent.splice(0, this.cacheContent.length)
+        MessageTip.cacheContent.splice(0, MessageTip.cacheContent.length)
         let tip: MessageTip
         for (let i = 0; i < AlertPanel.inst.numChildren; i++) {
             tip = AlertPanel.inst.getChildAt(0) as MessageTip
-            Tween.clearAll(tip)
-            this.hideEnd(tip)
+            tip.hideEnd()
             i--
         }
     }

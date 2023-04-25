@@ -317,7 +317,7 @@ export class SceneManager extends BaseProxy {
 
     /** 检查游戏状态 */
     private checkGameState(data: any) {
-        if (data.code == -1) return
+        if (data?.code == -1) return
         // 如果是游客模式
         if (Player.inst.isGuest) {
             Player.inst.cacheMoney = Player.inst.money

@@ -167,7 +167,7 @@ export class AppRecordManager {
                 if (token) {
                     Player.inst.token = token
                     Player.inst.login.loginToken((data: any) => {
-                        if (data.code == HttpCode.OK) {
+                        if (data?.code == HttpCode.OK) {
                             if (Player.inst.gameModel != -1) {
                                 AppRecordManager.JavaSendOpen(json)
                             } else {
