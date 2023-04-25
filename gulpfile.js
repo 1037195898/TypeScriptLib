@@ -12,95 +12,53 @@ const fs = require('fs')
 const http = require('https')
 const zlib = require('zlib')
 const AdmZip = require('adm-zip')
+const generate = require("./index")
 
 const tsProject = ts.createProject('tsconfig.json')
 // 需要添加到最前面的类
-let beforeTs = ["src/com/core/View.ts", "src/com/core/Proxys.ts", "src/com/core/BaseView.ts", "src/com/utils/ChangeValue.ts", "src/com/utils/UtilsTool.ts"]
+let beforeTs = ["src/com/core/View.ts", "src/com/core/Proxys.ts",
+    "src/com/core/BaseView.ts", "src/com/utils/ChangeValue.ts",
+    "src/com/utils/UtilsTool.ts"]
+
+generate.tsProject = tsProject
+generate.beforeTs = beforeTs
+generate.libs = ["libs/**/*", "src/**/*.d.ts"]
+generate.project = "gameCore"
+generate.namespace = "coreLib"
+generate.saveTempPath = "bin"
+generate.saveTempTs = "d22.ts"
+
+
 
 gulp.task("clean", () => {
-    return del(["bin/**/*.*", "!bin/*.html", "!bin/webp"], {force: true})
+    return generate.clean(["bin/**/*.*", "!bin/*.html", "!bin/webp"])
 })
 
 gulp.task('createTS', () => {
-    if (!fs.existsSync("bin/temp")) {
-        fs.mkdirSync("bin/temp")
-    }
-    return gulp.src(beforeTs.concat(["src/**/*.ts", "!**/*.d.ts"]))
-        .pipe(each(function (content, file, callback) {
-            // console.log(file.history[0])
-            let contents = content.split('\n')
-            let arr = []
-            let newContent = []
-            for (let line of contents) {
-                // if (line.startsWith("declare namespace ")) {
-                //     break
-                // } else
-                if (line.startsWith("import ")) {
-                    if (!line.match(/((\s|})from(\s|"|{))/g) && line.indexOf("=") > -1) {
-                        arr.push(line)
-                    }
-                } else {
-                    if (arr.length === 0) {
-                        newContent.push(line)
-                        continue
-                    }
-                    for (let i = 0; i < arr.length; i++) {
-                        let tar = arr[i].substring(arr[i].indexOf("import ") + 6, arr[i].indexOf("=")).trim()
-                        let reg = new RegExp("(?<=\\s|:|\\(|!|<|\\[)" + tar + "(?=\\s+?|\\.|\\[|,|\"|\\(|\\)|;|,|>|$)", "g")
-                        if (reg.test(line)) {
-                            let endIndex = arr[i].lastIndexOf(".")
-                            let newC = arr[i].substring(arr[i].lastIndexOf("=") + 1, endIndex).trim()
-                            let value = reg.exec(line)
-                            line = line.replace(reg, newC + "." + tar)
-                        }
-                    }
-                    newContent.push(line)
-                }
-            }
-            callback(null, newContent.join("\n"))
-        }))
-        .pipe(concat("d.ts"))
-        // .pipe(inject.replace("export\s+(?=class|enum|interface|const)", ""))
-        .pipe(inject.prepend('namespace coreLib {\n'))
-        .pipe(inject.append('\n}'))
-        .pipe(gulp.dest("bin/temp"))
+    return generate.createTS(["src/**/*.ts", "!**/*.d.ts"])
 })
 
 gulp.task('createJs', () => {
-    return gulp.src(["bin/temp/d.ts", "libs/**/*", "src/**/*.d.ts"])
-        .pipe(tsProject())
-        .js
-        .pipe(concat("gameCore.js"))
-        .pipe(inject.replace('var coreLib;', ''))
-        .pipe(inject.prepend('window.coreLib = {};\n'))
-        // .pipe(babel({presets: ['@babel/preset-env']}))
-        .pipe(minify({ext: {min: ".min.js"}}))
-        .pipe(gulp.dest('bin'))
+    return generate.createJs()
 })
 
 gulp.task('createDTs', () => {
-    return gulp.src(["bin/temp/d.ts", "libs/**/*", "src/**/*.d.ts"])
-        .pipe(tsProject())
-        .dts
-        .pipe(concat("gameCore.d.ts"))
-        .pipe(gulp.dest('bin'))
+    return generate.createDTs()
 })
 
 gulp.task('dtsAppend', (cd) => {
-    fs.appendFileSync("bin/gameCore.d.ts", "\n\n" + fs.readFileSync("src/com/define.d.ts"))
+    generate.dtsAppend("src/com/define.d.ts")
     return cd()
 })
 
 gulp.task('removeTemp', () => {
-    return del(["bin/temp/"], {force: true})
+    return generate.clean("bin/temp/")
 })
 
 //完整构建
-gulp.task('build', gulp.series("clean", 'createTS', "createJs", "createDTs", "dtsAppend", (cb) => {
-    gulp.series("removeTemp")()
-    return cb()
-}))
-// gulp.task('build', gulp.series("clean", 'createTS', "createJs", "createDTs", "dtsAppend", "removeTemp"))
+gulp.task('build', gulp.series("clean", 'createTS', "createJs", "createDTs", "dtsAppend"
+    , "removeTemp"
+))
 
 
 let downloadWebp = "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.3.0-windows-x64.zip"

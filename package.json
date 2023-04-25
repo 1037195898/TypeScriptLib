@@ -27,6 +27,7 @@
     "bin/gameCore.min.js",
     "bin/webp/",
     "ToWebp.js",
+    "index.js",
     "webp/buffer_utils.js",
     "webp/cwebp.js",
     "webp/dwebp.js",
