@@ -1,5 +1,5 @@
-import GButton = fgui.GButton
-import GTextField = fgui.GTextField
+import GButton = fgui.GButton;
+import GTextField = fgui.GTextField;
 import {LongPressBtn} from "./LongPressBtn"
 import {UtilsTool} from "./UtilsTool"
 
@@ -60,7 +60,10 @@ export class ChangeValue {
         }
     }
 
-    /** 设置到最大 */
+    /**
+     * 设置到最大
+     * @param [isEvent = true] 是否派发本次改变值的事件
+     */
     max(isEvent = true) {
         if (this.antes == null || this.antes.length == 0) {
             return
@@ -75,7 +78,10 @@ export class ChangeValue {
         if (isEvent) this.sendEventValue(ante)
     }
 
-    /** 设置到最小 */
+    /**
+     * 设置到最小
+     * @param [isEvent = true] 是否派发本次改变值的事件
+     */
     min(isEvent = true) {
         if (this.antes == null || this.antes.length == 0) {
             return
@@ -99,9 +105,9 @@ export class ChangeValue {
 
     /**
      * 赌注值
-     * @param value
-     * @param defaultValue 默认1
-     * @param isEvent 默认true
+     * @param value 值
+     * @param [defaultValue = 1] 默认取值
+     * @param [isEvent = true] 是否派发本次改变值的事件
      */
     setAntes(value?: number[], defaultValue = 1, isEvent = true) {
         if (value) this._antes = value
@@ -115,7 +121,7 @@ export class ChangeValue {
     /**
      * 设置显示为最接近参考值的值
      * @param value 一个参考值
-     * @param isEvent 是否派发事件
+     * @param [isEvent = true] 是否派发本次改变值的事件
      */
     setClosest(value: number, isEvent = true) {
         if (this.antes == null || this.antes.length == 0) return
@@ -136,7 +142,7 @@ export class ChangeValue {
 
     /**
      * 返回上一个值
-     * @param isEvent 是否派发事件
+     * @param [isEvent = true] 是否派发本次改变值的事件
      */
     before(isEvent = true) {
         let tempAnte = parseFloat(this.label.text)
@@ -147,21 +153,29 @@ export class ChangeValue {
         }
     }
 
-    /** 设置切换到指定的位置 */
+    /**
+     * 设置切换到指定的位置
+     * @param index 下标
+     * @param [isEvent = true] 是否派发本次改变值的事件 如果值和当前的值相同 不派发事件
+     */
     setPosition(index: number, isEvent = true) {
         if (index > -1 && index < this.antes.length) {
-            this.lastValue = parseFloat(this.label.text)
-            this.label.text = this.antes[index] + ""
-            if (isEvent) this.sendEventValue(this.antes[index])
+            let newValue = this.antes[index]
+            let lastValue = parseFloat(this.label.text)
+            if (newValue === lastValue) return
+            // 值相等不发送
+            this.lastValue = lastValue
+            this.label.text = newValue + ""
+            if (isEvent) this.sendEventValue(newValue)
         }
     }
 
-    get antes() {
+    get antes(): number[] {
         return runFun(this.dynamicHandler) ?? this._antes
     }
 
     /** 兼容老版本 */
-    getAntes(): any[] {
+    getAntes(): number[] {
         return this.antes
     }
 
@@ -220,8 +234,8 @@ export class ChangeValue {
     }
 
     dispose() {
-        if (this.jiaLongPressBtn != null) this.jiaLongPressBtn.dispose()
-        if (this.jianLongPressBtn != null) this.jianLongPressBtn.dispose()
+        this.jiaLongPressBtn?.dispose()
+        this.jianLongPressBtn?.dispose()
     }
 
     /** 检查自动启用停止 */
