@@ -19,14 +19,21 @@ export class SpineUtils {
      */
     static playSpine(skeleton: GSkeleton | GSpineSkeleton, url: string, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay = 0,
                      loop = true, playComplete?: ParamHandler, loaderComplete?: ParamHandler, aniMode = -1) {
-        if (skeleton instanceof GSpineSkeleton) {
-            this.createSpineSk(skeleton, url, nameOrIndex, loop, playComplete, loaderComplete)
-            return
-        }
         skeleton.offAll(Event.STOPPED)
         skeleton.on(Event.STOPPED, this, function (handler: ParamHandler) {
             runFun(handler)
         }, [playComplete])
+        if (skeleton instanceof GSpineSkeleton) {
+            if (skeleton.aniPath == url && skeleton.asSkeleton != null) {
+                // loaderComplete && loaderComplete.run()
+                SpineUtils.parseComplete(skeleton, nameOrIndex, loop, loaderComplete)
+                return
+            }
+            // 界面显示了  在加载资源
+            skeleton.load(url,
+                Handler.create(this, SpineUtils.parseComplete, [spine, nameOrIndex, loop, loaderComplete]))
+            return
+        }
         if (skeleton.asSkeleton.url == url && skeleton.asSkeleton.templet) {
             // loaderComplete && loaderComplete.run()
             SpineUtils.parseComplete(skeleton, nameOrIndex, loop, loaderComplete, null)
@@ -44,35 +51,17 @@ export class SpineUtils {
         skeleton.play(nameOrIndex, loop)
     }
 
-
-    static createSpineSk(spine: GSpineSkeleton, url: string, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay = 0,
-                         loop = true, playComplete?: ParamHandler, loaderComplete?: ParamHandler) {
-        spine.offAll(Event.STOPPED)
-        spine.on(Event.STOPPED, this, function (handler: ParamHandler) {
-            runFun(handler)
-        }, [playComplete])
-        if (spine.aniPath == url && spine.asSkeleton != null) {
-            // loaderComplete && loaderComplete.run()
-            SpineUtils.parseComplete(spine, nameOrIndex, loop, loaderComplete)
-            return
-        }
-        // 界面显示了  在加载资源
-        spine.load(url,
-            Handler.create(this, SpineUtils.parseComplete, [spine, nameOrIndex, loop, loaderComplete]))
-    }
-
     /**
      * 创建spine 骨骼动画组件
      * @param url 根据传入的json 或 sk自动创建 GSpineSkeleton、GSkeleton
      * @param optional
      * @param SkeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
      */
-    static createSpine(url: string, optional?: ISkeletonData, SkeletonClass?: {
-        new<T extends GSkeleton | GSpineSkeleton>()
-    }) {
-
+    static createSpine<T extends GSkeleton | GSpineSkeleton>(url: string, optional?: ISkeletonData,
+                                                             SkeletonClass?: { new(v?): T }): T {
         optional ||= {}
 
+        // @ts-ignore
         SkeletonClass ??= Laya.Utils.getFileExtension(url) === "json" ? GSpineSkeleton : GSkeleton
 
         const skeleton = new SkeletonClass()
