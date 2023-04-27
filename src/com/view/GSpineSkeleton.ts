@@ -121,7 +121,6 @@ export class GSpineSkeleton extends GComponent {
             this.playAni(nameOrIndex)
             return
         }
-        nameOrIndex ??= 0
         this.playAni({
             nameOrIndex: nameOrIndex, loop: loop, force: force,
             start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
@@ -142,7 +141,7 @@ export class GSpineSkeleton extends GComponent {
             playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex
             this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex]
         } else {
-            this.nameOrIndex = this.skeletonPlay.nameOrIndex
+            this.nameOrIndex = this.skeletonPlay.nameOrIndex ?? 0
         }
         this.asSkeleton.playbackRate(this.skeletonPlay.playbackRate ?? this.playbackRate)
 

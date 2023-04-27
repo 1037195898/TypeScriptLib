@@ -11170,7 +11170,6 @@ window.coreLib = {};
                 this.playAni(nameOrIndex);
                 return;
             }
-            nameOrIndex !== null && nameOrIndex !== void 0 ? nameOrIndex : (nameOrIndex = 0);
             this.playAni({
                 nameOrIndex: nameOrIndex, loop: loop, force: force,
                 start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
@@ -11233,7 +11232,7 @@ window.coreLib = {};
          * @private
          */
         playAni(skeletonPlay, playGroupIndex = -1) {
-            var _a, _b;
+            var _a, _b, _c;
             if (this.asSkeleton.templet == null)
                 return;
             if (skeletonPlay == null && this.skeletonPlay == null) {
@@ -11249,9 +11248,9 @@ window.coreLib = {};
                 this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex];
             }
             else {
-                this.nameOrIndex = this.skeletonPlay.nameOrIndex;
+                this.nameOrIndex = (_b = this.skeletonPlay.nameOrIndex) !== null && _b !== void 0 ? _b : 0;
             }
-            this.asSkeleton.playbackRate((_b = this.skeletonPlay.playbackRate) !== null && _b !== void 0 ? _b : this.playbackRate);
+            this.asSkeleton.playbackRate((_c = this.skeletonPlay.playbackRate) !== null && _c !== void 0 ? _c : this.playbackRate);
             if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
                 Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay]);
             }
@@ -11561,14 +11560,13 @@ window.coreLib = {};
                 this.playAni(nameOrIndex);
                 return;
             }
-            nameOrIndex !== null && nameOrIndex !== void 0 ? nameOrIndex : (nameOrIndex = 0);
             this.playAni({
                 nameOrIndex: nameOrIndex, loop: loop, force: force,
                 start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
             });
         }
         playAni(skeletonPlay, playGroupIndex = -1) {
-            var _a, _b;
+            var _a, _b, _c;
             if (this.asSkeleton.templet == null)
                 return;
             if (skeletonPlay == null && this.skeletonPlay == null) {
@@ -11584,9 +11582,9 @@ window.coreLib = {};
                 this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex];
             }
             else {
-                this.nameOrIndex = this.skeletonPlay.nameOrIndex;
+                this.nameOrIndex = (_b = this.skeletonPlay.nameOrIndex) !== null && _b !== void 0 ? _b : 0;
             }
-            this.asSkeleton.playbackRate((_b = this.skeletonPlay.playbackRate) !== null && _b !== void 0 ? _b : this.playbackRate);
+            this.asSkeleton.playbackRate((_c = this.skeletonPlay.playbackRate) !== null && _c !== void 0 ? _c : this.playbackRate);
             if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
                 Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay]);
             }
