@@ -351,6 +351,8 @@ class MySpineSkeleton extends Laya.SpineSkeleton {
         super.init(templet);
         let that = this;
         // @ts-ignore
+        this.state.clearListeners()
+        // @ts-ignore
         this.state.addListener({
             start: function(entry: any) {
                 // console.log("started:", entry);
