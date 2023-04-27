@@ -4806,11 +4806,6 @@ window.coreLib = {};
         }
     }
     coreLib.GoldSprayAni = GoldSprayAni;
-    let Method;
-    (function (Method) {
-        Method["GET"] = "get";
-        Method["POST"] = "post";
-    })(Method = coreLib.Method || (coreLib.Method = {}));
     /**
      * 统计管理器
      * @author boge
@@ -5697,7 +5692,7 @@ window.coreLib = {};
                     }
                 }
             }
-            loadArray = loadArray.concat(res);
+            loadArray = loadArray.concat(this.parseRes(res));
             if (fgui.UIPackage.getByName("gameCommon/gameCommon") == null) {
                 let gameCommonRes = Laya.Browser.window.gameCommon;
                 loadArray = loadArray.concat(gameCommonRes);
@@ -5735,6 +5730,44 @@ window.coreLib = {};
             // }
             // 开始load
             MyLoader.loader.load(loadArray, Laya.Handler.create(this, this.loadComplete), new Laya.Handler(this, this.progressComplete));
+        }
+        /**
+         * 处理资源
+         * @param res
+         * @private
+         */
+        parseRes(res) {
+            let data = res.concat();
+            let sks = data.filter(function (value, index, array) {
+                let temp;
+                return Laya.Utils.getFileExtension(value.url) === "sk"
+                    && (temp = value.url.replace(".sk", ".png")) !== null
+                    && array.findIndex(function (value) {
+                        return value === temp;
+                    }) === -1;
+            });
+            const spines = data.filter(function (value, index, array) {
+                return Laya.Utils.getFileExtension(value.url) === "json" && value.type === "spine";
+            });
+            for (const value of sks) {
+                data.push({ url: value.url.replace(".sk", ".png"), type: Laya.Loader.IMAGE, branch: value.branch });
+            }
+            for (const value of spines) {
+                value.type = "json";
+                let temp = value.url.replace(".json", ".atlas");
+                if (data.findIndex(function (value, index, obj) {
+                    return temp === value.url;
+                }) === -1) {
+                    data.push({ url: value.url.replace(".json", ".atlas"), type: "als", branch: value.branch });
+                }
+                temp = value.url.replace(".json", ".png");
+                if (data.findIndex(function (value, index, obj) {
+                    return temp === value.url;
+                }) === -1) {
+                    data.push({ url: value.url.replace(".json", ".png"), type: Laya.Loader.IMAGE, branch: value.branch });
+                }
+            }
+            return data;
         }
         /**
          * 检查分支资源更换加载
@@ -6351,6 +6384,11 @@ window.coreLib = {};
         }
     }
     coreLib.SceneManager = SceneManager;
+    let Method;
+    (function (Method) {
+        Method["GET"] = "get";
+        Method["POST"] = "post";
+    })(Method = coreLib.Method || (coreLib.Method = {}));
     /** 通信命令 */
     let Cmd;
     (function (Cmd) {
@@ -6950,6 +6988,201 @@ window.coreLib = {};
         /** 获取所有优惠券 */
         Urls["URL_GAME_ALL_COUPON"] = "/coupon/all?";
     })(Urls = coreLib.Urls || (coreLib.Urls = {}));
+    /** 卡牌 */
+    class Card extends BaseLabel {
+        constructor() {
+            super();
+            /** 偏移倍数 */
+            this.offsetMultiple = 0;
+            /** 中心点 */
+            this.tempPivot = new Laya.Point();
+        }
+        init(id) {
+            this.code = id;
+            this.value = id % 13 + 1;
+            this.nameCard = this.value === 1 ? 'A' : this.value === 11 ? 'J' : this.value === 12 ? 'Q' : this.value === 13 ? 'K' : this.value + "";
+            this.suit = id / 13 | 0;
+            this._suitName = this.suitName(this.suit);
+            this.nameCard = this.suit < 4 ? this.nameCard : 'JOKER';
+            // var z = (52 - id) / 4
+            // console.log(value, nameCard, suit)
+        }
+        suitName(value) {
+            // 黑红樱方
+            return value === 0 ? 'spades' : value === 1 ? 'hearts' : value === 2 ? 'clubs' : value === 3 ? 'diamonds' : 'joker';
+        }
+        createUI() {
+            this.displayObject.graphics.drawRect(0, 0, 100, 150, "#ffffff", "#000000", 2);
+            this.setSize(100, 150);
+            let text = new fgui.GBasicTextField();
+            text.text = this.nameCard;
+            text.fontSize = 30;
+            this.addChild(text);
+        }
+    }
+    coreLib.Card = Card;
+    class Deck {
+        constructor() {
+            /** 存放的卡牌 */
+            this.cards = [];
+            /** 已经完成了动画个数 */
+            this.completeNum = 0;
+            /** 动画执行次数 */
+            this.executeNum = 1;
+        }
+        createCard() {
+            for (let i = 0; i < 54; i++) {
+                let card = new Card();
+                card.init(i);
+                card.createUI();
+                card.initX = 400;
+                card.initY = 400;
+                card.offsetMultiple = .2;
+                card.offset = i * card.offsetMultiple;
+                card.setXY(card.initX - card.offset, card.initY - card.offset);
+                fgui.GRoot.inst.addChild(card);
+                this.cards.push(card);
+            }
+        }
+        /**
+         * 收集牌
+         * @param handler
+         * @param sort 是否需要排序
+         */
+        sort(handler = null, sort = true) {
+            if (this.isRun)
+                return;
+            this.isRun = true;
+            this.handler = handler;
+            this.completeNum = 0;
+            if (sort) {
+                this.cards.sort((a, b) => {
+                    return b.code - a.code;
+                });
+            }
+            let len = this.cards.length;
+            for (let i = 0; i < len; i++) {
+                let card = this.cards[i];
+                let tempPivot = card.tempPivot;
+                card.setPivot(tempPivot.x, tempPivot.y);
+                card.offset = i * card.offsetMultiple;
+                let _delay = i * 10;
+                // console.log(card.y, card.y + (- card.height * 1.5))
+                Laya.Tween.to(card, {
+                    x: card.initX - card.offset,
+                    y: card.y + (-card.height * 1.5),
+                    rotation: 0,
+                    scaleX: 1,
+                    scaleY: 1
+                }, _delay, null, Laya.Handler.create(this, (card) => {
+                    Laya.Tween.to(card, {
+                        x: card.initX - card.offset,
+                        y: card.initY - card.offset
+                    }, 400, null, Laya.Handler.create(this, () => {
+                        this.completeNum++;
+                        if (len == this.completeNum) {
+                            this.isRun = false;
+                            runFun(handler);
+                        }
+                    }));
+                }, [card]));
+                Laya.timer.once(200 + _delay, this, this.setChildIndexHandler, [card, i], false);
+            }
+        }
+        /** 展示牌 铺开 */
+        bySuit(handler = null) {
+            if (this.isRun)
+                return;
+            this.isRun = true;
+            this.handler = handler;
+            this.completeNum = 0;
+            this.cards.sort((a, b) => {
+                return a.code - b.code;
+            });
+            let len = this.cards.length;
+            for (let i = 0; i < len; i++) {
+                let card = this.cards[i];
+                let value = card.value;
+                let suit = card.suit;
+                let delay = i * 10;
+                let posX = -(6.75 - value) * 20 + card.initX;
+                let posY = -(1.5 - suit) * (card.height + 5) + card.initY;
+                Laya.Tween.to(card, { x: posX, y: posY }, delay, null, Laya.Handler.create(this, (card, i) => {
+                    this.setChildIndexHandler(card, i);
+                    this.completeNum++;
+                    if (this.completeNum == len) {
+                        this.isRun = false;
+                        if (handler != null)
+                            handler.run();
+                    }
+                }, [card, i]));
+            }
+        }
+        /** 展示牌 */
+        fan(handler = null) {
+            if (this.isRun)
+                return;
+            this.isRun = true;
+            this.handler = handler;
+            this.completeNum = 0;
+            let len = this.cards.length;
+            for (let i = 0; i < len; i++) {
+                let card = this.cards[i];
+                card.offset = i / 4;
+                let delay = i * 10;
+                let rot = i / (len - 1) * 260 - 130;
+                card.setPivot(.5, 2.3);
+                Laya.Tween.to(card, { x: card.initX - card.offset, y: card.initY - card.offset, rotation: rot }, 300 + delay, null, Laya.Handler.create(this, this.moveHandler, [card]), delay);
+            }
+        }
+        /**
+         * 洗牌
+         * @param handler 执行完成回调
+         * @param num 执行次数 暂未实现
+         */
+        shuffle(handler = null, num = 1) {
+            if (this.isRun)
+                return;
+            this.isRun = true;
+            this.executeNum = num;
+            this.handler = handler;
+            this.completeNum = 0;
+            Cast.shuffle(this.cards);
+            for (let i = 0; i < this.cards.length; i++) {
+                let card = this.cards[i];
+                card.offset = i * card.offsetMultiple;
+                let offsetX = this.plusMinus(Math.random() * 90 + 30) + card.initX;
+                let delay = i * 2;
+                Laya.Tween.to(card, { x: offsetX, y: card.initY - card.offset }, 200, null, Laya.Handler.create(this, this.moveHandler, [card]), delay);
+                Laya.timer.once(100 + delay, this, this.setChildIndexHandler, [card, i], false);
+            }
+        }
+        moveHandler(card) {
+            Laya.Tween.to(card, { x: card.initX - card.offset, y: card.initY - card.offset }, 200);
+            this.completeNum++;
+            if (this.completeNum == this.cards.length) {
+                Laya.timer.once(200, this, () => {
+                    this.isRun = false;
+                    runFun(this.handler);
+                });
+            }
+        }
+        plusMinus(value) {
+            let plus_minus = Math.round(Math.random()) ? -1 : 1;
+            return plus_minus * value;
+        }
+        setChildIndexHandler(card, index) {
+            card.parent.setChildIndex(card, index);
+        }
+        dispose() {
+            for (let i = 0; i < this.cards.length; i++) {
+                Laya.Tween.clearAll(this.cards[i]);
+            }
+            Laya.timer.clearAll(this);
+            this.isRun = false;
+        }
+    }
+    coreLib.Deck = Deck;
     class NativeUtils {
     }
     /**@private Market对象 只有加速器模式下才有值*/
@@ -10150,201 +10383,6 @@ window.coreLib = {};
         }
     }
     coreLib.TwinkleAniUtils = TwinkleAniUtils;
-    /** 卡牌 */
-    class Card extends BaseLabel {
-        constructor() {
-            super();
-            /** 偏移倍数 */
-            this.offsetMultiple = 0;
-            /** 中心点 */
-            this.tempPivot = new Laya.Point();
-        }
-        init(id) {
-            this.code = id;
-            this.value = id % 13 + 1;
-            this.nameCard = this.value === 1 ? 'A' : this.value === 11 ? 'J' : this.value === 12 ? 'Q' : this.value === 13 ? 'K' : this.value + "";
-            this.suit = id / 13 | 0;
-            this._suitName = this.suitName(this.suit);
-            this.nameCard = this.suit < 4 ? this.nameCard : 'JOKER';
-            // var z = (52 - id) / 4
-            // console.log(value, nameCard, suit)
-        }
-        suitName(value) {
-            // 黑红樱方
-            return value === 0 ? 'spades' : value === 1 ? 'hearts' : value === 2 ? 'clubs' : value === 3 ? 'diamonds' : 'joker';
-        }
-        createUI() {
-            this.displayObject.graphics.drawRect(0, 0, 100, 150, "#ffffff", "#000000", 2);
-            this.setSize(100, 150);
-            let text = new fgui.GBasicTextField();
-            text.text = this.nameCard;
-            text.fontSize = 30;
-            this.addChild(text);
-        }
-    }
-    coreLib.Card = Card;
-    class Deck {
-        constructor() {
-            /** 存放的卡牌 */
-            this.cards = [];
-            /** 已经完成了动画个数 */
-            this.completeNum = 0;
-            /** 动画执行次数 */
-            this.executeNum = 1;
-        }
-        createCard() {
-            for (let i = 0; i < 54; i++) {
-                let card = new Card();
-                card.init(i);
-                card.createUI();
-                card.initX = 400;
-                card.initY = 400;
-                card.offsetMultiple = .2;
-                card.offset = i * card.offsetMultiple;
-                card.setXY(card.initX - card.offset, card.initY - card.offset);
-                fgui.GRoot.inst.addChild(card);
-                this.cards.push(card);
-            }
-        }
-        /**
-         * 收集牌
-         * @param handler
-         * @param sort 是否需要排序
-         */
-        sort(handler = null, sort = true) {
-            if (this.isRun)
-                return;
-            this.isRun = true;
-            this.handler = handler;
-            this.completeNum = 0;
-            if (sort) {
-                this.cards.sort((a, b) => {
-                    return b.code - a.code;
-                });
-            }
-            let len = this.cards.length;
-            for (let i = 0; i < len; i++) {
-                let card = this.cards[i];
-                let tempPivot = card.tempPivot;
-                card.setPivot(tempPivot.x, tempPivot.y);
-                card.offset = i * card.offsetMultiple;
-                let _delay = i * 10;
-                // console.log(card.y, card.y + (- card.height * 1.5))
-                Laya.Tween.to(card, {
-                    x: card.initX - card.offset,
-                    y: card.y + (-card.height * 1.5),
-                    rotation: 0,
-                    scaleX: 1,
-                    scaleY: 1
-                }, _delay, null, Laya.Handler.create(this, (card) => {
-                    Laya.Tween.to(card, {
-                        x: card.initX - card.offset,
-                        y: card.initY - card.offset
-                    }, 400, null, Laya.Handler.create(this, () => {
-                        this.completeNum++;
-                        if (len == this.completeNum) {
-                            this.isRun = false;
-                            runFun(handler);
-                        }
-                    }));
-                }, [card]));
-                Laya.timer.once(200 + _delay, this, this.setChildIndexHandler, [card, i], false);
-            }
-        }
-        /** 展示牌 铺开 */
-        bySuit(handler = null) {
-            if (this.isRun)
-                return;
-            this.isRun = true;
-            this.handler = handler;
-            this.completeNum = 0;
-            this.cards.sort((a, b) => {
-                return a.code - b.code;
-            });
-            let len = this.cards.length;
-            for (let i = 0; i < len; i++) {
-                let card = this.cards[i];
-                let value = card.value;
-                let suit = card.suit;
-                let delay = i * 10;
-                let posX = -(6.75 - value) * 20 + card.initX;
-                let posY = -(1.5 - suit) * (card.height + 5) + card.initY;
-                Laya.Tween.to(card, { x: posX, y: posY }, delay, null, Laya.Handler.create(this, (card, i) => {
-                    this.setChildIndexHandler(card, i);
-                    this.completeNum++;
-                    if (this.completeNum == len) {
-                        this.isRun = false;
-                        if (handler != null)
-                            handler.run();
-                    }
-                }, [card, i]));
-            }
-        }
-        /** 展示牌 */
-        fan(handler = null) {
-            if (this.isRun)
-                return;
-            this.isRun = true;
-            this.handler = handler;
-            this.completeNum = 0;
-            let len = this.cards.length;
-            for (let i = 0; i < len; i++) {
-                let card = this.cards[i];
-                card.offset = i / 4;
-                let delay = i * 10;
-                let rot = i / (len - 1) * 260 - 130;
-                card.setPivot(.5, 2.3);
-                Laya.Tween.to(card, { x: card.initX - card.offset, y: card.initY - card.offset, rotation: rot }, 300 + delay, null, Laya.Handler.create(this, this.moveHandler, [card]), delay);
-            }
-        }
-        /**
-         * 洗牌
-         * @param handler 执行完成回调
-         * @param num 执行次数 暂未实现
-         */
-        shuffle(handler = null, num = 1) {
-            if (this.isRun)
-                return;
-            this.isRun = true;
-            this.executeNum = num;
-            this.handler = handler;
-            this.completeNum = 0;
-            Cast.shuffle(this.cards);
-            for (let i = 0; i < this.cards.length; i++) {
-                let card = this.cards[i];
-                card.offset = i * card.offsetMultiple;
-                let offsetX = this.plusMinus(Math.random() * 90 + 30) + card.initX;
-                let delay = i * 2;
-                Laya.Tween.to(card, { x: offsetX, y: card.initY - card.offset }, 200, null, Laya.Handler.create(this, this.moveHandler, [card]), delay);
-                Laya.timer.once(100 + delay, this, this.setChildIndexHandler, [card, i], false);
-            }
-        }
-        moveHandler(card) {
-            Laya.Tween.to(card, { x: card.initX - card.offset, y: card.initY - card.offset }, 200);
-            this.completeNum++;
-            if (this.completeNum == this.cards.length) {
-                Laya.timer.once(200, this, () => {
-                    this.isRun = false;
-                    runFun(this.handler);
-                });
-            }
-        }
-        plusMinus(value) {
-            let plus_minus = Math.round(Math.random()) ? -1 : 1;
-            return plus_minus * value;
-        }
-        setChildIndexHandler(card, index) {
-            card.parent.setChildIndex(card, index);
-        }
-        dispose() {
-            for (let i = 0; i < this.cards.length; i++) {
-                Laya.Tween.clearAll(this.cards[i]);
-            }
-            Laya.timer.clearAll(this);
-            this.isRun = false;
-        }
-    }
-    coreLib.Deck = Deck;
     class ActivityButton extends BaseButton {
         constructor() {
             super();
@@ -11132,6 +11170,7 @@ window.coreLib = {};
                 this.playAni(nameOrIndex);
                 return;
             }
+            nameOrIndex !== null && nameOrIndex !== void 0 ? nameOrIndex : (nameOrIndex = 0);
             this.playAni({
                 nameOrIndex: nameOrIndex, loop: loop, force: force,
                 start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
@@ -11522,6 +11561,7 @@ window.coreLib = {};
                 this.playAni(nameOrIndex);
                 return;
             }
+            nameOrIndex !== null && nameOrIndex !== void 0 ? nameOrIndex : (nameOrIndex = 0);
             this.playAni({
                 nameOrIndex: nameOrIndex, loop: loop, force: force,
                 start: start, end: end, freshSkin: freshSkin, playAudio: playAudio

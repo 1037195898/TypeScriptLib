@@ -174,7 +174,6 @@ export class AssetsLoader implements IFormatVer {
         AssetsLoader.checkBranch(assets)
 
 
-
         function loadCommonErrorHandler() {
             MyLoader.loader.clearUnLoaded()
             if (!Render.isConchApp) JSUtils.openModal(LanguageUtils.inst.getStr(LibStr.NET_ERROR))
@@ -291,7 +290,8 @@ export class AssetsLoader implements IFormatVer {
                 }
             }
         }
-        loadArray = loadArray.concat(res)
+
+        loadArray = loadArray.concat(this.parseRes(res))
 
         if (UIPackage.getByName("gameCommon/gameCommon") == null) {
             let gameCommonRes: LoadRes[] = Browser.window.gameCommon
@@ -335,6 +335,46 @@ export class AssetsLoader implements IFormatVer {
         MyLoader.loader.load(loadArray, Laya.Handler.create(this, this.loadComplete),
             new Laya.Handler(this, this.progressComplete))
 
+    }
+
+    /**
+     * 处理资源
+     * @param res
+     * @private
+     */
+    private parseRes(res: LoadRes[]) {
+        let data: LoadRes[] = res.concat()
+        let sks = data.filter(function (value, index, array) {
+            let temp
+            return Utils.getFileExtension(value.url) === "sk"
+                && (temp = value.url.replace(".sk", ".png")) !== null
+                && array.findIndex(function (value) {
+                    return value === temp
+                }) === -1
+        })
+        const spines = data.filter(function (value, index, array) {
+            return Utils.getFileExtension(value.url) === "json" && value.type === "spine"
+        })
+        for (const value of sks) {
+            data.push({url: value.url.replace(".sk", ".png"), type: Loader.IMAGE, branch: value.branch})
+        }
+        for (const value of spines) {
+            value.type = "json"
+            let temp = value.url.replace(".json", ".atlas")
+            if(data.findIndex(function (value, index, obj) {
+                return temp === value.url
+            }) === -1) {
+                data.push({url: value.url.replace(".json", ".atlas"), type: "als", branch: value.branch})
+            }
+
+            temp = value.url.replace(".json", ".png")
+            if(data.findIndex(function (value, index, obj) {
+                return temp === value.url
+            }) === -1) {
+                data.push({url: value.url.replace(".json", ".png"), type: Loader.IMAGE, branch: value.branch})
+            }
+        }
+        return data
     }
 
     /**

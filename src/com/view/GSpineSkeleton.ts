@@ -121,6 +121,7 @@ export class GSpineSkeleton extends GComponent {
             this.playAni(nameOrIndex)
             return
         }
+        nameOrIndex ??= 0
         this.playAni({
             nameOrIndex: nameOrIndex, loop: loop, force: force,
             start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
