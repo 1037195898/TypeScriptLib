@@ -7,7 +7,7 @@ const webpmux = require('./webpmux.js');//get webpmux module(convert non animate
 const buffer_utils = require('./buffer_utils.js');//get buffer utilities
 
 //permission issue in Linux and macOS
-exports.grant_permission = () => {
+module.exports.grant_permission = () => {
 
     const arr = [enwebp(), dewebp(), gifwebp(), webpmux()];
 
@@ -18,7 +18,7 @@ exports.grant_permission = () => {
 };
 
 //convert base64 to webp base64
-exports.str2webpstr = (base64str, image_type, option, extra_path) => {
+module.exports.str2webpstr = (base64str, image_type, option, extra_path) => {
     // base64str of image
     // base64str image type jpg,png ...
     //option: options and quality,it should be given between 0 to 100
@@ -28,7 +28,7 @@ exports.str2webpstr = (base64str, image_type, option, extra_path) => {
 };
 
 //convert buffer to webp buffer
-exports.buffer2webpbuffer = (buffer, image_type, option, extra_path) => {
+module.exports.buffer2webpbuffer = (buffer, image_type, option, extra_path) => {
     // buffer of image
     // buffer image type jpg,png ...
     //option: options and quality,it should be given between 0 to 100
@@ -44,7 +44,7 @@ exports.buffer2webpbuffer = (buffer, image_type, option, extra_path) => {
  * @param option options and quality,it should be given between 0 to 100
  * @param logging
  */
-exports.cwebp = (input_image, output_image, option, logging = '-quiet') => {
+module.exports.cwebp = (input_image, output_image, option, logging = '-quiet') => {
 
     const query = `${option} "${input_image}" -o "${output_image}" "${logging}"`; //command to convert image
 
@@ -66,7 +66,7 @@ exports.cwebp = (input_image, output_image, option, logging = '-quiet') => {
 /******************************************************* dwebp *****************************************************/
 
 //now convert .webp to other image format
-exports.dwebp = (input_image, output_image, option, logging = '-quiet') => {
+module.exports.dwebp = (input_image, output_image, option, logging = '-quiet') => {
 
 // input_image: input image .webp
 //output_image: output image(.jpeg, .pnp ....)
@@ -94,7 +94,7 @@ exports.dwebp = (input_image, output_image, option, logging = '-quiet') => {
 /******************************************************* gif2webp *****************************************************/
 
 //now convert .gif image to .webp format
-exports.gwebp = (input_image, output_image, option, logging = '-quiet') => {
+module.exports.gwebp = (input_image, output_image, option, logging = '-quiet') => {
 
 // input_image: input image(.jpeg, .pnp ....)
 //output_image: /output image .webp
@@ -122,7 +122,7 @@ exports.gwebp = (input_image, output_image, option, logging = '-quiet') => {
 
 //%%%%%%%%%%% Add ICC profile,XMP metadata and EXIF metadata
 
-exports.webpmux_add = (input_image, output_image, icc_profile, option, logging = '-quiet') => {
+module.exports.webpmux_add = (input_image, output_image, icc_profile, option, logging = '-quiet') => {
 
 // input_image: input image(.webp)
 //output_image: output image .webp
@@ -148,7 +148,7 @@ exports.webpmux_add = (input_image, output_image, icc_profile, option, logging =
 
 //%%%%%%%%%%%%% Extract ICC profile,XMP metadata and EXIF metadata
 
-exports.webpmux_extract = (input_image, icc_profile, option, logging = '-quiet') => {
+module.exports.webpmux_extract = (input_image, icc_profile, option, logging = '-quiet') => {
 
 // input_image: input image(.webp)
 //icc_profile: icc profile
@@ -172,7 +172,7 @@ exports.webpmux_extract = (input_image, icc_profile, option, logging = '-quiet')
 
 //%%%%%%%% Strip ICC profile,XMP metadata and EXIF metadata
 
-exports.webpmux_strip = (input_image, output_image, option, logging = '-quiet') => {
+module.exports.webpmux_strip = (input_image, output_image, option, logging = '-quiet') => {
 
 // input_image: input image(.webp)
 //output_image: output image .webp
@@ -196,7 +196,7 @@ exports.webpmux_strip = (input_image, output_image, option, logging = '-quiet') 
 
 //%%%%%%%%%%% Create an animated WebP file from Webp images
 
-exports.webpmux_animate = (input_images, output_image, loop, bgcolor, logging = '-quiet') => {
+module.exports.webpmux_animate = (input_images, output_image, loop, bgcolor, logging = '-quiet') => {
 
 // input_images: array of image(.webp)
 //output_image: animatedimage .webp
@@ -230,7 +230,7 @@ exports.webpmux_animate = (input_images, output_image, loop, bgcolor, logging = 
 
 //%%%%%%%%%%%% Get the a frame from an animated WebP file
 
-exports.webpmux_getframe = (input_image, output_image, frame_number, logging = '-quiet') => {
+module.exports.webpmux_getframe = (input_image, output_image, frame_number, logging = '-quiet') => {
 
 // input_image: input image(.webp)
 //output_image: output image .webp

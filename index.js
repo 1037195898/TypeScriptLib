@@ -6,6 +6,7 @@ const del = require("del")
 const each = require("gulp-each")
 const babel = require('gulp-babel')
 const fs = require('fs')
+const path = require('path')
 
 
 class GenerateModule {
@@ -146,3 +147,50 @@ class GenerateModule {
 
 
 module.exports = new GenerateModule()
+
+
+/**
+ * 收集所有的文件路径
+ * @param url
+ */
+module.exports.findFiles = function (url) {
+    return new Promise((resolve, reject) => {
+        const files = []
+        const read = (dir) => {
+            fs.readdir(dir, {withFileTypes: true}, (err, entries) => {
+                if (err) {
+                    reject()
+                    return
+                }
+                for (const entry of entries) {
+                    const fullPath = path.join(dir, entry.name)
+                    if (entry.isDirectory()) {
+                        read(fullPath)
+                    } else {
+                        files.push(fullPath)
+                    }
+                }
+                resolve(files)
+            })
+
+        }
+        read(url)
+    })
+}
+
+module.exports.findFilesSync = (url) => {
+    const files = []
+    const read = (dir) => {
+        const entries = fs.readdirSync(dir, {withFileTypes: true})
+        for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name)
+            if (entry.isDirectory()) {
+                read(fullPath)
+            } else {
+                files.push(fullPath)
+            }
+        }
+    }
+    read(url)
+    return files
+}
