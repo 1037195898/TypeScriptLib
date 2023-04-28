@@ -154,6 +154,11 @@ export interface ISkeletonPlay {
      * @default 0
      */
     delayLoopPlay?:number,
+    /**
+     * 当nameOrIndex是数组并且全局loop为false，此设置才有效
+     * @default -1 循环播放动画数组的下标 -1表示不循环
+     */
+    loopPlayIndex?:number,
     /** 加载完成调用
      * @deprecated 只能在ISkeletonData中配置
      * */

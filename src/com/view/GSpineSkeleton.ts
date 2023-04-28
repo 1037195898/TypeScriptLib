@@ -4,13 +4,8 @@ import SpineVersion = Laya.SpineVersion;
 import Event = Laya.Event;
 import SpineTempletBase = Laya.SpineTempletBase;
 import Point = Laya.Point;
-import SpineSkeleton = Laya.SpineSkeleton;
 import Rectangle = Laya.Rectangle;
 import {ISkeletonPlay} from "../interfaces/ICommon";
-import SoundChannel = Laya.SoundChannel;
-import SoundManager = Laya.SoundManager;
-import Handler = Laya.Handler;
-import {GSkeleton} from "./GSkeleton";
 
 export class GSpineSkeleton extends GComponent {
 
@@ -169,13 +164,19 @@ export class GSpineSkeleton extends GComponent {
             // 在播放动画数组
             this.playGroupIndex++
             let isNewPro = false
-            if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex ||
-                (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
+            if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex
+                || (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
                 if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
                     Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex])
                 } else {
                     this.playAni(this.skeletonPlay, this.playGroupIndex)
                 }
+                return
+            }
+            // 当全局数组动画loop是false loopPlayIndex > -1
+            if (this.skeletonPlay.loopPlayIndex > -1 && this.skeletonPlay.loopPlayIndex < this.skeletonPlay.nameOrIndex.length) {
+                this.playGroupIndex = this.skeletonPlay.loopPlayIndex
+                this.playAni(this.skeletonPlay, this.playGroupIndex)
                 return
             }
         } else {

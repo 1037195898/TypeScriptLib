@@ -220,6 +220,12 @@ export class GSkeleton extends GComponent {
                 }
                 return
             }
+            // 当全局数组动画loop是false loopPlayIndex > -1
+            if (this.skeletonPlay.loopPlayIndex > -1 && this.skeletonPlay.loopPlayIndex < this.skeletonPlay.nameOrIndex.length) {
+                this.playGroupIndex = this.skeletonPlay.loopPlayIndex
+                this.playAni(this.skeletonPlay, this.playGroupIndex)
+                return
+            }
         } else {
             if (this.skeletonPlay.loop) {
                 if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
