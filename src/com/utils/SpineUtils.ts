@@ -15,7 +15,7 @@ export class SpineUtils {
      * @param [loop = true] 循环
      * @param playComplete
      * @param loaderComplete
-     * @param aniMode
+     * @param [aniMode = -1]
      */
     static playSpine(skeleton: GSkeleton | GSpineSkeleton, url: string, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay = 0,
                      loop = true, playComplete?: ParamHandler, loaderComplete?: ParamHandler, aniMode = -1) {
@@ -48,10 +48,10 @@ export class SpineUtils {
     private static parseComplete(skeleton: GSkeleton | GSpineSkeleton,
                                  nameOrIndex: string | number | (string | number)[] | ISkeletonPlay,
                                  loop: boolean, loaderComplete: ParamHandler, fac?: Templet) {
-        if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
-            loaderComplete ??= nameOrIndex.loaderComplete
-        }
         runFun(loaderComplete)
+        if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
+            runFun(nameOrIndex.loaderComplete)
+        }
         if (skeleton && nameOrIndex) skeleton.play(nameOrIndex, loop)
     }
 
@@ -61,30 +61,32 @@ export class SpineUtils {
      * @param optional
      * @param SkeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
      */
-    static createSpine<T extends GSkeleton | GSpineSkeleton>(url: string, optional?: ISkeletonData,
-                                                             SkeletonClass?: { new(v?): T }): T {
-        optional ||= {}
+    static createSpine<T extends GSkeleton | GSpineSkeleton>(url: string | ISkeletonData, optional?: ISkeletonData,
+                                                             SkeletonClass?: { new(v?): T }) {
+        if (typeof url !== "string") {
+            optional = url
+            url = optional.url
+        }
+        optional ??= {url: url}
 
         // @ts-ignore
         SkeletonClass ??= Laya.Utils.getFileExtension(url) === "json" ? GSpineSkeleton : GSkeleton
 
         const skeleton = new SkeletonClass()
-
-        SpineUtils.playSpine(skeleton, url, optional.play)
-
+        optional.rotation && (skeleton.rotation = optional.rotation)
         if (optional.scale) {
             skeleton.setScale(optional.scale, optional.scale)
         } else {
             skeleton.setScale(optional.scaleX ?? skeleton.scaleX, optional.scaleY ?? skeleton.scaleY)
         }
         skeleton.setXY(optional.x ?? 0, optional.y ?? 0)
-
         if (optional.relation) {
             let relation = optional.relation
             relation.lr = relation.ud = relation.target
             relation.lr && skeleton.addRelation(relation.lr, fgui.RelationType.Center_Center, relation.usePercent ?? true)
             relation.ud && skeleton.addRelation(relation.ud, fgui.RelationType.Middle_Middle, relation.usePercent ?? true)
         }
+        SpineUtils.playSpine(skeleton, url, optional.play, optional.play?.loop, optional.playComplete, optional.loaderComplete, optional.aniMode)
         return skeleton
     }
 

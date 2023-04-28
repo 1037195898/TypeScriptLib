@@ -86,9 +86,16 @@ export interface Coupons {
 }
 
 export interface ISkeletonData {
-
+    /**
+     * 加载url地址
+     */
+    url?:string,
     x?: number,
     y?: number,
+    /** 播放结束调用 */
+    playComplete?: ParamHandler,
+    /** 加载完成调用 */
+    loaderComplete?: ParamHandler,
     /** 关联对象 */
     relation?: ISKRelation,
     /** 播放数据 */
@@ -114,7 +121,10 @@ export interface ISkeletonData {
      * @default GSkeleton.aniMode
      */
     aniMode?: number,
-    rot?
+    /**
+     * 旋转骨骼动画
+     */
+    rotation?:number
 
 }
 
@@ -144,9 +154,9 @@ export interface ISkeletonPlay {
      * @default 0
      */
     delayLoopPlay?:number,
-    /** 播放结束调用 */
-    playComplete?: ParamHandler,
-    /** 加载完成调用 */
+    /** 加载完成调用
+     * @deprecated 只能在ISkeletonData中配置
+     * */
     loaderComplete?: ParamHandler,
     /**
      *
@@ -157,13 +167,13 @@ export interface ISkeletonPlay {
     force?: boolean,
     /**
      * 起始时间
-     * 只有 nameOrIndex 为非数组才有用
+     * 只有 nameOrIndex 为数字或名字时才有用
      * @default 0
      */
     start?: number,
     /**
      * 结束时间
-     * 只有 nameOrIndex 为非数组才有用
+     * 只有 nameOrIndex 为数字或名字时才有用
      * @default 0
      */
     end?: number,
