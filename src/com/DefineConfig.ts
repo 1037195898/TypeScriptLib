@@ -10,6 +10,7 @@ import PopupMenu = fgui.PopupMenu;
 import GObject = fgui.GObject;
 import GButton = fgui.GButton;
 import GRoot = fgui.GRoot;
+import {StringUtil} from "./utils/StringUtil";
 
 export class DefineConfig {
 
@@ -117,9 +118,32 @@ export class DefineConfig {
         })
         Object.defineProperty(Laya.SpineSkeleton.prototype, "destroy", {
             value: function (destroyChild = true) {
-                if(this._templet == null) this._templet = new Laya.SpineTempletBase()
-                if(this.state == null) this.state = new spine.AnimationState(null)
+                if (this._templet == null) this._templet = new Laya.SpineTempletBase()
+                if (this.state == null) this.state = new spine.AnimationState(null)
                 this.tempDestroy(destroyChild)
+            }
+        })
+
+        Object.defineProperty(Laya.SpineSkeleton.prototype, "tempUpdate", {
+            // @ts-ignore
+            value: Laya.SpineSkeleton.prototype._update
+        })
+        Object.defineProperty(Laya.SpineSkeleton.prototype, "_update", {
+            value: function () {
+                this.tempUpdate()
+                let events = this._events
+                let slot: string[] = []
+                for (const key in events) {
+                    if (key.startsWith(GSkeleton.UPDATE_BONE_SLOT)) {
+                        slot.push(StringUtil.remove(key, GSkeleton.UPDATE_BONE_SLOT))
+                    }
+                }
+                let skeleton: spine.Skeleton = this.skeleton
+                for (const value of skeleton.slots) {
+                    if (slot.indexOf(value.data?.name) > -1) {
+                        this.event(GSkeleton.UPDATE_BONE_SLOT + value.data.name, value)
+                    }
+                }
             }
         })
 

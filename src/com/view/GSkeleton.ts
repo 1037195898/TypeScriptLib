@@ -18,7 +18,13 @@ import {ISkeletonPlay} from "../interfaces/ICommon";
 
 export class GSkeleton extends GComponent {
 
-    /** 骨骼更新  cmd:DrawTextureCmd  */
+    /**
+     * 骨骼更新
+     * ````
+     * GSkeleton cmd:DrawTextureCmd
+     * GSpineSkeleton spine.Slot
+     * ````
+     */
     static readonly UPDATE_BONE_SLOT = "update_bone_slot"
 
     /** 经过时间 */
