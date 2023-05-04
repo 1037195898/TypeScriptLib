@@ -1333,6 +1333,19 @@ window.coreLib = {};
         }
     }
     coreLib.Player = Player;
+    /** 加载资源配置 */
+    class LoaderConfig {
+        /**
+         * 清理资源
+         * @param res 要清理的资源数组
+         */
+        static clear(res) {
+            for (let i = 0; i < res.length; i++) {
+                MyLoader.loader.clearRes(res[i].url);
+            }
+        }
+    }
+    coreLib.LoaderConfig = LoaderConfig;
     let ActionLib;
     (function (ActionLib) {
         // 初始化设备数据
@@ -1488,19 +1501,6 @@ window.coreLib = {};
         /** 更新bounds信息 */
         ActionLib["GAME_UPDATE_BOUNDS_INFO"] = "game_update_bounds_info";
     })(ActionLib = coreLib.ActionLib || (coreLib.ActionLib = {}));
-    /** 加载资源配置 */
-    class LoaderConfig {
-        /**
-         * 清理资源
-         * @param res 要清理的资源数组
-         */
-        static clear(res) {
-            for (let i = 0; i < res.length; i++) {
-                MyLoader.loader.clearRes(res[i].url);
-            }
-        }
-    }
-    coreLib.LoaderConfig = LoaderConfig;
     class BaseButton extends fgui.GButton {
         constructor() {
             super();
@@ -12030,7 +12030,7 @@ window.coreLib = {};
          */
         static createSpine(url, optional, skeletonClass) {
             var _a, _b, _c, _d, _e, _f, _g;
-            if (!this.isInterface(optional)) {
+            if (optional && !this.isInterface(optional)) {
                 skeletonClass = optional;
                 optional = null;
             }
@@ -12038,7 +12038,7 @@ window.coreLib = {};
                 optional = url;
                 url = optional.url;
             }
-            if (!this.isInterface(optional)) {
+            if (!optional || !this.isInterface(optional)) {
                 throw Error("error type optional=" + optional);
             }
             console.log(optional);

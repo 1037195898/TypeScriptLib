@@ -586,6 +586,14 @@ declare namespace coreLib {
          */
         getCurrencyUnitFormat(): string;
     }
+    /** 加载资源配置 */
+    export class LoaderConfig {
+        /**
+         * 清理资源
+         * @param res 要清理的资源数组
+         */
+        static clear(res: LoadRes[]): void;
+    }
     export enum ActionLib {
         INIT_DEVICE_DATA = "init_device_data",
         CHECK_LOGIN_STATE = "check_login_state",
@@ -735,14 +743,6 @@ declare namespace coreLib {
         GAME_UPDATE_TOTAL_BET = "game_update_total_bet",
         /** 更新bounds信息 */
         GAME_UPDATE_BOUNDS_INFO = "game_update_bounds_info"
-    }
-    /** 加载资源配置 */
-    export class LoaderConfig {
-        /**
-         * 清理资源
-         * @param res 要清理的资源数组
-         */
-        static clear(res: LoadRes[]): void;
     }
     export class BaseButton extends fgui.GButton implements IView {
         constructor();

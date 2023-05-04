@@ -79,8 +79,8 @@ export class SpineUtils {
      */
     static createSpine<T extends GSkeleton | GSpineSkeleton>(url: string | ISkeletonData,
                                                              optional?: ISkeletonData | { new(): T },
-                                                             skeletonClass?: { new(): T }) {
-        if (!this.isInterface(optional)) {
+                                                             skeletonClass?: { new(): T }): T {
+        if (optional && !this.isInterface(optional)) {
             skeletonClass = optional
             optional = null
         }
@@ -88,8 +88,7 @@ export class SpineUtils {
             optional = url
             url = optional.url
         }
-
-        if (!this.isInterface(optional)) {
+        if (!optional || !this.isInterface(optional)) {
             throw Error("error type optional=" + optional)
         }
         console.log(optional)
