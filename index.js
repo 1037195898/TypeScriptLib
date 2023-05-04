@@ -4,6 +4,7 @@ const inject = require("gulp-inject-string")
 const concat = require('gulp-concat')
 const del = require("del")
 const each = require("gulp-each")
+const sort = require('gulp-sort')
 const babel = require('gulp-babel')
 const fs = require('fs')
 const path = require('path')
@@ -67,6 +68,20 @@ class GenerateModule {
             fs.mkdirSync(this.saveTempPath + "/temp")
         }
         return gulp.src(this.beforeTs.concat(files))
+            .pipe(sort({
+                comparator: (a, b) => {
+                    let aIndex = this.beforeTs.indexOf(path.relative(a.cwd, a.path).replaceAll("\\", "/"))
+                    let bIndex = this.beforeTs.indexOf(path.relative(b.cwd, b.path).replaceAll("\\", "/"))
+                    if (aIndex >= 0 && bIndex >= 0) {
+                        return aIndex - bIndex
+                    } else if (aIndex >= 0) {
+                        return -1
+                    } else if (bIndex >= 0) {
+                        return 1
+                    }
+                    return a.path.localeCompare(b.path);
+                }
+            }))
             .pipe(each((content, file, callback) => {
                 // console.log(file.history[0])
                 let contents = content.split('\n')

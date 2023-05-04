@@ -429,7 +429,7 @@ export class SceneManager extends BaseProxy {
         if (MyLoader.checkBaseUrl != null) URL.basePath = MyLoader.checkBaseUrl()[0]
         AppManager.onProfileSignOff()
 
-        Templet["TEMPLET_DICTIONARY"] = null
+        Templet["TEMPLET_DICTIONARY"] = {}
         this.removeGroup(BaseProxy.GAME_GROUP)
     }
 
