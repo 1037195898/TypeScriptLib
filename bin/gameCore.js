@@ -7213,6 +7213,3217 @@ window.coreLib = {};
     /**@private PlatformClass类，只有加速器模式下才有值 */
     NativeUtils.PlatformClass = window["PlatformClass"];
     coreLib.NativeUtils = NativeUtils;
+    class BindInputButton {
+        /**
+         *
+         * @param btn
+         * @param array
+         */
+        constructor(btn, array) {
+            this.btn = btn;
+            this.array = array;
+            let value;
+            let input;
+            let gbtn;
+            for (let i = 0; i < array.length; i++) {
+                value = array[i];
+                if (value instanceof fgui.GTextInput) {
+                    input = value;
+                    input.on(Laya.Event.INPUT, this, this.changeHandler);
+                }
+                else if (value instanceof fgui.GButton) {
+                    gbtn = value;
+                    gbtn.on(fgui.Events.STATE_CHANGED, this, this.changeHandler);
+                }
+            }
+        }
+        /** 检查一次状态 */
+        check() {
+            this.changeHandler();
+        }
+        changeHandler() {
+            let enabled = true; // 注释
+            let value;
+            let input;
+            let gbtn;
+            for (let i = 0; i < this.array.length; i++) {
+                value = this.array[i];
+                if (value instanceof fgui.GTextInput) {
+                    input = value;
+                    if (input.text.length == 0 || input.text == input.promptText) {
+                        enabled = false;
+                    }
+                }
+                else if (value instanceof fgui.GButton) {
+                    gbtn = value;
+                    if (gbtn.selected == false) {
+                        enabled = false;
+                    }
+                }
+            }
+            this.btn.enabled = enabled;
+            if (this.callback != null)
+                this.callback();
+        }
+    }
+    coreLib.BindInputButton = BindInputButton;
+    class Cast {
+        constructor() {
+        }
+        /**
+         * 角度转弧度
+         * @param angle 角度
+         */
+        static angleToRadians(angle) {
+            return angle * Cast.DEG_TO_RAD;
+        }
+        /**
+         * 弧度转角度
+         * @param radians 弧度
+         */
+        static radiansToAngle(radians) {
+            return radians * Cast.RAD_TO_DEG;
+        }
+        /**
+         * 计算两点之间的角度角度
+         * @param x1 原始坐标X
+         * @param y1 原始坐标Y
+         * @param x2 新坐标X
+         * @param y2 新坐标Y
+         *
+         */
+        static angle(x1, y1, x2, y2) {
+            let newX = x2 - x1;
+            let newY = y2 - y1;
+            let a = Math.atan2(newY, newX);
+            return a * 180 / Math.PI;
+        }
+        /**
+         * 计算两点之间的距离
+         * @param x1 原始坐标X
+         * @param y1 原始坐标Y
+         * @param x2 新坐标X
+         * @param y2 新坐标Y
+         * @return
+         *
+         */
+        static pointDistance(x1, y1, x2, y2) {
+            let x = x1 - x2;
+            let y = y1 - y2;
+            return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        }
+        /**
+         * 获取两点中间点的坐标
+         * @param x1 原始坐标X
+         * @param y1 原始坐标Y
+         * @param x2 新坐标X
+         * @param y2 新坐标Y
+         * @return
+         */
+        static getPointMiddle(x1, y1, x2, y2) {
+            let tempX = (Math.max(x1, x2) - Math.min(x1, x2)) / 2;
+            let tempY = (Math.max(y1, y2) - Math.min(y1, y2)) / 2;
+            tempX += Math.min(x1, x2);
+            tempY += Math.min(y1, y2);
+            return new Laya.Point(tempX, tempY);
+        }
+        /**
+         * 获取圆上一点的坐标，坐标起点从坐标系右下方向左计算
+         * @param x 圆点X坐标
+         * @param y 圆点Y坐标
+         * @param radius 半径
+         * @param radians 弧度(不是角度)
+         */
+        static roundPoint(x, y, radius, radians) {
+            x = x + (Math.cos(radians) * radius);
+            y = y + (Math.sin(radians) * radius);
+            return new Laya.Point(x, y);
+        }
+        /**
+         * 补全数字
+         * @param data 要处理的数字、或字符串化的数字
+         * @param len 数字总长度
+         * @param isLast 是否补在尾部
+         */
+        static fillAVacancy(data, len, isLast = false) {
+            let string = data + "";
+            len = len - string.length;
+            if (len > 0) {
+                for (let i = 0; i < len; i++) {
+                    string = isLast ? string + "0" : "0" + string;
+                }
+            }
+            return string;
+        }
+        /**
+         * 精确小数点  如果有小数点 保留指定数量  如果没有  返回整数
+         * @param value 要处理的数字、或字符串化的数字
+         * @param p 保留的小数位数
+         * @return
+         */
+        static toFixed(value, p = 0) {
+            let temp = value + "";
+            let index = temp.indexOf(".");
+            if (index == -1)
+                return parseFloat(temp);
+            p = p > 0 ? p + 1 : 0;
+            return parseFloat(temp.substring(0, index + p));
+        }
+        /**
+         * 精确小数点  如果有小数点 保留指定数量  如果没有  返回整数
+         * @param value 要处理的数字、或字符串化的数字
+         * @param p 保留的小数位数
+         */
+        static toFixedStr(value, p = 0) {
+            value = Cast.toFixed(value, p);
+            let money = value + "";
+            let moneyStr = money.split('.');
+            let left = moneyStr[0];
+            if (p == 0)
+                return left;
+            let right = moneyStr.length > 1 ? moneyStr[1] : null;
+            if (right) {
+                if (right.length >= p) {
+                    right = '.' + right.substring(0, p);
+                }
+                else {
+                    right = '.' + Cast.fillAVacancy(right, p, true);
+                }
+            }
+            else {
+                right = '.' + Cast.fillAVacancy("0", p);
+            }
+            return left + right;
+        }
+        /**
+         * 字格式
+         * @param value 数值
+         * @param beyondLimit 超过此值否才分隔 (默认 1000)
+         * @param limit 分隔值 按照此值分隔 (默认 1000)
+         * @param unit 单位  (默认 K)
+         * @param fixed 最后保留几位小数 (默认 2)
+         * @return
+         */
+        static numberConvert(value, beyondLimit = 1000, limit = 1000, unit = "K", fixed = 2) {
+            if (value >= beyondLimit)
+                return this.toFixed(value / limit, fixed) + unit;
+            return this.toFixed(value, fixed) + "";
+        }
+        /**
+         * 将100000转为100,000.00形式
+         * @param money
+         * @param fixed 是否保留小数(默认false)
+         * @return
+         */
+        static formatMoney(money, fixed = false) {
+            if (money != null) {
+                money = money + "";
+                let left = money.split('.')[0];
+                let right = money.split('.')[1];
+                right = right ? (right.length >= 2 ? '.' + right.substring(0, 2) : '.' + right + '0') : '.00';
+                if (!fixed)
+                    right = "";
+                let temp = left.split('').reverse().join('').match(/(\d{1,3})/g);
+                return (parseFloat(money) < 0 ? "-" : "") + temp.join(',').split('').reverse().join('') + right;
+            }
+            else if (money === 0) { //注意===在这里的使用，如果传入的money为0,if中会将其判定为boolean类型，故而要另外做===判断
+                return fixed ? '0.00' : "0";
+            }
+            else {
+                return fixed ? '0.00' : "0";
+            }
+        }
+        /**
+         * 将100,000.00转为100000形式
+         * @param money
+         * @param fixed 是否保留小数 (默认false)
+         * @return
+         */
+        static formatMoney2(money, fixed = false) {
+            if (money != null) {
+                money = money + "";
+                let group = money.split('.');
+                let left = group[0].split(',').join('');
+                return fixed ? parseFloat(left + "." + group[1]) : parseFloat(left);
+            }
+            else {
+                return 0;
+            }
+        }
+        /**
+         * 打乱数组
+         * @param array 要被打乱的数组
+         *
+         */
+        static shuffle(array) {
+            let rnd;
+            let tmp;
+            let len = array.length;
+            for (let i = 0; i < len; i++) {
+                tmp = array[i];
+                rnd = parseInt(Math.random() * len + "");
+                array[i] = array[rnd];
+                array[rnd] = tmp;
+            }
+        }
+        /** aes加密 */
+        static encrypt(word, key) {
+            if (key == null)
+                key = "abcdefgabcdefg12";
+            let keyWordArray = CryptoJS.enc.Utf8.parse(key);
+            let srcs = CryptoJS.enc.Utf8.parse(word);
+            let encrypted = CryptoJS.AES.encrypt(srcs, keyWordArray, {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            return encrypted.toString();
+        }
+        /** aes解密 */
+        static decrypt(word, key) {
+            if (key == null)
+                key = "abcdefgabcdefg12";
+            let keyWordArray = CryptoJS.enc.Utf8.parse(key);
+            let decrypt = CryptoJS.AES.decrypt(word, keyWordArray, {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            return CryptoJS.enc.Utf8.stringify(decrypt).toString();
+        }
+        /**
+         * 文字长度省略
+         * @param value 文字内容
+         * @param len 最大长度
+         * @param symbol 符号
+         */
+        static stringOmit(value, len, symbol = "...") {
+            let str = value;
+            if (str && str.length > len) {
+                str = str.substring(0, len);
+                str += symbol;
+            }
+            return str;
+        }
+        /**
+         * 去除重复值
+         * @param array
+         */
+        static removeRepeat(array) {
+            return array.filter(this.checkRepeat);
+        }
+        static checkRepeat(item, index, arr) {
+            return arr.indexOf(item) == index;
+        }
+        /**
+         * 交换数组中的两个值的位置
+         * @param value 数组
+         * @param stateIndex 要被切换掉的值
+         * @param endIndex 要新切换到的位置 (该位置必须是总数组的长度-1)
+         *
+         */
+        static swapValue(value, stateIndex, endIndex) {
+            if (stateIndex < value.length && endIndex < value.length) {
+                let i = value[stateIndex];
+                let i2 = value[endIndex];
+                value.splice(endIndex, 1, i);
+                value.splice(stateIndex, 1, i2);
+            }
+        }
+        /**
+         * 改变值的位置(将数组中的一个值修改到其它位置)
+         * @param value 数组
+         * @param stateIndex 要被切换掉的值
+         * @param endIndex 要新切换到的位置 (该位置必须是总数组的长度-1)
+         *
+         */
+        static changeValue(value, stateIndex, endIndex) {
+            if (stateIndex < value.length && endIndex < value.length) {
+                let i = value.splice(stateIndex, 1);
+                value.splice(endIndex, 0, i[0]);
+            }
+        }
+        /**
+         * 高度适配
+         * @param obj 适配对象
+         */
+        static heightAdaptation(obj) {
+            let scale = obj.width / obj.initWidth;
+            obj.height = obj.initHeight * scale;
+            // 如果有字体
+        }
+        static evil(fn) {
+            let Fn = Function; //一个变量指向Function，防止有些前端编译工具报错
+            return new Fn('return ' + fn)();
+        }
+        static loadScript(str) {
+            //		    console.log(Browser.document.head)
+            let script = document.createElement('script');
+            script.type = "text/javascript";
+            script.text = str;
+            document.getElementsByTagName('head')[0].appendChild(script);
+            document.head.removeChild(document.head.lastChild);
+        }
+    }
+    /** 计算角度的公式  180 / Math.PI */
+    Cast.RAD_TO_DEG = 180 / Math.PI;
+    /** 计算弧度的公式  Math.PI / 180 */
+    Cast.DEG_TO_RAD = Math.PI / 180;
+    coreLib.Cast = Cast;
+    class ConfigUtils {
+        /**
+         * 获取游戏配置表
+         */
+        static gameConfig() {
+            return window[ConfigUtils.CONFIG_NAME];
+        }
+        /**
+         * 根据游戏id获取游戏名字 如果没有 null
+         * @param code
+         */
+        static gameName(code) {
+            return ConfigUtils.gameConfig()[code];
+        }
+        /**
+         * 根据游戏名获取游戏id 如果不存在返回-1
+         * @param name
+         */
+        static gameCode(name) {
+            const config = ConfigUtils.gameConfig();
+            for (const key in config) {
+                if (config[key] == name) {
+                    return parseInt(key);
+                }
+            }
+            return -1;
+        }
+        /**
+         * 获取游戏配置数据
+         * @param name 游戏名字 如果传入null 将尝试获取当前打开的游戏数据
+         */
+        static gameRes(name = null) {
+            if (name == null && StringUtil.isNotEmpty(Player.inst.gameName)) {
+                return ConfigUtils.gameRes(Player.inst.gameName);
+            }
+            if (name == null)
+                return null;
+            return window[name];
+        }
+    }
+    /**
+     * 在window上配置的属性名字
+     * @default gameIdConfig
+     */
+    ConfigUtils.CONFIG_NAME = "gameIdConfig";
+    coreLib.ConfigUtils = ConfigUtils;
+    /**
+     * 拷贝对象
+     */
+    class CopyObject {
+        /**
+         * 复制一个 fgui.GLoader 对象
+         * @param loader 被复制的对象
+         * @param parent 设置一个父对象  更换的时候 会同事转换原坐标到新的父对象上
+         */
+        static copyLoader(loader, parent) {
+            let newObject = new fgui.GLoader();
+            newObject.setPivot(loader.pivotX, loader.pivotY);
+            newObject.setSize(loader.width, loader.height);
+            newObject.setScale(loader.scaleX, loader.scaleY);
+            newObject.align = loader.align;
+            newObject.autoSize = loader.autoSize;
+            newObject.fill = loader.fill;
+            newObject.icon = loader.icon;
+            if (parent != null) {
+                let point = loader.localToGlobal();
+                parent.globalToLocal(point.x, point.y, point);
+                newObject.setXY(point.x, point.y);
+                parent.addChild(newObject);
+            }
+            else {
+                newObject.setXY(loader.x, loader.y);
+            }
+            return newObject;
+        }
+        /**
+         * 复制一个 fgui.GTextField 对象
+         * @param textField 被复制的对象
+         * @param parent 设置一个父对象  更换的时候 会同事转换原坐标到新的父对象上
+         */
+        static copyTextField(textField, parent) {
+            let tf;
+            if (textField instanceof fgui.GRichTextField) {
+                tf = new fgui.GRichTextField();
+            }
+            else {
+                tf = new fgui.GBasicTextField();
+                tf.font = textField["_font"];
+                tf.fontSize = textField.fontSize;
+                tf.color = textField.color;
+                tf.align = textField.align;
+                tf.valign = textField.valign;
+                tf.leading = textField.leading;
+                tf.letterSpacing = textField.letterSpacing;
+                tf.ubbEnabled = textField.ubbEnabled;
+                tf.autoSize = textField.autoSize;
+                tf.underline = textField.underline;
+                tf.italic = textField.italic;
+                tf.bold = textField.bold;
+                tf.singleLine = textField.singleLine;
+                tf.strokeColor = textField.strokeColor;
+                tf.stroke = textField.stroke;
+                tf.setPivot(textField.pivotX, textField.pivotY);
+                tf.setSize(textField.width, textField.height);
+                tf.setScale(textField.scaleX, textField.scaleY);
+                tf.text = textField.text;
+                if (parent != null) {
+                    let point = textField.localToGlobal();
+                    parent.globalToLocal(point.x, point.y, point);
+                    tf.setXY(point.x, point.y);
+                    parent.addChild(tf);
+                }
+                else {
+                    tf.setXY(textField.x, textField.y);
+                }
+            }
+            return tf;
+        }
+    }
+    coreLib.CopyObject = CopyObject;
+    class CounterUtils {
+        static create(total, complete) {
+            return new Counter(complete, total);
+        }
+    }
+    coreLib.CounterUtils = CounterUtils;
+    class Counter {
+        constructor(complete, total) {
+            this.total = 0;
+            this._index = 0;
+            this.complete = complete;
+            this.total = total;
+        }
+        /** 完成一次计数 */
+        oneComplete() {
+            this._index++;
+            if (this._index == this.total)
+                runFun(this.complete);
+        }
+        get index() {
+            return this._index;
+        }
+        dispose() {
+            this.complete = null;
+        }
+    }
+    class DateUtils {
+        /**
+         * 格式化时间
+         * @param date 时间
+         * @param fmt 格式
+         * @param isUTC 使用国际时间
+         * @example
+         * fmt:
+         * yyyy：年
+         * MM：月
+         * dd：
+         * hh：1~12小时制(1-12)
+         * HH：24小时制(0-23)
+         * mm：分
+         * ss：秒
+         * S：毫秒
+         * E：星期几
+         * @return
+         */
+        static formatDate(date, fmt, isUTC = false) {
+            if (!(date instanceof Date)) {
+                let date2 = new Date();
+                date2.setTime(date);
+                date = date2;
+            }
+            // 时区
+            //		var localOffset:number = date.getTimezoneOffset() * 60000
+            //		console.log(localOffset)
+            let tempStr = "";
+            let match = fmt.match(/(y+)/);
+            if ((match === null || match === void 0 ? void 0 : match.length) > 0) {
+                tempStr = match[0];
+                if (isUTC) {
+                    fmt = fmt.replace(tempStr, (date.getUTCFullYear() + '').substring(4 - tempStr.length));
+                }
+                else {
+                    fmt = fmt.replace(tempStr, (date.getFullYear() + '').substring(4 - tempStr.length));
+                }
+            }
+            let o = {
+                'M+': (isUTC ? date.getUTCMonth() : date.getMonth()) + 1,
+                'd+': (isUTC ? date.getUTCDate() : date.getDate()),
+                'h+': ((isUTC ? date.getUTCHours() : date.getHours()) % 12),
+                'H+': (isUTC ? date.getUTCHours() : date.getHours()),
+                'm+': (isUTC ? date.getUTCMinutes() : date.getMinutes()),
+                's+': (isUTC ? date.getUTCSeconds() : date.getSeconds()),
+                'S+': (isUTC ? date.getUTCMilliseconds() : date.getMilliseconds()),
+                "E+": DateUtils.weekday[(isUTC ? date.getUTCDay() : date.getDay())]
+            };
+            //		console.log(o)
+            // 遍历这个对象
+            for (let k in o) {
+                match = fmt.match(new RegExp("(" + k + ")"));
+                if ((match === null || match === void 0 ? void 0 : match.length) > 0) {
+                    //				 console.log('${k}')
+                    tempStr = match[0];
+                    fmt = fmt.replace(tempStr, tempStr.length == 1 ? o[k] : ("00" + o[k]).substring(("" + o[k]).length));
+                }
+            }
+            return fmt;
+        }
+        /**
+         * 比较时间大小
+         * time1>time2 return 1
+         * time1<time2 return -1
+         * time1==time2 return 0
+         * @param time1
+         * @param time2
+         */
+        static compareTime(time1, time2) {
+            if (Date.parse(time1.replace(/-/g, "/")) > Date.parse(time2.replace(/-/g, "/"))) {
+                return 1;
+            }
+            else if (Date.parse(time1.replace(/-/g, "/")) < Date.parse(time2.replace(/-/g, "/"))) {
+                return -1;
+            }
+            else if (Date.parse(time1.replace(/-/g, "/")) == Date.parse(time2.replace(/-/g, "/"))) {
+                return 0;
+            }
+        }
+        /**
+         * 是否闰年
+         * @param year 年份
+         */
+        static isLeapYear(year) {
+            return ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0);
+        }
+        /**
+         * 获取某个月的天数，从0开始
+         * @param year 年份
+         * @param month 月份
+         */
+        static getDaysOfMonth(year, month) {
+            return [31, (this.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+        }
+        /**
+         * 将天置为0，获取其上个月的最后一天
+         * @param year
+         * @param month
+         */
+        static getDaysOfMonth2(year, month) {
+            month = parseInt(month) + 1;
+            let date = new Date(year, month, 0);
+            return date.getDate();
+        }
+        /**
+         * 距离现在几天的日期：
+         * @param days 负数表示今天之前的日期，0表示今天，整数表示未来的日期。 如-1表示昨天的日期，0表示今天，2表示后天
+         */
+        static fromToday(days) {
+            let today = new Date();
+            today.setDate(today.getDate() + days);
+            return today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+        }
+        /**
+         * 计算一个日期是当年的第几天
+         * @param date
+         */
+        static dayOfTheYear(date) {
+            let obj = new Date(date);
+            let year = obj.getFullYear();
+            let month = obj.getMonth(); //从0开始
+            let days = obj.getDate();
+            let daysArr = [31, (this.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            for (let i = 0; i < month; i++) {
+                days += daysArr[i];
+            }
+            return days;
+        }
+        /**
+         * 获得时区名和值
+         * @param dateObj
+         */
+        static getZoneNameValue(dateObj) {
+            let date = new Date(dateObj);
+            date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            let arr = date.toString().match(/([A-Z]+)([-+]\d+:?\d+)/);
+            return { 'name': arr[1], 'value': arr[2] };
+        }
+        /**
+         * 判断是否是同一天
+         * @param date1 毫秒
+         * @param date2 毫秒
+         * @return
+         */
+        static isSameDay(date1, date2) {
+            let _date1 = new Date(date1);
+            let _date2 = new Date(date2);
+            return (_date1.getFullYear() == _date2.getFullYear() &&
+                _date1.getMonth() == _date2.getMonth() &&
+                _date1.getDate() == _date2.getDate());
+        }
+        /**
+         * 判断传入的时间小于今天
+         * @param time
+         */
+        static notTomorrow(time) {
+            let timeDate = new Date(time);
+            let today = new Date();
+            if (timeDate.getFullYear() < today.getFullYear()) {
+                return true;
+            }
+            else if (timeDate.getFullYear() == today.getFullYear()) { // 年份一样
+                if (timeDate.getMonth() < today.getMonth()) { // 小于今天的月份
+                    return true;
+                }
+                else if (timeDate.getMonth() == today.getMonth()) { // 月份一样
+                    if (timeDate.getDate() < today.getDate()) { // 日期小于今天
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+    /** 星期 默认英文 */
+    DateUtils.weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    coreLib.DateUtils = DateUtils;
+    /**
+     * 水果机旋转动画
+     * @author boge
+     *
+     */
+    class FruitRotationUtils {
+        constructor(fruit) {
+            /** 跑帧位置 */
+            this.currentRunIndex = 0;
+            /** 上次时间 */
+            this.oldTimer = 0;
+            /** 间隔时间 */
+            this.spaceTimer = 500;
+            /** 开始位置 */
+            this.startIndex = 0;
+            /** 预计演播跑灯圈数 */
+            this.runCount = 0;
+            /** 当前跑动圈数 */
+            this.currentRunCount = 0;
+            /** 奖励 */
+            this.awards = [];
+            /** 预选位置偏移量 */
+            this.preselectionOffset = 4;
+            this.fruit = fruit;
+        }
+        /**
+         *
+         * @param arr 奖励
+         * @param runCallback 运行调用函数
+         * @param selectedCallback 选定阶段调用函数
+         * @param playRunSlotEndCallback 结束调用函数
+         * @param runEndCallback 结束调用函数
+         */
+        startRun(arr, runCallback, selectedCallback, playRunSlotEndCallback, runEndCallback) {
+            this.awards = arr;
+            this.runCallback = runCallback;
+            this.selectedCallback = selectedCallback;
+            this.playRunSlotEndCallback = playRunSlotEndCallback;
+            this.runEndCallback = runEndCallback;
+            this.catapultDirection = true;
+            // 重置
+            this.oldTimer = 0;
+            this.spaceTimer = 300;
+            // 计算预告结束位置
+            let value = this.awards[0] - this.preselectionOffset;
+            if (value < 0)
+                value = this.fruit.fruitLen() + value;
+            this.startIndex = value; // 预告结束位置
+            this.runCount = 5;
+            this.currentRunCount = 0;
+            this.isRunEnd = false;
+            Laya.timer.frameLoop(1, this, this.runHandler);
+        }
+        runHandler() {
+            let newTimer = Laya.Browser.now();
+            if (newTimer - this.oldTimer >= this.spaceTimer) { //1s
+                this.oldTimer = newTimer;
+                runFun(this.runCallback);
+                this.fruit.showSlotIndex(this.currentRunIndex, this.isRunEnd ? 0 : 3);
+                // 计算圈数
+                if (this.currentRunIndex == this.startIndex) { // 判断是否进入预告结束位置
+                    this.currentRunCount++;
+                    if (this.currentRunCount >= this.runCount) { // 跑动圈数大于等于5圈
+                        this.isRunEnd = true; //进入选定阶段
+                        runFun(this.selectedCallback);
+                    }
+                }
+                if (this.isRunEnd) { // 如果是选定阶段
+                    this.spaceTimer = this.spaceTimer + 120; //递增间隔滚动
+                    if (this.spaceTimer > 530) { // 最高延迟速度
+                        this.spaceTimer = 530;
+                    }
+                    // 当前滚动值等于最终值
+                    if (this.currentRunIndex == this.awards[0]) {
+                        Laya.timer.clear(this, this.runHandler);
+                        runFun(this.playRunSlotEndCallback);
+                        this.checkAward();
+                    }
+                }
+                else {
+                    this.spaceTimer = this.spaceTimer - 30;
+                    if (this.spaceTimer < 0) {
+                        this.spaceTimer = 0;
+                    }
+                }
+                // 计算下一次跑动坐标
+                this.currentRunIndex++;
+                if (this.currentRunIndex >= this.fruit.fruitLen()) {
+                    this.currentRunIndex = 0;
+                }
+            }
+        }
+        checkAward() {
+            let value;
+            if (this.awards.length == 1) { // 判断数量 正常得分   或  特殊奖励  开启失败
+                this.runEnd();
+            }
+            else if (this.awards.length > 1) { // 数量大于1  说明存在  多个奖励
+                value = this.awards[0];
+                Laya.timer.once(600, this, () => {
+                    //					if (value == 9 || value == 21) { // 特殊奖励
+                    //						fruitScene.twinkleAllFruits()
+                    //						SoundUtils.playSound(URL.formatURL("sounds/bomb.ogg"))
+                    //						Laya.timer.once(1000, this, function() {
+                    //							fruitScene.stopAllTwinkleFruits()
+                    ////							SoundUtils.playMusic(URL.formatURL("sounds/background_turnning.mp3"))
+                    //							Laya.timer.once(500, this, function()  {
+                    //								if (awardType == CommonCmd.GRAND_SLAM) { // 大满贯
+                    //									baodeng(awards.slice(1))
+                    //								} else {
+                    //									catapult(value, awards.slice(1), 1)
+                    //								}
+                    //							})
+                    //						})
+                    //					} else {
+                    this.fruit.twinkleFruits(value, 3, () => {
+                        SoundUtils.playMusic(Laya.URL.basePath + "sounds/background_turnning.mp3");
+                        this.fruit.stopTwinkleFruits(value);
+                        this.fruit.wakey(value);
+                        //							trace("FruitModel.enclosing_method()", value)
+                        Laya.timer.once(500, this, () => {
+                            this.catapult(value, this.awards.slice(1), 1);
+                        });
+                    });
+                    //					}
+                });
+            }
+        }
+        runEnd() {
+            runFun(this.runEndCallback);
+        }
+        /**
+         * 弹射动画
+         * @param startIndex 击打起始位置
+         * @param array 剩余要被击中的值
+         * @param runCount 预计演播跑灯圈数
+         * @param huoche 开火车
+         */
+        catapult(startIndex, array, runCount = 0, huoche = false) {
+            if (array.length > 0) {
+                let value; // 选中位置
+                if (huoche) {
+                    value = array.pop();
+                }
+                else {
+                    value = array.shift();
+                }
+                this.oldTimer = 0;
+                this.spaceTimer = 20;
+                this.currentRunIndex = startIndex;
+                this.currentRunCount = 0;
+                this.isRunEnd = false;
+                this.runCount = 0;
+                if (runCount != 0) {
+                    this.runCount = runCount + 1;
+                }
+                Laya.timer.frameLoop(1, this, this.runCatapultHandler, [startIndex, value, array, runCount, huoche]);
+            }
+            else {
+                // 击打结束
+                //				trace("FruitModel.catapult(startIndex, array) 结束  开下一局")
+                this.runEnd();
+            }
+        }
+        /**
+         * 弹击函数
+         * @param startIndex 击打起始位置
+         * @param value 当前选中的值
+         * @param array 剩余要被击中的值
+         * @param runCount 预计演播跑灯圈数
+         * @param huoche 开火车
+         */
+        runCatapultHandler(startIndex, value, array, runCount = 0, huoche = false) {
+            let newTimer = Laya.Browser.now();
+            if (newTimer - this.oldTimer >= this.spaceTimer) { //满足当前间隔时间
+                this.oldTimer = newTimer;
+                let tail = array.length;
+                //				tail = tail>5?5:tail
+                this.fruit.showSlotIndex(this.currentRunIndex, tail, this.catapultDirection);
+                // 计算圈数
+                if (this.currentRunIndex == startIndex) { // 判断是否进入预告结束位置
+                    this.currentRunCount++;
+                    if (this.currentRunCount >= this.runCount) { // 跑动圈数大于等于预计演播跑灯圈数
+                        this.isRunEnd = true; //进入选定阶段
+                    }
+                }
+                if (this.isRunEnd) { // 如果是选定阶段
+                    if (value == this.currentRunIndex) { // 走到了指定位置
+                        //						if (awardType == 0) {
+                        //							
+                        //						}
+                        Laya.timer.clear(this, this.runCatapultHandler);
+                        SoundUtils.playSound(Laya.URL.basePath + "sounds/zha.ogg");
+                        if (huoche) {
+                            array.splice(0, array.length);
+                            this.fruit.allTailLight();
+                            this.catapult(value, array, runCount);
+                        }
+                        else {
+                            this.catapultDirection = !this.catapultDirection;
+                            //							trace("FruitModel.runCatapultHandler()", catapultDirection)
+                            //							let isWin:boolean = hitFruit(value)
+                            this.fruit.stopAllTail();
+                            this.fruit.twinkleFruits(value, 3, () => {
+                                this.fruit.stopTwinkleFruits(value);
+                                this.fruit.wakey(value);
+                                this.catapult(value, array, runCount);
+                            });
+                        }
+                        return;
+                    }
+                }
+                // 计算下一次跑动坐标
+                if (this.catapultDirection) {
+                    this.currentRunIndex++;
+                }
+                else {
+                    this.currentRunIndex--;
+                }
+                if (this.currentRunIndex >= this.fruit.fruitLen()) {
+                    this.currentRunIndex = 0;
+                }
+                else if (this.currentRunIndex < 0) {
+                    this.currentRunIndex = this.fruit.fruitLen() - 1;
+                }
+            }
+        }
+        stop() {
+            Laya.timer.clearAll(this);
+        }
+        /** 跑帧位置 */
+        getCurrentRunIndex() {
+            return this.currentRunIndex;
+        }
+        /** 跑动是否结束了 */
+        getIsRunEnd() {
+            return this.isRunEnd;
+        }
+    }
+    coreLib.FruitRotationUtils = FruitRotationUtils;
+    /**
+     * 金币动画
+     */
+    class GoldAniUtils {
+        constructor(goldIconUrl) {
+            this.count = 0;
+            /** 宽 */
+            this.goldW = 70;
+            /** 高 */
+            this.goldH = 70;
+            this.goldIconUrl = goldIconUrl || GoldAniUtils.defaultIcon;
+            this.loaders = [];
+        }
+        /**
+         * 播放金币动画
+         * @param num 创建数量
+         * @param startObject 开始对象
+         * @param endObject 结束对象
+         * @param endHandler 结束回调
+         */
+        playObject(num, startObject, endObject, endHandler) {
+            if (startObject == null || startObject.isDisposed || startObject.displayObject == null) {
+                this.startPoint = new Laya.Point((fgui.GRoot.inst.width >> 1), (fgui.GRoot.inst.height >> 1));
+            }
+            else {
+                this.startPoint = startObject.localToGlobal();
+                fgui.GRoot.inst.globalToLocal(this.startPoint.x, this.startPoint.y, this.startPoint);
+                this.startPoint.x += startObject.width / 2;
+                this.startPoint.y += startObject.height / 2;
+            }
+            this.endPoint = endObject.localToGlobal();
+            fgui.GRoot.inst.globalToLocal(this.endPoint.x, this.endPoint.y, this.endPoint);
+            this.endPoint.x += endObject.width / 2;
+            this.endPoint.y += endObject.height / 2;
+            this.play(num, this.startPoint, this.endPoint, endHandler);
+        }
+        /**
+         * 播放金币动画
+         * @param num 创建数量
+         * @param startPoint 开始位置
+         * @param endPoint 结束位置
+         * @param endHandler 结束回调
+         */
+        play(num, startPoint, endPoint, endHandler) {
+            this.startPoint = startPoint;
+            this.endPoint = endPoint;
+            this.endHandler = endHandler;
+            this.count = 0;
+            this.specialAward(num);
+            SoundUtils.playSound("sounds/gold.ogg");
+        }
+        /**
+         * 特殊奖品 效果 - 移动至底部然后飘直指定位置
+         * @param len 创建数量
+         */
+        specialAward(len) {
+            for (let i = 0; i < len; i++) {
+                let loader = new GoldLoader();
+                loader.icon = this.goldIconUrl;
+                loader.setXY(this.startPoint.x, this.startPoint.y);
+                loader.setSize(this.goldW, this.goldH);
+                let tempX = this.startPoint.x + Math.random() * 250 - 125;
+                let tempY = this.startPoint.y + Math.random() * 50 + 100;
+                let endP = new Laya.Point(this.endPoint.x - loader.width / 2, this.endPoint.y - loader.height / 2);
+                loader.setStartPoint(tempX, tempY);
+                loader.setMiddlePoint(tempX + (endP.x - tempX) / 2 + UtilsTool.random(200, 300), tempY + (endP.y - tempY) / 2 + UtilsTool.random(0, 100));
+                loader.setEndPoint(endP.x, endP.y);
+                Laya.Tween.to(loader, { x: tempX, y: tempY }, 600, Laya.Ease.backOut, Laya.Handler.create(this, (loader, i) => {
+                    Laya.Tween.to(loader, {
+                        //                                    x: endP.x,
+                        //                                    y: endP.y,
+                        t: 1,
+                        scaleX: .7,
+                        scaleY: .7
+                    }, 600, Laya.Ease.linearNone, Laya.Handler.create(this, (loader) => {
+                        loader.removeFromParent();
+                        this.count++;
+                        if (this.count == len) {
+                            while (this.loaders.length) {
+                                loader = this.loaders.shift();
+                                loader.dispose();
+                            }
+                            runFun(this.endHandler);
+                        }
+                    }, [loader]), i * 5);
+                }, [loader, i]), i * 5);
+                fgui.GRoot.inst.addChild(loader);
+                this.loaders.push(loader);
+            }
+        }
+        /************************************  普通金币掉落动画  ***********************************/
+        /**
+         * 播放移动目标到指定目标位置
+         * @param targetObject 要被移动的对象
+         * @param endObject 结束对象
+         * @param endHandler 完成回调
+         * @param parent 父对象
+         * @param props 附带的属性变化 或参数 duration,delay,ease
+         */
+        playGoldAni(targetObject, endObject, endHandler, parent, props) {
+            !parent && (parent = fgui.GRoot.inst);
+            let endGlobal = endObject.localToGlobal();
+            parent.globalToLocal(endGlobal.x, endGlobal.y, endGlobal);
+            let targetGlobal = targetObject.localToGlobal();
+            parent.globalToLocal(targetGlobal.x, targetGlobal.y, targetGlobal);
+            this.playGoldPointAni(targetObject, targetGlobal, endGlobal, endHandler, parent, props);
+        }
+        /**
+         * 播放移动目标到指定位置
+         * @param targetObject 要被移动的对象
+         * @param startPoint 起始位置
+         * @param endPoint 结束位置
+         * @param endHandler 完成回调
+         * @param parent 父对象
+         * @param props 附带的属性变化 或参数 duration,delay,ease
+         */
+        playGoldPointAni(targetObject, startPoint, endPoint, endHandler, parent, props) {
+            !parent && (parent = fgui.GRoot.inst);
+            !props && (props = {});
+            targetObject.setXY(startPoint.x, startPoint.y);
+            parent.addChild(targetObject);
+            props.x = endPoint.x;
+            props.y = endPoint.y;
+            props.scaleX == undefined && (props.scaleX = .5);
+            props.scaleY == undefined && (props.scaleY = .5);
+            let duration = props.duration ? props.duration : 600;
+            let delay = props.delay ? props.delay : 0;
+            let ease = props.ease ? props.ease : null;
+            this.goldTween = Laya.Tween.to(targetObject, props, duration, ease, Laya.Handler.create(this, this.goldTweenHandler, [endHandler]), delay);
+        }
+        /** 移动完成 */
+        goldTweenHandler(endHandler) {
+            runFun(endHandler);
+        }
+        dispose() {
+            while (this.loaders.length) {
+                let loader = this.loaders.shift();
+                Laya.Tween.clearAll(loader);
+                loader.dispose();
+            }
+            if (this.goldTween != null)
+                this.goldTween.clear();
+            this.goldTween = null;
+        }
+    }
+    GoldAniUtils.defaultIcon = "";
+    coreLib.GoldAniUtils = GoldAniUtils;
+    class HTTPUtils {
+        constructor() {
+            /**
+             * 用于请求的 HTTP 方法。值包括 "get"、"post"、"head"。
+             * @default null
+             */
+            this.method = null;
+            /**
+             * (default = "text")Web 服务器的响应类型，可设置为 "text"、"json"、"xml"、"arraybuffer"。
+             */
+            this.responseType = HTTPUtils.defaultResponseType;
+            this.ghr = new GameHttpRequest();
+        }
+        static create() {
+            return new HTTPUtils();
+        }
+        setUrl(url) {
+            this.url = url;
+            return this;
+        }
+        setData(data) {
+            this.data = data;
+            return this;
+        }
+        setMethod(data) {
+            this.method = data;
+            return this;
+        }
+        setResponseType(data) {
+            this.responseType = data;
+            return this;
+        }
+        setHeaders(array) {
+            this.headers = array;
+            return this;
+        }
+        setOvertime(value) {
+            this.ghr.setOvertime(value);
+            return this;
+        }
+        onComplete(handler) {
+            this.complete = handler;
+            return this;
+        }
+        onError(handler) {
+            this.error = handler;
+            return this;
+        }
+        onTimeout(handler) {
+            this.timeout = handler;
+            return this;
+        }
+        /**
+         *
+         */
+        call() {
+            var _a, _b, _c, _d;
+            let onComplete = (_a = this.completeHandler) === null || _a === void 0 ? void 0 : _a.bind(this);
+            let onError = (_b = this.errorHandler) === null || _b === void 0 ? void 0 : _b.bind(this);
+            let onTimeOut = (_c = this.timeOutHandler) === null || _c === void 0 ? void 0 : _c.bind(this);
+            // 判断是否需要拦截发送
+            if ((_d = HTTPUtils.filter) === null || _d === void 0 ? void 0 : _d.interceptSend(this.url, this.data, onComplete, onError, onTimeOut))
+                return;
+            // 判断是否有解析数据格式
+            let value = this.data;
+            HTTPUtils.filter && (value = HTTPUtils.filter.filterSendData(this.url, this.data));
+            this.ghr.onComplete(onComplete);
+            this.ghr.onError(onError);
+            this.ghr.onTimerOut(onTimeOut);
+            if (this.method == null) {
+                if (value == null) {
+                    this.method = Method.GET;
+                }
+                else {
+                    this.method = Method.POST;
+                }
+            }
+            this.ghr.send(this.url, value, this.method, this.responseType, this.headers);
+        }
+        timeOutHandler() {
+            console.log("HTTPUtils.timeOutHandler()");
+            if (this.timeout != null)
+                runFun(this.timeout);
+            else if (this.error != null)
+                runFun(this.error, "time out");
+        }
+        errorHandler(e) {
+            var _a;
+            console.log("HTTPUtils.errorHandler()", e);
+            (_a = HTTPUtils.filter) === null || _a === void 0 ? void 0 : _a.errorResult(e);
+            runFun(this.error, e);
+        }
+        completeHandler(data) {
+            if (data == null) {
+                this.errorHandler(data);
+                return;
+            }
+            HTTPUtils.parseDate(data);
+            HTTPUtils.filter && (data = HTTPUtils.filter.filterResultData(this.url, data));
+            runFun(this.complete, data);
+        }
+        abort() {
+            this.ghr.abort();
+        }
+        getHttp() {
+            return this.ghr;
+        }
+        /** 解析时间 */
+        static parseDate(data) {
+            let serverTime = HTTPUtils.filter ? HTTPUtils.filter.parseData(data) : 0;
+            this.castDifference(serverTime);
+        }
+        static castDifference(serverTime) {
+            if (!isNaN(serverTime) && serverTime > 0) {
+                //		    trace("HTTPUtils.parseDate(data)",
+                //			Cast.timerFrom(serverTime),
+                //			Cast.timerFrom(parseInt((Browser.now()/1000)+"")))
+                HTTPUtils.difference = Laya.Browser.now() - serverTime;
+            }
+        }
+        /** 获取差值 */
+        static getDifference() {
+            return HTTPUtils.difference;
+        }
+        /** 当前时间  毫秒 */
+        static getTimer() {
+            return (Laya.Browser.now() - HTTPUtils.difference);
+        }
+        /** 当前时间  秒 */
+        static getTimerSecond() {
+            return Math.floor((Laya.Browser.now() - HTTPUtils.difference) / 1000);
+        }
+        /** 解析json数据格式 */
+        static parseJson(data) {
+            if (data == null) {
+                return null;
+            }
+            if (typeof data === "string") {
+                return data;
+            }
+            let value = null;
+            let v;
+            for (let key in data) {
+                v = data[key];
+                if (value == null) {
+                    value = key + "=" + v;
+                }
+                else {
+                    value += "&" + key + "=" + v;
+                }
+            }
+            return value;
+        }
+        /** 开启服务器时间检查 */
+        static openCheckServerTimer(value) {
+            HTTPUtils.serverTimerUrl = value;
+            this.serverTimerHandler();
+            this.closeCheckServerTimer();
+            Laya.timer.loop(this.checkTimer, this, this.serverTimerHandler);
+        }
+        /** 关闭服务器时间检查 */
+        static closeCheckServerTimer() {
+            Laya.timer.clear(this, this.serverTimerHandler);
+        }
+        static serverTimerHandler() {
+            this.create().onComplete((data) => {
+                if (data.code == HttpCode.OK) {
+                    data = data.data;
+                    HTTPUtils.parseDate(data);
+                }
+            }).setUrl(this.serverTimerUrl).call();
+        }
+    }
+    HTTPUtils.defaultResponseType = "text";
+    /** 检查服务器时间间隔 */
+    HTTPUtils.checkTimer = 1000 * 60;
+    /** 差值 */
+    HTTPUtils.difference = 0;
+    coreLib.HTTPUtils = HTTPUtils;
+    class JSUtils {
+        constructor() {
+        }
+        /**
+         * 刷新页面  如果有父页面  刷新父页面
+         */
+        static reloadAll() {
+            if (Laya.Browser.window.parent) {
+                Laya.Browser.window.parent.location.reload();
+            }
+            else {
+                Laya.Browser.window.location.reload();
+            }
+        }
+        /** 刷新 */
+        static reload() {
+            Laya.Browser.window.location.reload();
+        }
+        /** 进入登录界面 */
+        static login() {
+            if (Laya.Browser.window.parent.GameToHall) {
+                Laya.Browser.window.parent.GameToHall.comeWebPage("/login");
+            }
+            AppManager.showWeb({ javascript: "window.GameToHall.comeWebPage('/login')" });
+            SceneManager.inst.closeGame();
+        }
+        /** 充值 */
+        static deposit() {
+            if (Laya.Browser.window.parent.GameToHall) {
+                Laya.Browser.window.parent.GameToHall.comeWebPage("/deposit");
+            }
+            AppManager.showWeb({ javascript: "window.GameToHall.comeWebPage('/deposit')" });
+            SceneManager.inst.closeGame();
+        }
+        /** 进入刮刮卡 */
+        static jackpot() {
+            if (Laya.Browser.window.parent.GameToHall) {
+                Laya.Browser.window.parent.GameToHall.comeWebPage("/jackpot");
+            }
+            AppManager.showWeb({ javascript: "window.GameToHall.comeWebPage('/jackpot')" });
+            SceneManager.inst.closeGame();
+        }
+        /** 关闭游戏
+         * @param [type = 0]  0 默认直接退出  1 退出切换到新游戏
+         * @param [data = null]
+         * */
+        static gameClose(type = 0, data = null) {
+            SceneManager.inst.initComplete = false;
+            SceneManager.inst.isLoaderResComplete = false;
+            if (Laya.Browser.window.parent.GameToHall) {
+                Laya.Browser.window.parent.GameToHall.gameClose(type, data);
+            }
+            else {
+                if (!Laya.Render.isConchApp && Laya.Browser.window.location.protocol == "https:") {
+                    // 如果不是加速器 并且不是在非https下  那么直接返回大厅
+                    // Laya.Browser.window.location.href = Player.HOME_URL
+                    Laya.Browser.window.location.href = "//" + Laya.Browser.window.location.host;
+                }
+            }
+            AppManager.showWeb({ javascript: "window.GameToHall.gameClose(" + type + ", " + data + ")" });
+            SceneManager.inst.closeGame();
+        }
+        /** 弹窗 */
+        static openModal(value) {
+            if (Laya.Browser.window.parent.GameToHall) {
+                Laya.Browser.window.parent.GameToHall.openModal(value);
+            }
+            AppManager.showWeb({ javascript: "window.GameToHall.openModal('" + value + "')" });
+        }
+        /** 打开指定的web页面 不关闭游戏的前提下 */
+        static openWebPageWithoutLeaveGame(value) {
+            if (Laya.Browser.window.parent.GameToHall) {
+                Laya.Browser.window.parent.GameToHall.openWebPageWithoutLeaveGame(value);
+            }
+            AppManager.showWeb({ javascript: "window.GameToHall.openWebPageWithoutLeaveGame('" + value + "')" });
+        }
+        /** 进入游戏进度条 */
+        static getProgress(value) {
+            if (Laya.Browser.window.parent.GameToHall) {
+                Laya.Browser.window.parent.GameToHall.getProgress(value);
+            }
+            AppManager.executionJavascript("window.GameToHall.getProgress", value);
+        }
+        /** 通知进入游戏了 */
+        static gameOnload() {
+            if (Laya.Browser.window.parent.GameToHall) {
+                Laya.Browser.window.parent.GameToHall.gameOnload();
+            }
+            AppManager.executionJavascript("window.GameToHall.gameOnload", null);
+        }
+        /**
+         * 通知服务器直接离开的房间
+         */
+        static outGameHttp() {
+            if (Laya.Browser.window.parent.GameToHall)
+                Laya.Browser.window.parent.GameToHall.outGameHttp(Player.inst.urlParam.roomId);
+            else
+                console.log("debug");
+        }
+        /**
+         * 分析邀请
+         * @param type 1 开  2 关
+         */
+        static shareDetail(type) {
+            if (Laya.Browser.window.parent.GameToHall)
+                Laya.Browser.window.parent.GameToHall.shareDetail(Player.inst.gameModel, type);
+            else
+                console.log("debug");
+        }
+        /** 上传头像 */
+        static updateHead() {
+            if (Laya.Browser.window.parent.GameToHall) {
+                Laya.Browser.window.parent.GameToHall.openReviseAvatarNickNameDrawer();
+            }
+            AppManager.showWeb({ javascript: "window.GameToHall.openReviseAvatarNickNameDrawer()" });
+        }
+    }
+    coreLib.JSUtils = JSUtils;
+    class LanguageUtils {
+        static get inst() {
+            if (!LanguageUtils._instance)
+                LanguageUtils._instance = new LanguageUtils();
+            return LanguageUtils._instance;
+        }
+        setXml(xml) {
+            this.xml = xml;
+        }
+        /**
+         * 返回对应的语言
+         * @see LibStr
+         * @param str key
+         */
+        getStr(str) {
+            if (typeof (str) !== "string") {
+                str = str + "";
+            }
+            if (!this.xml)
+                return str;
+            let element = this.xml.getElementById(str);
+            if (element != null) {
+                return this.__getStr(element);
+            }
+            let elements = this.xml.getElementsByName(str);
+            if (elements.length > 0) {
+                if (elements.length > 1)
+                    throw new Error("Language configuration has duplicate items：" + str);
+                return this.__getStr(elements.item(0));
+            }
+            return str;
+        }
+        __getStr(element) {
+            let content = element.textContent;
+            if (this.customConvert)
+                content = runFun(this.customConvert, content);
+            // 这里统一处理货币转换
+            content = content.replace(/\{unit}/g, Player.inst.getCurrencyUnit());
+            return content;
+        }
+    }
+    coreLib.LanguageUtils = LanguageUtils;
+    /**
+     * 长按、点击按钮绑定
+     * @author boge
+     *
+     */
+    class LongPressBtn {
+        /**
+         * 创建一个监听
+         * @param btn 绑定按钮
+         * @param callback 回调方法
+         * @param args 执行回调方法  附带参数
+         *
+         */
+        constructor(btn, callback, ...args) {
+            /** 按下判定长按的间隔时间 */
+            this.HOLD_TRIGGER_TIME = 500;
+            /** 是否单次调用 */
+            this.single = false;
+            this.btn = btn;
+            this.args = args;
+            this.callback = callback;
+            btn.displayObject.once(Laya.Event.MOUSE_DOWN, this, this.downHandler);
+            btn.onClick(this, this.clickHandler);
+        }
+        /** 点下按钮 */
+        downHandler(e) {
+            Laya.timer.once(this.HOLD_TRIGGER_TIME, this, this.onHold);
+            Laya.stage.once(Laya.Event.MOUSE_UP, this, this.upHandler);
+        }
+        /** 松开按钮 */
+        upHandler() {
+            this._isApeHold = false;
+            Laya.timer.clear(this, this.onLoopClick);
+            // 如果未触发hold，终止触发hold
+            Laya.timer.clear(this, this.onHold);
+            Laya.stage.off(Laya.Event.MOUSE_UP, this, this.upHandler);
+            this.btn.displayObject.once(Laya.Event.MOUSE_DOWN, this, this.downHandler);
+            this.btn.onClick(this, this.clickHandler);
+        }
+        onHold() {
+            this._isApeHold = true;
+            Laya.timer.loop(100, this, this.onLoopClick);
+            this.onLoopClick();
+        }
+        onLoopClick() {
+            if (this._isApeHold) {
+                // 先清理单击事件
+                this.btn.offClick(this, this.clickHandler);
+                // 执行一次点击
+                this.clickHandler(null);
+                // 单次执行  直接执行清理结束操作
+                if (this.single)
+                    this.upHandler();
+            }
+            else {
+                Laya.timer.clear(this, this.onLoopClick);
+            }
+        }
+        clickHandler(e) {
+            if (e != null)
+                e.stopPropagation();
+            let args = [this.callback].concat(this.args);
+            runFun.apply(null, args);
+        }
+        get isApeHold() {
+            return this._isApeHold;
+        }
+        dispose() {
+            Laya.timer.clearAll(this);
+            this.btn.off(Laya.Event.MOUSE_DOWN, this, this.downHandler);
+            this.btn.offClick(this, this.clickHandler);
+        }
+    }
+    coreLib.LongPressBtn = LongPressBtn;
+    /**
+     * 数字变动动画
+     */
+    class NumberTween {
+        constructor() {
+            this.value = 0;
+        }
+        /**
+         * 创建一个动画
+         * @param target 缓动动画绑定类  用于执行清楚动画
+         * @param start 开始值
+         * @param end 结束值
+         * @param duration 执行时长
+         * @param ease 执行缓动动画
+         * @param complete 执行完成
+         * @param update 执行更新
+         * @param delay 延迟执行
+         */
+        static createTween(target, start = 0, end = 0, duration = 300, ease = null, complete, update, delay = 0) {
+            if (start == end) {
+                runFun(update);
+                runFun(complete);
+                return;
+            }
+            let numberTween = Laya.Pool.getItemByClass(this.NAME, NumberTween);
+            numberTween.value = start;
+            numberTween.target = target;
+            numberTween.complete = complete;
+            numberTween.update = update;
+            numberTween.gid = this.getGID();
+            numberTween.tween = Laya.Tween.to(numberTween, { value: end, update: new Laya.Handler(numberTween, numberTween.updateHandler) }, duration, ease, Laya.Handler.create(numberTween, numberTween.completeHandler), delay);
+            this.nums.push(numberTween);
+        }
+        /**
+         * 清理并销毁指定的动画
+         * @param target 绑定的执行对象
+         */
+        static clearTween(target) {
+            for (let i = 0; i < this.nums.length; i++) {
+                let numberTween = this.nums[i];
+                if (numberTween.target == target) {
+                    numberTween.dispose();
+                }
+            }
+        }
+        /**
+         * 提前完成动画
+         * @param target 要提前完成动画的对象
+         */
+        static completeTween(target) {
+            for (let i = 0; i < this.nums.length; i++) {
+                let numberTween = this.nums[i];
+                if (numberTween.target == target) {
+                    // let complete = numberTween.complete
+                    numberTween.completeTween();
+                    // if (complete != null) complete.run()
+                }
+            }
+        }
+        /**
+         * 获取指定对象监听的所有动画
+         * @param target 动画对象
+         */
+        static getTween(target) {
+            let tween = [];
+            for (let i = 0; i < this.nums.length; i++) {
+                let numberTween = this.nums[i];
+                if (numberTween.target == target) {
+                    tween.push(numberTween);
+                }
+            }
+            return tween;
+        }
+        static getGID() {
+            return this._gid++;
+        }
+        updateHandler() {
+            runFun(this.update, this.value);
+        }
+        completeHandler() {
+            this.removeTween(this.gid);
+            runFun(this.complete);
+            Laya.Pool.recover(NumberTween.NAME, this);
+        }
+        /** 直接完成动画 */
+        completeTween() {
+            if (this.tween != null)
+                this.tween.complete();
+            this.tween = null;
+        }
+        /**
+         * 销毁 并清理动画
+         */
+        dispose() {
+            this.update = null;
+            this.complete = null;
+            this.tween = null;
+            Laya.Tween.clearAll(this);
+            this.removeTween(this.gid);
+            Laya.Pool.recover(NumberTween.NAME, this);
+        }
+        /**
+         * 根据动画id删除一个缓动动画
+         * @param gid 动画id
+         */
+        removeTween(gid) {
+            for (let i = 0; i < NumberTween.nums.length; i++) {
+                let numberTween = NumberTween.nums[i];
+                if (numberTween.gid == gid) {
+                    NumberTween.nums.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    }
+    NumberTween.NAME = "NumberTween";
+    NumberTween.nums = [];
+    NumberTween._gid = 0;
+    coreLib.NumberTween = NumberTween;
+    class ObjectUtil {
+        static setColorTransform(source, value) {
+            if (value) {
+                let array = StringUtil.changeType(value, "array,number");
+                if (array.length == 8) {
+                    // ObjectUtil.colorTransform.redMultiplier = array[0]
+                    // ObjectUtil.colorTransform.greenMultiplier = array[1]
+                    // ObjectUtil.colorTransform.blueMultiplier = array[2]
+                    // ObjectUtil.colorTransform.alphaMultiplier = array[3]
+                    // ObjectUtil.colorTransform.redOffset = array[4]
+                    // ObjectUtil.colorTransform.greenOffset = array[5]
+                    // ObjectUtil.colorTransform.blueOffset = array[6]
+                    // ObjectUtil.colorTransform.alphaOffset = array[7]
+                    // source.transform.colorTransform = ObjectUtil.colorTransform
+                    ObjectUtil.colorTransform.adjustColor(array[1], array[2], array[3], array[4]);
+                    ObjectUtil.colorTransform.color(array[4], array[5], array[6], array[7]);
+                    source.filters = [ObjectUtil.colorTransform];
+                }
+                else {
+                    console.log("ObjectUtil.setColorTransform(source, value) 色值数量不对，应为8!");
+                }
+            }
+            else {
+                // ObjectUtil.colorTransform.redMultiplier = 1
+                // ObjectUtil.colorTransform.greenMultiplier = 1
+                // ObjectUtil.colorTransform.blueMultiplier = 1
+                // ObjectUtil.colorTransform.alphaMultiplier = 1
+                // ObjectUtil.colorTransform.redOffset = 0
+                // ObjectUtil.colorTransform.greenOffset = 0
+                // ObjectUtil.colorTransform.blueOffset = 0
+                // ObjectUtil.colorTransform.alphaOffset = 0
+                // source.transform.colorTransform = ObjectUtil.colorTransform
+                ObjectUtil.colorTransform.adjustColor(0, 0, 0, 0);
+                ObjectUtil.colorTransform.color(255, 255, 255, 1);
+                source.filters = [ObjectUtil.colorTransform];
+            }
+        }
+        static setColorMatrixFilter(source, value) {
+            if (value) {
+                let array = StringUtil.changeType(value, "array,number");
+                ObjectUtil.colorMatrixFilters[0].setByMatrix(array);
+                source.filters = this.colorMatrixFilters;
+            }
+            else {
+                source.filters = null;
+            }
+        }
+        /**
+         * 深度赋值对象 <br/>
+         *        赋值            浅层拷贝    深层拷贝    getter/setter <br/>
+         * Object.assign      ok      no         no<br/>
+         * JSON.stringify      ok      ok         no<br/>
+         * Object.create      ok      no         ok<br/>
+         * @param source
+         * @param isCls
+         * @deprecated
+         *
+         */
+        static copy(source, isCls = false) {
+            // if (isCls) {
+            // 	let typeName:string = getQualifiedClassName(source)
+            // 	let packageName:string = typeName.split("::")[0]
+            // 	let type:Class = getDefinitionByName(typeName) as Class
+            // 	registerClassAlias(packageName, type)
+            // }
+            // let copier:ByteArray = new ByteArray()
+            // copier.writeObject(source)
+            // copier.position = 0
+            // return copier.readObject()
+            // 其实就是写了个子类继承父类数据而也
+            // Object.setPrototypeOf(source, newObject)
+            return Object.create(source);
+        }
+        /**
+         * 将二进制转换成 base64 图片字符
+         * @param buffer
+         */
+        static arrayBufferToBase64(buffer) {
+            let binary = '';
+            let bytes = new Uint8Array(buffer);
+            let len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return 'data:image/png;base64,' + window.btoa(binary);
+        }
+        /**
+         * ArrayBuffer 转为字符串，参数为 ArrayBuffer对象
+         * @param buf
+         */
+        static ab2str(buf) {
+            return String.fromCharCode.apply(null, new Uint8Array(buf));
+        }
+        /**
+         * 字符串转为 ArrayBuffer 对象，参数为字符串
+         * @param str
+         */
+        static str2ab(str) {
+            let buf = new ArrayBuffer(str.length * 2); // 每个字符占用2个字节
+            let bufView = new Uint8Array(buf);
+            for (let i = 0, strLen = str.length; i < strLen; i++) {
+                bufView[i] = str.charCodeAt(i);
+            }
+            return buf;
+        }
+        /**
+         * 解析角色数据
+         * @param xml
+         * @param handler 解析完成回调 ( 返回数组 [xml, texture] )
+         * @param content
+         */
+        // static parseRole(value: ArrayBuffer, handler: Laya.Handler) {
+        // 	let buf: Uint8Array = new Uint8Array(value, 0)
+        // 	let inflater = new Zlib.Inflate(buf)
+        // 	buf = inflater.decompress()
+        // 	let bytes: ByteBuffer = new ByteBuffer(buf)
+        // 	let pngIen = bytes.readInt32()
+        // 	let pngBytes: Byte = new Byte(bytes.readArrayBuffer(pngIen))
+        // 	let xmlLength = bytes.readInt32()
+        // 	let xmlBytes: Byte = new Byte(bytes.readArrayBuffer(xmlLength))
+        // 	// 将二进制转换成字符串
+        // 	let str = ObjectUtil.ab2str(xmlBytes.buffer)
+        // 	let xmlStr = Utils.parseXMLFromString(str)
+        // 	// 转换成base64 位图信息
+        // 	let base64Str = ObjectUtil.arrayBufferToBase64(pngBytes.buffer)
+        // 	// 判断如果已经加载  直接使用不再重新加载
+        // 	let texture = Laya.loader.getRes(base64Str)
+        // 	if (texture != null) {
+        // 		this.onLoadTexture(xmlStr, handler, texture)
+        // 	} else {
+        // 		Laya.loader.load(base64Str,
+        // 			Handler.create(this, this.onLoadTexture, [xmlStr, handler]),
+        // 			null, Loader.IMAGE)
+        // 	}
+        // }
+        static onLoadTexture(xml, handler, content) {
+            handler.runWith([xml, content]);
+        }
+        /**
+         * 获取指定坐标下存在的对象
+         * @param x x坐标 或 point对象
+         * @param y y坐标 默认0
+         */
+        static getObjectsUnderPoint(x, y = 0) {
+            if (x instanceof Laya.Point) {
+                y = x.y;
+                x = x.x;
+            }
+            let len = Laya.stage.numChildren;
+            let maps = [];
+            for (let i = 0; i < len; i++) {
+                let a = Laya.stage.getChildAt(i);
+                if (a instanceof Laya.Sprite && a.alpha > 0 && a.visible) {
+                    if (new Laya.Rectangle(a.x, a.y, a.displayWidth, a.displayHeight).contains(x, y)) {
+                        maps.push(a);
+                    }
+                }
+            }
+            return maps;
+        }
+        /**
+         * 获取指定位置的颜色值 16进制
+         * @param texture
+         * @param x x坐标 或 point对象 和 Laya.Sprite
+         * @param y y坐标 默认-1
+         */
+        static getPixel(texture, x = -1, y = -1) {
+            if (x instanceof Laya.Point) {
+                y = x.y;
+                x = x.x;
+            }
+            if (texture instanceof Laya.Sprite) {
+                if (x == -1) {
+                    x = texture.x;
+                }
+                if (y == -1) {
+                    y = texture.y;
+                }
+                texture = texture.texture;
+            }
+            if (x == -1) {
+                x = 0;
+            }
+            if (y == -1) {
+                y = 0;
+            }
+            let arr = texture.getPixels(x, y, 1, 1);
+            return StringUtil.colorRgb(arr);
+        }
+        /**
+         * 根据类名获取对象 如 com.test.Test可获取Test对象
+         * @param classStr
+         */
+        static getClass(classStr) {
+            let c = classStr.split(".");
+            let cls = null;
+            for (let i = 0; i < c.length; i++) {
+                if (cls == null) {
+                    cls = window[c[i]];
+                }
+                else {
+                    cls = cls[c[i]];
+                }
+            }
+            return cls;
+        }
+    }
+    ObjectUtil.colorTransform = new Laya.ColorFilter();
+    ObjectUtil.colorMatrixFilters = [new Laya.ColorFilter()];
+    coreLib.ObjectUtil = ObjectUtil;
+    class RotationUtils {
+        constructor() {
+            /** 速度最大值 */
+            this.maxSpeed = 10;
+            /** 减速后最小值 */
+            this.minSpeed = 0;
+            /** 格子数量 */
+            this.count = 20;
+            /** 第一个奖区起始点与0点位置的偏移比例 */
+            this.skew = -0.5;
+            /** 最少圈数 */
+            this.minCircle = 5;
+            /** 最多圈数 */
+            this.maxCircle = 8;
+            /** 指针所停位置离奖区边缘的比例 */
+            this.offset = 0.5;
+            /** 旋转花费的时间，单位毫秒。 只有tween有用 */
+            this.duration = 1000 * 5;
+        }
+        /**
+         *
+         * @param comp 要旋转的对象
+         * @param runEndIndex 最终停止的位置
+         * @param callback 转动停止后调用函数
+         * @param proCall 转动开始消弱后调用函数
+         * @param isClockwise 是否是顺时针方向转动
+         *
+         */
+        rollFrame(comp, runEndIndex, callback, proCall, isClockwise = true) {
+            this.roll(comp, runEndIndex, callback, proCall, true, isClockwise);
+        }
+        /**
+         *
+         * @param comp 要旋转的对象
+         * @param runEndIndex 最终停止的位置
+         * @param callback 转动停止后调用函数
+         * @param proCall 转动开始消弱后调用函数
+         * @param isClockwise 是否是顺时针方向转动
+         *
+         */
+        rollTween(comp, runEndIndex, callback, proCall, isClockwise = true) {
+            this.roll(comp, runEndIndex, callback, proCall, false, isClockwise);
+        }
+        /**
+         *
+         * @param comp 要旋转的对象
+         * @param runEndIndex 最终停止的位置
+         * @param callback 转动停止后调用函数
+         * @param proCall 转动开始消弱后调用函数
+         * @param isFrame 是否使用帧动画播放
+         * @param isClockwise 是否是顺时针方向转动
+         *
+         */
+        roll(comp, runEndIndex, callback, proCall, isFrame, isClockwise) {
+            this.comp = comp;
+            this.endCall = callback;
+            this.proCall = proCall;
+            comp.rotation = comp.rotation % 360; //初始化角度
+            this.runEndIndex = runEndIndex;
+            this.rotationTotal = this.getRotationLong(this.count, this.skew, this.minCircle, this.maxCircle, runEndIndex, this.offset); //获取总长度
+            if (isFrame) {
+                this.rotationTotal -= comp.rotation;
+                if (!isClockwise)
+                    this.rotationTotal *= -1;
+                this.addSpeed = (this.maxSpeed * this.maxSpeed - this.minSpeed * this.minSpeed) / this.rotationTotal; //获取加速度
+                this.speed = 0; //初始化速度
+                Laya.timer.frameLoop(1, this, this.runHandler);
+            }
+            else {
+                if (!isClockwise)
+                    this.rotationTotal *= -1;
+                this.tween = Laya.Tween.to(comp, {
+                    rotation: this.rotationTotal,
+                    ease: Laya.Ease.expoInOut, complete: Laya.Handler.create(this, this.onRollEndHandler),
+                    update: new Laya.Handler(this, this.updateHandler)
+                }, this.duration);
+                //				Ease.sineInOut
+                //				Ease.expoInOut
+                //				Ease.quadInOut
+                //				Ease.quartInOut
+                //				Ease.circInOut
+                //				Ease.cubicInOut
+            }
+        }
+        updateHandler() {
+            let rt = this.rotationTotal - this.rotationTotal / 3;
+            if (rt <= this.comp.rotation) {
+                runFun(this.proCall);
+                this.proCall = null;
+            }
+        }
+        onRollEndHandler() {
+            this.tween = null;
+            runFun(this.endCall);
+            this.endCall = null;
+        }
+        /**
+         * 获取总长度函数
+         * @param count 转盘拆分份数
+         * @param skew 第一个奖区起始点与0点位置的偏移比例
+         * @param Qmin 最少圈数
+         * @param Qmax 最多圈数
+         * @param location 奖品所在奖区
+         * @param offset 指针所停位置离奖区边缘的比例
+         * @return
+         *
+         */
+        getRotationLong(count, skew, Qmin, Qmax, location, offset) {
+            let _q = 360 * (Math.floor(Math.random() * (Qmax - Qmin)) + Qmin); //整圈长度
+            let _skew = (360 / count) * skew; //第一个奖区起始点与0点位置的偏移量
+            let _location = (360 / count) * location; //目标奖区的起始点
+            let _offset = Math.floor(Math.random() * (360 / count) * (1 - 2 * offset)) + (360 / count) * offset;
+            return _q + _skew + _location + _offset;
+        }
+        runHandler() {
+            //如果速度到达最大速度开始减速
+            if (this.speed >= this.maxSpeed) {
+                this.speed = 2 * this.maxSpeed - this.speed; //最大速度超范围后修正回来!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!关键
+                this.addSpeed = -this.addSpeed;
+                runFun(this.proCall);
+                this.proCall = null;
+            }
+            this.speed += this.addSpeed;
+            if (this.speed > 0) {
+                this.comp.rotation += this.speed;
+            }
+            else {
+                Laya.timer.clear(this, this.runHandler);
+                this.onRollEndHandler();
+            }
+        }
+        /** 销毁动画 */
+        diapose() {
+            if (this.tween)
+                this.tween.clear();
+            this.tween = null;
+            this.endCall = null;
+            this.proCall = null;
+            if (this.comp)
+                Laya.Tween.clearAll(this.comp);
+            Laya.timer.clear(this, this.runHandler);
+        }
+        /** 立即停止到结束为止 */
+        stop() {
+            if (this.tween)
+                this.tween.complete();
+            this.tween = null;
+            this.endCall = null;
+            this.proCall = null;
+            if (this.comp)
+                Laya.Tween.clearAll(this.comp);
+            Laya.timer.clear(this, this.runHandler);
+        }
+    }
+    coreLib.RotationUtils = RotationUtils;
+    class ShowUtils {
+        static showSize(spr) {
+            const bonus = new Laya.Sprite();
+            bonus.alpha = .7;
+            if (spr.hitArea) {
+                bonus.graphics.drawRect(spr.hitArea.x, spr.hitArea.y, spr.hitArea.width, spr.hitArea.height, "#ffffff");
+            }
+            else {
+                bonus.graphics.drawRect(spr.x, spr.y, spr.width, spr.height, "#ffffff");
+            }
+            spr.addChild(bonus);
+        }
+    }
+    coreLib.ShowUtils = ShowUtils;
+    class SoundUtils {
+        static addRes(res) {
+            Laya.SoundManager.autoReleaseSound = false;
+            SoundUtils.loadAsset = res;
+        }
+        static load(url = null) {
+            Laya.loader.load(url == null ? SoundUtils.loadAsset : url, Laya.Handler.create(null, SoundUtils.onLoader));
+        }
+        static onLoader() {
+            for (let i = 0; i < SoundUtils.autoPlay.length; i++) {
+                let url = SoundUtils.autoPlay[i];
+                SoundUtils.playMusic(url, SoundUtils.bgMusicLoop, SoundUtils.bgComplete, SoundUtils.bgVolume, SoundUtils.bgStartTime);
+                console.log("auto play = " + url);
+            }
+            SoundUtils.autoPlay.length = 0;
+        }
+        /**
+         *
+         * @param url
+         * @param loops
+         * @param complete
+         * @param volume
+         * @param startTime
+         * @param coverBefore 如果正在播放指定的音乐  是否覆盖 默认 false
+         * @return
+         */
+        static playMusic(url, loops = 0, complete, volume = -1, startTime = 0, coverBefore = false) {
+            if (Laya.SoundManager["_bgMusic"] == Laya.URL.formatURL(url) && !coverBefore)
+                return null;
+            let sound = Laya.loader.getRes(url);
+            SoundUtils.bgMusicLoop = loops;
+            SoundUtils.bgVolume = volume;
+            SoundUtils.bgComplete = complete;
+            SoundUtils.bgStartTime = startTime;
+            if (sound != null) {
+                let channel = Laya.SoundManager.playMusic(url, loops, complete, startTime);
+                if (!channel)
+                    return null;
+                if (volume > -1)
+                    channel.volume = volume;
+                return channel;
+            }
+            else {
+                console.log("sound not load " + url);
+                if (SoundUtils.autoPlay.indexOf(url) == -1)
+                    SoundUtils.autoPlay.push(url);
+                const index = SoundUtils.loadAsset.findIndex(function (value) {
+                    return value.url == url;
+                });
+                if (index < 0) {
+                    SoundUtils.load(url);
+                }
+            }
+            return null;
+        }
+        static playSound(url, loops = 1, complete, volume = 1, startTime = 0) {
+            let sound = Laya.loader.getRes(url);
+            if (sound != null) {
+                let channel = Laya.SoundManager.playSound(url, loops, complete, null, startTime);
+                if (!channel)
+                    return null;
+                if (volume > -1)
+                    channel.volume = volume;
+                return channel;
+            }
+            else {
+                let index = SoundUtils.loadAsset.findIndex(function (value) {
+                    return value.url == url;
+                });
+                if (index < 0) {
+                    SoundUtils.load(url);
+                }
+                console.log("sound not load " + url);
+            }
+            return null;
+        }
+        static clear() {
+            SoundUtils.autoPlay.length = 0;
+            while (SoundUtils.loadAsset.length > 0) {
+                let loadRes = SoundUtils.loadAsset.shift();
+                Laya.loader.cancelLoadByUrl(loadRes.url);
+                Laya.SoundManager.destroySound(loadRes.url);
+            }
+            console.log("clear sound");
+            SoundUtils.loadAsset.length = 0;
+        }
+        static stopSound(url) {
+            Laya.SoundManager.stopSound(url);
+        }
+        /**
+         * 停止播放所有音效（不包括背景音乐）。
+         */
+        static stopAllSound() {
+            Laya.SoundManager.stopAllSound();
+        }
+        /**
+         * 停止播放所有声音（包括背景音乐和音效）。
+         */
+        static stopAll() {
+            Laya.SoundManager.stopAll();
+        }
+        /**
+         * 停止播放背景音乐（不包括音效）。
+         */
+        static stopMusic() {
+            Laya.SoundManager.stopMusic();
+        }
+    }
+    /** 需要立即播放的 */
+    SoundUtils.autoPlay = [];
+    /** 加载资源 */
+    SoundUtils.loadAsset = [];
+    SoundUtils.bgMusicLoop = 0;
+    SoundUtils.bgVolume = 1;
+    SoundUtils.bgStartTime = 0;
+    coreLib.SoundUtils = SoundUtils;
+    class SpineUtils {
+        /**
+         * 对指定 skeleton 进行设置
+         * @param skeleton
+         * @param url
+         * @param [nameOrIndex = 0] 播放名字或位置
+         * @param [loop = true] 循环
+         * @param playComplete
+         * @param loaderComplete
+         * @param [aniMode = -1]
+         */
+        static playSpine(skeleton, url, nameOrIndex = 0, loop = true, playComplete, loaderComplete, aniMode = -1) {
+            skeleton.offAll(Laya.Event.STOPPED);
+            skeleton.on(Laya.Event.STOPPED, this, function (handler) {
+                runFun(handler);
+            }, [playComplete]);
+            if (skeleton instanceof GSpineSkeleton) {
+                if (skeleton.aniPath == url && skeleton.asSkeleton != null) {
+                    // loaderComplete && loaderComplete.run()
+                    SpineUtils.parseComplete(skeleton, nameOrIndex, loop, loaderComplete);
+                    return;
+                }
+                // 界面显示了  在加载资源
+                skeleton.load(url, Laya.Handler.create(this, SpineUtils.parseComplete, [skeleton, nameOrIndex, loop, loaderComplete]));
+                return;
+            }
+            if (skeleton.asSkeleton.url == url && skeleton.asSkeleton.templet) {
+                // loaderComplete && loaderComplete.run()
+                SpineUtils.parseComplete(skeleton, nameOrIndex, loop, loaderComplete, null);
+                return;
+            }
+            if (aniMode == -1)
+                aniMode = skeleton.aniMode;
+            // 界面显示了  在加载资源
+            skeleton.load(url, Laya.Handler.create(this, SpineUtils.parseComplete, [skeleton, nameOrIndex, loop, loaderComplete]), aniMode);
+        }
+        static parseComplete(skeleton, nameOrIndex, loop, loaderComplete, fac) {
+            runFun(loaderComplete);
+            if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
+                runFun(nameOrIndex.loaderComplete);
+            }
+            if (skeleton && nameOrIndex)
+                skeleton.play(nameOrIndex, loop);
+        }
+        /**
+         * 创建spine 骨骼动画组件
+         * @param url 根据传入的json 或 sk自动创建 GSpineSkeleton、GSkeleton
+         * @param optional
+         * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
+         */
+        static createSpine(url, optional, skeletonClass) {
+            var _a, _b, _c, _d, _e, _f, _g;
+            if (optional && !this.isInterface(optional)) {
+                skeletonClass = optional;
+                optional = null;
+            }
+            if (typeof url !== "string") {
+                optional = url;
+                url = optional.url;
+            }
+            // 配置属性为null 或者不是配置属性
+            if (!optional || !this.isInterface(optional)) {
+                optional = { url: url };
+            }
+            // @ts-ignore
+            skeletonClass !== null && skeletonClass !== void 0 ? skeletonClass : (skeletonClass = Laya.Utils.getFileExtension(url) === "json" ? GSpineSkeleton : GSkeleton);
+            let skeleton = new skeletonClass();
+            if (optional.ver && skeleton instanceof GSpineSkeleton) {
+                skeleton.ver = optional.ver;
+            }
+            optional.rotation && (skeleton.rotation = optional.rotation);
+            if (optional.scale) {
+                skeleton.setScale(optional.scale, optional.scale);
+            }
+            else {
+                skeleton.setScale((_a = optional.scaleX) !== null && _a !== void 0 ? _a : skeleton.scaleX, (_b = optional.scaleY) !== null && _b !== void 0 ? _b : skeleton.scaleY);
+            }
+            skeleton.setXY((_c = optional.x) !== null && _c !== void 0 ? _c : 0, (_d = optional.y) !== null && _d !== void 0 ? _d : 0);
+            if (optional.relation) {
+                let relation = optional.relation;
+                relation.lr = relation.ud = relation.target;
+                relation.lr && skeleton.addRelation(relation.lr, fgui.RelationType.Center_Center, (_e = relation.usePercent) !== null && _e !== void 0 ? _e : true);
+                relation.ud && skeleton.addRelation(relation.ud, fgui.RelationType.Middle_Middle, (_f = relation.usePercent) !== null && _f !== void 0 ? _f : true);
+            }
+            SpineUtils.playSpine(skeleton, url, optional.play, (_g = optional.play) === null || _g === void 0 ? void 0 : _g.loop, optional.playComplete, optional.loaderComplete, optional.aniMode);
+            return skeleton;
+        }
+        /**
+         * 判断是否是接口 用_displayObject 是否存在判断
+         * @param optional
+         */
+        static isInterface(optional) {
+            return !("_displayObject" in optional);
+        }
+    }
+    coreLib.SpineUtils = SpineUtils;
+    /** 状态吗获取显示信息 */
+    class StateCode {
+        /**
+         * 获取显示信息
+         * @param data 一个object对象  如果带有message错误文字  直接使用 否则用code命令获取错误内容
+         */
+        static getShowMessage(data) {
+            var _a, _b;
+            if (data == null)
+                return LanguageUtils.inst.getStr(1005 /* LibStr.NET_ERROR */);
+            if (((_a = data.message) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+                return data.message;
+            }
+            else if (((_b = data.msg) === null || _b === void 0 ? void 0 : _b.length) > 0) {
+                return data.msg;
+            }
+            return this.getInfo(data.code);
+        }
+        /**
+         * 显示错误信息
+         * @param code 错误代号
+         */
+        static getInfo(code) {
+            let content = "";
+            switch (code) {
+                case 300: // 未登陆，请先登陆
+                    content = LanguageUtils.inst.getStr(1007 /* LibStr.FIRST_LOG */);
+                    break;
+                case 5002: // 资金不足
+                    content = LanguageUtils.inst.getStr(1021 /* LibStr.RECHARGE */);
+                    break;
+                case 8002: // 当前游戏状态不属于投注状态
+                    content = LanguageUtils.inst.getStr(1006 /* LibStr.CANNOT_BET */);
+                    break;
+                case 8003: // 游戏暂停中
+                    content = LanguageUtils.inst.getStr(1002 /* LibStr.GAME_OFF */);
+                    break;
+                case 8004: // 投注失败
+                    content = LanguageUtils.inst.getStr(1010 /* LibStr.BET_FAIL */);
+                    break;
+                default:
+                    content = LanguageUtils.inst.getStr(1005 /* LibStr.NET_ERROR */) + ". code:" + code;
+                    break;
+            }
+            return content;
+        }
+        /** 此错误是后在执行范围内 */
+        static execute(code, msg = null) {
+            switch (code) {
+                case 300: // 请登录
+                    console.log("StateCode.execute() 300");
+                    if (Player.inst.urlParam.isJumpPage()) {
+                        JSUtils.login();
+                        return true;
+                    }
+                    fgui.GRoot.inst.closeModalWait();
+                    LoadingWindow.inst.hide();
+                    HtmlWindow.inst.hide();
+                    msg = msg ? msg : LanguageUtils.inst.getStr(1007 /* LibStr.FIRST_LOG */);
+                    if (fgui.UIPackage.getByName("gameCommon"))
+                        WaitResult.inst.hide();
+                    HomePrompt.instance.showTip(0, msg, function () {
+                        if (Player.inst.gameModel == -1) {
+                            Laya.LocalStorage.removeItem("token");
+                            Laya.LocalStorage.removeItem("userData");
+                            Player.inst.token = null;
+                            if (Player.inst.urlParam.isJumpPage()) {
+                                Player.inst.urlParam.clearJumpPage();
+                                //								SceneManager.inst.enterGame()
+                                //								return
+                            }
+                            SceneManager.inst.showHomeScene();
+                        }
+                        else {
+                            SceneManager.inst.logout();
+                        }
+                    }, null, { cancelName: LanguageUtils.inst.getStr(1066 /* LibStr.OK */) });
+                    return true;
+                case 8003: // 游戏暂停中
+                    console.log("StateCode.execute() 8003");
+                    this.showGameOff();
+                    return true;
+            }
+            return false;
+        }
+        /** 游戏暂停中，返回大厅 */
+        static showGameOff() {
+            JSUtils.openModal(LanguageUtils.inst.getStr(1002 /* LibStr.GAME_OFF */));
+            JSUtils.gameClose();
+        }
+    }
+    coreLib.StateCode = StateCode;
+    /**
+     * 流量统计
+     */
+    class StatFlow {
+        constructor() {
+            /** 公共流量计算接口 */
+            this.by = new Laya.Byte();
+        }
+        static get inst() {
+            if (this._instance == null)
+                StatFlow._instance = new StatFlow();
+            return this._instance;
+        }
+        /**
+         * 计算流量
+         * @param url
+         * @param value
+         */
+        castFlow(url, value) {
+            if (Player.inst.token == null) {
+                return;
+            }
+            this.by.clear();
+            //		by.writeUTFBytes(value)
+            ////		trace(value)
+            //		let len:number = by.length
+            ////		trace(len)
+            ////		trace("**********************")
+            //
+            //		let simpleUrl:string = url.split("?")[0]
+            //
+            //		let obj:any = getUserStat(simpleUrl)
+            //		if (obj == null) {
+            //			obj = {timer:HTTPUtils.inst.getTimer(), size:0, url:simpleUrl}
+            //		}
+            //
+            //		let current:number = HTTPUtils.inst.getTimer()
+            //
+            //		let sendSize:number = 0
+            //		let sendUrl:string
+            //		let sendTimer:number
+            //		if (!Cast.isSameDay(obj.timer, current)) {
+            //			sendSize = obj.size
+            //			sendUrl = obj.url
+            //			sendTimer = obj.timer
+            //			obj.timer = current
+            //			obj.size = 0
+            //		}
+            ////		trace(Cast.timerFrom2(obj.timer/1000), Cast.timerFrom2(current/1000), url)
+            //		obj.size += len
+            ////		trace("当前流量消耗统计 今天="+obj.size+"b "+Math.floor(obj.size/1024)+"kb | 发送="+sendSize)
+            //
+            //		addUserStat(obj)
+            //
+            //		if (sendSize > 0) {
+            //			let sendObj:any = {reqData:[{url:sendUrl, size:sendSize, timer:sendTimer}], uid:Player.inst.userId}
+            //			let obj2:any = Laya.LocalStorage.getJSON(NOT_SEND_STAT_FLOW)
+            //			let users:any[] = obj2.data
+            //			for (let i:number = 0; i < users.length; i++) {
+            //				let user:any = users[i]
+            //				if (!Cast.isSameDay(user.timer, current)) {
+            //					if (user.size > 0) {
+            //						sendObj.reqData.push({url:user.url, size:user.size, timer:user.timer})
+            //					}
+            //					user.size = 0
+            //					user.timer = current
+            //				}
+            //			}
+            //
+            //			Laya.LocalStorage.setJSON(NOT_SEND_STAT_FLOW, obj2)
+            //
+            //			sendObj.reqData = JSON.stringify(sendObj.reqData)
+            //
+            //			HTTPUtils.inst.post(__JS__("analysisUrl")+"data-traffic", sendObj)
+            //		}
+        }
+        /** 添加用户统计 */
+        addUserStat(value) {
+            //		let obj:any = Laya.LocalStorage.getJSON(NOT_SEND_STAT_FLOW)
+            //		if (obj == null) {
+            //			obj = {data:[]}
+            //		}
+            //		let users:any[] = obj.data
+            //		if (!(users is Array)) {
+            //			users = []
+            //		}
+            //		let update:boolean
+            //		for (let i = 0; i < users.length; i++) {
+            //			let user = users[i]
+            //			if (user.url == value.url) {
+            //				users[i] = value
+            //				update = true
+            //				break
+            //			}
+            //		}
+            //		if(!update) users.push(value)
+            //		obj.data = users
+            //		Laya.LocalStorage.setJSON(NOT_SEND_STAT_FLOW, obj)
+        }
+        /** 根据用户id获取用户统计信息 */
+        getUserStat(url) {
+            let obj = Laya.LocalStorage.getJSON(StatFlow.NOT_SEND_STAT_FLOW);
+            if (obj == null) {
+                obj = { data: [] };
+            }
+            else {
+                if (!(obj.data instanceof Array)) {
+                    obj = { data: [] };
+                }
+            }
+            let users = obj.data;
+            for (let i = 0; i < users.length; i++) {
+                let user = users[i];
+                if (user.url == url) {
+                    return user;
+                }
+            }
+            return null;
+        }
+    }
+    /** 未发送的流量统计 */
+    StatFlow.NOT_SEND_STAT_FLOW = "notSendStatFlow";
+    coreLib.StatFlow = StatFlow;
+    /**
+     * 字符串一些常用方法。
+     * @author boge
+     *
+     */
+    class StringUtil {
+        /** 支持字符串格式 ("{0}"). 格式化 */
+        static format(format, ...args) {
+            for (let i = 0; i < args.length; ++i)
+                format = format.replace(new RegExp("\\{" + i + "\\}", "g"), args[i]);
+            return format;
+        }
+        /**
+         * 忽略大小字母比较字符是否相等
+         * @param char1 字符串一
+         * @param char2 字符串二
+         * @return
+         */
+        static equalsIgnoreCase(char1, char2) {
+            return char1.toLowerCase() == char2.toLowerCase();
+        }
+        /**
+         * 是否是数值字符串
+         * @param char 指定字符串
+         * @return
+         */
+        static isNumber(char) {
+            if (!char) {
+                return false;
+            }
+            return !isNaN(parseFloat(char));
+        }
+        /**
+         * 去除所有html 标签形式
+         * @param value
+         * @return
+         *
+         */
+        static removeHtml(value) {
+            let str = value.replace(this.HTML_TAG_REG, "");
+            if (str) {
+                return this.trim(str);
+            }
+            return value;
+        }
+        /**
+         * 是否为合法 Email
+         * @param char 指定字符串
+         * @return
+         */
+        static isEmail(char) {
+            let reg = new RegExp("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$");
+            return this.checkChar(char, reg);
+        }
+        /**
+         * 是否是 Double 型数据
+         * @param    char    指定字符串
+         * @return
+         */
+        static isDouble(char) {
+            let pattern = new RegExp("^[+\-]?\d+(\.\d+)?$");
+            return this.checkChar(char, pattern);
+        }
+        /**
+         * 是否是整数
+         * @param    char    指定字符串
+         * @return
+         */
+        static isInteger(char) {
+            let pattern = new RegExp("^[-\+]?\d+$");
+            return this.checkChar(char, pattern);
+        }
+        /**
+         * 是否是英文字符（包括大小写）
+         * @param    char    指定字符串
+         * @return
+         */
+        static isEnglish(char) {
+            let pattern = new RegExp("^[A-Za-z]+$");
+            return this.checkChar(char, pattern);
+        }
+        /**
+         * 是否是中文
+         * @param    char    指定字符串
+         * @return
+         */
+        static isChinese(char) {
+            let pattern = new RegExp("^[\u0391-\uFFE5]+$");
+            return this.checkChar(char, pattern);
+        }
+        /**
+         * 万军从中取数字
+         * @param char
+         * @return
+         */
+        static getNumbers(char) {
+            let pattern = /\d+/g;
+            let value = "";
+            if (pattern.test(char)) {
+                value = char.match(pattern).join("");
+            }
+            return parseFloat(value);
+        }
+        /**
+         * 万军从中取非数字
+         * @param char
+         * @return
+         */
+        static getNotNumbers(char) {
+            let pattern = /\D+/g;
+            let value = "";
+            if (pattern.test(char)) {
+                value = char.match(pattern).join("");
+            }
+            return value;
+        }
+        /**
+         * 是否是双字节
+         * @param    char    指定字符串
+         * @return
+         */
+        static isDoubleChar(char) {
+            let pattern = new RegExp("^[^\x00-\xff]+$");
+            return this.checkChar(char, pattern);
+        }
+        /**
+         * 是否是 url 地址
+         * @param    char    指定字符串
+         * @return
+         */
+        static isURL(char) {
+            if (!char) {
+                return false;
+            }
+            char = char.toLowerCase();
+            //		let pattern:RegExp = /^http:\/\/[A-Za-z0-9]+\.[A-Za-z0-9]+[\/=\?%\-&_~`@[\]\':+!]*([^<>\"\"])*$/
+            return this.checkChar(char, this.HTML_URL_REG);
+        }
+        /**
+         * 是否为空  需要用正则匹配出多个空格的情况
+         * @param    char    指定字符串
+         * @return
+         */
+        static isEmpty(char) {
+            switch (char) {
+                case null:
+                case "":
+                case "\t":
+                case "\r":
+                case "\n":
+                case "\f":
+                case undefined:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        /**
+         * 是否不是空  需要用正则匹配出多个空格的情况
+         * @param    char    指定字符串
+         * @return
+         */
+        static isNotEmpty(char) {
+            return !this.isEmpty(char);
+        }
+        /**
+         * 是否包含中文
+         * @param    char    指定字符串
+         * @return
+         */
+        static hasChineseChar(char) {
+            let pattern = /[^\x00-\xff]/;
+            return this.checkChar(char, pattern);
+        }
+        /**
+         * 检测指定字符串是否匹配指定模式
+         * @param    char    指定字符串
+         * @param    pattern    指定模式
+         * @return
+         */
+        static checkChar(char, pattern) {
+            if (!char) {
+                return false;
+            }
+            char = this.trim(char);
+            return pattern.test(char);
+        }
+        /**
+         * 比较两个字符串是否相等
+         * @param s1 第一个比较字符串。
+         * @param s2 第二个比较字符串。
+         * @param caseSensitive 是否区分大小写  默认不区分
+         * @return
+         */
+        static stringsAreEqual(s1, s2, caseSensitive = false) {
+            if (caseSensitive) {
+                return (s1 == s2);
+            }
+            else {
+                return (s1.toUpperCase() == s2.toUpperCase());
+            }
+        }
+        /**
+         * 去除首位的空白部分
+         * @param input 要被处理的字符串
+         * @return
+         */
+        static trim(input) {
+            return StringUtil.ltrim(StringUtil.rtrim(input));
+        }
+        /**
+         * 去除所有的空白部分
+         * @param input 要被处理的字符串
+         * @return
+         *
+         */
+        static trimAll(input) {
+            if (input == null)
+                return null;
+            let value = "";
+            let size = input.length;
+            for (let i = 0; i < size; i++) {
+                if (input.charCodeAt(i) > 32) {
+                    value += input.charAt(i);
+                }
+            }
+            return value;
+        }
+        /**
+         * 从前面指定的字符串中删除空格。
+         * @param input 输入字符串开始的空白将被删除。
+         * @return
+         *
+         */
+        static ltrim(input) {
+            let size = input.length;
+            for (let i = 0; i < size; i++) {
+                if (input.charCodeAt(i) > 32) {
+                    return input.substring(i);
+                }
+            }
+            return "";
+        }
+        /**
+         *
+         * 从指定的字符串的结尾删除空格。
+         *
+         * @param input 输入字符串结尾的空白将被删除。
+         * @return
+         *
+         */
+        static rtrim(input) {
+            let size = input.length;
+            for (let i = size; i > 0; i--) {
+                if (input.charCodeAt(i - 1) > 32) {
+                    return input.substring(0, i);
+                }
+            }
+            return "";
+        }
+        /**
+         * 确定是否按指定字符串开始。
+         * @param input 要被处理的字符串
+         * @param prefix 字符串的前缀
+         */
+        static beginsWith(input, prefix) {
+            if (!input) {
+                return false;
+            }
+            return (prefix == input.substring(0, prefix.length));
+        }
+        /**
+         * 确定是否按指定字符串开始。
+         * @param input 要被处理的字符串
+         * @param prefix 字符串的前缀
+         */
+        static beginsWithAny(input, ...prefix) {
+            if (StringUtil.isEmpty(input)) {
+                return false;
+            }
+            for (let i = 0; i < prefix.length; i++) {
+                if (StringUtil.beginsWith(input, prefix[i]))
+                    return true;
+            }
+            return false;
+        }
+        /**
+         * 确定是否按指定字符串结束。
+         * @param input 要被处理的字符串
+         * @param suffix 字符串的后缀
+         */
+        static endsWith(input, suffix) {
+            if (!input) {
+                return false;
+            }
+            return (suffix == input.substring(input.length - suffix.length));
+        }
+        /**
+         * 确定是否按指定字符串结束。  只要满足一个就返回 true
+         * @param input 要被处理的字符串
+         * @param prefix 字符串的后缀
+         */
+        static endsWithAny(input, ...prefix) {
+            if (StringUtil.isEmpty(input)) {
+                return false;
+            }
+            for (let i = 0; i < prefix.length; i++) {
+                if (StringUtil.endsWith(input, prefix[i]))
+                    return true;
+            }
+            return false;
+        }
+        /**
+         * 删除在输入字符串中删除字符串的所有实例。
+         * @param input 要被处理的字符串
+         * @param remove 要删除的字符串
+         * @return
+         */
+        static remove(input, remove) {
+            return this.replace(input, remove, "");
+        }
+        /**
+         * 字符串内容替换
+         * @param input 要被处理的字符串
+         * @param replace 要被替换掉的字符串
+         * @param replaceWith 用来替换的新字符串
+         */
+        static replace(input, replace, replaceWith) {
+            return input.split(replace).join(replaceWith);
+        }
+        /**
+         * 获取指定符号之后的字符串
+         * @param input 要处理的字符串
+         * @param suffix 要做为依据的最后一个符号
+         * @param retain 是否要保留作为依据的符号 (默认不保留)
+         * @param direction 是从前开始还是从后开始 (默认从后)
+         * <br>
+         * @example
+         * var str = "ssdw/aa"
+         * StringUtils.endsCode(str, "/") = aa
+         */
+        static endsCode(input, suffix, retain = false, direction = false) {
+            let index;
+            if (direction) {
+                index = input.indexOf(suffix);
+            }
+            else {
+                index = input.lastIndexOf(suffix);
+            }
+            if (index != -1) {
+                if (retain) {
+                    input = input.substring(index, input.length);
+                }
+                else {
+                    input = input.substring(index + (suffix.length), input.length);
+                }
+            }
+            return input;
+        }
+        /**
+         * 获取指定符号之前的字符串
+         * @param input 要处理的字符串
+         * @param suffix 要做为依据的最后一个符号
+         * @param retain 是否要保留作为依据的符号 (默认不保留)
+         * @param direction 是从前开始还是从后开始 (默认从后)
+         *
+         * @return
+         *
+         */
+        static beginsCode(input, suffix, retain = false, direction = false) {
+            let index;
+            if (direction) {
+                index = input.indexOf(suffix);
+            }
+            else {
+                index = input.lastIndexOf(suffix);
+            }
+            if (index != -1) {
+                if (retain) {
+                    input = input.substring(0, index + 1);
+                }
+                else {
+                    input = input.substring(0, index);
+                }
+            }
+            return input;
+        }
+        /**
+         * 字符串与对象进行比较。按字典顺序比较两个字符串
+         * @param value 源字符串
+         * @param anotherString 要比较的字符串
+         * @return number 返回值是整型，它是先比较对应字符的大小(ASCII码顺序)，如果第一个字符和参数的第一个字符不等，结束比较，返回他们之间的长度差值，如果第一个字符和参数的第一个字符相等，则以第二个字符和参数的第二个字符做比较，以此类推,直至比较的字符或被比较的字符有一方结束。
+         * <br>如果参数字符串等于此字符串，则返回值 0；<br>如果此字符串小于字符串参数，则返回一个小于 0 的值；<br>如果此字符串大于字符串参数，则返回一个大于 0 的值。
+         */
+        static compareTo(value, anotherString) {
+            let len1 = value.length;
+            let len2 = anotherString.length;
+            let lim = Math.min(len1, len2);
+            let k = 0;
+            while (k < lim) {
+                let c1 = value.charCodeAt(k);
+                let c2 = anotherString.charCodeAt(k);
+                if (c1 != c2) {
+                    return c1 - c2;
+                }
+                k++;
+            }
+            return len1 - len2;
+        }
+        /**
+         * 获取资源文件的名字
+         * @param url 路径名
+         * @param retain 是否去掉尾部标签 默认true
+         * @return
+         */
+        static urlName(url, retain = true) {
+            // 先同意替换符号
+            if (url.indexOf("\\") != -1) {
+                url = url.replace(/\\/g, "/");
+            }
+            let index = url.lastIndexOf("/");
+            if (retain) {
+                url = url.substring(index + 1, url.lastIndexOf("."));
+            }
+            else {
+                url = url.substring(index + 1, url.length);
+            }
+            return url;
+        }
+        /**
+         * 判断此字符串中是否包含
+         * @param value
+         * @param arge
+         * @return
+         */
+        static contains(value, ...arge) {
+            for (let i = 0; i < arge.length; i++) {
+                let items = arge[i];
+                if (value.indexOf(items) != -1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        /**
+         * 将 Uint8Array 转换成16进制颜色值  至少保证3个值
+         * @param value 数据
+         * @param defaultColor 默认值  如果不满足要求  直接返回的值 默认#ffffff
+         */
+        static colorRgb(value, defaultColor = "#ffffff") {
+            if (value.length < 3)
+                return defaultColor;
+            // 转成16进制
+            let strHex = "#";
+            for (let i = 0; i < 3; i++) {
+                let hex = value[i].toString(16);
+                if (hex === "0") {
+                    hex += hex;
+                }
+                strHex += hex;
+            }
+            return strHex;
+        }
+        /**
+         * 转换数据类型
+         * @param value 数据
+         * @param type 类型
+         * @return
+         */
+        static changeType(value, type) {
+            let tempValue = value;
+            switch (type) {
+                case "int":
+                case "uint":
+                case "number":
+                    tempValue = parseFloat(value);
+                    break;
+                case "boolean":
+                    if (this.isNumber(value)) {
+                        tempValue = Laya.Utils.parseInt(value) > 0;
+                    }
+                    else {
+                        tempValue = value == "true";
+                    }
+                    break;
+                case "array":
+                    tempValue = value.split(",");
+                    break;
+                case "array,int":
+                    tempValue = value.split(",");
+                    for (let j = 0, len = tempValue.length; j < len; j++) {
+                        tempValue[j] = this.changeType(tempValue[j], "int");
+                    }
+                    break;
+                case "array,number":
+                    tempValue = value.split(",");
+                    for (let j = 0, len = tempValue.length; j < len; j++) {
+                        tempValue[j] = this.changeType(tempValue[j], "number");
+                    }
+                    break;
+                case "array,uint":
+                    tempValue = value.split(",");
+                    for (let j = 0, len = tempValue.length; j < len; j++) {
+                        tempValue[j] = this.changeType(tempValue[j], "uint");
+                    }
+                    break;
+            }
+            return tempValue;
+        }
+    }
+    /** 验证是否是有效的html标签 */
+    StringUtil.HTML_TAG_REG = /<[^>]*>/g;
+    /** 验证是否是有效的网址 */
+    StringUtil.HTML_URL_REG = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/g;
+    /** 根据大写字母分隔 */
+    StringUtil.UPPERCASE_SPLIT = /(?=[A-Z])/;
+    /* 删除指定标签 */
+    StringUtil.removeTag = /<\/?TEXTFORMAT[^>]*>/gi;
+    coreLib.StringUtil = StringUtil;
+    /**
+     * 文字动画
+     */
+    class TextAniUtils {
+        constructor(defaultText, textField) {
+            /** 保存播放文字动画的位置 */
+            this.textObj = [];
+            /** 当前清楚完的数量 */
+            this.clearCount = 0;
+            /** 当前播放结束的数量 */
+            this.playEndCount = 0;
+            /** 数组文字位置 */
+            this.playIndex = 0;
+            this._defaultText = defaultText;
+            this._textField = textField;
+        }
+        /**
+         * 要播放的一组文字
+         * @param tests
+         */
+        plays(tests) {
+            if (this.playTexts == tests)
+                return;
+            this.clean(false);
+            this.playTexts = tests;
+            this.playIndex = 0;
+            if (this.playTexts != null && this.playTexts.length > 0) {
+                let playText = this.playTexts[this.playIndex];
+                this._play(playText);
+            }
+        }
+        /**
+         * 播放文字
+         * @param playText
+         */
+        play(playText) {
+            if (this._playText == playText)
+                return;
+            this.playTexts = null;
+            this._play(playText);
+        }
+        /** 直接设置文本 */
+        setText(text) {
+            Laya.timer.clearAll(this);
+            while (this.textObj.length > 0) {
+                Laya.Tween.clearAll(this.textObj.shift());
+            }
+            text = text.toUpperCase();
+            this._playText = text;
+            let msgLen = this._textField.text.length;
+            let tempPlayText = StringUtil.replace(text, " ", ",");
+            let showTextLen = tempPlayText.length;
+            let start = Math.floor((msgLen - showTextLen) / 2);
+            let tempText = "";
+            for (let i = 0; i < start; i++) {
+                tempText += this._defaultText;
+            }
+            tempText += tempPlayText;
+            if (tempText.length > msgLen) {
+                tempText = tempText.substring(0, msgLen);
+            }
+            else if (tempText.length < msgLen) {
+                let len = msgLen - tempText.length;
+                for (let i = 0; i < len; i++) {
+                    tempText += this._defaultText;
+                }
+            }
+            this._textField.text = tempText;
+        }
+        _play(playText) {
+            if (this._playText != null) {
+                this._playClean(playText);
+                return;
+            }
+            this._playAni(playText);
+        }
+        _playClean(playText = null) {
+            if (this._playText.length != this.textObj.length) {
+                return;
+            }
+            Laya.timer.clearAll(this);
+            this.playTwinkle(2, Laya.Handler.create(this, (playText) => {
+                let showTextLen = this._playText.length;
+                let charData;
+                this.clearCount = 0;
+                for (let i = 0; i < showTextLen; i++) {
+                    charData = this.textObj[i];
+                    Laya.Tween.to(charData, {
+                        count: 0,
+                        update: new Laya.Handler(this, this.changeTextHandler, [charData, this._playText.charAt(i)])
+                    }, 300, null, Laya.Handler.create(this, this.cleanTextEndHandler, [playText]), 300);
+                }
+            }, [playText]));
+        }
+        /**
+         * 清理播放的文字
+         * @param ani 是否需要动画清理
+         */
+        clean(ani = true) {
+            this.playTexts = null;
+            if (ani) {
+                this._playClean();
+            }
+            else {
+                Laya.timer.clearAll(this);
+                while (this.textObj.length > 0) {
+                    Laya.Tween.clearAll(this.textObj.shift());
+                }
+                this._playText = null;
+                let msgLen = this._textField.text.length;
+                let text = "";
+                for (let i = 0; i < msgLen; i++) {
+                    text += this._defaultText;
+                }
+                this._textField.text = text;
+            }
+        }
+        /** 清除结束 */
+        cleanTextEndHandler(playText) {
+            this.clearCount++;
+            if (this.clearCount < this.textObj.length)
+                return;
+            this.textObj.splice(0, this.textObj.length);
+            this._playText = null;
+            if (!StringUtil.isEmpty(playText)) {
+                Laya.timer.once(300, this, this._play, [playText]);
+            }
+        }
+        _playAni(playText) {
+            if (StringUtil.isEmpty(playText))
+                return;
+            this.textObj.splice(0, this.textObj.length);
+            this._playText = playText.toUpperCase();
+            let msgLen = this._textField.text.length;
+            let showTextLen = this._playText.length;
+            let start = Math.ceil((msgLen + 1 - showTextLen) / 2); // +1 是为了保证数据左右均匀 和字符串substring 取值位置有关
+            this.aniText = "";
+            for (let i = 0; i < msgLen; i++) {
+                this.aniText += this._defaultText;
+            }
+            //        console.log("默认文本 = " + this.aniText, "len = " + this.aniText.length)
+            let charData;
+            this.playEndCount = 0;
+            for (let i = 0; i < showTextLen; i++) {
+                charData = { count: msgLen + 1, tempCount: -1 };
+                this.textObj.push(charData);
+                Laya.Tween.to(charData, {
+                    count: start + i,
+                    update: new Laya.Handler(this, this.changeTextHandler, [charData, this._playText.charAt(i)])
+                }, 200, null, Laya.Handler.create(this, this.changeTextEndHandler), 15 * i);
+            }
+        }
+        /** 显示文字完成 */
+        changeTextEndHandler() {
+            this.playEndCount++;
+            if (this.playEndCount < this.textObj.length)
+                return;
+            runFun(this._endCallBack);
+            if (this.playTexts != null && this.playTexts.length > 0) {
+                this.playIndex++;
+                if (this.playIndex >= this.playTexts.length) {
+                    this.playIndex = 0;
+                }
+                Laya.timer.once(1000, this, this._play, [this.playTexts[this.playIndex]]);
+            }
+        }
+        changeTextHandler(charData, txt) {
+            if (StringUtil.trimAll(txt).length == 0) {
+                txt = this._defaultText;
+            }
+            let index = Math.floor(charData.count);
+            if (charData.tempCount == index)
+                return;
+            if (charData.tempCount != -1)
+                this.aniText = this.replacePos(this.aniText, charData.tempCount, charData.tempCount, this._defaultText);
+            charData.tempCount = index;
+            if (index > 0) {
+                this.aniText = this.replacePos(this.aniText, index, index, txt);
+            }
+            //        console.log("changeTextHandler="+this.aniText, index, this.aniText.length)
+            this._textField.text = this.aniText;
+        }
+        replacePos(text, start, end, replaceText) {
+            //        console.log("replacePos", text, start, replaceText)
+            return text.substring(0, start - 1) + replaceText + text.substring(end);
+        }
+        /**
+         * 播放闪烁
+         * @param count 文字闪烁次数
+         * @param callback
+         */
+        playTwinkle(count = 2, callback = null) {
+            this.twinkleCount = count;
+            this.twinkleCallHandler = callback;
+            //        if (this.textObj.length > 0) {
+            Laya.timer.loop(100, this, this.twinkleHandler);
+            //        }
+        }
+        twinkleHandler() {
+            if (this.isTwinkle) {
+                let msgLen = this._textField.text.length;
+                let tempPlayText = StringUtil.replace(this._playText, " ", ",");
+                let showTextLen = tempPlayText.length;
+                let start = Math.floor((msgLen - showTextLen) / 2);
+                let tempText = "";
+                for (let i = 0; i < start; i++) {
+                    tempText += this._defaultText;
+                }
+                tempText += tempPlayText;
+                if (tempText.length > msgLen) {
+                    tempText = tempText.substring(0, msgLen);
+                }
+                else if (tempText.length < msgLen) {
+                    let len = msgLen - tempText.length;
+                    for (let i = 0; i < len; i++) {
+                        tempText += this._defaultText;
+                    }
+                }
+                //                console.log(tempText, tempText.length)
+                this._textField.text = tempText;
+                this.twinkleCount--;
+            }
+            else {
+                let msgLen = this._textField.text.length;
+                let tempText = "";
+                for (let i = 0; i < msgLen; i++) {
+                    tempText += this._defaultText;
+                }
+                this._textField.text = tempText;
+            }
+            this.isTwinkle = !this.isTwinkle;
+            if (this.twinkleCount == 0) {
+                Laya.timer.clear(this, this.twinkleHandler);
+                runFun(this.twinkleCallHandler);
+            }
+        }
+        dispose() {
+            this._playText = null;
+            this._textField = null;
+            this._endCallBack = null;
+            this._defaultText = null;
+            this.twinkleCallHandler = null;
+            this.playTexts = null;
+            Laya.timer.clearAll(this);
+            while (this.textObj.length > 0) {
+                Laya.Tween.clearAll(this.textObj.shift());
+            }
+        }
+        get playText() {
+            return this._playText;
+        }
+    }
+    coreLib.TextAniUtils = TextAniUtils;
+    /**
+     * 闪烁动画
+     */
+    class TwinkleAniUtils {
+        /**
+         * 指定对象闪烁
+         * @param target 对象
+         * @param count 闪烁次数
+         * @param callback 完成回调
+         */
+        play(target, count, callback) {
+            this.callback = callback;
+            target["twinkleAni"] = { count: 0, maxCount: count };
+            Laya.timer.frameLoop(5, this, this.twinkleHandler, [target]);
+        }
+        twinkleHandler(target) {
+            let obj = target["twinkleAni"];
+            obj.count++;
+            if (obj.count % 2 == 0) {
+                target.alpha = 1;
+            }
+            else {
+                target.alpha = .5;
+            }
+            if (obj.count >= obj.maxCount) {
+                Laya.timer.clear(this, this.twinkleHandler);
+                runFun(this.callback);
+            }
+        }
+        dispose() {
+            this.callback = null;
+            Laya.timer.clear(this, this.twinkleHandler);
+        }
+    }
+    coreLib.TwinkleAniUtils = TwinkleAniUtils;
     class ActivityButton extends BaseButton {
         constructor() {
             super();
@@ -9885,3215 +13096,4 @@ window.coreLib = {};
         }
     }
     coreLib.WaitResult = WaitResult;
-    class BindInputButton {
-        /**
-         *
-         * @param btn
-         * @param array
-         */
-        constructor(btn, array) {
-            this.btn = btn;
-            this.array = array;
-            let value;
-            let input;
-            let gbtn;
-            for (let i = 0; i < array.length; i++) {
-                value = array[i];
-                if (value instanceof fgui.GTextInput) {
-                    input = value;
-                    input.on(Laya.Event.INPUT, this, this.changeHandler);
-                }
-                else if (value instanceof fgui.GButton) {
-                    gbtn = value;
-                    gbtn.on(fgui.Events.STATE_CHANGED, this, this.changeHandler);
-                }
-            }
-        }
-        /** 检查一次状态 */
-        check() {
-            this.changeHandler();
-        }
-        changeHandler() {
-            let enabled = true; // 注释
-            let value;
-            let input;
-            let gbtn;
-            for (let i = 0; i < this.array.length; i++) {
-                value = this.array[i];
-                if (value instanceof fgui.GTextInput) {
-                    input = value;
-                    if (input.text.length == 0 || input.text == input.promptText) {
-                        enabled = false;
-                    }
-                }
-                else if (value instanceof fgui.GButton) {
-                    gbtn = value;
-                    if (gbtn.selected == false) {
-                        enabled = false;
-                    }
-                }
-            }
-            this.btn.enabled = enabled;
-            if (this.callback != null)
-                this.callback();
-        }
-    }
-    coreLib.BindInputButton = BindInputButton;
-    class Cast {
-        constructor() {
-        }
-        /**
-         * 角度转弧度
-         * @param angle 角度
-         */
-        static angleToRadians(angle) {
-            return angle * Cast.DEG_TO_RAD;
-        }
-        /**
-         * 弧度转角度
-         * @param radians 弧度
-         */
-        static radiansToAngle(radians) {
-            return radians * Cast.RAD_TO_DEG;
-        }
-        /**
-         * 计算两点之间的角度角度
-         * @param x1 原始坐标X
-         * @param y1 原始坐标Y
-         * @param x2 新坐标X
-         * @param y2 新坐标Y
-         *
-         */
-        static angle(x1, y1, x2, y2) {
-            let newX = x2 - x1;
-            let newY = y2 - y1;
-            let a = Math.atan2(newY, newX);
-            return a * 180 / Math.PI;
-        }
-        /**
-         * 计算两点之间的距离
-         * @param x1 原始坐标X
-         * @param y1 原始坐标Y
-         * @param x2 新坐标X
-         * @param y2 新坐标Y
-         * @return
-         *
-         */
-        static pointDistance(x1, y1, x2, y2) {
-            let x = x1 - x2;
-            let y = y1 - y2;
-            return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-        }
-        /**
-         * 获取两点中间点的坐标
-         * @param x1 原始坐标X
-         * @param y1 原始坐标Y
-         * @param x2 新坐标X
-         * @param y2 新坐标Y
-         * @return
-         */
-        static getPointMiddle(x1, y1, x2, y2) {
-            let tempX = (Math.max(x1, x2) - Math.min(x1, x2)) / 2;
-            let tempY = (Math.max(y1, y2) - Math.min(y1, y2)) / 2;
-            tempX += Math.min(x1, x2);
-            tempY += Math.min(y1, y2);
-            return new Laya.Point(tempX, tempY);
-        }
-        /**
-         * 获取圆上一点的坐标，坐标起点从坐标系右下方向左计算
-         * @param x 圆点X坐标
-         * @param y 圆点Y坐标
-         * @param radius 半径
-         * @param radians 弧度(不是角度)
-         */
-        static roundPoint(x, y, radius, radians) {
-            x = x + (Math.cos(radians) * radius);
-            y = y + (Math.sin(radians) * radius);
-            return new Laya.Point(x, y);
-        }
-        /**
-         * 补全数字
-         * @param data 要处理的数字、或字符串化的数字
-         * @param len 数字总长度
-         * @param isLast 是否补在尾部
-         */
-        static fillAVacancy(data, len, isLast = false) {
-            let string = data + "";
-            len = len - string.length;
-            if (len > 0) {
-                for (let i = 0; i < len; i++) {
-                    string = isLast ? string + "0" : "0" + string;
-                }
-            }
-            return string;
-        }
-        /**
-         * 精确小数点  如果有小数点 保留指定数量  如果没有  返回整数
-         * @param value 要处理的数字、或字符串化的数字
-         * @param p 保留的小数位数
-         * @return
-         */
-        static toFixed(value, p = 0) {
-            let temp = value + "";
-            let index = temp.indexOf(".");
-            if (index == -1)
-                return parseFloat(temp);
-            p = p > 0 ? p + 1 : 0;
-            return parseFloat(temp.substring(0, index + p));
-        }
-        /**
-         * 精确小数点  如果有小数点 保留指定数量  如果没有  返回整数
-         * @param value 要处理的数字、或字符串化的数字
-         * @param p 保留的小数位数
-         */
-        static toFixedStr(value, p = 0) {
-            value = Cast.toFixed(value, p);
-            let money = value + "";
-            let moneyStr = money.split('.');
-            let left = moneyStr[0];
-            if (p == 0)
-                return left;
-            let right = moneyStr.length > 1 ? moneyStr[1] : null;
-            if (right) {
-                if (right.length >= p) {
-                    right = '.' + right.substring(0, p);
-                }
-                else {
-                    right = '.' + Cast.fillAVacancy(right, p, true);
-                }
-            }
-            else {
-                right = '.' + Cast.fillAVacancy("0", p);
-            }
-            return left + right;
-        }
-        /**
-         * 字格式
-         * @param value 数值
-         * @param beyondLimit 超过此值否才分隔 (默认 1000)
-         * @param limit 分隔值 按照此值分隔 (默认 1000)
-         * @param unit 单位  (默认 K)
-         * @param fixed 最后保留几位小数 (默认 2)
-         * @return
-         */
-        static numberConvert(value, beyondLimit = 1000, limit = 1000, unit = "K", fixed = 2) {
-            if (value >= beyondLimit)
-                return this.toFixed(value / limit, fixed) + unit;
-            return this.toFixed(value, fixed) + "";
-        }
-        /**
-         * 将100000转为100,000.00形式
-         * @param money
-         * @param fixed 是否保留小数(默认false)
-         * @return
-         */
-        static formatMoney(money, fixed = false) {
-            if (money != null) {
-                money = money + "";
-                let left = money.split('.')[0];
-                let right = money.split('.')[1];
-                right = right ? (right.length >= 2 ? '.' + right.substring(0, 2) : '.' + right + '0') : '.00';
-                if (!fixed)
-                    right = "";
-                let temp = left.split('').reverse().join('').match(/(\d{1,3})/g);
-                return (parseFloat(money) < 0 ? "-" : "") + temp.join(',').split('').reverse().join('') + right;
-            }
-            else if (money === 0) { //注意===在这里的使用，如果传入的money为0,if中会将其判定为boolean类型，故而要另外做===判断
-                return fixed ? '0.00' : "0";
-            }
-            else {
-                return fixed ? '0.00' : "0";
-            }
-        }
-        /**
-         * 将100,000.00转为100000形式
-         * @param money
-         * @param fixed 是否保留小数 (默认false)
-         * @return
-         */
-        static formatMoney2(money, fixed = false) {
-            if (money != null) {
-                money = money + "";
-                let group = money.split('.');
-                let left = group[0].split(',').join('');
-                return fixed ? parseFloat(left + "." + group[1]) : parseFloat(left);
-            }
-            else {
-                return 0;
-            }
-        }
-        /**
-         * 打乱数组
-         * @param array 要被打乱的数组
-         *
-         */
-        static shuffle(array) {
-            let rnd;
-            let tmp;
-            let len = array.length;
-            for (let i = 0; i < len; i++) {
-                tmp = array[i];
-                rnd = parseInt(Math.random() * len + "");
-                array[i] = array[rnd];
-                array[rnd] = tmp;
-            }
-        }
-        /** aes加密 */
-        static encrypt(word, key) {
-            if (key == null)
-                key = "abcdefgabcdefg12";
-            let keyWordArray = CryptoJS.enc.Utf8.parse(key);
-            let srcs = CryptoJS.enc.Utf8.parse(word);
-            let encrypted = CryptoJS.AES.encrypt(srcs, keyWordArray, {
-                mode: CryptoJS.mode.ECB,
-                padding: CryptoJS.pad.Pkcs7
-            });
-            return encrypted.toString();
-        }
-        /** aes解密 */
-        static decrypt(word, key) {
-            if (key == null)
-                key = "abcdefgabcdefg12";
-            let keyWordArray = CryptoJS.enc.Utf8.parse(key);
-            let decrypt = CryptoJS.AES.decrypt(word, keyWordArray, {
-                mode: CryptoJS.mode.ECB,
-                padding: CryptoJS.pad.Pkcs7
-            });
-            return CryptoJS.enc.Utf8.stringify(decrypt).toString();
-        }
-        /**
-         * 文字长度省略
-         * @param value 文字内容
-         * @param len 最大长度
-         * @param symbol 符号
-         */
-        static stringOmit(value, len, symbol = "...") {
-            let str = value;
-            if (str && str.length > len) {
-                str = str.substring(0, len);
-                str += symbol;
-            }
-            return str;
-        }
-        /**
-         * 去除重复值
-         * @param array
-         */
-        static removeRepeat(array) {
-            return array.filter(this.checkRepeat);
-        }
-        static checkRepeat(item, index, arr) {
-            return arr.indexOf(item) == index;
-        }
-        /**
-         * 交换数组中的两个值的位置
-         * @param value 数组
-         * @param stateIndex 要被切换掉的值
-         * @param endIndex 要新切换到的位置 (该位置必须是总数组的长度-1)
-         *
-         */
-        static swapValue(value, stateIndex, endIndex) {
-            if (stateIndex < value.length && endIndex < value.length) {
-                let i = value[stateIndex];
-                let i2 = value[endIndex];
-                value.splice(endIndex, 1, i);
-                value.splice(stateIndex, 1, i2);
-            }
-        }
-        /**
-         * 改变值的位置(将数组中的一个值修改到其它位置)
-         * @param value 数组
-         * @param stateIndex 要被切换掉的值
-         * @param endIndex 要新切换到的位置 (该位置必须是总数组的长度-1)
-         *
-         */
-        static changeValue(value, stateIndex, endIndex) {
-            if (stateIndex < value.length && endIndex < value.length) {
-                let i = value.splice(stateIndex, 1);
-                value.splice(endIndex, 0, i[0]);
-            }
-        }
-        /**
-         * 高度适配
-         * @param obj 适配对象
-         */
-        static heightAdaptation(obj) {
-            let scale = obj.width / obj.initWidth;
-            obj.height = obj.initHeight * scale;
-            // 如果有字体
-        }
-        static evil(fn) {
-            let Fn = Function; //一个变量指向Function，防止有些前端编译工具报错
-            return new Fn('return ' + fn)();
-        }
-        static loadScript(str) {
-            //		    console.log(Browser.document.head)
-            let script = document.createElement('script');
-            script.type = "text/javascript";
-            script.text = str;
-            document.getElementsByTagName('head')[0].appendChild(script);
-            document.head.removeChild(document.head.lastChild);
-        }
-    }
-    /** 计算角度的公式  180 / Math.PI */
-    Cast.RAD_TO_DEG = 180 / Math.PI;
-    /** 计算弧度的公式  Math.PI / 180 */
-    Cast.DEG_TO_RAD = Math.PI / 180;
-    coreLib.Cast = Cast;
-    class ConfigUtils {
-        /**
-         * 获取游戏配置表
-         */
-        static gameConfig() {
-            return window[ConfigUtils.CONFIG_NAME];
-        }
-        /**
-         * 根据游戏id获取游戏名字 如果没有 null
-         * @param code
-         */
-        static gameName(code) {
-            return ConfigUtils.gameConfig()[code];
-        }
-        /**
-         * 根据游戏名获取游戏id 如果不存在返回-1
-         * @param name
-         */
-        static gameCode(name) {
-            const config = ConfigUtils.gameConfig();
-            for (const key in config) {
-                if (config[key] == name) {
-                    return parseInt(key);
-                }
-            }
-            return -1;
-        }
-        /**
-         * 获取游戏配置数据
-         * @param name 游戏名字 如果传入null 将尝试获取当前打开的游戏数据
-         */
-        static gameRes(name = null) {
-            if (name == null && StringUtil.isNotEmpty(Player.inst.gameName)) {
-                return ConfigUtils.gameRes(Player.inst.gameName);
-            }
-            if (name == null)
-                return null;
-            return window[name];
-        }
-    }
-    /**
-     * 在window上配置的属性名字
-     * @default gameIdConfig
-     */
-    ConfigUtils.CONFIG_NAME = "gameIdConfig";
-    coreLib.ConfigUtils = ConfigUtils;
-    /**
-     * 拷贝对象
-     */
-    class CopyObject {
-        /**
-         * 复制一个 fgui.GLoader 对象
-         * @param loader 被复制的对象
-         * @param parent 设置一个父对象  更换的时候 会同事转换原坐标到新的父对象上
-         */
-        static copyLoader(loader, parent) {
-            let newObject = new fgui.GLoader();
-            newObject.setPivot(loader.pivotX, loader.pivotY);
-            newObject.setSize(loader.width, loader.height);
-            newObject.setScale(loader.scaleX, loader.scaleY);
-            newObject.align = loader.align;
-            newObject.autoSize = loader.autoSize;
-            newObject.fill = loader.fill;
-            newObject.icon = loader.icon;
-            if (parent != null) {
-                let point = loader.localToGlobal();
-                parent.globalToLocal(point.x, point.y, point);
-                newObject.setXY(point.x, point.y);
-                parent.addChild(newObject);
-            }
-            else {
-                newObject.setXY(loader.x, loader.y);
-            }
-            return newObject;
-        }
-        /**
-         * 复制一个 fgui.GTextField 对象
-         * @param textField 被复制的对象
-         * @param parent 设置一个父对象  更换的时候 会同事转换原坐标到新的父对象上
-         */
-        static copyTextField(textField, parent) {
-            let tf;
-            if (textField instanceof fgui.GRichTextField) {
-                tf = new fgui.GRichTextField();
-            }
-            else {
-                tf = new fgui.GBasicTextField();
-                tf.font = textField["_font"];
-                tf.fontSize = textField.fontSize;
-                tf.color = textField.color;
-                tf.align = textField.align;
-                tf.valign = textField.valign;
-                tf.leading = textField.leading;
-                tf.letterSpacing = textField.letterSpacing;
-                tf.ubbEnabled = textField.ubbEnabled;
-                tf.autoSize = textField.autoSize;
-                tf.underline = textField.underline;
-                tf.italic = textField.italic;
-                tf.bold = textField.bold;
-                tf.singleLine = textField.singleLine;
-                tf.strokeColor = textField.strokeColor;
-                tf.stroke = textField.stroke;
-                tf.setPivot(textField.pivotX, textField.pivotY);
-                tf.setSize(textField.width, textField.height);
-                tf.setScale(textField.scaleX, textField.scaleY);
-                tf.text = textField.text;
-                if (parent != null) {
-                    let point = textField.localToGlobal();
-                    parent.globalToLocal(point.x, point.y, point);
-                    tf.setXY(point.x, point.y);
-                    parent.addChild(tf);
-                }
-                else {
-                    tf.setXY(textField.x, textField.y);
-                }
-            }
-            return tf;
-        }
-    }
-    coreLib.CopyObject = CopyObject;
-    class CounterUtils {
-        static create(total, complete) {
-            return new Counter(complete, total);
-        }
-    }
-    coreLib.CounterUtils = CounterUtils;
-    class Counter {
-        constructor(complete, total) {
-            this.total = 0;
-            this._index = 0;
-            this.complete = complete;
-            this.total = total;
-        }
-        /** 完成一次计数 */
-        oneComplete() {
-            this._index++;
-            if (this._index == this.total)
-                runFun(this.complete);
-        }
-        get index() {
-            return this._index;
-        }
-        dispose() {
-            this.complete = null;
-        }
-    }
-    class DateUtils {
-        /**
-         * 格式化时间
-         * @param date 时间
-         * @param fmt 格式
-         * @param isUTC 使用国际时间
-         * @example
-         * fmt:
-         * yyyy：年
-         * MM：月
-         * dd：
-         * hh：1~12小时制(1-12)
-         * HH：24小时制(0-23)
-         * mm：分
-         * ss：秒
-         * S：毫秒
-         * E：星期几
-         * @return
-         */
-        static formatDate(date, fmt, isUTC = false) {
-            if (!(date instanceof Date)) {
-                let date2 = new Date();
-                date2.setTime(date);
-                date = date2;
-            }
-            // 时区
-            //		var localOffset:number = date.getTimezoneOffset() * 60000
-            //		console.log(localOffset)
-            let tempStr = "";
-            let match = fmt.match(/(y+)/);
-            if ((match === null || match === void 0 ? void 0 : match.length) > 0) {
-                tempStr = match[0];
-                if (isUTC) {
-                    fmt = fmt.replace(tempStr, (date.getUTCFullYear() + '').substring(4 - tempStr.length));
-                }
-                else {
-                    fmt = fmt.replace(tempStr, (date.getFullYear() + '').substring(4 - tempStr.length));
-                }
-            }
-            let o = {
-                'M+': (isUTC ? date.getUTCMonth() : date.getMonth()) + 1,
-                'd+': (isUTC ? date.getUTCDate() : date.getDate()),
-                'h+': ((isUTC ? date.getUTCHours() : date.getHours()) % 12),
-                'H+': (isUTC ? date.getUTCHours() : date.getHours()),
-                'm+': (isUTC ? date.getUTCMinutes() : date.getMinutes()),
-                's+': (isUTC ? date.getUTCSeconds() : date.getSeconds()),
-                'S+': (isUTC ? date.getUTCMilliseconds() : date.getMilliseconds()),
-                "E+": DateUtils.weekday[(isUTC ? date.getUTCDay() : date.getDay())]
-            };
-            //		console.log(o)
-            // 遍历这个对象
-            for (let k in o) {
-                match = fmt.match(new RegExp("(" + k + ")"));
-                if ((match === null || match === void 0 ? void 0 : match.length) > 0) {
-                    //				 console.log('${k}')
-                    tempStr = match[0];
-                    fmt = fmt.replace(tempStr, tempStr.length == 1 ? o[k] : ("00" + o[k]).substring(("" + o[k]).length));
-                }
-            }
-            return fmt;
-        }
-        /**
-         * 比较时间大小
-         * time1>time2 return 1
-         * time1<time2 return -1
-         * time1==time2 return 0
-         * @param time1
-         * @param time2
-         */
-        static compareTime(time1, time2) {
-            if (Date.parse(time1.replace(/-/g, "/")) > Date.parse(time2.replace(/-/g, "/"))) {
-                return 1;
-            }
-            else if (Date.parse(time1.replace(/-/g, "/")) < Date.parse(time2.replace(/-/g, "/"))) {
-                return -1;
-            }
-            else if (Date.parse(time1.replace(/-/g, "/")) == Date.parse(time2.replace(/-/g, "/"))) {
-                return 0;
-            }
-        }
-        /**
-         * 是否闰年
-         * @param year 年份
-         */
-        static isLeapYear(year) {
-            return ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0);
-        }
-        /**
-         * 获取某个月的天数，从0开始
-         * @param year 年份
-         * @param month 月份
-         */
-        static getDaysOfMonth(year, month) {
-            return [31, (this.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
-        }
-        /**
-         * 将天置为0，获取其上个月的最后一天
-         * @param year
-         * @param month
-         */
-        static getDaysOfMonth2(year, month) {
-            month = parseInt(month) + 1;
-            let date = new Date(year, month, 0);
-            return date.getDate();
-        }
-        /**
-         * 距离现在几天的日期：
-         * @param days 负数表示今天之前的日期，0表示今天，整数表示未来的日期。 如-1表示昨天的日期，0表示今天，2表示后天
-         */
-        static fromToday(days) {
-            let today = new Date();
-            today.setDate(today.getDate() + days);
-            return today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-        }
-        /**
-         * 计算一个日期是当年的第几天
-         * @param date
-         */
-        static dayOfTheYear(date) {
-            let obj = new Date(date);
-            let year = obj.getFullYear();
-            let month = obj.getMonth(); //从0开始
-            let days = obj.getDate();
-            let daysArr = [31, (this.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-            for (let i = 0; i < month; i++) {
-                days += daysArr[i];
-            }
-            return days;
-        }
-        /**
-         * 获得时区名和值
-         * @param dateObj
-         */
-        static getZoneNameValue(dateObj) {
-            let date = new Date(dateObj);
-            date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-            let arr = date.toString().match(/([A-Z]+)([-+]\d+:?\d+)/);
-            return { 'name': arr[1], 'value': arr[2] };
-        }
-        /**
-         * 判断是否是同一天
-         * @param date1 毫秒
-         * @param date2 毫秒
-         * @return
-         */
-        static isSameDay(date1, date2) {
-            let _date1 = new Date(date1);
-            let _date2 = new Date(date2);
-            return (_date1.getFullYear() == _date2.getFullYear() &&
-                _date1.getMonth() == _date2.getMonth() &&
-                _date1.getDate() == _date2.getDate());
-        }
-        /**
-         * 判断传入的时间小于今天
-         * @param time
-         */
-        static notTomorrow(time) {
-            let timeDate = new Date(time);
-            let today = new Date();
-            if (timeDate.getFullYear() < today.getFullYear()) {
-                return true;
-            }
-            else if (timeDate.getFullYear() == today.getFullYear()) { // 年份一样
-                if (timeDate.getMonth() < today.getMonth()) { // 小于今天的月份
-                    return true;
-                }
-                else if (timeDate.getMonth() == today.getMonth()) { // 月份一样
-                    if (timeDate.getDate() < today.getDate()) { // 日期小于今天
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-    }
-    /** 星期 默认英文 */
-    DateUtils.weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    coreLib.DateUtils = DateUtils;
-    /**
-     * 水果机旋转动画
-     * @author boge
-     *
-     */
-    class FruitRotationUtils {
-        constructor(fruit) {
-            /** 跑帧位置 */
-            this.currentRunIndex = 0;
-            /** 上次时间 */
-            this.oldTimer = 0;
-            /** 间隔时间 */
-            this.spaceTimer = 500;
-            /** 开始位置 */
-            this.startIndex = 0;
-            /** 预计演播跑灯圈数 */
-            this.runCount = 0;
-            /** 当前跑动圈数 */
-            this.currentRunCount = 0;
-            /** 奖励 */
-            this.awards = [];
-            /** 预选位置偏移量 */
-            this.preselectionOffset = 4;
-            this.fruit = fruit;
-        }
-        /**
-         *
-         * @param arr 奖励
-         * @param runCallback 运行调用函数
-         * @param selectedCallback 选定阶段调用函数
-         * @param playRunSlotEndCallback 结束调用函数
-         * @param runEndCallback 结束调用函数
-         */
-        startRun(arr, runCallback, selectedCallback, playRunSlotEndCallback, runEndCallback) {
-            this.awards = arr;
-            this.runCallback = runCallback;
-            this.selectedCallback = selectedCallback;
-            this.playRunSlotEndCallback = playRunSlotEndCallback;
-            this.runEndCallback = runEndCallback;
-            this.catapultDirection = true;
-            // 重置
-            this.oldTimer = 0;
-            this.spaceTimer = 300;
-            // 计算预告结束位置
-            let value = this.awards[0] - this.preselectionOffset;
-            if (value < 0)
-                value = this.fruit.fruitLen() + value;
-            this.startIndex = value; // 预告结束位置
-            this.runCount = 5;
-            this.currentRunCount = 0;
-            this.isRunEnd = false;
-            Laya.timer.frameLoop(1, this, this.runHandler);
-        }
-        runHandler() {
-            let newTimer = Laya.Browser.now();
-            if (newTimer - this.oldTimer >= this.spaceTimer) { //1s
-                this.oldTimer = newTimer;
-                runFun(this.runCallback);
-                this.fruit.showSlotIndex(this.currentRunIndex, this.isRunEnd ? 0 : 3);
-                // 计算圈数
-                if (this.currentRunIndex == this.startIndex) { // 判断是否进入预告结束位置
-                    this.currentRunCount++;
-                    if (this.currentRunCount >= this.runCount) { // 跑动圈数大于等于5圈
-                        this.isRunEnd = true; //进入选定阶段
-                        runFun(this.selectedCallback);
-                    }
-                }
-                if (this.isRunEnd) { // 如果是选定阶段
-                    this.spaceTimer = this.spaceTimer + 120; //递增间隔滚动
-                    if (this.spaceTimer > 530) { // 最高延迟速度
-                        this.spaceTimer = 530;
-                    }
-                    // 当前滚动值等于最终值
-                    if (this.currentRunIndex == this.awards[0]) {
-                        Laya.timer.clear(this, this.runHandler);
-                        runFun(this.playRunSlotEndCallback);
-                        this.checkAward();
-                    }
-                }
-                else {
-                    this.spaceTimer = this.spaceTimer - 30;
-                    if (this.spaceTimer < 0) {
-                        this.spaceTimer = 0;
-                    }
-                }
-                // 计算下一次跑动坐标
-                this.currentRunIndex++;
-                if (this.currentRunIndex >= this.fruit.fruitLen()) {
-                    this.currentRunIndex = 0;
-                }
-            }
-        }
-        checkAward() {
-            let value;
-            if (this.awards.length == 1) { // 判断数量 正常得分   或  特殊奖励  开启失败
-                this.runEnd();
-            }
-            else if (this.awards.length > 1) { // 数量大于1  说明存在  多个奖励
-                value = this.awards[0];
-                Laya.timer.once(600, this, () => {
-                    //					if (value == 9 || value == 21) { // 特殊奖励
-                    //						fruitScene.twinkleAllFruits()
-                    //						SoundUtils.playSound(URL.formatURL("sounds/bomb.ogg"))
-                    //						Laya.timer.once(1000, this, function() {
-                    //							fruitScene.stopAllTwinkleFruits()
-                    ////							SoundUtils.playMusic(URL.formatURL("sounds/background_turnning.mp3"))
-                    //							Laya.timer.once(500, this, function()  {
-                    //								if (awardType == CommonCmd.GRAND_SLAM) { // 大满贯
-                    //									baodeng(awards.slice(1))
-                    //								} else {
-                    //									catapult(value, awards.slice(1), 1)
-                    //								}
-                    //							})
-                    //						})
-                    //					} else {
-                    this.fruit.twinkleFruits(value, 3, () => {
-                        SoundUtils.playMusic(Laya.URL.basePath + "sounds/background_turnning.mp3");
-                        this.fruit.stopTwinkleFruits(value);
-                        this.fruit.wakey(value);
-                        //							trace("FruitModel.enclosing_method()", value)
-                        Laya.timer.once(500, this, () => {
-                            this.catapult(value, this.awards.slice(1), 1);
-                        });
-                    });
-                    //					}
-                });
-            }
-        }
-        runEnd() {
-            runFun(this.runEndCallback);
-        }
-        /**
-         * 弹射动画
-         * @param startIndex 击打起始位置
-         * @param array 剩余要被击中的值
-         * @param runCount 预计演播跑灯圈数
-         * @param huoche 开火车
-         */
-        catapult(startIndex, array, runCount = 0, huoche = false) {
-            if (array.length > 0) {
-                let value; // 选中位置
-                if (huoche) {
-                    value = array.pop();
-                }
-                else {
-                    value = array.shift();
-                }
-                this.oldTimer = 0;
-                this.spaceTimer = 20;
-                this.currentRunIndex = startIndex;
-                this.currentRunCount = 0;
-                this.isRunEnd = false;
-                this.runCount = 0;
-                if (runCount != 0) {
-                    this.runCount = runCount + 1;
-                }
-                Laya.timer.frameLoop(1, this, this.runCatapultHandler, [startIndex, value, array, runCount, huoche]);
-            }
-            else {
-                // 击打结束
-                //				trace("FruitModel.catapult(startIndex, array) 结束  开下一局")
-                this.runEnd();
-            }
-        }
-        /**
-         * 弹击函数
-         * @param startIndex 击打起始位置
-         * @param value 当前选中的值
-         * @param array 剩余要被击中的值
-         * @param runCount 预计演播跑灯圈数
-         * @param huoche 开火车
-         */
-        runCatapultHandler(startIndex, value, array, runCount = 0, huoche = false) {
-            let newTimer = Laya.Browser.now();
-            if (newTimer - this.oldTimer >= this.spaceTimer) { //满足当前间隔时间
-                this.oldTimer = newTimer;
-                let tail = array.length;
-                //				tail = tail>5?5:tail
-                this.fruit.showSlotIndex(this.currentRunIndex, tail, this.catapultDirection);
-                // 计算圈数
-                if (this.currentRunIndex == startIndex) { // 判断是否进入预告结束位置
-                    this.currentRunCount++;
-                    if (this.currentRunCount >= this.runCount) { // 跑动圈数大于等于预计演播跑灯圈数
-                        this.isRunEnd = true; //进入选定阶段
-                    }
-                }
-                if (this.isRunEnd) { // 如果是选定阶段
-                    if (value == this.currentRunIndex) { // 走到了指定位置
-                        //						if (awardType == 0) {
-                        //							
-                        //						}
-                        Laya.timer.clear(this, this.runCatapultHandler);
-                        SoundUtils.playSound(Laya.URL.basePath + "sounds/zha.ogg");
-                        if (huoche) {
-                            array.splice(0, array.length);
-                            this.fruit.allTailLight();
-                            this.catapult(value, array, runCount);
-                        }
-                        else {
-                            this.catapultDirection = !this.catapultDirection;
-                            //							trace("FruitModel.runCatapultHandler()", catapultDirection)
-                            //							let isWin:boolean = hitFruit(value)
-                            this.fruit.stopAllTail();
-                            this.fruit.twinkleFruits(value, 3, () => {
-                                this.fruit.stopTwinkleFruits(value);
-                                this.fruit.wakey(value);
-                                this.catapult(value, array, runCount);
-                            });
-                        }
-                        return;
-                    }
-                }
-                // 计算下一次跑动坐标
-                if (this.catapultDirection) {
-                    this.currentRunIndex++;
-                }
-                else {
-                    this.currentRunIndex--;
-                }
-                if (this.currentRunIndex >= this.fruit.fruitLen()) {
-                    this.currentRunIndex = 0;
-                }
-                else if (this.currentRunIndex < 0) {
-                    this.currentRunIndex = this.fruit.fruitLen() - 1;
-                }
-            }
-        }
-        stop() {
-            Laya.timer.clearAll(this);
-        }
-        /** 跑帧位置 */
-        getCurrentRunIndex() {
-            return this.currentRunIndex;
-        }
-        /** 跑动是否结束了 */
-        getIsRunEnd() {
-            return this.isRunEnd;
-        }
-    }
-    coreLib.FruitRotationUtils = FruitRotationUtils;
-    /**
-     * 金币动画
-     */
-    class GoldAniUtils {
-        constructor(goldIconUrl) {
-            this.count = 0;
-            /** 宽 */
-            this.goldW = 70;
-            /** 高 */
-            this.goldH = 70;
-            this.goldIconUrl = goldIconUrl || GoldAniUtils.defaultIcon;
-            this.loaders = [];
-        }
-        /**
-         * 播放金币动画
-         * @param num 创建数量
-         * @param startObject 开始对象
-         * @param endObject 结束对象
-         * @param endHandler 结束回调
-         */
-        playObject(num, startObject, endObject, endHandler) {
-            if (startObject == null || startObject.isDisposed || startObject.displayObject == null) {
-                this.startPoint = new Laya.Point((fgui.GRoot.inst.width >> 1), (fgui.GRoot.inst.height >> 1));
-            }
-            else {
-                this.startPoint = startObject.localToGlobal();
-                fgui.GRoot.inst.globalToLocal(this.startPoint.x, this.startPoint.y, this.startPoint);
-                this.startPoint.x += startObject.width / 2;
-                this.startPoint.y += startObject.height / 2;
-            }
-            this.endPoint = endObject.localToGlobal();
-            fgui.GRoot.inst.globalToLocal(this.endPoint.x, this.endPoint.y, this.endPoint);
-            this.endPoint.x += endObject.width / 2;
-            this.endPoint.y += endObject.height / 2;
-            this.play(num, this.startPoint, this.endPoint, endHandler);
-        }
-        /**
-         * 播放金币动画
-         * @param num 创建数量
-         * @param startPoint 开始位置
-         * @param endPoint 结束位置
-         * @param endHandler 结束回调
-         */
-        play(num, startPoint, endPoint, endHandler) {
-            this.startPoint = startPoint;
-            this.endPoint = endPoint;
-            this.endHandler = endHandler;
-            this.count = 0;
-            this.specialAward(num);
-            SoundUtils.playSound("sounds/gold.ogg");
-        }
-        /**
-         * 特殊奖品 效果 - 移动至底部然后飘直指定位置
-         * @param len 创建数量
-         */
-        specialAward(len) {
-            for (let i = 0; i < len; i++) {
-                let loader = new GoldLoader();
-                loader.icon = this.goldIconUrl;
-                loader.setXY(this.startPoint.x, this.startPoint.y);
-                loader.setSize(this.goldW, this.goldH);
-                let tempX = this.startPoint.x + Math.random() * 250 - 125;
-                let tempY = this.startPoint.y + Math.random() * 50 + 100;
-                let endP = new Laya.Point(this.endPoint.x - loader.width / 2, this.endPoint.y - loader.height / 2);
-                loader.setStartPoint(tempX, tempY);
-                loader.setMiddlePoint(tempX + (endP.x - tempX) / 2 + UtilsTool.random(200, 300), tempY + (endP.y - tempY) / 2 + UtilsTool.random(0, 100));
-                loader.setEndPoint(endP.x, endP.y);
-                Laya.Tween.to(loader, { x: tempX, y: tempY }, 600, Laya.Ease.backOut, Laya.Handler.create(this, (loader, i) => {
-                    Laya.Tween.to(loader, {
-                        //                                    x: endP.x,
-                        //                                    y: endP.y,
-                        t: 1,
-                        scaleX: .7,
-                        scaleY: .7
-                    }, 600, Laya.Ease.linearNone, Laya.Handler.create(this, (loader) => {
-                        loader.removeFromParent();
-                        this.count++;
-                        if (this.count == len) {
-                            while (this.loaders.length) {
-                                loader = this.loaders.shift();
-                                loader.dispose();
-                            }
-                            runFun(this.endHandler);
-                        }
-                    }, [loader]), i * 5);
-                }, [loader, i]), i * 5);
-                fgui.GRoot.inst.addChild(loader);
-                this.loaders.push(loader);
-            }
-        }
-        /************************************  普通金币掉落动画  ***********************************/
-        /**
-         * 播放移动目标到指定目标位置
-         * @param targetObject 要被移动的对象
-         * @param endObject 结束对象
-         * @param endHandler 完成回调
-         * @param parent 父对象
-         * @param props 附带的属性变化 或参数 duration,delay,ease
-         */
-        playGoldAni(targetObject, endObject, endHandler, parent, props) {
-            !parent && (parent = fgui.GRoot.inst);
-            let endGlobal = endObject.localToGlobal();
-            parent.globalToLocal(endGlobal.x, endGlobal.y, endGlobal);
-            let targetGlobal = targetObject.localToGlobal();
-            parent.globalToLocal(targetGlobal.x, targetGlobal.y, targetGlobal);
-            this.playGoldPointAni(targetObject, targetGlobal, endGlobal, endHandler, parent, props);
-        }
-        /**
-         * 播放移动目标到指定位置
-         * @param targetObject 要被移动的对象
-         * @param startPoint 起始位置
-         * @param endPoint 结束位置
-         * @param endHandler 完成回调
-         * @param parent 父对象
-         * @param props 附带的属性变化 或参数 duration,delay,ease
-         */
-        playGoldPointAni(targetObject, startPoint, endPoint, endHandler, parent, props) {
-            !parent && (parent = fgui.GRoot.inst);
-            !props && (props = {});
-            targetObject.setXY(startPoint.x, startPoint.y);
-            parent.addChild(targetObject);
-            props.x = endPoint.x;
-            props.y = endPoint.y;
-            props.scaleX == undefined && (props.scaleX = .5);
-            props.scaleY == undefined && (props.scaleY = .5);
-            let duration = props.duration ? props.duration : 600;
-            let delay = props.delay ? props.delay : 0;
-            let ease = props.ease ? props.ease : null;
-            this.goldTween = Laya.Tween.to(targetObject, props, duration, ease, Laya.Handler.create(this, this.goldTweenHandler, [endHandler]), delay);
-        }
-        /** 移动完成 */
-        goldTweenHandler(endHandler) {
-            runFun(endHandler);
-        }
-        dispose() {
-            while (this.loaders.length) {
-                let loader = this.loaders.shift();
-                Laya.Tween.clearAll(loader);
-                loader.dispose();
-            }
-            if (this.goldTween != null)
-                this.goldTween.clear();
-            this.goldTween = null;
-        }
-    }
-    GoldAniUtils.defaultIcon = "";
-    coreLib.GoldAniUtils = GoldAniUtils;
-    class HTTPUtils {
-        constructor() {
-            /**
-             * 用于请求的 HTTP 方法。值包括 "get"、"post"、"head"。
-             * @default null
-             */
-            this.method = null;
-            /**
-             * (default = "text")Web 服务器的响应类型，可设置为 "text"、"json"、"xml"、"arraybuffer"。
-             */
-            this.responseType = HTTPUtils.defaultResponseType;
-            this.ghr = new GameHttpRequest();
-        }
-        static create() {
-            return new HTTPUtils();
-        }
-        setUrl(url) {
-            this.url = url;
-            return this;
-        }
-        setData(data) {
-            this.data = data;
-            return this;
-        }
-        setMethod(data) {
-            this.method = data;
-            return this;
-        }
-        setResponseType(data) {
-            this.responseType = data;
-            return this;
-        }
-        setHeaders(array) {
-            this.headers = array;
-            return this;
-        }
-        setOvertime(value) {
-            this.ghr.setOvertime(value);
-            return this;
-        }
-        onComplete(handler) {
-            this.complete = handler;
-            return this;
-        }
-        onError(handler) {
-            this.error = handler;
-            return this;
-        }
-        onTimeout(handler) {
-            this.timeout = handler;
-            return this;
-        }
-        /**
-         *
-         */
-        call() {
-            var _a, _b, _c, _d;
-            let onComplete = (_a = this.completeHandler) === null || _a === void 0 ? void 0 : _a.bind(this);
-            let onError = (_b = this.errorHandler) === null || _b === void 0 ? void 0 : _b.bind(this);
-            let onTimeOut = (_c = this.timeOutHandler) === null || _c === void 0 ? void 0 : _c.bind(this);
-            // 判断是否需要拦截发送
-            if ((_d = HTTPUtils.filter) === null || _d === void 0 ? void 0 : _d.interceptSend(this.url, this.data, onComplete, onError, onTimeOut))
-                return;
-            // 判断是否有解析数据格式
-            let value = this.data;
-            HTTPUtils.filter && (value = HTTPUtils.filter.filterSendData(this.url, this.data));
-            this.ghr.onComplete(onComplete);
-            this.ghr.onError(onError);
-            this.ghr.onTimerOut(onTimeOut);
-            if (this.method == null) {
-                if (value == null) {
-                    this.method = Method.GET;
-                }
-                else {
-                    this.method = Method.POST;
-                }
-            }
-            this.ghr.send(this.url, value, this.method, this.responseType, this.headers);
-        }
-        timeOutHandler() {
-            console.log("HTTPUtils.timeOutHandler()");
-            if (this.timeout != null)
-                runFun(this.timeout);
-            else if (this.error != null)
-                runFun(this.error, "time out");
-        }
-        errorHandler(e) {
-            var _a;
-            console.log("HTTPUtils.errorHandler()", e);
-            (_a = HTTPUtils.filter) === null || _a === void 0 ? void 0 : _a.errorResult(e);
-            runFun(this.error, e);
-        }
-        completeHandler(data) {
-            if (data == null) {
-                this.errorHandler(data);
-                return;
-            }
-            HTTPUtils.parseDate(data);
-            HTTPUtils.filter && (data = HTTPUtils.filter.filterResultData(this.url, data));
-            runFun(this.complete, data);
-        }
-        abort() {
-            this.ghr.abort();
-        }
-        getHttp() {
-            return this.ghr;
-        }
-        /** 解析时间 */
-        static parseDate(data) {
-            let serverTime = HTTPUtils.filter ? HTTPUtils.filter.parseData(data) : 0;
-            this.castDifference(serverTime);
-        }
-        static castDifference(serverTime) {
-            if (!isNaN(serverTime) && serverTime > 0) {
-                //		    trace("HTTPUtils.parseDate(data)",
-                //			Cast.timerFrom(serverTime),
-                //			Cast.timerFrom(parseInt((Browser.now()/1000)+"")))
-                HTTPUtils.difference = Laya.Browser.now() - serverTime;
-            }
-        }
-        /** 获取差值 */
-        static getDifference() {
-            return HTTPUtils.difference;
-        }
-        /** 当前时间  毫秒 */
-        static getTimer() {
-            return (Laya.Browser.now() - HTTPUtils.difference);
-        }
-        /** 当前时间  秒 */
-        static getTimerSecond() {
-            return Math.floor((Laya.Browser.now() - HTTPUtils.difference) / 1000);
-        }
-        /** 解析json数据格式 */
-        static parseJson(data) {
-            if (data == null) {
-                return null;
-            }
-            if (typeof data === "string") {
-                return data;
-            }
-            let value = null;
-            let v;
-            for (let key in data) {
-                v = data[key];
-                if (value == null) {
-                    value = key + "=" + v;
-                }
-                else {
-                    value += "&" + key + "=" + v;
-                }
-            }
-            return value;
-        }
-        /** 开启服务器时间检查 */
-        static openCheckServerTimer(value) {
-            HTTPUtils.serverTimerUrl = value;
-            this.serverTimerHandler();
-            this.closeCheckServerTimer();
-            Laya.timer.loop(this.checkTimer, this, this.serverTimerHandler);
-        }
-        /** 关闭服务器时间检查 */
-        static closeCheckServerTimer() {
-            Laya.timer.clear(this, this.serverTimerHandler);
-        }
-        static serverTimerHandler() {
-            this.create().onComplete((data) => {
-                if (data.code == HttpCode.OK) {
-                    data = data.data;
-                    HTTPUtils.parseDate(data);
-                }
-            }).setUrl(this.serverTimerUrl).call();
-        }
-    }
-    HTTPUtils.defaultResponseType = "text";
-    /** 检查服务器时间间隔 */
-    HTTPUtils.checkTimer = 1000 * 60;
-    /** 差值 */
-    HTTPUtils.difference = 0;
-    coreLib.HTTPUtils = HTTPUtils;
-    class JSUtils {
-        constructor() {
-        }
-        /**
-         * 刷新页面  如果有父页面  刷新父页面
-         */
-        static reloadAll() {
-            if (Laya.Browser.window.parent) {
-                Laya.Browser.window.parent.location.reload();
-            }
-            else {
-                Laya.Browser.window.location.reload();
-            }
-        }
-        /** 刷新 */
-        static reload() {
-            Laya.Browser.window.location.reload();
-        }
-        /** 进入登录界面 */
-        static login() {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.comeWebPage("/login");
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.comeWebPage('/login')" });
-            SceneManager.inst.closeGame();
-        }
-        /** 充值 */
-        static deposit() {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.comeWebPage("/deposit");
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.comeWebPage('/deposit')" });
-            SceneManager.inst.closeGame();
-        }
-        /** 进入刮刮卡 */
-        static jackpot() {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.comeWebPage("/jackpot");
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.comeWebPage('/jackpot')" });
-            SceneManager.inst.closeGame();
-        }
-        /** 关闭游戏
-         * @param [type = 0]  0 默认直接退出  1 退出切换到新游戏
-         * @param [data = null]
-         * */
-        static gameClose(type = 0, data = null) {
-            SceneManager.inst.initComplete = false;
-            SceneManager.inst.isLoaderResComplete = false;
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.gameClose(type, data);
-            }
-            else {
-                if (!Laya.Render.isConchApp && Laya.Browser.window.location.protocol == "https:") {
-                    // 如果不是加速器 并且不是在非https下  那么直接返回大厅
-                    // Laya.Browser.window.location.href = Player.HOME_URL
-                    Laya.Browser.window.location.href = "//" + Laya.Browser.window.location.host;
-                }
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.gameClose(" + type + ", " + data + ")" });
-            SceneManager.inst.closeGame();
-        }
-        /** 弹窗 */
-        static openModal(value) {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.openModal(value);
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.openModal('" + value + "')" });
-        }
-        /** 打开指定的web页面 不关闭游戏的前提下 */
-        static openWebPageWithoutLeaveGame(value) {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.openWebPageWithoutLeaveGame(value);
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.openWebPageWithoutLeaveGame('" + value + "')" });
-        }
-        /** 进入游戏进度条 */
-        static getProgress(value) {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.getProgress(value);
-            }
-            AppManager.executionJavascript("window.GameToHall.getProgress", value);
-        }
-        /** 通知进入游戏了 */
-        static gameOnload() {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.gameOnload();
-            }
-            AppManager.executionJavascript("window.GameToHall.gameOnload", null);
-        }
-        /**
-         * 通知服务器直接离开的房间
-         */
-        static outGameHttp() {
-            if (Laya.Browser.window.parent.GameToHall)
-                Laya.Browser.window.parent.GameToHall.outGameHttp(Player.inst.urlParam.roomId);
-            else
-                console.log("debug");
-        }
-        /**
-         * 分析邀请
-         * @param type 1 开  2 关
-         */
-        static shareDetail(type) {
-            if (Laya.Browser.window.parent.GameToHall)
-                Laya.Browser.window.parent.GameToHall.shareDetail(Player.inst.gameModel, type);
-            else
-                console.log("debug");
-        }
-        /** 上传头像 */
-        static updateHead() {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.openReviseAvatarNickNameDrawer();
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.openReviseAvatarNickNameDrawer()" });
-        }
-    }
-    coreLib.JSUtils = JSUtils;
-    class LanguageUtils {
-        static get inst() {
-            if (!LanguageUtils._instance)
-                LanguageUtils._instance = new LanguageUtils();
-            return LanguageUtils._instance;
-        }
-        setXml(xml) {
-            this.xml = xml;
-        }
-        /**
-         * 返回对应的语言
-         * @see LibStr
-         * @param str key
-         */
-        getStr(str) {
-            if (typeof (str) !== "string") {
-                str = str + "";
-            }
-            if (!this.xml)
-                return str;
-            let element = this.xml.getElementById(str);
-            if (element != null) {
-                return this.__getStr(element);
-            }
-            let elements = this.xml.getElementsByName(str);
-            if (elements.length > 0) {
-                if (elements.length > 1)
-                    throw new Error("Language configuration has duplicate items：" + str);
-                return this.__getStr(elements.item(0));
-            }
-            return str;
-        }
-        __getStr(element) {
-            let content = element.textContent;
-            if (this.customConvert)
-                content = runFun(this.customConvert, content);
-            // 这里统一处理货币转换
-            content = content.replace(/\{unit}/g, Player.inst.getCurrencyUnit());
-            return content;
-        }
-    }
-    coreLib.LanguageUtils = LanguageUtils;
-    /**
-     * 长按、点击按钮绑定
-     * @author boge
-     *
-     */
-    class LongPressBtn {
-        /**
-         * 创建一个监听
-         * @param btn 绑定按钮
-         * @param callback 回调方法
-         * @param args 执行回调方法  附带参数
-         *
-         */
-        constructor(btn, callback, ...args) {
-            /** 按下判定长按的间隔时间 */
-            this.HOLD_TRIGGER_TIME = 500;
-            /** 是否单次调用 */
-            this.single = false;
-            this.btn = btn;
-            this.args = args;
-            this.callback = callback;
-            btn.displayObject.once(Laya.Event.MOUSE_DOWN, this, this.downHandler);
-            btn.onClick(this, this.clickHandler);
-        }
-        /** 点下按钮 */
-        downHandler(e) {
-            Laya.timer.once(this.HOLD_TRIGGER_TIME, this, this.onHold);
-            Laya.stage.once(Laya.Event.MOUSE_UP, this, this.upHandler);
-        }
-        /** 松开按钮 */
-        upHandler() {
-            this._isApeHold = false;
-            Laya.timer.clear(this, this.onLoopClick);
-            // 如果未触发hold，终止触发hold
-            Laya.timer.clear(this, this.onHold);
-            Laya.stage.off(Laya.Event.MOUSE_UP, this, this.upHandler);
-            this.btn.displayObject.once(Laya.Event.MOUSE_DOWN, this, this.downHandler);
-            this.btn.onClick(this, this.clickHandler);
-        }
-        onHold() {
-            this._isApeHold = true;
-            Laya.timer.loop(100, this, this.onLoopClick);
-            this.onLoopClick();
-        }
-        onLoopClick() {
-            if (this._isApeHold) {
-                // 先清理单击事件
-                this.btn.offClick(this, this.clickHandler);
-                // 执行一次点击
-                this.clickHandler(null);
-                // 单次执行  直接执行清理结束操作
-                if (this.single)
-                    this.upHandler();
-            }
-            else {
-                Laya.timer.clear(this, this.onLoopClick);
-            }
-        }
-        clickHandler(e) {
-            if (e != null)
-                e.stopPropagation();
-            let args = [this.callback].concat(this.args);
-            runFun.apply(null, args);
-        }
-        get isApeHold() {
-            return this._isApeHold;
-        }
-        dispose() {
-            Laya.timer.clearAll(this);
-            this.btn.off(Laya.Event.MOUSE_DOWN, this, this.downHandler);
-            this.btn.offClick(this, this.clickHandler);
-        }
-    }
-    coreLib.LongPressBtn = LongPressBtn;
-    /**
-     * 数字变动动画
-     */
-    class NumberTween {
-        constructor() {
-            this.value = 0;
-        }
-        /**
-         * 创建一个动画
-         * @param target 缓动动画绑定类  用于执行清楚动画
-         * @param start 开始值
-         * @param end 结束值
-         * @param duration 执行时长
-         * @param ease 执行缓动动画
-         * @param complete 执行完成
-         * @param update 执行更新
-         * @param delay 延迟执行
-         */
-        static createTween(target, start = 0, end = 0, duration = 300, ease = null, complete, update, delay = 0) {
-            if (start == end) {
-                runFun(update);
-                runFun(complete);
-                return;
-            }
-            let numberTween = Laya.Pool.getItemByClass(this.NAME, NumberTween);
-            numberTween.value = start;
-            numberTween.target = target;
-            numberTween.complete = complete;
-            numberTween.update = update;
-            numberTween.gid = this.getGID();
-            numberTween.tween = Laya.Tween.to(numberTween, { value: end, update: new Laya.Handler(numberTween, numberTween.updateHandler) }, duration, ease, Laya.Handler.create(numberTween, numberTween.completeHandler), delay);
-            this.nums.push(numberTween);
-        }
-        /**
-         * 清理并销毁指定的动画
-         * @param target 绑定的执行对象
-         */
-        static clearTween(target) {
-            for (let i = 0; i < this.nums.length; i++) {
-                let numberTween = this.nums[i];
-                if (numberTween.target == target) {
-                    numberTween.dispose();
-                }
-            }
-        }
-        /**
-         * 提前完成动画
-         * @param target 要提前完成动画的对象
-         */
-        static completeTween(target) {
-            for (let i = 0; i < this.nums.length; i++) {
-                let numberTween = this.nums[i];
-                if (numberTween.target == target) {
-                    // let complete = numberTween.complete
-                    numberTween.completeTween();
-                    // if (complete != null) complete.run()
-                }
-            }
-        }
-        /**
-         * 获取指定对象监听的所有动画
-         * @param target 动画对象
-         */
-        static getTween(target) {
-            let tween = [];
-            for (let i = 0; i < this.nums.length; i++) {
-                let numberTween = this.nums[i];
-                if (numberTween.target == target) {
-                    tween.push(numberTween);
-                }
-            }
-            return tween;
-        }
-        static getGID() {
-            return this._gid++;
-        }
-        updateHandler() {
-            runFun(this.update, this.value);
-        }
-        completeHandler() {
-            this.removeTween(this.gid);
-            runFun(this.complete);
-            Laya.Pool.recover(NumberTween.NAME, this);
-        }
-        /** 直接完成动画 */
-        completeTween() {
-            if (this.tween != null)
-                this.tween.complete();
-            this.tween = null;
-        }
-        /**
-         * 销毁 并清理动画
-         */
-        dispose() {
-            this.update = null;
-            this.complete = null;
-            this.tween = null;
-            Laya.Tween.clearAll(this);
-            this.removeTween(this.gid);
-            Laya.Pool.recover(NumberTween.NAME, this);
-        }
-        /**
-         * 根据动画id删除一个缓动动画
-         * @param gid 动画id
-         */
-        removeTween(gid) {
-            for (let i = 0; i < NumberTween.nums.length; i++) {
-                let numberTween = NumberTween.nums[i];
-                if (numberTween.gid == gid) {
-                    NumberTween.nums.splice(i, 1);
-                    break;
-                }
-            }
-        }
-    }
-    NumberTween.NAME = "NumberTween";
-    NumberTween.nums = [];
-    NumberTween._gid = 0;
-    coreLib.NumberTween = NumberTween;
-    class ObjectUtil {
-        static setColorTransform(source, value) {
-            if (value) {
-                let array = StringUtil.changeType(value, "array,number");
-                if (array.length == 8) {
-                    // ObjectUtil.colorTransform.redMultiplier = array[0]
-                    // ObjectUtil.colorTransform.greenMultiplier = array[1]
-                    // ObjectUtil.colorTransform.blueMultiplier = array[2]
-                    // ObjectUtil.colorTransform.alphaMultiplier = array[3]
-                    // ObjectUtil.colorTransform.redOffset = array[4]
-                    // ObjectUtil.colorTransform.greenOffset = array[5]
-                    // ObjectUtil.colorTransform.blueOffset = array[6]
-                    // ObjectUtil.colorTransform.alphaOffset = array[7]
-                    // source.transform.colorTransform = ObjectUtil.colorTransform
-                    ObjectUtil.colorTransform.adjustColor(array[1], array[2], array[3], array[4]);
-                    ObjectUtil.colorTransform.color(array[4], array[5], array[6], array[7]);
-                    source.filters = [ObjectUtil.colorTransform];
-                }
-                else {
-                    console.log("ObjectUtil.setColorTransform(source, value) 色值数量不对，应为8!");
-                }
-            }
-            else {
-                // ObjectUtil.colorTransform.redMultiplier = 1
-                // ObjectUtil.colorTransform.greenMultiplier = 1
-                // ObjectUtil.colorTransform.blueMultiplier = 1
-                // ObjectUtil.colorTransform.alphaMultiplier = 1
-                // ObjectUtil.colorTransform.redOffset = 0
-                // ObjectUtil.colorTransform.greenOffset = 0
-                // ObjectUtil.colorTransform.blueOffset = 0
-                // ObjectUtil.colorTransform.alphaOffset = 0
-                // source.transform.colorTransform = ObjectUtil.colorTransform
-                ObjectUtil.colorTransform.adjustColor(0, 0, 0, 0);
-                ObjectUtil.colorTransform.color(255, 255, 255, 1);
-                source.filters = [ObjectUtil.colorTransform];
-            }
-        }
-        static setColorMatrixFilter(source, value) {
-            if (value) {
-                let array = StringUtil.changeType(value, "array,number");
-                ObjectUtil.colorMatrixFilters[0].setByMatrix(array);
-                source.filters = this.colorMatrixFilters;
-            }
-            else {
-                source.filters = null;
-            }
-        }
-        /**
-         * 深度赋值对象 <br/>
-         *        赋值            浅层拷贝    深层拷贝    getter/setter <br/>
-         * Object.assign      ok      no         no<br/>
-         * JSON.stringify      ok      ok         no<br/>
-         * Object.create      ok      no         ok<br/>
-         * @param source
-         * @param isCls
-         * @deprecated
-         *
-         */
-        static copy(source, isCls = false) {
-            // if (isCls) {
-            // 	let typeName:string = getQualifiedClassName(source)
-            // 	let packageName:string = typeName.split("::")[0]
-            // 	let type:Class = getDefinitionByName(typeName) as Class
-            // 	registerClassAlias(packageName, type)
-            // }
-            // let copier:ByteArray = new ByteArray()
-            // copier.writeObject(source)
-            // copier.position = 0
-            // return copier.readObject()
-            // 其实就是写了个子类继承父类数据而也
-            // Object.setPrototypeOf(source, newObject)
-            return Object.create(source);
-        }
-        /**
-         * 将二进制转换成 base64 图片字符
-         * @param buffer
-         */
-        static arrayBufferToBase64(buffer) {
-            let binary = '';
-            let bytes = new Uint8Array(buffer);
-            let len = bytes.byteLength;
-            for (let i = 0; i < len; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            return 'data:image/png;base64,' + window.btoa(binary);
-        }
-        /**
-         * ArrayBuffer 转为字符串，参数为 ArrayBuffer对象
-         * @param buf
-         */
-        static ab2str(buf) {
-            return String.fromCharCode.apply(null, new Uint8Array(buf));
-        }
-        /**
-         * 字符串转为 ArrayBuffer 对象，参数为字符串
-         * @param str
-         */
-        static str2ab(str) {
-            let buf = new ArrayBuffer(str.length * 2); // 每个字符占用2个字节
-            let bufView = new Uint8Array(buf);
-            for (let i = 0, strLen = str.length; i < strLen; i++) {
-                bufView[i] = str.charCodeAt(i);
-            }
-            return buf;
-        }
-        /**
-         * 解析角色数据
-         * @param xml
-         * @param handler 解析完成回调 ( 返回数组 [xml, texture] )
-         * @param content
-         */
-        // static parseRole(value: ArrayBuffer, handler: Laya.Handler) {
-        // 	let buf: Uint8Array = new Uint8Array(value, 0)
-        // 	let inflater = new Zlib.Inflate(buf)
-        // 	buf = inflater.decompress()
-        // 	let bytes: ByteBuffer = new ByteBuffer(buf)
-        // 	let pngIen = bytes.readInt32()
-        // 	let pngBytes: Byte = new Byte(bytes.readArrayBuffer(pngIen))
-        // 	let xmlLength = bytes.readInt32()
-        // 	let xmlBytes: Byte = new Byte(bytes.readArrayBuffer(xmlLength))
-        // 	// 将二进制转换成字符串
-        // 	let str = ObjectUtil.ab2str(xmlBytes.buffer)
-        // 	let xmlStr = Utils.parseXMLFromString(str)
-        // 	// 转换成base64 位图信息
-        // 	let base64Str = ObjectUtil.arrayBufferToBase64(pngBytes.buffer)
-        // 	// 判断如果已经加载  直接使用不再重新加载
-        // 	let texture = Laya.loader.getRes(base64Str)
-        // 	if (texture != null) {
-        // 		this.onLoadTexture(xmlStr, handler, texture)
-        // 	} else {
-        // 		Laya.loader.load(base64Str,
-        // 			Handler.create(this, this.onLoadTexture, [xmlStr, handler]),
-        // 			null, Loader.IMAGE)
-        // 	}
-        // }
-        static onLoadTexture(xml, handler, content) {
-            handler.runWith([xml, content]);
-        }
-        /**
-         * 获取指定坐标下存在的对象
-         * @param x x坐标 或 point对象
-         * @param y y坐标 默认0
-         */
-        static getObjectsUnderPoint(x, y = 0) {
-            if (x instanceof Laya.Point) {
-                y = x.y;
-                x = x.x;
-            }
-            let len = Laya.stage.numChildren;
-            let maps = [];
-            for (let i = 0; i < len; i++) {
-                let a = Laya.stage.getChildAt(i);
-                if (a instanceof Laya.Sprite && a.alpha > 0 && a.visible) {
-                    if (new Laya.Rectangle(a.x, a.y, a.displayWidth, a.displayHeight).contains(x, y)) {
-                        maps.push(a);
-                    }
-                }
-            }
-            return maps;
-        }
-        /**
-         * 获取指定位置的颜色值 16进制
-         * @param texture
-         * @param x x坐标 或 point对象 和 Laya.Sprite
-         * @param y y坐标 默认-1
-         */
-        static getPixel(texture, x = -1, y = -1) {
-            if (x instanceof Laya.Point) {
-                y = x.y;
-                x = x.x;
-            }
-            if (texture instanceof Laya.Sprite) {
-                if (x == -1) {
-                    x = texture.x;
-                }
-                if (y == -1) {
-                    y = texture.y;
-                }
-                texture = texture.texture;
-            }
-            if (x == -1) {
-                x = 0;
-            }
-            if (y == -1) {
-                y = 0;
-            }
-            let arr = texture.getPixels(x, y, 1, 1);
-            return StringUtil.colorRgb(arr);
-        }
-        /**
-         * 根据类名获取对象 如 com.test.Test可获取Test对象
-         * @param classStr
-         */
-        static getClass(classStr) {
-            let c = classStr.split(".");
-            let cls = null;
-            for (let i = 0; i < c.length; i++) {
-                if (cls == null) {
-                    cls = window[c[i]];
-                }
-                else {
-                    cls = cls[c[i]];
-                }
-            }
-            return cls;
-        }
-    }
-    ObjectUtil.colorTransform = new Laya.ColorFilter();
-    ObjectUtil.colorMatrixFilters = [new Laya.ColorFilter()];
-    coreLib.ObjectUtil = ObjectUtil;
-    class RotationUtils {
-        constructor() {
-            /** 速度最大值 */
-            this.maxSpeed = 10;
-            /** 减速后最小值 */
-            this.minSpeed = 0;
-            /** 格子数量 */
-            this.count = 20;
-            /** 第一个奖区起始点与0点位置的偏移比例 */
-            this.skew = -0.5;
-            /** 最少圈数 */
-            this.minCircle = 5;
-            /** 最多圈数 */
-            this.maxCircle = 8;
-            /** 指针所停位置离奖区边缘的比例 */
-            this.offset = 0.5;
-            /** 旋转花费的时间，单位毫秒。 只有tween有用 */
-            this.duration = 1000 * 5;
-        }
-        /**
-         *
-         * @param comp 要旋转的对象
-         * @param runEndIndex 最终停止的位置
-         * @param callback 转动停止后调用函数
-         * @param proCall 转动开始消弱后调用函数
-         * @param isClockwise 是否是顺时针方向转动
-         *
-         */
-        rollFrame(comp, runEndIndex, callback, proCall, isClockwise = true) {
-            this.roll(comp, runEndIndex, callback, proCall, true, isClockwise);
-        }
-        /**
-         *
-         * @param comp 要旋转的对象
-         * @param runEndIndex 最终停止的位置
-         * @param callback 转动停止后调用函数
-         * @param proCall 转动开始消弱后调用函数
-         * @param isClockwise 是否是顺时针方向转动
-         *
-         */
-        rollTween(comp, runEndIndex, callback, proCall, isClockwise = true) {
-            this.roll(comp, runEndIndex, callback, proCall, false, isClockwise);
-        }
-        /**
-         *
-         * @param comp 要旋转的对象
-         * @param runEndIndex 最终停止的位置
-         * @param callback 转动停止后调用函数
-         * @param proCall 转动开始消弱后调用函数
-         * @param isFrame 是否使用帧动画播放
-         * @param isClockwise 是否是顺时针方向转动
-         *
-         */
-        roll(comp, runEndIndex, callback, proCall, isFrame, isClockwise) {
-            this.comp = comp;
-            this.endCall = callback;
-            this.proCall = proCall;
-            comp.rotation = comp.rotation % 360; //初始化角度
-            this.runEndIndex = runEndIndex;
-            this.rotationTotal = this.getRotationLong(this.count, this.skew, this.minCircle, this.maxCircle, runEndIndex, this.offset); //获取总长度
-            if (isFrame) {
-                this.rotationTotal -= comp.rotation;
-                if (!isClockwise)
-                    this.rotationTotal *= -1;
-                this.addSpeed = (this.maxSpeed * this.maxSpeed - this.minSpeed * this.minSpeed) / this.rotationTotal; //获取加速度
-                this.speed = 0; //初始化速度
-                Laya.timer.frameLoop(1, this, this.runHandler);
-            }
-            else {
-                if (!isClockwise)
-                    this.rotationTotal *= -1;
-                this.tween = Laya.Tween.to(comp, {
-                    rotation: this.rotationTotal,
-                    ease: Laya.Ease.expoInOut, complete: Laya.Handler.create(this, this.onRollEndHandler),
-                    update: new Laya.Handler(this, this.updateHandler)
-                }, this.duration);
-                //				Ease.sineInOut
-                //				Ease.expoInOut
-                //				Ease.quadInOut
-                //				Ease.quartInOut
-                //				Ease.circInOut
-                //				Ease.cubicInOut
-            }
-        }
-        updateHandler() {
-            let rt = this.rotationTotal - this.rotationTotal / 3;
-            if (rt <= this.comp.rotation) {
-                runFun(this.proCall);
-                this.proCall = null;
-            }
-        }
-        onRollEndHandler() {
-            this.tween = null;
-            runFun(this.endCall);
-            this.endCall = null;
-        }
-        /**
-         * 获取总长度函数
-         * @param count 转盘拆分份数
-         * @param skew 第一个奖区起始点与0点位置的偏移比例
-         * @param Qmin 最少圈数
-         * @param Qmax 最多圈数
-         * @param location 奖品所在奖区
-         * @param offset 指针所停位置离奖区边缘的比例
-         * @return
-         *
-         */
-        getRotationLong(count, skew, Qmin, Qmax, location, offset) {
-            let _q = 360 * (Math.floor(Math.random() * (Qmax - Qmin)) + Qmin); //整圈长度
-            let _skew = (360 / count) * skew; //第一个奖区起始点与0点位置的偏移量
-            let _location = (360 / count) * location; //目标奖区的起始点
-            let _offset = Math.floor(Math.random() * (360 / count) * (1 - 2 * offset)) + (360 / count) * offset;
-            return _q + _skew + _location + _offset;
-        }
-        runHandler() {
-            //如果速度到达最大速度开始减速
-            if (this.speed >= this.maxSpeed) {
-                this.speed = 2 * this.maxSpeed - this.speed; //最大速度超范围后修正回来!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!关键
-                this.addSpeed = -this.addSpeed;
-                runFun(this.proCall);
-                this.proCall = null;
-            }
-            this.speed += this.addSpeed;
-            if (this.speed > 0) {
-                this.comp.rotation += this.speed;
-            }
-            else {
-                Laya.timer.clear(this, this.runHandler);
-                this.onRollEndHandler();
-            }
-        }
-        /** 销毁动画 */
-        diapose() {
-            if (this.tween)
-                this.tween.clear();
-            this.tween = null;
-            this.endCall = null;
-            this.proCall = null;
-            if (this.comp)
-                Laya.Tween.clearAll(this.comp);
-            Laya.timer.clear(this, this.runHandler);
-        }
-        /** 立即停止到结束为止 */
-        stop() {
-            if (this.tween)
-                this.tween.complete();
-            this.tween = null;
-            this.endCall = null;
-            this.proCall = null;
-            if (this.comp)
-                Laya.Tween.clearAll(this.comp);
-            Laya.timer.clear(this, this.runHandler);
-        }
-    }
-    coreLib.RotationUtils = RotationUtils;
-    class ShowUtils {
-        static showSize(spr) {
-            const bonus = new Laya.Sprite();
-            bonus.alpha = .7;
-            if (spr.hitArea) {
-                bonus.graphics.drawRect(spr.hitArea.x, spr.hitArea.y, spr.hitArea.width, spr.hitArea.height, "#ffffff");
-            }
-            else {
-                bonus.graphics.drawRect(spr.x, spr.y, spr.width, spr.height, "#ffffff");
-            }
-            spr.addChild(bonus);
-        }
-    }
-    coreLib.ShowUtils = ShowUtils;
-    class SoundUtils {
-        static addRes(res) {
-            Laya.SoundManager.autoReleaseSound = false;
-            SoundUtils.loadAsset = res;
-        }
-        static load(url = null) {
-            Laya.loader.load(url == null ? SoundUtils.loadAsset : url, Laya.Handler.create(null, SoundUtils.onLoader));
-        }
-        static onLoader() {
-            for (let i = 0; i < SoundUtils.autoPlay.length; i++) {
-                let url = SoundUtils.autoPlay[i];
-                SoundUtils.playMusic(url, SoundUtils.bgMusicLoop, SoundUtils.bgComplete, SoundUtils.bgVolume, SoundUtils.bgStartTime);
-                console.log("auto play = " + url);
-            }
-            SoundUtils.autoPlay.length = 0;
-        }
-        /**
-         *
-         * @param url
-         * @param loops
-         * @param complete
-         * @param volume
-         * @param startTime
-         * @param coverBefore 如果正在播放指定的音乐  是否覆盖 默认 false
-         * @return
-         */
-        static playMusic(url, loops = 0, complete, volume = -1, startTime = 0, coverBefore = false) {
-            if (Laya.SoundManager["_bgMusic"] == Laya.URL.formatURL(url) && !coverBefore)
-                return null;
-            let sound = Laya.loader.getRes(url);
-            SoundUtils.bgMusicLoop = loops;
-            SoundUtils.bgVolume = volume;
-            SoundUtils.bgComplete = complete;
-            SoundUtils.bgStartTime = startTime;
-            if (sound != null) {
-                let channel = Laya.SoundManager.playMusic(url, loops, complete, startTime);
-                if (!channel)
-                    return null;
-                if (volume > -1)
-                    channel.volume = volume;
-                return channel;
-            }
-            else {
-                console.log("sound not load " + url);
-                if (SoundUtils.autoPlay.indexOf(url) == -1)
-                    SoundUtils.autoPlay.push(url);
-                const index = SoundUtils.loadAsset.findIndex(function (value) {
-                    return value.url == url;
-                });
-                if (index < 0) {
-                    SoundUtils.load(url);
-                }
-            }
-            return null;
-        }
-        static playSound(url, loops = 1, complete, volume = 1, startTime = 0) {
-            let sound = Laya.loader.getRes(url);
-            if (sound != null) {
-                let channel = Laya.SoundManager.playSound(url, loops, complete, null, startTime);
-                if (!channel)
-                    return null;
-                if (volume > -1)
-                    channel.volume = volume;
-                return channel;
-            }
-            else {
-                let index = SoundUtils.loadAsset.findIndex(function (value) {
-                    return value.url == url;
-                });
-                if (index < 0) {
-                    SoundUtils.load(url);
-                }
-                console.log("sound not load " + url);
-            }
-            return null;
-        }
-        static clear() {
-            SoundUtils.autoPlay.length = 0;
-            while (SoundUtils.loadAsset.length > 0) {
-                let loadRes = SoundUtils.loadAsset.shift();
-                Laya.loader.cancelLoadByUrl(loadRes.url);
-                Laya.SoundManager.destroySound(loadRes.url);
-            }
-            console.log("clear sound");
-            SoundUtils.loadAsset.length = 0;
-        }
-        static stopSound(url) {
-            Laya.SoundManager.stopSound(url);
-        }
-        /**
-         * 停止播放所有音效（不包括背景音乐）。
-         */
-        static stopAllSound() {
-            Laya.SoundManager.stopAllSound();
-        }
-        /**
-         * 停止播放所有声音（包括背景音乐和音效）。
-         */
-        static stopAll() {
-            Laya.SoundManager.stopAll();
-        }
-        /**
-         * 停止播放背景音乐（不包括音效）。
-         */
-        static stopMusic() {
-            Laya.SoundManager.stopMusic();
-        }
-    }
-    /** 需要立即播放的 */
-    SoundUtils.autoPlay = [];
-    /** 加载资源 */
-    SoundUtils.loadAsset = [];
-    SoundUtils.bgMusicLoop = 0;
-    SoundUtils.bgVolume = 1;
-    SoundUtils.bgStartTime = 0;
-    coreLib.SoundUtils = SoundUtils;
-    class SpineUtils {
-        /**
-         * 对指定 skeleton 进行设置
-         * @param skeleton
-         * @param url
-         * @param [nameOrIndex = 0] 播放名字或位置
-         * @param [loop = true] 循环
-         * @param playComplete
-         * @param loaderComplete
-         * @param [aniMode = -1]
-         */
-        static playSpine(skeleton, url, nameOrIndex = 0, loop = true, playComplete, loaderComplete, aniMode = -1) {
-            skeleton.offAll(Laya.Event.STOPPED);
-            skeleton.on(Laya.Event.STOPPED, this, function (handler) {
-                runFun(handler);
-            }, [playComplete]);
-            if (skeleton instanceof GSpineSkeleton) {
-                if (skeleton.aniPath == url && skeleton.asSkeleton != null) {
-                    // loaderComplete && loaderComplete.run()
-                    SpineUtils.parseComplete(skeleton, nameOrIndex, loop, loaderComplete);
-                    return;
-                }
-                // 界面显示了  在加载资源
-                skeleton.load(url, Laya.Handler.create(this, SpineUtils.parseComplete, [skeleton, nameOrIndex, loop, loaderComplete]));
-                return;
-            }
-            if (skeleton.asSkeleton.url == url && skeleton.asSkeleton.templet) {
-                // loaderComplete && loaderComplete.run()
-                SpineUtils.parseComplete(skeleton, nameOrIndex, loop, loaderComplete, null);
-                return;
-            }
-            if (aniMode == -1)
-                aniMode = skeleton.aniMode;
-            // 界面显示了  在加载资源
-            skeleton.load(url, Laya.Handler.create(this, SpineUtils.parseComplete, [skeleton, nameOrIndex, loop, loaderComplete]), aniMode);
-        }
-        static parseComplete(skeleton, nameOrIndex, loop, loaderComplete, fac) {
-            runFun(loaderComplete);
-            if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
-                runFun(nameOrIndex.loaderComplete);
-            }
-            if (skeleton && nameOrIndex)
-                skeleton.play(nameOrIndex, loop);
-        }
-        /**
-         * 创建spine 骨骼动画组件
-         * @param url 根据传入的json 或 sk自动创建 GSpineSkeleton、GSkeleton
-         * @param optional
-         * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
-         */
-        static createSpine(url, optional, skeletonClass) {
-            var _a, _b, _c, _d, _e, _f, _g;
-            if (optional && !this.isInterface(optional)) {
-                skeletonClass = optional;
-                optional = null;
-            }
-            if (typeof url !== "string") {
-                optional = url;
-                url = optional.url;
-            }
-            // 配置属性为null 或者不是配置属性
-            if (!optional || !this.isInterface(optional)) {
-                optional = { url: url };
-            }
-            // @ts-ignore
-            skeletonClass !== null && skeletonClass !== void 0 ? skeletonClass : (skeletonClass = Laya.Utils.getFileExtension(url) === "json" ? GSpineSkeleton : GSkeleton);
-            let skeleton = new skeletonClass();
-            if (optional.ver && skeleton instanceof GSpineSkeleton) {
-                skeleton.ver = optional.ver;
-            }
-            optional.rotation && (skeleton.rotation = optional.rotation);
-            if (optional.scale) {
-                skeleton.setScale(optional.scale, optional.scale);
-            }
-            else {
-                skeleton.setScale((_a = optional.scaleX) !== null && _a !== void 0 ? _a : skeleton.scaleX, (_b = optional.scaleY) !== null && _b !== void 0 ? _b : skeleton.scaleY);
-            }
-            skeleton.setXY((_c = optional.x) !== null && _c !== void 0 ? _c : 0, (_d = optional.y) !== null && _d !== void 0 ? _d : 0);
-            if (optional.relation) {
-                let relation = optional.relation;
-                relation.lr = relation.ud = relation.target;
-                relation.lr && skeleton.addRelation(relation.lr, fgui.RelationType.Center_Center, (_e = relation.usePercent) !== null && _e !== void 0 ? _e : true);
-                relation.ud && skeleton.addRelation(relation.ud, fgui.RelationType.Middle_Middle, (_f = relation.usePercent) !== null && _f !== void 0 ? _f : true);
-            }
-            SpineUtils.playSpine(skeleton, url, optional.play, (_g = optional.play) === null || _g === void 0 ? void 0 : _g.loop, optional.playComplete, optional.loaderComplete, optional.aniMode);
-            return skeleton;
-        }
-        /**
-         * 判断是否是接口
-         * @param optional
-         */
-        static isInterface(optional) {
-            return "aniMode" in optional && "ver" in optional;
-        }
-    }
-    coreLib.SpineUtils = SpineUtils;
-    /** 状态吗获取显示信息 */
-    class StateCode {
-        /**
-         * 获取显示信息
-         * @param data 一个object对象  如果带有message错误文字  直接使用 否则用code命令获取错误内容
-         */
-        static getShowMessage(data) {
-            var _a, _b;
-            if (data == null)
-                return LanguageUtils.inst.getStr(1005 /* LibStr.NET_ERROR */);
-            if (((_a = data.message) === null || _a === void 0 ? void 0 : _a.length) > 0) {
-                return data.message;
-            }
-            else if (((_b = data.msg) === null || _b === void 0 ? void 0 : _b.length) > 0) {
-                return data.msg;
-            }
-            return this.getInfo(data.code);
-        }
-        /**
-         * 显示错误信息
-         * @param code 错误代号
-         */
-        static getInfo(code) {
-            let content = "";
-            switch (code) {
-                case 300: // 未登陆，请先登陆
-                    content = LanguageUtils.inst.getStr(1007 /* LibStr.FIRST_LOG */);
-                    break;
-                case 5002: // 资金不足
-                    content = LanguageUtils.inst.getStr(1021 /* LibStr.RECHARGE */);
-                    break;
-                case 8002: // 当前游戏状态不属于投注状态
-                    content = LanguageUtils.inst.getStr(1006 /* LibStr.CANNOT_BET */);
-                    break;
-                case 8003: // 游戏暂停中
-                    content = LanguageUtils.inst.getStr(1002 /* LibStr.GAME_OFF */);
-                    break;
-                case 8004: // 投注失败
-                    content = LanguageUtils.inst.getStr(1010 /* LibStr.BET_FAIL */);
-                    break;
-                default:
-                    content = LanguageUtils.inst.getStr(1005 /* LibStr.NET_ERROR */) + ". code:" + code;
-                    break;
-            }
-            return content;
-        }
-        /** 此错误是后在执行范围内 */
-        static execute(code, msg = null) {
-            switch (code) {
-                case 300: // 请登录
-                    console.log("StateCode.execute() 300");
-                    if (Player.inst.urlParam.isJumpPage()) {
-                        JSUtils.login();
-                        return true;
-                    }
-                    fgui.GRoot.inst.closeModalWait();
-                    LoadingWindow.inst.hide();
-                    HtmlWindow.inst.hide();
-                    msg = msg ? msg : LanguageUtils.inst.getStr(1007 /* LibStr.FIRST_LOG */);
-                    if (fgui.UIPackage.getByName("gameCommon"))
-                        WaitResult.inst.hide();
-                    HomePrompt.instance.showTip(0, msg, function () {
-                        if (Player.inst.gameModel == -1) {
-                            Laya.LocalStorage.removeItem("token");
-                            Laya.LocalStorage.removeItem("userData");
-                            Player.inst.token = null;
-                            if (Player.inst.urlParam.isJumpPage()) {
-                                Player.inst.urlParam.clearJumpPage();
-                                //								SceneManager.inst.enterGame()
-                                //								return
-                            }
-                            SceneManager.inst.showHomeScene();
-                        }
-                        else {
-                            SceneManager.inst.logout();
-                        }
-                    }, null, { cancelName: LanguageUtils.inst.getStr(1066 /* LibStr.OK */) });
-                    return true;
-                case 8003: // 游戏暂停中
-                    console.log("StateCode.execute() 8003");
-                    this.showGameOff();
-                    return true;
-            }
-            return false;
-        }
-        /** 游戏暂停中，返回大厅 */
-        static showGameOff() {
-            JSUtils.openModal(LanguageUtils.inst.getStr(1002 /* LibStr.GAME_OFF */));
-            JSUtils.gameClose();
-        }
-    }
-    coreLib.StateCode = StateCode;
-    /**
-     * 流量统计
-     */
-    class StatFlow {
-        constructor() {
-            /** 公共流量计算接口 */
-            this.by = new Laya.Byte();
-        }
-        static get inst() {
-            if (this._instance == null)
-                StatFlow._instance = new StatFlow();
-            return this._instance;
-        }
-        /**
-         * 计算流量
-         * @param url
-         * @param value
-         */
-        castFlow(url, value) {
-            if (Player.inst.token == null) {
-                return;
-            }
-            this.by.clear();
-            //		by.writeUTFBytes(value)
-            ////		trace(value)
-            //		let len:number = by.length
-            ////		trace(len)
-            ////		trace("**********************")
-            //
-            //		let simpleUrl:string = url.split("?")[0]
-            //
-            //		let obj:any = getUserStat(simpleUrl)
-            //		if (obj == null) {
-            //			obj = {timer:HTTPUtils.inst.getTimer(), size:0, url:simpleUrl}
-            //		}
-            //
-            //		let current:number = HTTPUtils.inst.getTimer()
-            //
-            //		let sendSize:number = 0
-            //		let sendUrl:string
-            //		let sendTimer:number
-            //		if (!Cast.isSameDay(obj.timer, current)) {
-            //			sendSize = obj.size
-            //			sendUrl = obj.url
-            //			sendTimer = obj.timer
-            //			obj.timer = current
-            //			obj.size = 0
-            //		}
-            ////		trace(Cast.timerFrom2(obj.timer/1000), Cast.timerFrom2(current/1000), url)
-            //		obj.size += len
-            ////		trace("当前流量消耗统计 今天="+obj.size+"b "+Math.floor(obj.size/1024)+"kb | 发送="+sendSize)
-            //
-            //		addUserStat(obj)
-            //
-            //		if (sendSize > 0) {
-            //			let sendObj:any = {reqData:[{url:sendUrl, size:sendSize, timer:sendTimer}], uid:Player.inst.userId}
-            //			let obj2:any = Laya.LocalStorage.getJSON(NOT_SEND_STAT_FLOW)
-            //			let users:any[] = obj2.data
-            //			for (let i:number = 0; i < users.length; i++) {
-            //				let user:any = users[i]
-            //				if (!Cast.isSameDay(user.timer, current)) {
-            //					if (user.size > 0) {
-            //						sendObj.reqData.push({url:user.url, size:user.size, timer:user.timer})
-            //					}
-            //					user.size = 0
-            //					user.timer = current
-            //				}
-            //			}
-            //
-            //			Laya.LocalStorage.setJSON(NOT_SEND_STAT_FLOW, obj2)
-            //
-            //			sendObj.reqData = JSON.stringify(sendObj.reqData)
-            //
-            //			HTTPUtils.inst.post(__JS__("analysisUrl")+"data-traffic", sendObj)
-            //		}
-        }
-        /** 添加用户统计 */
-        addUserStat(value) {
-            //		let obj:any = Laya.LocalStorage.getJSON(NOT_SEND_STAT_FLOW)
-            //		if (obj == null) {
-            //			obj = {data:[]}
-            //		}
-            //		let users:any[] = obj.data
-            //		if (!(users is Array)) {
-            //			users = []
-            //		}
-            //		let update:boolean
-            //		for (let i = 0; i < users.length; i++) {
-            //			let user = users[i]
-            //			if (user.url == value.url) {
-            //				users[i] = value
-            //				update = true
-            //				break
-            //			}
-            //		}
-            //		if(!update) users.push(value)
-            //		obj.data = users
-            //		Laya.LocalStorage.setJSON(NOT_SEND_STAT_FLOW, obj)
-        }
-        /** 根据用户id获取用户统计信息 */
-        getUserStat(url) {
-            let obj = Laya.LocalStorage.getJSON(StatFlow.NOT_SEND_STAT_FLOW);
-            if (obj == null) {
-                obj = { data: [] };
-            }
-            else {
-                if (!(obj.data instanceof Array)) {
-                    obj = { data: [] };
-                }
-            }
-            let users = obj.data;
-            for (let i = 0; i < users.length; i++) {
-                let user = users[i];
-                if (user.url == url) {
-                    return user;
-                }
-            }
-            return null;
-        }
-    }
-    /** 未发送的流量统计 */
-    StatFlow.NOT_SEND_STAT_FLOW = "notSendStatFlow";
-    coreLib.StatFlow = StatFlow;
-    /**
-     * 字符串一些常用方法。
-     * @author boge
-     *
-     */
-    class StringUtil {
-        /** 支持字符串格式 ("{0}"). 格式化 */
-        static format(format, ...args) {
-            for (let i = 0; i < args.length; ++i)
-                format = format.replace(new RegExp("\\{" + i + "\\}", "g"), args[i]);
-            return format;
-        }
-        /**
-         * 忽略大小字母比较字符是否相等
-         * @param char1 字符串一
-         * @param char2 字符串二
-         * @return
-         */
-        static equalsIgnoreCase(char1, char2) {
-            return char1.toLowerCase() == char2.toLowerCase();
-        }
-        /**
-         * 是否是数值字符串
-         * @param char 指定字符串
-         * @return
-         */
-        static isNumber(char) {
-            if (!char) {
-                return false;
-            }
-            return !isNaN(parseFloat(char));
-        }
-        /**
-         * 去除所有html 标签形式
-         * @param value
-         * @return
-         *
-         */
-        static removeHtml(value) {
-            let str = value.replace(this.HTML_TAG_REG, "");
-            if (str) {
-                return this.trim(str);
-            }
-            return value;
-        }
-        /**
-         * 是否为合法 Email
-         * @param char 指定字符串
-         * @return
-         */
-        static isEmail(char) {
-            let reg = new RegExp("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$");
-            return this.checkChar(char, reg);
-        }
-        /**
-         * 是否是 Double 型数据
-         * @param    char    指定字符串
-         * @return
-         */
-        static isDouble(char) {
-            let pattern = new RegExp("^[+\-]?\d+(\.\d+)?$");
-            return this.checkChar(char, pattern);
-        }
-        /**
-         * 是否是整数
-         * @param    char    指定字符串
-         * @return
-         */
-        static isInteger(char) {
-            let pattern = new RegExp("^[-\+]?\d+$");
-            return this.checkChar(char, pattern);
-        }
-        /**
-         * 是否是英文字符（包括大小写）
-         * @param    char    指定字符串
-         * @return
-         */
-        static isEnglish(char) {
-            let pattern = new RegExp("^[A-Za-z]+$");
-            return this.checkChar(char, pattern);
-        }
-        /**
-         * 是否是中文
-         * @param    char    指定字符串
-         * @return
-         */
-        static isChinese(char) {
-            let pattern = new RegExp("^[\u0391-\uFFE5]+$");
-            return this.checkChar(char, pattern);
-        }
-        /**
-         * 万军从中取数字
-         * @param char
-         * @return
-         */
-        static getNumbers(char) {
-            let pattern = /\d+/g;
-            let value = "";
-            if (pattern.test(char)) {
-                value = char.match(pattern).join("");
-            }
-            return parseFloat(value);
-        }
-        /**
-         * 万军从中取非数字
-         * @param char
-         * @return
-         */
-        static getNotNumbers(char) {
-            let pattern = /\D+/g;
-            let value = "";
-            if (pattern.test(char)) {
-                value = char.match(pattern).join("");
-            }
-            return value;
-        }
-        /**
-         * 是否是双字节
-         * @param    char    指定字符串
-         * @return
-         */
-        static isDoubleChar(char) {
-            let pattern = new RegExp("^[^\x00-\xff]+$");
-            return this.checkChar(char, pattern);
-        }
-        /**
-         * 是否是 url 地址
-         * @param    char    指定字符串
-         * @return
-         */
-        static isURL(char) {
-            if (!char) {
-                return false;
-            }
-            char = char.toLowerCase();
-            //		let pattern:RegExp = /^http:\/\/[A-Za-z0-9]+\.[A-Za-z0-9]+[\/=\?%\-&_~`@[\]\':+!]*([^<>\"\"])*$/
-            return this.checkChar(char, this.HTML_URL_REG);
-        }
-        /**
-         * 是否为空  需要用正则匹配出多个空格的情况
-         * @param    char    指定字符串
-         * @return
-         */
-        static isEmpty(char) {
-            switch (char) {
-                case null:
-                case "":
-                case "\t":
-                case "\r":
-                case "\n":
-                case "\f":
-                case undefined:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-        /**
-         * 是否不是空  需要用正则匹配出多个空格的情况
-         * @param    char    指定字符串
-         * @return
-         */
-        static isNotEmpty(char) {
-            return !this.isEmpty(char);
-        }
-        /**
-         * 是否包含中文
-         * @param    char    指定字符串
-         * @return
-         */
-        static hasChineseChar(char) {
-            let pattern = /[^\x00-\xff]/;
-            return this.checkChar(char, pattern);
-        }
-        /**
-         * 检测指定字符串是否匹配指定模式
-         * @param    char    指定字符串
-         * @param    pattern    指定模式
-         * @return
-         */
-        static checkChar(char, pattern) {
-            if (!char) {
-                return false;
-            }
-            char = this.trim(char);
-            return pattern.test(char);
-        }
-        /**
-         * 比较两个字符串是否相等
-         * @param s1 第一个比较字符串。
-         * @param s2 第二个比较字符串。
-         * @param caseSensitive 是否区分大小写  默认不区分
-         * @return
-         */
-        static stringsAreEqual(s1, s2, caseSensitive = false) {
-            if (caseSensitive) {
-                return (s1 == s2);
-            }
-            else {
-                return (s1.toUpperCase() == s2.toUpperCase());
-            }
-        }
-        /**
-         * 去除首位的空白部分
-         * @param input 要被处理的字符串
-         * @return
-         */
-        static trim(input) {
-            return StringUtil.ltrim(StringUtil.rtrim(input));
-        }
-        /**
-         * 去除所有的空白部分
-         * @param input 要被处理的字符串
-         * @return
-         *
-         */
-        static trimAll(input) {
-            if (input == null)
-                return null;
-            let value = "";
-            let size = input.length;
-            for (let i = 0; i < size; i++) {
-                if (input.charCodeAt(i) > 32) {
-                    value += input.charAt(i);
-                }
-            }
-            return value;
-        }
-        /**
-         * 从前面指定的字符串中删除空格。
-         * @param input 输入字符串开始的空白将被删除。
-         * @return
-         *
-         */
-        static ltrim(input) {
-            let size = input.length;
-            for (let i = 0; i < size; i++) {
-                if (input.charCodeAt(i) > 32) {
-                    return input.substring(i);
-                }
-            }
-            return "";
-        }
-        /**
-         *
-         * 从指定的字符串的结尾删除空格。
-         *
-         * @param input 输入字符串结尾的空白将被删除。
-         * @return
-         *
-         */
-        static rtrim(input) {
-            let size = input.length;
-            for (let i = size; i > 0; i--) {
-                if (input.charCodeAt(i - 1) > 32) {
-                    return input.substring(0, i);
-                }
-            }
-            return "";
-        }
-        /**
-         * 确定是否按指定字符串开始。
-         * @param input 要被处理的字符串
-         * @param prefix 字符串的前缀
-         */
-        static beginsWith(input, prefix) {
-            if (!input) {
-                return false;
-            }
-            return (prefix == input.substring(0, prefix.length));
-        }
-        /**
-         * 确定是否按指定字符串开始。
-         * @param input 要被处理的字符串
-         * @param prefix 字符串的前缀
-         */
-        static beginsWithAny(input, ...prefix) {
-            if (StringUtil.isEmpty(input)) {
-                return false;
-            }
-            for (let i = 0; i < prefix.length; i++) {
-                if (StringUtil.beginsWith(input, prefix[i]))
-                    return true;
-            }
-            return false;
-        }
-        /**
-         * 确定是否按指定字符串结束。
-         * @param input 要被处理的字符串
-         * @param suffix 字符串的后缀
-         */
-        static endsWith(input, suffix) {
-            if (!input) {
-                return false;
-            }
-            return (suffix == input.substring(input.length - suffix.length));
-        }
-        /**
-         * 确定是否按指定字符串结束。  只要满足一个就返回 true
-         * @param input 要被处理的字符串
-         * @param prefix 字符串的后缀
-         */
-        static endsWithAny(input, ...prefix) {
-            if (StringUtil.isEmpty(input)) {
-                return false;
-            }
-            for (let i = 0; i < prefix.length; i++) {
-                if (StringUtil.endsWith(input, prefix[i]))
-                    return true;
-            }
-            return false;
-        }
-        /**
-         * 删除在输入字符串中删除字符串的所有实例。
-         * @param input 要被处理的字符串
-         * @param remove 要删除的字符串
-         * @return
-         */
-        static remove(input, remove) {
-            return this.replace(input, remove, "");
-        }
-        /**
-         * 字符串内容替换
-         * @param input 要被处理的字符串
-         * @param replace 要被替换掉的字符串
-         * @param replaceWith 用来替换的新字符串
-         */
-        static replace(input, replace, replaceWith) {
-            return input.split(replace).join(replaceWith);
-        }
-        /**
-         * 获取指定符号之后的字符串
-         * @param input 要处理的字符串
-         * @param suffix 要做为依据的最后一个符号
-         * @param retain 是否要保留作为依据的符号 (默认不保留)
-         * @param direction 是从前开始还是从后开始 (默认从后)
-         * <br>
-         * @example
-         * var str = "ssdw/aa"
-         * StringUtils.endsCode(str, "/") = aa
-         */
-        static endsCode(input, suffix, retain = false, direction = false) {
-            let index;
-            if (direction) {
-                index = input.indexOf(suffix);
-            }
-            else {
-                index = input.lastIndexOf(suffix);
-            }
-            if (index != -1) {
-                if (retain) {
-                    input = input.substring(index, input.length);
-                }
-                else {
-                    input = input.substring(index + (suffix.length), input.length);
-                }
-            }
-            return input;
-        }
-        /**
-         * 获取指定符号之前的字符串
-         * @param input 要处理的字符串
-         * @param suffix 要做为依据的最后一个符号
-         * @param retain 是否要保留作为依据的符号 (默认不保留)
-         * @param direction 是从前开始还是从后开始 (默认从后)
-         *
-         * @return
-         *
-         */
-        static beginsCode(input, suffix, retain = false, direction = false) {
-            let index;
-            if (direction) {
-                index = input.indexOf(suffix);
-            }
-            else {
-                index = input.lastIndexOf(suffix);
-            }
-            if (index != -1) {
-                if (retain) {
-                    input = input.substring(0, index + 1);
-                }
-                else {
-                    input = input.substring(0, index);
-                }
-            }
-            return input;
-        }
-        /**
-         * 字符串与对象进行比较。按字典顺序比较两个字符串
-         * @param value 源字符串
-         * @param anotherString 要比较的字符串
-         * @return number 返回值是整型，它是先比较对应字符的大小(ASCII码顺序)，如果第一个字符和参数的第一个字符不等，结束比较，返回他们之间的长度差值，如果第一个字符和参数的第一个字符相等，则以第二个字符和参数的第二个字符做比较，以此类推,直至比较的字符或被比较的字符有一方结束。
-         * <br>如果参数字符串等于此字符串，则返回值 0；<br>如果此字符串小于字符串参数，则返回一个小于 0 的值；<br>如果此字符串大于字符串参数，则返回一个大于 0 的值。
-         */
-        static compareTo(value, anotherString) {
-            let len1 = value.length;
-            let len2 = anotherString.length;
-            let lim = Math.min(len1, len2);
-            let k = 0;
-            while (k < lim) {
-                let c1 = value.charCodeAt(k);
-                let c2 = anotherString.charCodeAt(k);
-                if (c1 != c2) {
-                    return c1 - c2;
-                }
-                k++;
-            }
-            return len1 - len2;
-        }
-        /**
-         * 获取资源文件的名字
-         * @param url 路径名
-         * @param retain 是否去掉尾部标签 默认true
-         * @return
-         */
-        static urlName(url, retain = true) {
-            // 先同意替换符号
-            if (url.indexOf("\\") != -1) {
-                url = url.replace(/\\/g, "/");
-            }
-            let index = url.lastIndexOf("/");
-            if (retain) {
-                url = url.substring(index + 1, url.lastIndexOf("."));
-            }
-            else {
-                url = url.substring(index + 1, url.length);
-            }
-            return url;
-        }
-        /**
-         * 判断此字符串中是否包含
-         * @param value
-         * @param arge
-         * @return
-         */
-        static contains(value, ...arge) {
-            for (let i = 0; i < arge.length; i++) {
-                let items = arge[i];
-                if (value.indexOf(items) != -1) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        /**
-         * 将 Uint8Array 转换成16进制颜色值  至少保证3个值
-         * @param value 数据
-         * @param defaultColor 默认值  如果不满足要求  直接返回的值 默认#ffffff
-         */
-        static colorRgb(value, defaultColor = "#ffffff") {
-            if (value.length < 3)
-                return defaultColor;
-            // 转成16进制
-            let strHex = "#";
-            for (let i = 0; i < 3; i++) {
-                let hex = value[i].toString(16);
-                if (hex === "0") {
-                    hex += hex;
-                }
-                strHex += hex;
-            }
-            return strHex;
-        }
-        /**
-         * 转换数据类型
-         * @param value 数据
-         * @param type 类型
-         * @return
-         */
-        static changeType(value, type) {
-            let tempValue = value;
-            switch (type) {
-                case "int":
-                case "uint":
-                case "number":
-                    tempValue = parseFloat(value);
-                    break;
-                case "boolean":
-                    if (this.isNumber(value)) {
-                        tempValue = Laya.Utils.parseInt(value) > 0;
-                    }
-                    else {
-                        tempValue = value == "true";
-                    }
-                    break;
-                case "array":
-                    tempValue = value.split(",");
-                    break;
-                case "array,int":
-                    tempValue = value.split(",");
-                    for (let j = 0, len = tempValue.length; j < len; j++) {
-                        tempValue[j] = this.changeType(tempValue[j], "int");
-                    }
-                    break;
-                case "array,number":
-                    tempValue = value.split(",");
-                    for (let j = 0, len = tempValue.length; j < len; j++) {
-                        tempValue[j] = this.changeType(tempValue[j], "number");
-                    }
-                    break;
-                case "array,uint":
-                    tempValue = value.split(",");
-                    for (let j = 0, len = tempValue.length; j < len; j++) {
-                        tempValue[j] = this.changeType(tempValue[j], "uint");
-                    }
-                    break;
-            }
-            return tempValue;
-        }
-    }
-    /** 验证是否是有效的html标签 */
-    StringUtil.HTML_TAG_REG = /<[^>]*>/g;
-    /** 验证是否是有效的网址 */
-    StringUtil.HTML_URL_REG = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/g;
-    /** 根据大写字母分隔 */
-    StringUtil.UPPERCASE_SPLIT = /(?=[A-Z])/;
-    /* 删除指定标签 */
-    StringUtil.removeTag = /<\/?TEXTFORMAT[^>]*>/gi;
-    coreLib.StringUtil = StringUtil;
-    /**
-     * 文字动画
-     */
-    class TextAniUtils {
-        constructor(defaultText, textField) {
-            /** 保存播放文字动画的位置 */
-            this.textObj = [];
-            /** 当前清楚完的数量 */
-            this.clearCount = 0;
-            /** 当前播放结束的数量 */
-            this.playEndCount = 0;
-            /** 数组文字位置 */
-            this.playIndex = 0;
-            this._defaultText = defaultText;
-            this._textField = textField;
-        }
-        /**
-         * 要播放的一组文字
-         * @param tests
-         */
-        plays(tests) {
-            if (this.playTexts == tests)
-                return;
-            this.clean(false);
-            this.playTexts = tests;
-            this.playIndex = 0;
-            if (this.playTexts != null && this.playTexts.length > 0) {
-                let playText = this.playTexts[this.playIndex];
-                this._play(playText);
-            }
-        }
-        /**
-         * 播放文字
-         * @param playText
-         */
-        play(playText) {
-            if (this._playText == playText)
-                return;
-            this.playTexts = null;
-            this._play(playText);
-        }
-        /** 直接设置文本 */
-        setText(text) {
-            Laya.timer.clearAll(this);
-            while (this.textObj.length > 0) {
-                Laya.Tween.clearAll(this.textObj.shift());
-            }
-            text = text.toUpperCase();
-            this._playText = text;
-            let msgLen = this._textField.text.length;
-            let tempPlayText = StringUtil.replace(text, " ", ",");
-            let showTextLen = tempPlayText.length;
-            let start = Math.floor((msgLen - showTextLen) / 2);
-            let tempText = "";
-            for (let i = 0; i < start; i++) {
-                tempText += this._defaultText;
-            }
-            tempText += tempPlayText;
-            if (tempText.length > msgLen) {
-                tempText = tempText.substring(0, msgLen);
-            }
-            else if (tempText.length < msgLen) {
-                let len = msgLen - tempText.length;
-                for (let i = 0; i < len; i++) {
-                    tempText += this._defaultText;
-                }
-            }
-            this._textField.text = tempText;
-        }
-        _play(playText) {
-            if (this._playText != null) {
-                this._playClean(playText);
-                return;
-            }
-            this._playAni(playText);
-        }
-        _playClean(playText = null) {
-            if (this._playText.length != this.textObj.length) {
-                return;
-            }
-            Laya.timer.clearAll(this);
-            this.playTwinkle(2, Laya.Handler.create(this, (playText) => {
-                let showTextLen = this._playText.length;
-                let charData;
-                this.clearCount = 0;
-                for (let i = 0; i < showTextLen; i++) {
-                    charData = this.textObj[i];
-                    Laya.Tween.to(charData, {
-                        count: 0,
-                        update: new Laya.Handler(this, this.changeTextHandler, [charData, this._playText.charAt(i)])
-                    }, 300, null, Laya.Handler.create(this, this.cleanTextEndHandler, [playText]), 300);
-                }
-            }, [playText]));
-        }
-        /**
-         * 清理播放的文字
-         * @param ani 是否需要动画清理
-         */
-        clean(ani = true) {
-            this.playTexts = null;
-            if (ani) {
-                this._playClean();
-            }
-            else {
-                Laya.timer.clearAll(this);
-                while (this.textObj.length > 0) {
-                    Laya.Tween.clearAll(this.textObj.shift());
-                }
-                this._playText = null;
-                let msgLen = this._textField.text.length;
-                let text = "";
-                for (let i = 0; i < msgLen; i++) {
-                    text += this._defaultText;
-                }
-                this._textField.text = text;
-            }
-        }
-        /** 清除结束 */
-        cleanTextEndHandler(playText) {
-            this.clearCount++;
-            if (this.clearCount < this.textObj.length)
-                return;
-            this.textObj.splice(0, this.textObj.length);
-            this._playText = null;
-            if (!StringUtil.isEmpty(playText)) {
-                Laya.timer.once(300, this, this._play, [playText]);
-            }
-        }
-        _playAni(playText) {
-            if (StringUtil.isEmpty(playText))
-                return;
-            this.textObj.splice(0, this.textObj.length);
-            this._playText = playText.toUpperCase();
-            let msgLen = this._textField.text.length;
-            let showTextLen = this._playText.length;
-            let start = Math.ceil((msgLen + 1 - showTextLen) / 2); // +1 是为了保证数据左右均匀 和字符串substring 取值位置有关
-            this.aniText = "";
-            for (let i = 0; i < msgLen; i++) {
-                this.aniText += this._defaultText;
-            }
-            //        console.log("默认文本 = " + this.aniText, "len = " + this.aniText.length)
-            let charData;
-            this.playEndCount = 0;
-            for (let i = 0; i < showTextLen; i++) {
-                charData = { count: msgLen + 1, tempCount: -1 };
-                this.textObj.push(charData);
-                Laya.Tween.to(charData, {
-                    count: start + i,
-                    update: new Laya.Handler(this, this.changeTextHandler, [charData, this._playText.charAt(i)])
-                }, 200, null, Laya.Handler.create(this, this.changeTextEndHandler), 15 * i);
-            }
-        }
-        /** 显示文字完成 */
-        changeTextEndHandler() {
-            this.playEndCount++;
-            if (this.playEndCount < this.textObj.length)
-                return;
-            runFun(this._endCallBack);
-            if (this.playTexts != null && this.playTexts.length > 0) {
-                this.playIndex++;
-                if (this.playIndex >= this.playTexts.length) {
-                    this.playIndex = 0;
-                }
-                Laya.timer.once(1000, this, this._play, [this.playTexts[this.playIndex]]);
-            }
-        }
-        changeTextHandler(charData, txt) {
-            if (StringUtil.trimAll(txt).length == 0) {
-                txt = this._defaultText;
-            }
-            let index = Math.floor(charData.count);
-            if (charData.tempCount == index)
-                return;
-            if (charData.tempCount != -1)
-                this.aniText = this.replacePos(this.aniText, charData.tempCount, charData.tempCount, this._defaultText);
-            charData.tempCount = index;
-            if (index > 0) {
-                this.aniText = this.replacePos(this.aniText, index, index, txt);
-            }
-            //        console.log("changeTextHandler="+this.aniText, index, this.aniText.length)
-            this._textField.text = this.aniText;
-        }
-        replacePos(text, start, end, replaceText) {
-            //        console.log("replacePos", text, start, replaceText)
-            return text.substring(0, start - 1) + replaceText + text.substring(end);
-        }
-        /**
-         * 播放闪烁
-         * @param count 文字闪烁次数
-         * @param callback
-         */
-        playTwinkle(count = 2, callback = null) {
-            this.twinkleCount = count;
-            this.twinkleCallHandler = callback;
-            //        if (this.textObj.length > 0) {
-            Laya.timer.loop(100, this, this.twinkleHandler);
-            //        }
-        }
-        twinkleHandler() {
-            if (this.isTwinkle) {
-                let msgLen = this._textField.text.length;
-                let tempPlayText = StringUtil.replace(this._playText, " ", ",");
-                let showTextLen = tempPlayText.length;
-                let start = Math.floor((msgLen - showTextLen) / 2);
-                let tempText = "";
-                for (let i = 0; i < start; i++) {
-                    tempText += this._defaultText;
-                }
-                tempText += tempPlayText;
-                if (tempText.length > msgLen) {
-                    tempText = tempText.substring(0, msgLen);
-                }
-                else if (tempText.length < msgLen) {
-                    let len = msgLen - tempText.length;
-                    for (let i = 0; i < len; i++) {
-                        tempText += this._defaultText;
-                    }
-                }
-                //                console.log(tempText, tempText.length)
-                this._textField.text = tempText;
-                this.twinkleCount--;
-            }
-            else {
-                let msgLen = this._textField.text.length;
-                let tempText = "";
-                for (let i = 0; i < msgLen; i++) {
-                    tempText += this._defaultText;
-                }
-                this._textField.text = tempText;
-            }
-            this.isTwinkle = !this.isTwinkle;
-            if (this.twinkleCount == 0) {
-                Laya.timer.clear(this, this.twinkleHandler);
-                runFun(this.twinkleCallHandler);
-            }
-        }
-        dispose() {
-            this._playText = null;
-            this._textField = null;
-            this._endCallBack = null;
-            this._defaultText = null;
-            this.twinkleCallHandler = null;
-            this.playTexts = null;
-            Laya.timer.clearAll(this);
-            while (this.textObj.length > 0) {
-                Laya.Tween.clearAll(this.textObj.shift());
-            }
-        }
-        get playText() {
-            return this._playText;
-        }
-    }
-    coreLib.TextAniUtils = TextAniUtils;
-    /**
-     * 闪烁动画
-     */
-    class TwinkleAniUtils {
-        /**
-         * 指定对象闪烁
-         * @param target 对象
-         * @param count 闪烁次数
-         * @param callback 完成回调
-         */
-        play(target, count, callback) {
-            this.callback = callback;
-            target["twinkleAni"] = { count: 0, maxCount: count };
-            Laya.timer.frameLoop(5, this, this.twinkleHandler, [target]);
-        }
-        twinkleHandler(target) {
-            let obj = target["twinkleAni"];
-            obj.count++;
-            if (obj.count % 2 == 0) {
-                target.alpha = 1;
-            }
-            else {
-                target.alpha = .5;
-            }
-            if (obj.count >= obj.maxCount) {
-                Laya.timer.clear(this, this.twinkleHandler);
-                runFun(this.callback);
-            }
-        }
-        dispose() {
-            this.callback = null;
-            Laya.timer.clear(this, this.twinkleHandler);
-        }
-    }
-    coreLib.TwinkleAniUtils = TwinkleAniUtils;
 })(coreLib || (coreLib = {}));

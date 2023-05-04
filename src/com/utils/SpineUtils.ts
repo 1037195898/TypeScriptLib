@@ -84,6 +84,7 @@ export class SpineUtils {
             skeletonClass = optional
             optional = null
         }
+
         if (typeof url !== "string") {
             optional = url
             url = optional.url
@@ -118,11 +119,11 @@ export class SpineUtils {
     }
 
     /**
-     * 判断是否是接口
+     * 判断是否是接口 用_displayObject 是否存在判断
      * @param optional
      */
     static isInterface(optional): optional is ISkeletonData {
-        return "aniMode" in optional && "ver" in optional
+        return !("_displayObject" in optional)
     }
 
 
