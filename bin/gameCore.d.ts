@@ -647,6 +647,74 @@ declare namespace coreLib {
         dispose(): void;
         protected backHandler(): void;
     }
+    export abstract class BaseSkeleton extends fgui.GComponent implements ISkeleton {
+        /** 经过时间 */
+        private _t;
+        private p1;
+        private p2;
+        private p3;
+        private p4;
+        /** 播放动画数组的索引 */
+        protected playGroupIndex: number;
+        /** 缓存每次播放的名字或下标 */
+        nameOrIndex: string | number;
+        /** 播放结束执行函数 */
+        protected stoppedHandler: Laya.Handler[];
+        /**
+         * 动画播放速率 1为标准速率
+         * @default 1
+         */
+        playbackRate: number;
+        /**
+         * 播放数据
+         */
+        protected skeletonPlay: ISkeletonPlay;
+        /** 加载路径 */
+        protected _aniPath: string;
+        protected _complete: ParamHandler;
+        get aniPath(): string;
+        /**
+         * 播放动画
+         *
+         * @param    nameOrIndex    动画名字或者索引
+         * @param    loop        是否循环播放
+         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
+         * @param    start        起始时间
+         * @param    end            结束时间
+         * @param    freshSkin    是否刷新皮肤数据
+         * @param    playAudio    是否播放音频
+         */
+        play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
+        /**
+         * 播放动画
+         * @param skeletonPlay 播放数据
+         * @param playGroupIndex 如果是播放数组动画 需要要播放动画的位置
+         */
+        playAni(skeletonPlay: ISkeletonPlay, playGroupIndex?: number): void;
+        private _play;
+        protected onPlayStopped(): void;
+        paused(): void;
+        resume(): void;
+        stop(): void;
+        getAniNameByIndex(index: number): string;
+        /**
+         * 获取实例 Skeleton
+         */
+        abstract get asSkeleton(): Laya.Skeleton | Laya.SpineSkeleton;
+        abstract getAniIndexByName(name: string): number;
+        abstract getAnimDuration(aniIndex: number): number;
+        abstract getAnimFrame(aniIndex: number): number;
+        abstract getAnimation(aniIndex: number): AnimationContent | spine.Animation;
+        abstract get currAniIndex(): number;
+        get t(): number;
+        set t(value: number);
+        getX(): number;
+        getY(): number;
+        setStartPoint(tempX: number, tempY: number): void;
+        setMiddlePoint(tempX: number, tempY: number): void;
+        setMiddlePoint2(tempX: number, tempY: number, tempX2: number, tempY2: number): void;
+        setEndPoint(tempX: number, tempY: number): void;
+    }
     export class BaseSlotGameData extends BaseGameData {
         /** 中奖配置表 按列排序 */
         lottery: number[][];
@@ -2234,6 +2302,37 @@ declare namespace coreLib {
          * 隐藏当前界面
          */
         hideRecord(): void;
+    }
+    export interface ISkeleton {
+        /**
+         * 通过索引得动画名称
+         * @param index
+         */
+        getAniNameByIndex(index: number): string;
+        /**
+         * 通过动画名称得索引
+         * @param name
+         */
+        getAniIndexByName(name: string): number;
+        /**
+         * 通过索引获取动画
+         * @param aniIndex
+         */
+        getAnimation(aniIndex: number): AnimationContent | spine.Animation;
+        /**
+         * 通过索引获取动画时长
+         * @param aniIndex
+         */
+        getAnimDuration(aniIndex: number): number;
+        /**
+         * 通过索引获取动画总帧数
+         * @param aniIndex
+         */
+        getAnimFrame(aniIndex: number): number;
+        /**
+         * 当前播放的索引
+         */
+        readonly currAniIndex: number;
     }
     /**
      * 开奖数据
@@ -4927,7 +5026,7 @@ declare namespace coreLib {
         private onInit;
         set text(value: string);
     }
-    export class GSkeleton extends fgui.GComponent {
+    export class GSkeleton extends BaseSkeleton {
         /**
          * 骨骼更新
          * ````
@@ -4936,12 +5035,6 @@ declare namespace coreLib {
          * ````
          */
         static readonly UPDATE_BONE_SLOT = "update_bone_slot";
-        /** 经过时间 */
-        private _t;
-        private p1;
-        private p2;
-        private p3;
-        private p4;
         /** 是否使用混合模式 */
         isBlendModeAdd: boolean;
         /** 使用混合模式的插槽 */
@@ -4953,26 +5046,9 @@ declare namespace coreLib {
         /** 指定的骨骼忽略Y偏移量 */
         readonly clearBoneSlotOffsetY: string[];
         aniMode: number;
-        private _aniPath;
-        private _complete;
         private _loadAniMode;
-        /** 播放动画的id */
-        private playGroupIndex;
         /** 自定义缓存的Templet名字 */
         cacheName: string;
-        /** 缓存每次播放的名字或下标 */
-        nameOrIndex: string | number;
-        /** 播放结束执行函数 */
-        private stoppedHandler;
-        /**
-         * 动画播放速率 1为标准速率
-         * @default 1
-         */
-        playbackRate: number;
-        /**
-         * 播放数据
-         */
-        private skeletonPlay;
         constructor(aniMode?: number);
         protected createDisplayObject(): void;
         get asSkeleton(): Laya.Skeleton;
@@ -4996,18 +5072,6 @@ declare namespace coreLib {
          */
         private _parseFail;
         /**
-         * 播放动画
-         *
-         * @param    nameOrIndex    动画名字或者索引
-         * @param    loop        是否循环播放
-         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-         * @param    start        起始时间
-         * @param    end            结束时间
-         * @param    freshSkin    是否刷新皮肤数据
-         * @param playAudio 自动播放声音
-         */
-        play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
-        /**
          * 延迟播放动画
          * @param    playDelay    延迟时间
          * @param    nameOrIndex    动画名字或者索引
@@ -5020,18 +5084,6 @@ declare namespace coreLib {
          * @deprecated
          */
         playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
-        private onPlayStopped;
-        /**
-         * 播放动画
-         * @param skeletonPlay 播放数据
-         * @param playGroupIndex 如果是播放数组动画 需要要播放动画的位置
-         * @private
-         */
-        playAni(skeletonPlay: ISkeletonPlay, playGroupIndex?: number): void;
-        private _play;
-        paused(): void;
-        resume(): void;
-        stop(): void;
         /**
          * 通过名字显示一套皮肤
          * @param    name    皮肤的名字
@@ -5044,9 +5096,10 @@ declare namespace coreLib {
          * @param    freshSlotIndex    是否将插槽纹理重置到初始化状态
          */
         showSkinByIndex(skinIndex: number, freshSlotIndex?: boolean): void;
-        getAniIndexByName(name: string): any;
-        getAniNameByIndex(index: number): string;
-        getAnimation(index: number): AnimationContent;
+        getAniIndexByName(name: string): number;
+        getAnimation(aniIndex: number): AnimationContent;
+        getAnimDuration(aniIndex: number): number;
+        getAnimFrame(aniIndex: number): number;
         get currAniIndex(): number;
         /**
          * 根据动作名和插槽骨骼名,来获取该骨骼在该动作播放时,每一帧该骨骼坐标位置,返回所有帧数骨骼坐标位置组成的列表
@@ -5075,14 +5128,6 @@ declare namespace coreLib {
         offAll(type?: string): void;
         getSkeletonPlay(): ISkeletonPlay;
         dispose(): void;
-        get t(): number;
-        set t(value: number);
-        getX(): number;
-        getY(): number;
-        setStartPoint(tempX: number, tempY: number): void;
-        setMiddlePoint(tempX: number, tempY: number): void;
-        setMiddlePoint2(tempX: number, tempY: number, tempX2: number, tempY2: number): void;
-        setEndPoint(tempX: number, tempY: number): void;
     }
     export class AnimationNodeContent {
         name: string;
@@ -5100,37 +5145,17 @@ declare namespace coreLib {
     export class AnimationContent {
         nodes: AnimationNodeContent[];
         name: string;
+        /**
+         * 播放时长
+         */
         playTime: number;
         bone3DMap: any;
         totalKeyframeDatasLength: number;
     }
-    export class GSpineSkeleton extends fgui.GComponent {
-        /** 经过时间 */
-        private _t;
-        private p1;
-        private p2;
-        private p3;
-        private p4;
+    export class GSpineSkeleton extends BaseSkeleton {
         ver: Laya.SpineVersion;
         private spineSkeleton;
         private template;
-        /** 加载路径 */
-        private _aniPath;
-        private _complete;
-        private playGroupIndex;
-        /** 缓存每次播放的名字或下标 */
-        nameOrIndex: string | number;
-        /** 播放结束执行函数 */
-        private stoppedHandler;
-        /**
-         * 动画播放速率 1为标准速率
-         * @default 1
-         */
-        playbackRate: number;
-        /**
-         * 播放数据
-         */
-        private skeletonPlay;
         constructor(ver?: Laya.SpineVersion);
         protected createDisplayObject(): void;
         get asSkeleton(): Laya.SpineSkeleton;
@@ -5145,28 +5170,9 @@ declare namespace coreLib {
          * @param ver
          */
         load(jsonOrSkelUrl: string, handler: ParamHandler, ver?: Laya.SpineVersion): void;
-        get aniPath(): string;
         private onComplete;
         set touchable(value: boolean);
         get touchable(): boolean;
-        /**
-         * 播放动画
-         *
-         * @param    nameOrIndex    动画名字或者索引
-         * @param    loop        是否循环播放
-         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-         * @param    start        起始时间
-         * @param    end            结束时间
-         * @param    freshSkin    是否刷新皮肤数据
-         * @param    playAudio    是否播放音频
-         */
-        play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
-        playAni(skeletonPlay: ISkeletonPlay, playGroupIndex?: number): void;
-        private _play;
-        private onPlayStopped;
-        paused(): void;
-        resume(): void;
-        stop(): void;
         /**
          * 通过名字显示一套皮肤
          * @param    name    皮肤的名字
@@ -5177,25 +5183,15 @@ declare namespace coreLib {
          * @param    skinIndex    皮肤索引
          */
         showSkinByIndex(skinIndex: number): void;
-        /**
-         * 得到指定动画的索引
-         * @param aniName 动画名字
-         */
         getAniIndexByName(aniName: string): number;
-        getAniNameByIndex(index: number): string;
+        getAnimation(aniIndex: number): spine.Animation;
+        getAnimDuration(aniIndex: number): number;
+        getAnimFrame(aniIndex: number): number;
         get currAniIndex(): number;
         set hitArea(rec: Laya.Rectangle);
         on(type: string, thisObject: any, listener: Function, args?: any[]): void;
         off(type: string, thisObject: any, listener: Function): void;
         offAll(type?: string): void;
-        get t(): number;
-        set t(value: number);
-        getX(): number;
-        getY(): number;
-        setStartPoint(tempX: number, tempY: number): void;
-        setMiddlePoint(tempX: number, tempY: number): void;
-        setMiddlePoint2(tempX: number, tempY: number, tempX2: number, tempY2: number): void;
-        setEndPoint(tempX: number, tempY: number): void;
         dispose(): void;
     }
     /** 提示框 */
@@ -5647,6 +5643,14 @@ declare namespace Laya {
         /** 清空所有的计时器 */
         clearAllTimer()
 
+    }
+
+    interface Skeleton {
+        /**
+         * 通过动画名称得索引
+         * @param name
+         */
+        getAniIndexByName(name: string): number
     }
 
 }

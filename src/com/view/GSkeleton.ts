@@ -3,7 +3,6 @@ import Templet = Laya.Templet;
 
 
 import GraphicsAni = Laya.GraphicsAni;
-import GComponent = fgui.GComponent;
 import Handler = Laya.Handler;
 import Loader = Laya.Loader;
 import Event = Laya.Event;
@@ -15,8 +14,9 @@ import BoneSlot = Laya.BoneSlot;
 import TextureFormat = Laya.TextureFormat;
 import KeyFramesContent = Laya.KeyFramesContent;
 import {ISkeletonPlay} from "../interfaces/ICommon";
+import {BaseSkeleton} from "../core/BaseSkeleton";
 
-export class GSkeleton extends GComponent {
+export class GSkeleton extends BaseSkeleton {
 
     /**
      * 骨骼更新
@@ -26,13 +26,6 @@ export class GSkeleton extends GComponent {
      * ````
      */
     static readonly UPDATE_BONE_SLOT = "update_bone_slot"
-
-    /** 经过时间 */
-    private _t = 0
-    private p1: Point
-    private p2: Point
-    private p3: Point
-    private p4: Point
 
     /** 是否使用混合模式 */
     isBlendModeAdd = false
@@ -45,27 +38,9 @@ export class GSkeleton extends GComponent {
     /** 指定的骨骼忽略Y偏移量 */
     readonly clearBoneSlotOffsetY: string[] = []
     aniMode = 0
-    //加载路径
-    private _aniPath: string
-    private _complete: ParamHandler
     private _loadAniMode = 0
-    /** 播放动画的id */
-    private playGroupIndex = 0
     /** 自定义缓存的Templet名字 */
     cacheName = ""
-    /** 缓存每次播放的名字或下标 */
-    nameOrIndex: string | number
-    /** 播放结束执行函数 */
-    private stoppedHandler: Handler[] = []
-    /**
-     * 动画播放速率 1为标准速率
-     * @default 1
-     */
-    playbackRate = 1
-    /**
-     * 播放数据
-     */
-    private skeletonPlay: ISkeletonPlay
 
     constructor(aniMode = 0) {
         super()
@@ -163,32 +138,6 @@ export class GSkeleton extends GComponent {
     }
 
     /**
-     * 播放动画
-     *
-     * @param    nameOrIndex    动画名字或者索引
-     * @param    loop        是否循环播放
-     * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-     * @param    start        起始时间
-     * @param    end            结束时间
-     * @param    freshSkin    是否刷新皮肤数据
-     * @param playAudio 自动播放声音
-     */
-    play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force = true, start = 0, end = 0, freshSkin = true, playAudio?: boolean) {
-        if (this.asSkeleton.templet == null) return
-        this.playGroupIndex = 0
-        if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
-            if (nameOrIndex.nameOrIndex && (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0)) return
-            this.playAni(nameOrIndex)
-            return
-        }
-        if (typeof nameOrIndex === "number" && nameOrIndex < 0) return
-        this.playAni({
-            nameOrIndex: nameOrIndex, loop: loop, force: force,
-            start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
-        })
-    }
-
-    /**
      * 延迟播放动画
      * @param    playDelay    延迟时间
      * @param    nameOrIndex    动画名字或者索引
@@ -203,92 +152,6 @@ export class GSkeleton extends GComponent {
     playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force = true, start = 0, end = 0, freshSkin = true) {
         if (this.asSkeleton.templet == null) return
         Laya.timer.once(playDelay, this, this.play, [nameOrIndex, loop, force, start, end, freshSkin])
-    }
-
-    private onPlayStopped() {
-        // console.log("playEnd")
-        if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
-            // 在播放动画数组
-            this.playGroupIndex++
-            let isNewPro = false
-            if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex ||
-                (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
-                if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
-                    Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex])
-                } else {
-                    this.playAni(this.skeletonPlay, this.playGroupIndex)
-                }
-                return
-            }
-            // 当全局数组动画loop是false loopPlayIndex > -1
-            if (this.skeletonPlay.loopPlayIndex > -1 && this.skeletonPlay.loopPlayIndex < this.skeletonPlay.nameOrIndex.length) {
-                this.playGroupIndex = this.skeletonPlay.loopPlayIndex
-                this.playAni(this.skeletonPlay, this.playGroupIndex)
-                return
-            }
-        } else {
-            if (this.skeletonPlay.loop) {
-                if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
-                    Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex])
-                } else {
-                    this.playAni(this.skeletonPlay, this.playGroupIndex)
-                }
-                return
-            }
-        }
-        for (let i = 0; i < this.stoppedHandler.length; i++) {
-            this.stoppedHandler[i].run()
-        }
-    }
-
-    // private startPlay(nameOrIndex: number | string, loop: boolean, force = true, start = 0, end = 0, freshSkin = true) {
-    /**
-     * 播放动画
-     * @param skeletonPlay 播放数据
-     * @param playGroupIndex 如果是播放数组动画 需要要播放动画的位置
-     * @private
-     */
-    playAni(skeletonPlay: ISkeletonPlay, playGroupIndex = -1) {
-        if (this.asSkeleton.templet == null) return
-        if (skeletonPlay == null && this.skeletonPlay == null) {
-            console.warn("not found play data " + skeletonPlay)
-            return;
-        }
-        if (skeletonPlay) {
-            skeletonPlay.loop ??= true
-            this.skeletonPlay = skeletonPlay
-        }
-        if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
-            playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex
-            this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex]
-        } else {
-            this.nameOrIndex = this.skeletonPlay.nameOrIndex ?? 0
-        }
-        this.asSkeleton.playbackRate(this.skeletonPlay.playbackRate ?? this.playbackRate)
-
-        if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
-            Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay])
-        } else {
-            this._play(this.skeletonPlay)
-        }
-    }
-
-    private _play(skeletonPlay: ISkeletonPlay) {
-        this.asSkeleton.play(this.nameOrIndex, false, skeletonPlay.force ?? true,
-            skeletonPlay.start ?? 0, skeletonPlay.end ?? 0,
-            skeletonPlay.freshSkin ?? true, skeletonPlay.playAudio ?? true)
-    }
-
-    paused() {
-        (<Skeleton>this._displayObject).paused()
-    }
-
-    resume() {
-        (<Skeleton>this._displayObject).resume()
-    }
-
-    stop() {
-        (<Skeleton>this._displayObject).stop()
     }
 
     /**
@@ -310,16 +173,20 @@ export class GSkeleton extends GComponent {
     }
 
     getAniIndexByName(name: string) {
-        return this.asSkeleton["getAniIndexByName"](name)
-    }
-
-    getAniNameByIndex(index: number) {
-        return this.asSkeleton.templet?.getAniNameByIndex(index)
+        return this.asSkeleton.getAniIndexByName(name)
     }
 
     // AnimationContent
-    getAnimation(index: number): AnimationContent {
-        return this.asSkeleton.templet?.getAnimation(index)
+    getAnimation(aniIndex: number): AnimationContent {
+        return this.asSkeleton.templet?.getAnimation(aniIndex)
+    }
+
+    getAnimDuration(aniIndex: number): number {
+        return this.getAnimation(aniIndex).playTime
+    }
+
+    getAnimFrame(aniIndex: number): number {
+        return this.getAnimation(aniIndex).totalKeyframeDatasLength
     }
 
     get currAniIndex(): number {
@@ -467,50 +334,6 @@ export class GSkeleton extends GComponent {
         super.dispose()
     }
 
-    get t() {
-        return this._t
-    }
-
-    set t(value: number) {
-        this._t = value
-        this.x = this.getX()
-        this.y = this.getY()
-    }
-
-    getX() {
-        return Math.pow((1 - this._t), 3) * this.p1.x
-            + 3 * this.p2.x * this._t * (1 - this._t) * (1 - this._t)
-            + 3 * this.p3.x * this._t * this._t * (1 - this._t)
-            + this.p4.x * Math.pow(this._t, 3)
-    }
-
-    getY() {
-        return Math.pow((1 - this._t), 3) * this.p1.y
-            + 3 * this.p2.y * this._t * (1 - this._t) * (1 - this._t)
-            + 3 * this.p3.y * this._t * this._t * (1 - this._t)
-            + this.p4.y * Math.pow(this._t, 3)
-    }
-
-    setStartPoint(tempX: number, tempY: number) {
-        this.p1 = new Point(tempX, tempY)
-        this._t = 0
-    }
-
-    setMiddlePoint(tempX: number, tempY: number) {
-        this.p2 = new Point(tempX, tempY)
-        this.p3 = this.p2
-    }
-
-    setMiddlePoint2(tempX: number, tempY: number, tempX2: number, tempY2: number) {
-        this.p2 = new Point(tempX, tempY)
-        this.p3 = new Point(tempX2, tempY2)
-    }
-
-    setEndPoint(tempX: number, tempY: number) {
-        this.p4 = new Point(tempX, tempY)
-    }
-
-
 }
 
 export class AnimationNodeContent {
@@ -530,6 +353,9 @@ export class AnimationNodeContent {
 export class AnimationContent {
     nodes: AnimationNodeContent[]
     name: string
+    /**
+     * 播放时长
+     */
     playTime: number
     bone3DMap: any
     totalKeyframeDatasLength: number

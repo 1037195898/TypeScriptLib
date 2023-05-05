@@ -116,7 +116,7 @@ export class DefineConfig {
         DefineConfig.defineSpineSkeleton()
 
         Object.defineProperty(Laya.Skeleton.prototype, "getAniIndexByName", {
-            value: function (name: String) {
+            value: function (name: string) {
                 let index = -1
                 let i = 0, n = this._templet.getAnimationCount()
                 for (; i < n; i++) {
@@ -130,7 +130,7 @@ export class DefineConfig {
             }
         })
         Object.defineProperty(Laya.Skeleton.prototype, "getBoneCoords", {
-            value: function (nameOrIndex: string | number, boneName: String) {
+            value: function (nameOrIndex: string | number, boneName: string) {
                 const arrCoords: number[] = []
                 let aniClipIndex: number
                 if (typeof nameOrIndex === "string") {

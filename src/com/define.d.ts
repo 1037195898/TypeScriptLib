@@ -57,4 +57,12 @@ declare namespace Laya {
 
     }
 
+    interface Skeleton {
+        /**
+         * 通过动画名称得索引
+         * @param name
+         */
+        getAniIndexByName(name: string): number
+    }
+
 }

@@ -1446,6 +1446,175 @@ window.coreLib = {};
         }
     }
     coreLib.BaseScene = BaseScene;
+    class BaseSkeleton extends fgui.GComponent {
+        constructor() {
+            super(...arguments);
+            /** 经过时间 */
+            this._t = 0;
+            /** 播放动画数组的索引 */
+            this.playGroupIndex = 0;
+            /** 播放结束执行函数 */
+            this.stoppedHandler = [];
+            /**
+             * 动画播放速率 1为标准速率
+             * @default 1
+             */
+            this.playbackRate = 1;
+        }
+        get aniPath() {
+            return this._aniPath;
+        }
+        /**
+         * 播放动画
+         *
+         * @param    nameOrIndex    动画名字或者索引
+         * @param    loop        是否循环播放
+         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
+         * @param    start        起始时间
+         * @param    end            结束时间
+         * @param    freshSkin    是否刷新皮肤数据
+         * @param    playAudio    是否播放音频
+         */
+        play(nameOrIndex, loop, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
+            if (this.asSkeleton.templet == null)
+                return;
+            this.playGroupIndex = 0;
+            if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
+                if (nameOrIndex.nameOrIndex && (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0))
+                    return;
+                this.playAni(nameOrIndex);
+                return;
+            }
+            if (typeof nameOrIndex === "number" && nameOrIndex < 0)
+                return;
+            this.playAni({
+                nameOrIndex: nameOrIndex, loop: loop, force: force,
+                start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
+            });
+        }
+        /**
+         * 播放动画
+         * @param skeletonPlay 播放数据
+         * @param playGroupIndex 如果是播放数组动画 需要要播放动画的位置
+         */
+        playAni(skeletonPlay, playGroupIndex = -1) {
+            var _a, _b, _c;
+            if (this.asSkeleton.templet == null)
+                return;
+            if (skeletonPlay == null && this.skeletonPlay == null) {
+                console.warn("not found play data " + skeletonPlay);
+                return;
+            }
+            if (skeletonPlay) {
+                (_a = skeletonPlay.loop) !== null && _a !== void 0 ? _a : (skeletonPlay.loop = true);
+                this.skeletonPlay = skeletonPlay;
+            }
+            if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
+                playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex;
+                this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex];
+            }
+            else {
+                this.nameOrIndex = (_b = this.skeletonPlay.nameOrIndex) !== null && _b !== void 0 ? _b : 0;
+            }
+            this.asSkeleton.playbackRate((_c = this.skeletonPlay.playbackRate) !== null && _c !== void 0 ? _c : this.playbackRate);
+            if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
+                Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay]);
+            }
+            else {
+                this._play(this.skeletonPlay);
+            }
+        }
+        _play(skeletonPlay) {
+            var _a, _b, _c, _d, _e;
+            this.asSkeleton.play(this.nameOrIndex, false, (_a = skeletonPlay.force) !== null && _a !== void 0 ? _a : true, (_b = skeletonPlay.start) !== null && _b !== void 0 ? _b : 0, (_c = skeletonPlay.end) !== null && _c !== void 0 ? _c : 0, (_d = skeletonPlay.freshSkin) !== null && _d !== void 0 ? _d : true, (_e = skeletonPlay.playAudio) !== null && _e !== void 0 ? _e : true);
+        }
+        onPlayStopped() {
+            if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
+                // 在播放动画数组
+                this.playGroupIndex++;
+                let isNewPro = false;
+                if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex
+                    || (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
+                    if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
+                    }
+                    else {
+                        this.playAni(this.skeletonPlay, this.playGroupIndex);
+                    }
+                    return;
+                }
+                // 当全局数组动画loop是false loopPlayIndex > -1
+                if (this.skeletonPlay.loopPlayIndex > -1 && this.skeletonPlay.loopPlayIndex < this.skeletonPlay.nameOrIndex.length) {
+                    this.playGroupIndex = this.skeletonPlay.loopPlayIndex;
+                    this.playAni(this.skeletonPlay, this.playGroupIndex);
+                    return;
+                }
+            }
+            else {
+                if (this.skeletonPlay.loop && this.getAnimDuration(0) > 1 && this.getAnimFrame(0) > 1) {
+                    if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
+                    }
+                    else {
+                        this.playAni(this.skeletonPlay, this.playGroupIndex);
+                    }
+                    return;
+                }
+            }
+            for (let i = 0; i < this.stoppedHandler.length; i++) {
+                this.stoppedHandler[i].run();
+            }
+        }
+        paused() {
+            this.asSkeleton.paused();
+        }
+        resume() {
+            this.asSkeleton.resume();
+        }
+        stop() {
+            this.asSkeleton.stop();
+        }
+        getAniNameByIndex(index) {
+            var _a;
+            return (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.getAniNameByIndex(index);
+        }
+        get t() {
+            return this._t;
+        }
+        set t(value) {
+            this._t = value;
+            this.x = this.getX();
+            this.y = this.getY();
+        }
+        getX() {
+            return Math.pow((1 - this._t), 3) * this.p1.x
+                + 3 * this.p2.x * this._t * (1 - this._t) * (1 - this._t)
+                + 3 * this.p3.x * this._t * this._t * (1 - this._t)
+                + this.p4.x * Math.pow(this._t, 3);
+        }
+        getY() {
+            return Math.pow((1 - this._t), 3) * this.p1.y
+                + 3 * this.p2.y * this._t * (1 - this._t) * (1 - this._t)
+                + 3 * this.p3.y * this._t * this._t * (1 - this._t)
+                + this.p4.y * Math.pow(this._t, 3);
+        }
+        setStartPoint(tempX, tempY) {
+            this.p1 = new Laya.Point(tempX, tempY);
+            this._t = 0;
+        }
+        setMiddlePoint(tempX, tempY) {
+            this.p2 = new Laya.Point(tempX, tempY);
+            this.p3 = this.p2;
+        }
+        setMiddlePoint2(tempX, tempY, tempX2, tempY2) {
+            this.p2 = new Laya.Point(tempX, tempY);
+            this.p3 = new Laya.Point(tempX2, tempY2);
+        }
+        setEndPoint(tempX, tempY) {
+            this.p4 = new Laya.Point(tempX, tempY);
+        }
+    }
+    coreLib.BaseSkeleton = BaseSkeleton;
     class BaseSlotGameData extends BaseGameData {
         constructor() {
             super();
@@ -11111,11 +11280,9 @@ window.coreLib = {};
         }
     }
     coreLib.GlobalWaiting = GlobalWaiting;
-    class GSkeleton extends fgui.GComponent {
+    class GSkeleton extends BaseSkeleton {
         constructor(aniMode = 0) {
             super();
-            /** 经过时间 */
-            this._t = 0;
             /** 是否使用混合模式 */
             this.isBlendModeAdd = false;
             /** 使用混合模式的插槽 */
@@ -11128,17 +11295,8 @@ window.coreLib = {};
             this.clearBoneSlotOffsetY = [];
             this.aniMode = 0;
             this._loadAniMode = 0;
-            /** 播放动画的id */
-            this.playGroupIndex = 0;
             /** 自定义缓存的Templet名字 */
             this.cacheName = "";
-            /** 播放结束执行函数 */
-            this.stoppedHandler = [];
-            /**
-             * 动画播放速率 1为标准速率
-             * @default 1
-             */
-            this.playbackRate = 1;
             this.aniMode = aniMode;
         }
         createDisplayObject() {
@@ -11231,34 +11389,6 @@ window.coreLib = {};
             console.log("[Error]:" + this._aniPath + "解析失败");
         }
         /**
-         * 播放动画
-         *
-         * @param    nameOrIndex    动画名字或者索引
-         * @param    loop        是否循环播放
-         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-         * @param    start        起始时间
-         * @param    end            结束时间
-         * @param    freshSkin    是否刷新皮肤数据
-         * @param playAudio 自动播放声音
-         */
-        play(nameOrIndex, loop, force = true, start = 0, end = 0, freshSkin = true, playAudio) {
-            if (this.asSkeleton.templet == null)
-                return;
-            this.playGroupIndex = 0;
-            if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
-                if (nameOrIndex.nameOrIndex && (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0))
-                    return;
-                this.playAni(nameOrIndex);
-                return;
-            }
-            if (typeof nameOrIndex === "number" && nameOrIndex < 0)
-                return;
-            this.playAni({
-                nameOrIndex: nameOrIndex, loop: loop, force: force,
-                start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
-            });
-        }
-        /**
          * 延迟播放动画
          * @param    playDelay    延迟时间
          * @param    nameOrIndex    动画名字或者索引
@@ -11274,91 +11404,6 @@ window.coreLib = {};
             if (this.asSkeleton.templet == null)
                 return;
             Laya.timer.once(playDelay, this, this.play, [nameOrIndex, loop, force, start, end, freshSkin]);
-        }
-        onPlayStopped() {
-            // console.log("playEnd")
-            if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
-                // 在播放动画数组
-                this.playGroupIndex++;
-                let isNewPro = false;
-                if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex ||
-                    (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
-                    if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
-                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
-                    }
-                    else {
-                        this.playAni(this.skeletonPlay, this.playGroupIndex);
-                    }
-                    return;
-                }
-                // 当全局数组动画loop是false loopPlayIndex > -1
-                if (this.skeletonPlay.loopPlayIndex > -1 && this.skeletonPlay.loopPlayIndex < this.skeletonPlay.nameOrIndex.length) {
-                    this.playGroupIndex = this.skeletonPlay.loopPlayIndex;
-                    this.playAni(this.skeletonPlay, this.playGroupIndex);
-                    return;
-                }
-            }
-            else {
-                if (this.skeletonPlay.loop) {
-                    if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
-                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
-                    }
-                    else {
-                        this.playAni(this.skeletonPlay, this.playGroupIndex);
-                    }
-                    return;
-                }
-            }
-            for (let i = 0; i < this.stoppedHandler.length; i++) {
-                this.stoppedHandler[i].run();
-            }
-        }
-        // private startPlay(nameOrIndex: number | string, loop: boolean, force = true, start = 0, end = 0, freshSkin = true) {
-        /**
-         * 播放动画
-         * @param skeletonPlay 播放数据
-         * @param playGroupIndex 如果是播放数组动画 需要要播放动画的位置
-         * @private
-         */
-        playAni(skeletonPlay, playGroupIndex = -1) {
-            var _a, _b, _c;
-            if (this.asSkeleton.templet == null)
-                return;
-            if (skeletonPlay == null && this.skeletonPlay == null) {
-                console.warn("not found play data " + skeletonPlay);
-                return;
-            }
-            if (skeletonPlay) {
-                (_a = skeletonPlay.loop) !== null && _a !== void 0 ? _a : (skeletonPlay.loop = true);
-                this.skeletonPlay = skeletonPlay;
-            }
-            if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
-                playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex;
-                this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex];
-            }
-            else {
-                this.nameOrIndex = (_b = this.skeletonPlay.nameOrIndex) !== null && _b !== void 0 ? _b : 0;
-            }
-            this.asSkeleton.playbackRate((_c = this.skeletonPlay.playbackRate) !== null && _c !== void 0 ? _c : this.playbackRate);
-            if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
-                Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay]);
-            }
-            else {
-                this._play(this.skeletonPlay);
-            }
-        }
-        _play(skeletonPlay) {
-            var _a, _b, _c, _d, _e;
-            this.asSkeleton.play(this.nameOrIndex, false, (_a = skeletonPlay.force) !== null && _a !== void 0 ? _a : true, (_b = skeletonPlay.start) !== null && _b !== void 0 ? _b : 0, (_c = skeletonPlay.end) !== null && _c !== void 0 ? _c : 0, (_d = skeletonPlay.freshSkin) !== null && _d !== void 0 ? _d : true, (_e = skeletonPlay.playAudio) !== null && _e !== void 0 ? _e : true);
-        }
-        paused() {
-            this._displayObject.paused();
-        }
-        resume() {
-            this._displayObject.resume();
-        }
-        stop() {
-            this._displayObject.stop();
         }
         /**
          * 通过名字显示一套皮肤
@@ -11377,16 +11422,18 @@ window.coreLib = {};
             this.asSkeleton.showSkinByIndex(skinIndex, freshSlotIndex);
         }
         getAniIndexByName(name) {
-            return this.asSkeleton["getAniIndexByName"](name);
-        }
-        getAniNameByIndex(index) {
-            var _a;
-            return (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.getAniNameByIndex(index);
+            return this.asSkeleton.getAniIndexByName(name);
         }
         // AnimationContent
-        getAnimation(index) {
+        getAnimation(aniIndex) {
             var _a;
-            return (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.getAnimation(index);
+            return (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.getAnimation(aniIndex);
+        }
+        getAnimDuration(aniIndex) {
+            return this.getAnimation(aniIndex).playTime;
+        }
+        getAnimFrame(aniIndex) {
+            return this.getAnimation(aniIndex).totalKeyframeDatasLength;
         }
         get currAniIndex() {
             return this.asSkeleton["_currAniIndex"];
@@ -11524,41 +11571,6 @@ window.coreLib = {};
             Laya.timer.clearAll(this);
             super.dispose();
         }
-        get t() {
-            return this._t;
-        }
-        set t(value) {
-            this._t = value;
-            this.x = this.getX();
-            this.y = this.getY();
-        }
-        getX() {
-            return Math.pow((1 - this._t), 3) * this.p1.x
-                + 3 * this.p2.x * this._t * (1 - this._t) * (1 - this._t)
-                + 3 * this.p3.x * this._t * this._t * (1 - this._t)
-                + this.p4.x * Math.pow(this._t, 3);
-        }
-        getY() {
-            return Math.pow((1 - this._t), 3) * this.p1.y
-                + 3 * this.p2.y * this._t * (1 - this._t) * (1 - this._t)
-                + 3 * this.p3.y * this._t * this._t * (1 - this._t)
-                + this.p4.y * Math.pow(this._t, 3);
-        }
-        setStartPoint(tempX, tempY) {
-            this.p1 = new Laya.Point(tempX, tempY);
-            this._t = 0;
-        }
-        setMiddlePoint(tempX, tempY) {
-            this.p2 = new Laya.Point(tempX, tempY);
-            this.p3 = this.p2;
-        }
-        setMiddlePoint2(tempX, tempY, tempX2, tempY2) {
-            this.p2 = new Laya.Point(tempX, tempY);
-            this.p3 = new Laya.Point(tempX2, tempY2);
-        }
-        setEndPoint(tempX, tempY) {
-            this.p4 = new Laya.Point(tempX, tempY);
-        }
     }
     /**
      * 骨骼更新
@@ -11575,19 +11587,9 @@ window.coreLib = {};
     class AnimationContent {
     }
     coreLib.AnimationContent = AnimationContent;
-    class GSpineSkeleton extends fgui.GComponent {
+    class GSpineSkeleton extends BaseSkeleton {
         constructor(ver = Laya.SpineVersion.v3_8) {
             super();
-            /** 经过时间 */
-            this._t = 0;
-            this.playGroupIndex = 0;
-            /** 播放结束执行函数 */
-            this.stoppedHandler = [];
-            /**
-             * 动画播放速率 1为标准速率
-             * @default 1
-             */
-            this.playbackRate = 1;
             this.ver = ver;
         }
         createDisplayObject() {
@@ -11623,9 +11625,6 @@ window.coreLib = {};
             }
             this.template.loadAni(jsonOrSkelUrl);
         }
-        get aniPath() {
-            return this._aniPath;
-        }
         onComplete(spine) {
             this.spineSkeleton.init(spine);
             // 销毁已有的动画
@@ -11650,111 +11649,6 @@ window.coreLib = {};
             return super.touchable;
         }
         /**
-         * 播放动画
-         *
-         * @param    nameOrIndex    动画名字或者索引
-         * @param    loop        是否循环播放
-         * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-         * @param    start        起始时间
-         * @param    end            结束时间
-         * @param    freshSkin    是否刷新皮肤数据
-         * @param    playAudio    是否播放音频
-         */
-        play(nameOrIndex, loop, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
-            if (this.asSkeleton.templet == null)
-                return;
-            this.playGroupIndex = 0;
-            if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
-                if (nameOrIndex.nameOrIndex && (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0))
-                    return;
-                this.playAni(nameOrIndex);
-                return;
-            }
-            if (typeof nameOrIndex === "number" && nameOrIndex < 0)
-                return;
-            this.playAni({
-                nameOrIndex: nameOrIndex, loop: loop, force: force,
-                start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
-            });
-        }
-        playAni(skeletonPlay, playGroupIndex = -1) {
-            var _a, _b, _c;
-            if (this.asSkeleton.templet == null)
-                return;
-            if (skeletonPlay == null && this.skeletonPlay == null) {
-                console.warn("not found play data " + skeletonPlay);
-                return;
-            }
-            if (skeletonPlay) {
-                (_a = skeletonPlay.loop) !== null && _a !== void 0 ? _a : (skeletonPlay.loop = true);
-                this.skeletonPlay = skeletonPlay;
-            }
-            if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
-                playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex;
-                this.nameOrIndex = this.skeletonPlay.nameOrIndex[playGroupIndex];
-            }
-            else {
-                this.nameOrIndex = (_b = this.skeletonPlay.nameOrIndex) !== null && _b !== void 0 ? _b : 0;
-            }
-            this.asSkeleton.playbackRate((_c = this.skeletonPlay.playbackRate) !== null && _c !== void 0 ? _c : this.playbackRate);
-            if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
-                Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay]);
-            }
-            else {
-                this._play(this.skeletonPlay);
-            }
-        }
-        _play(skeletonPlay) {
-            var _a, _b, _c, _d, _e;
-            this.asSkeleton.play(this.nameOrIndex, false, (_a = skeletonPlay.force) !== null && _a !== void 0 ? _a : true, (_b = skeletonPlay.start) !== null && _b !== void 0 ? _b : 0, (_c = skeletonPlay.end) !== null && _c !== void 0 ? _c : 0, (_d = skeletonPlay.freshSkin) !== null && _d !== void 0 ? _d : true, (_e = skeletonPlay.playAudio) !== null && _e !== void 0 ? _e : true);
-        }
-        onPlayStopped(loop, force, freshSkin) {
-            if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
-                // 在播放动画数组
-                this.playGroupIndex++;
-                let isNewPro = false;
-                if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex
-                    || (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
-                    if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
-                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
-                    }
-                    else {
-                        this.playAni(this.skeletonPlay, this.playGroupIndex);
-                    }
-                    return;
-                }
-                // 当全局数组动画loop是false loopPlayIndex > -1
-                if (this.skeletonPlay.loopPlayIndex > -1 && this.skeletonPlay.loopPlayIndex < this.skeletonPlay.nameOrIndex.length) {
-                    this.playGroupIndex = this.skeletonPlay.loopPlayIndex;
-                    this.playAni(this.skeletonPlay, this.playGroupIndex);
-                    return;
-                }
-            }
-            else {
-                if (this.skeletonPlay.loop) {
-                    if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
-                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
-                    }
-                    else {
-                        this.playAni(this.skeletonPlay, this.playGroupIndex);
-                    }
-                    return;
-                }
-            }
-            for (let i = 0; i < this.stoppedHandler.length; i++) {
-                this.stoppedHandler[i].run();
-            }
-        }
-        paused() {
-            this.asSkeleton.paused();
-        }
-        resume() {
-            this.asSkeleton.resume();
-        }
-        stop() {
-            this.asSkeleton.stop();
-        }
-        /**
          * 通过名字显示一套皮肤
          * @param    name    皮肤的名字
          */
@@ -11768,10 +11662,6 @@ window.coreLib = {};
         showSkinByIndex(skinIndex) {
             this.asSkeleton.showSkinByIndex(skinIndex);
         }
-        /**
-         * 得到指定动画的索引
-         * @param aniName 动画名字
-         */
         getAniIndexByName(aniName) {
             let animations = this.asSkeleton.templet.skeletonData.animations;
             let index = -1;
@@ -11784,9 +11674,15 @@ window.coreLib = {};
             }
             return index;
         }
-        getAniNameByIndex(index) {
-            var _a;
-            return (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.getAniNameByIndex(index);
+        getAnimation(aniIndex) {
+            var _a, _b;
+            return (_b = (_a = this.getSkeletonNative()) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.animations[aniIndex];
+        }
+        getAnimDuration(aniIndex) {
+            return this.getAnimation(aniIndex).duration;
+        }
+        getAnimFrame(aniIndex) {
+            return this.getAnimation(aniIndex).timelines.length;
         }
         get currAniIndex() {
             let _currAniName = this.asSkeleton["_currAniName"];
@@ -11839,41 +11735,6 @@ window.coreLib = {};
                 return;
             }
             this.displayObject.offAll(type);
-        }
-        get t() {
-            return this._t;
-        }
-        set t(value) {
-            this._t = value;
-            this.x = this.getX();
-            this.y = this.getY();
-        }
-        getX() {
-            return Math.pow((1 - this._t), 3) * this.p1.x
-                + 3 * this.p2.x * this._t * (1 - this._t) * (1 - this._t)
-                + 3 * this.p3.x * this._t * this._t * (1 - this._t)
-                + this.p4.x * Math.pow(this._t, 3);
-        }
-        getY() {
-            return Math.pow((1 - this._t), 3) * this.p1.y
-                + 3 * this.p2.y * this._t * (1 - this._t) * (1 - this._t)
-                + 3 * this.p3.y * this._t * this._t * (1 - this._t)
-                + this.p4.y * Math.pow(this._t, 3);
-        }
-        setStartPoint(tempX, tempY) {
-            this.p1 = new Laya.Point(tempX, tempY);
-            this._t = 0;
-        }
-        setMiddlePoint(tempX, tempY) {
-            this.p2 = new Laya.Point(tempX, tempY);
-            this.p3 = this.p2;
-        }
-        setMiddlePoint2(tempX, tempY, tempX2, tempY2) {
-            this.p2 = new Laya.Point(tempX, tempY);
-            this.p3 = new Laya.Point(tempX2, tempY2);
-        }
-        setEndPoint(tempX, tempY) {
-            this.p4 = new Laya.Point(tempX, tempY);
         }
         dispose() {
             super.dispose();
