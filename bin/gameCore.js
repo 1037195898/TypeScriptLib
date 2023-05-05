@@ -4301,7 +4301,7 @@ window.coreLib = {};
                     value: function (url, success, error) {
                         const content = Laya.loader.getRes(url);
                         if (content)
-                            success(url, content);
+                            success(content);
                         else
                             this.tempDownloadText(url, success, error);
                     }

@@ -469,9 +469,9 @@ export class DefineConfig {
                 value: spine.AssetManager.prototype.downloadText
             })
             Object.defineProperty(spine.AssetManager.prototype, "downloadText", {
-                value: function (url: string, success?: (path: string, text: string) => void, error?: (path: string, message: string) => void) {
+                value: function (url: string, success?: (data: any) => void, error?: (message: string, path: string) => void) {
                     const content = Laya.loader.getRes(url)
-                    if (content) success(url, content)
+                    if (content) success(content)
                     else this.tempDownloadText(url, success, error)
                 }
             })
