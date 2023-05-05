@@ -4254,24 +4254,22 @@ window.coreLib = {};
                         }
                     }
                 });
-                // 有预加载  立即返回  默认是延迟返回
-                Object.defineProperty(spine.Downloader.prototype, "tempDownloadText", {
-                    value: spine.Downloader.prototype.downloadText
-                });
-                Object.defineProperty(spine.Downloader.prototype, "downloadText", {
-                    value: function (url, success, error) {
-                        const content = Laya.loader.getRes(url);
-                        if (content) {
-                            if (this.rawDataUris[url])
-                                url = this.rawDataUris[url];
-                            if (this.start(url, success, error))
-                                return;
-                            this.finish(url, 200, new Uint8Array(content));
-                        }
-                        else
-                            this.tempDownloadText(url, success, error);
-                    }
-                });
+                // // 有预加载  立即返回  默认是延迟返回
+                // Object.defineProperty(spine.Downloader.prototype, "tempDownloadText", {
+                //     value: spine.Downloader.prototype.downloadText
+                // })
+                // Object.defineProperty(spine.Downloader.prototype, "downloadText", {
+                //     value: function (url: string, success?: (path: string, text: string) => void, error?: (path: string, message: string) => void) {
+                //         const content = Laya.loader.getRes(url)
+                //         if (content) {
+                //             if (this.rawDataUris[url])
+                //                 url = this.rawDataUris[url];
+                //             if (this.start(url, success, error))
+                //                 return;
+                //             this.finish(url, 200, new Uint8Array(content))
+                //         } else this.tempDownloadText(url, success, error)
+                //     }
+                // })
             }
             else {
                 // 修改3.x
@@ -4292,20 +4290,18 @@ window.coreLib = {};
                             this.tempLoadText(path, success, error);
                     }
                 });
-                // 有预加载  立即返回  默认是延迟返回
-                Object.defineProperty(spine.AssetManager.prototype, "tempDownloadText", {
-                    // @ts-ignore
-                    value: spine.AssetManager.prototype.downloadText
-                });
-                Object.defineProperty(spine.AssetManager.prototype, "downloadText", {
-                    value: function (url, success, error) {
-                        const content = Laya.loader.getRes(url);
-                        if (content)
-                            success(content);
-                        else
-                            this.tempDownloadText(url, success, error);
-                    }
-                });
+                // // 有预加载  立即返回  默认是延迟返回
+                // Object.defineProperty(spine.AssetManager.prototype, "tempDownloadText", {
+                //     // @ts-ignore
+                //     value: spine.AssetManager.prototype.downloadText
+                // })
+                // Object.defineProperty(spine.AssetManager.prototype, "downloadText", {
+                //     value: function (url: string, success?: (data: any) => void, error?: (message: string, path: string) => void) {
+                //         const content = Laya.loader.getRes(url)
+                //         if (content) success(content)
+                //         else this.tempDownloadText(url, success, error)
+                //     }
+                // })
             }
             // 销毁 templet 检查判断
             Object.defineProperty(Laya.SpineSkeleton.prototype, "tempDestroy", {
@@ -11654,6 +11650,7 @@ window.coreLib = {};
             this._aniPath = jsonOrSkelUrl;
             if (this.template == null || (ver && this.ver != ver)) {
                 this.template = new Laya.SpineTemplet(this.ver);
+                this.spineSkeleton["_templet"] = this.template;
                 this.template.on(Laya.Event.COMPLETE, this, this.onComplete);
             }
             this.template.loadAni(jsonOrSkelUrl);

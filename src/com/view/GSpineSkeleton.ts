@@ -53,6 +53,7 @@ export class GSpineSkeleton extends BaseSkeleton {
 
         if (this.template == null || (ver && this.ver != ver)) {
             this.template = new SpineTemplet(this.ver)
+            this.spineSkeleton["_templet"] = this.template
             this.template.on(Event.COMPLETE, this, this.onComplete)
         }
         this.template.loadAni(jsonOrSkelUrl)
