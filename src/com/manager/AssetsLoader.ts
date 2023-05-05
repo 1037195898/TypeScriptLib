@@ -356,10 +356,11 @@ export class AssetsLoader implements IFormatVer {
             return Utils.getFileExtension(value.url) === "json" && value.type === "spine"
         })
         for (const value of sks) {
+            value.type = Loader.BUFFER
             data.push({url: value.url.replace(".sk", ".png"), type: Loader.IMAGE, branch: value.branch})
         }
         for (const value of spines) {
-            value.type = "json"
+            value.type = Loader.JSON
             let temp = value.url.replace(".json", ".atlas")
             if(data.findIndex(function (value, index, obj) {
                 return temp === value.url

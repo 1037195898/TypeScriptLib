@@ -5744,10 +5744,11 @@ window.coreLib = {};
                 return Laya.Utils.getFileExtension(value.url) === "json" && value.type === "spine";
             });
             for (const value of sks) {
+                value.type = Laya.Loader.BUFFER;
                 data.push({ url: value.url.replace(".sk", ".png"), type: Laya.Loader.IMAGE, branch: value.branch });
             }
             for (const value of spines) {
-                value.type = "json";
+                value.type = Laya.Loader.JSON;
                 let temp = value.url.replace(".json", ".atlas");
                 if (data.findIndex(function (value, index, obj) {
                     return temp === value.url;
