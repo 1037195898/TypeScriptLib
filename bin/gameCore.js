@@ -11596,6 +11596,13 @@ window.coreLib = {};
             return this.spineSkeleton;
         }
         /**
+         * 获取spine的Skeleton对象
+         */
+        getSkeletonNative() {
+            // @ts-ignore
+            return this.asSkeleton.getSkeleton();
+        }
+        /**
          * 加载json 或 skel格式的骨骼文件
          * @param jsonOrSkelUrl
          * @param handler 回调方法

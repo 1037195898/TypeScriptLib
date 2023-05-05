@@ -59,12 +59,20 @@ export class GSpineSkeleton extends GComponent {
     }
 
     /**
+     * 获取spine的Skeleton对象
+     */
+    getSkeletonNative(): spine.Skeleton {
+        // @ts-ignore
+        return this.asSkeleton.getSkeleton()
+    }
+
+    /**
      * 加载json 或 skel格式的骨骼文件
      * @param jsonOrSkelUrl
      * @param handler 回调方法
      * @param ver
      */
-    load(jsonOrSkelUrl: string, handler: ParamHandler, ver?:SpineVersion) {
+    load(jsonOrSkelUrl: string, handler: ParamHandler, ver?: SpineVersion) {
         this._complete = handler
         this._aniPath = jsonOrSkelUrl
 

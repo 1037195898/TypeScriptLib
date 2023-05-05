@@ -5135,6 +5135,10 @@ declare namespace coreLib {
         protected createDisplayObject(): void;
         get asSkeleton(): Laya.SpineSkeleton;
         /**
+         * 获取spine的Skeleton对象
+         */
+        getSkeletonNative(): spine.Skeleton;
+        /**
          * 加载json 或 skel格式的骨骼文件
          * @param jsonOrSkelUrl
          * @param handler 回调方法
