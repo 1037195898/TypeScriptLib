@@ -11246,7 +11246,7 @@ window.coreLib = {};
                 return;
             this.playGroupIndex = 0;
             if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
-                if (nameOrIndex.nameOrIndex == null || (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0))
+                if (nameOrIndex.nameOrIndex && (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0))
                     return;
                 this.playAni(nameOrIndex);
                 return;
@@ -11665,7 +11665,7 @@ window.coreLib = {};
                 return;
             this.playGroupIndex = 0;
             if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
-                if (nameOrIndex.nameOrIndex == null || (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0))
+                if (nameOrIndex.nameOrIndex && (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0))
                     return;
                 this.playAni(nameOrIndex);
                 return;
