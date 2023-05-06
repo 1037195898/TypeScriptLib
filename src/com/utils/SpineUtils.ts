@@ -1,6 +1,3 @@
-import Event = Laya.Event;
-import Templet = Laya.Templet;
-import Handler = Laya.Handler;
 import {GSkeleton} from "../view/GSkeleton"
 import {GSpineSkeleton} from "../view/GSpineSkeleton"
 import {ISkeletonData, ISkeletonPlay} from "../interfaces/ICommon";
@@ -19,8 +16,8 @@ export class SpineUtils {
      */
     static playSpine(skeleton: GSkeleton | GSpineSkeleton, url: string, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay = 0,
                      loop = true, playComplete?: ParamHandler, loaderComplete?: ParamHandler, aniMode = -1) {
-        skeleton.offAll(Event.STOPPED)
-        skeleton.on(Event.STOPPED, this, function (handler: ParamHandler) {
+        skeleton.offAll(Laya.Event.STOPPED)
+        skeleton.on(Laya.Event.STOPPED, this, function (handler: ParamHandler) {
             runFun(handler)
         }, [playComplete])
         if (skeleton instanceof GSpineSkeleton) {
@@ -31,7 +28,7 @@ export class SpineUtils {
             }
             // 界面显示了  在加载资源
             skeleton.load(url,
-                Handler.create(this, SpineUtils.parseComplete, [skeleton, nameOrIndex, loop, loaderComplete]))
+                Laya.Handler.create(this, SpineUtils.parseComplete, [skeleton, nameOrIndex, loop, loaderComplete]))
             return
         }
         if (skeleton.asSkeleton.url == url && skeleton.asSkeleton.templet) {
@@ -42,12 +39,12 @@ export class SpineUtils {
         if (aniMode == -1) aniMode = skeleton.aniMode
         // 界面显示了  在加载资源
         skeleton.load(url,
-            Handler.create(this, SpineUtils.parseComplete, [skeleton, nameOrIndex, loop, loaderComplete]), aniMode)
+            Laya.Handler.create(this, SpineUtils.parseComplete, [skeleton, nameOrIndex, loop, loaderComplete]), aniMode)
     }
 
     private static parseComplete(skeleton: GSkeleton | GSpineSkeleton,
                                  nameOrIndex: string | number | (string | number)[] | ISkeletonPlay,
-                                 loop: boolean, loaderComplete: ParamHandler, fac?: Templet) {
+                                 loop: boolean, loaderComplete: ParamHandler, fac?: Laya.Templet) {
         runFun(loaderComplete)
         if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
             runFun(nameOrIndex.loaderComplete)
@@ -61,17 +58,18 @@ export class SpineUtils {
      * @param optional
      * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
      */
-    static createSpine(url: string, optional?: ISkeletonData, skeletonClass?: {
-        new(): GSkeleton | GSpineSkeleton
-    }): GSkeleton | GSpineSkeleton
+    static createSpine<T extends new () => GSkeleton | GSpineSkeleton | undefined>(url: string, optional?: ISkeletonData, skeletonClass?: T): T extends {
+        new(): infer R
+    } ? R : (GSkeleton | GSpineSkeleton)
+
     /**
      * 创建spine 骨骼动画组件
      * @param optional
      * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
      */
-    static createSpine(optional?: ISkeletonData, skeletonClass?: {
-        new(): GSkeleton | GSpineSkeleton
-    }): GSkeleton | GSpineSkeleton
+    static createSpine<T extends new () => GSkeleton | GSpineSkeleton | undefined>(optional?: ISkeletonData, skeletonClass?: T): T extends {
+        new(): infer R
+    } ? R : (GSkeleton | GSpineSkeleton)
 
     /**
      * 创建spine 骨骼动画组件
@@ -79,8 +77,11 @@ export class SpineUtils {
      * @param optional
      * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
      */
-    static createSpine(url: string | ISkeletonData, optional?: ISkeletonData | { new(): GSkeleton | GSpineSkeleton },
-                       skeletonClass?: { new(): GSkeleton | GSpineSkeleton }) {
+    static createSpine<T extends new () => GSkeleton | GSpineSkeleton | undefined>(
+        url: string | ISkeletonData,
+        optional?: ISkeletonData | T,
+        skeletonClass?: T) {
+
         if (optional && !this.isInterface(optional)) {
             skeletonClass = optional
             optional = null
@@ -116,7 +117,7 @@ export class SpineUtils {
             relation.ud && skeleton.addRelation(relation.ud, fgui.RelationType.Middle_Middle, relation.usePercent ?? true)
         }
         SpineUtils.playSpine(skeleton, url, optional.play, optional.play?.loop, optional.playComplete, optional.loaderComplete, optional.aniMode)
-        return skeleton
+        return skeleton as T extends { new(): infer R } ? R : GSkeleton | GSpineSkeleton
     }
 
     /**
