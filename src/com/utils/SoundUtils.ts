@@ -1,7 +1,6 @@
 import SoundManager = Laya.SoundManager
 import Sound = Laya.Sound
 import URL = Laya.URL
-import {LoadRes} from "../interfaces/ICommon"
 
 export class SoundUtils {
 

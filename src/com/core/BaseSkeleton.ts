@@ -1,8 +1,6 @@
 import GComponent = fgui.GComponent;
 import Point = Laya.Point;
 import {ISkeleton} from "../interfaces/ISkeleton"
-import {AnimationContent} from "../view/GSkeleton"
-import {ISkeletonPlay} from "../interfaces/ICommon";
 
 export abstract class BaseSkeleton extends GComponent implements ISkeleton {
 
@@ -41,14 +39,14 @@ export abstract class BaseSkeleton extends GComponent implements ISkeleton {
      * 播放动画
      *
      * @param    nameOrIndex    动画名字或者索引
-     * @param    loop        是否循环播放
+     * @param    loop        是否循环播放 默认true
      * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
      * @param    start        起始时间
      * @param    end            结束时间
      * @param    freshSkin    是否刷新皮肤数据
      * @param    playAudio    是否播放音频
      */
-    play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop?: boolean, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
+    play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean = true, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
         if (this.asSkeleton.templet == null) return
         this.playGroupIndex = 0
         if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
@@ -58,7 +56,7 @@ export abstract class BaseSkeleton extends GComponent implements ISkeleton {
         }
         if (typeof nameOrIndex === "number" && nameOrIndex < 0) return
         this.playAni({
-            nameOrIndex: nameOrIndex, loop: loop ?? true, force: force,
+            nameOrIndex: nameOrIndex, loop: loop, force: force,
             start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
         })
     }
@@ -87,16 +85,16 @@ export abstract class BaseSkeleton extends GComponent implements ISkeleton {
         this.asSkeleton.playbackRate(this.skeletonPlay.playbackRate ?? this.playbackRate)
 
         if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
-            Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay])
+            Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play)
         } else {
-            this._play(this.skeletonPlay)
+            this._play()
         }
     }
 
-    private _play(skeletonPlay: ISkeletonPlay) {
-        this.asSkeleton.play(this.nameOrIndex, false, skeletonPlay.force ?? true,
-            skeletonPlay.start ?? 0, skeletonPlay.end ?? 0,
-            skeletonPlay.freshSkin ?? true, skeletonPlay.playAudio ?? true)
+    private _play() {
+        this.asSkeleton.play(this.nameOrIndex, false, this.skeletonPlay.force ?? true,
+            this.skeletonPlay.start ?? 0, this.skeletonPlay.end ?? 0,
+            this.skeletonPlay.freshSkin ?? true, this.skeletonPlay.playAudio ?? true)
     }
 
     protected onPlayStopped() {
@@ -149,6 +147,11 @@ export abstract class BaseSkeleton extends GComponent implements ISkeleton {
     getAniNameByIndex(index: number) {
         return this.asSkeleton.templet?.getAniNameByIndex(index)
     }
+
+    getSkeletonPlay() {
+        return this.skeletonPlay
+    }
+
 
     /**
      * 获取实例 Skeleton

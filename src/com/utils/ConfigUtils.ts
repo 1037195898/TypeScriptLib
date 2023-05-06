@@ -1,4 +1,3 @@
-import {ResConfig} from "../interfaces/ICommon"
 import {StringUtil} from "./StringUtil"
 import {Player} from "../Player"
 

@@ -6,7 +6,6 @@ import {BaseWindow} from "../core/BaseWindow"
 import {ActionLib} from "../actions/ActionLib"
 import {AppRecordManager} from "../manager/AppRecordManager"
 import {LibStr} from "../LibStr"
-import {IPromptData} from "../interfaces/ICommon"
 import {StringUtil} from "../utils/StringUtil"
 
 /** 提示框 */

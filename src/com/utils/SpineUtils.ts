@@ -1,6 +1,5 @@
 import {GSkeleton} from "../view/GSkeleton"
 import {GSpineSkeleton} from "../view/GSpineSkeleton"
-import {ISkeletonData, ISkeletonPlay} from "../interfaces/ICommon";
 
 export class SpineUtils {
 

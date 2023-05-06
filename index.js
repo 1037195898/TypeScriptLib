@@ -147,11 +147,10 @@ class GenerateModule {
      * @param appendFile 文件路径
      */
     dtsAppend(...appendFile) {
-        let content = []
-        for (let i = 0; i < appendFile.length; i++) {
-            content.push(fs.readFileSync(appendFile[i], "utf-8"))
-        }
-        fs.appendFileSync(this.saveTempPath + "/" + this.project + ".d.ts", "\n\n" + content.join("\n\n"))
+        appendFile.unshift(this.saveTempPath + "/" + this.project + ".d.ts")
+        return gulp.src(appendFile)
+            .pipe(concat(this.project + ".d.ts"))
+            .pipe(gulp.dest(this.saveTempPath))
     }
 
     removeTemp() {

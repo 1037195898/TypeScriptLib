@@ -4,7 +4,6 @@ import URL = Laya.URL
 import Render = Laya.Render
 import {IFormatVer} from "../interfaces/IFormatVer"
 import {StringUtil} from "../utils/StringUtil"
-import {LoadRes} from "../interfaces/ICommon"
 
 export class MyLoader {
 

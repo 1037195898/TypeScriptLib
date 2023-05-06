@@ -1,13 +1,7 @@
 'use strict'
 
 const gulp = require("gulp")
-const minify = require('gulp-minify')
-const inject = require("gulp-inject-string")
 const ts = require('gulp-typescript')
-const concat = require('gulp-concat')
-const del = require("del")
-const each = require("gulp-each")
-const babel = require('gulp-babel')
 const fs = require('fs')
 const http = require('https')
 const zlib = require('zlib')
@@ -46,9 +40,8 @@ gulp.task('createDTs', () => {
     return generate.createDTs()
 })
 
-gulp.task('dtsAppend', (cd) => {
-    generate.dtsAppend("src/com/define.d.ts")
-    return cd()
+gulp.task('dtsAppend', () => {
+    return generate.dtsAppend("src/**/*.d.ts")
 })
 
 gulp.task('removeTemp', () => {

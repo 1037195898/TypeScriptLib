@@ -1468,14 +1468,14 @@ window.coreLib = {};
          * 播放动画
          *
          * @param    nameOrIndex    动画名字或者索引
-         * @param    loop        是否循环播放
+         * @param    loop        是否循环播放 默认true
          * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
          * @param    start        起始时间
          * @param    end            结束时间
          * @param    freshSkin    是否刷新皮肤数据
          * @param    playAudio    是否播放音频
          */
-        play(nameOrIndex, loop, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
+        play(nameOrIndex, loop = true, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
             if (this.asSkeleton.templet == null)
                 return;
             this.playGroupIndex = 0;
@@ -1488,7 +1488,7 @@ window.coreLib = {};
             if (typeof nameOrIndex === "number" && nameOrIndex < 0)
                 return;
             this.playAni({
-                nameOrIndex: nameOrIndex, loop: loop !== null && loop !== void 0 ? loop : true, force: force,
+                nameOrIndex: nameOrIndex, loop: loop, force: force,
                 start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
             });
         }
@@ -1518,15 +1518,15 @@ window.coreLib = {};
             }
             this.asSkeleton.playbackRate((_c = this.skeletonPlay.playbackRate) !== null && _c !== void 0 ? _c : this.playbackRate);
             if (this.skeletonPlay.delayPlay && this.skeletonPlay.delayPlay > 0) {
-                Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play, [this.skeletonPlay]);
+                Laya.timer.once(this.skeletonPlay.delayPlay, this, this._play);
             }
             else {
-                this._play(this.skeletonPlay);
+                this._play();
             }
         }
-        _play(skeletonPlay) {
+        _play() {
             var _a, _b, _c, _d, _e;
-            this.asSkeleton.play(this.nameOrIndex, false, (_a = skeletonPlay.force) !== null && _a !== void 0 ? _a : true, (_b = skeletonPlay.start) !== null && _b !== void 0 ? _b : 0, (_c = skeletonPlay.end) !== null && _c !== void 0 ? _c : 0, (_d = skeletonPlay.freshSkin) !== null && _d !== void 0 ? _d : true, (_e = skeletonPlay.playAudio) !== null && _e !== void 0 ? _e : true);
+            this.asSkeleton.play(this.nameOrIndex, false, (_a = this.skeletonPlay.force) !== null && _a !== void 0 ? _a : true, (_b = this.skeletonPlay.start) !== null && _b !== void 0 ? _b : 0, (_c = this.skeletonPlay.end) !== null && _c !== void 0 ? _c : 0, (_d = this.skeletonPlay.freshSkin) !== null && _d !== void 0 ? _d : true, (_e = this.skeletonPlay.playAudio) !== null && _e !== void 0 ? _e : true);
         }
         onPlayStopped() {
             if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
@@ -1577,6 +1577,9 @@ window.coreLib = {};
         getAniNameByIndex(index) {
             var _a;
             return (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.getAniNameByIndex(index);
+        }
+        getSkeletonPlay() {
+            return this.skeletonPlay;
         }
         get t() {
             return this._t;
@@ -11585,9 +11588,6 @@ window.coreLib = {};
             }
             this.displayObject.offAll(type);
         }
-        getSkeletonPlay() {
-            return this.skeletonPlay;
-        }
         dispose() {
             const obj = Laya.Templet["TEMPLET_DICTIONARY"];
             const tTemple = obj[this._aniPath + this.cacheName];
@@ -11610,12 +11610,6 @@ window.coreLib = {};
      */
     GSkeleton.UPDATE_BONE_SLOT = "update_bone_slot";
     coreLib.GSkeleton = GSkeleton;
-    class AnimationNodeContent {
-    }
-    coreLib.AnimationNodeContent = AnimationNodeContent;
-    class AnimationContent {
-    }
-    coreLib.AnimationContent = AnimationContent;
     class GSpineSkeleton extends BaseSkeleton {
         constructor(ver = Laya.SpineVersion.v3_8) {
             super();

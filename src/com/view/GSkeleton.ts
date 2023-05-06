@@ -12,8 +12,6 @@ import HTMLImage = Laya.HTMLImage;
 import UIPackage = fgui.UIPackage;
 import BoneSlot = Laya.BoneSlot;
 import TextureFormat = Laya.TextureFormat;
-import KeyFramesContent = Laya.KeyFramesContent;
-import {ISkeletonPlay} from "../interfaces/ICommon";
 import {BaseSkeleton} from "../core/BaseSkeleton";
 
 export class GSkeleton extends BaseSkeleton {
@@ -318,10 +316,6 @@ export class GSkeleton extends BaseSkeleton {
         this.displayObject.offAll(type)
     }
 
-    getSkeletonPlay() {
-        return this.skeletonPlay
-    }
-
     dispose() {
         const obj = Templet["TEMPLET_DICTIONARY"]
         const tTemple: Templet = obj[this._aniPath + this.cacheName]
@@ -334,29 +328,4 @@ export class GSkeleton extends BaseSkeleton {
         super.dispose()
     }
 
-}
-
-export class AnimationNodeContent {
-    name: string
-    parentIndex: number
-    parent: AnimationNodeContent
-    keyframeWidth: number
-    lerpType: number
-    interpolationMethod: any[]
-    childs: any[]
-    keyFrame: KeyFramesContent[];// = new Vector.<KeyFramesContent>
-    playTime: number
-    extenData: ArrayBuffer
-    dataOffset: number
-}
-
-export class AnimationContent {
-    nodes: AnimationNodeContent[]
-    name: string
-    /**
-     * 播放时长
-     */
-    playTime: number
-    bone3DMap: any
-    totalKeyframeDatasLength: number
 }

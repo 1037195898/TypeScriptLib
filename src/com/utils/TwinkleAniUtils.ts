@@ -1,5 +1,4 @@
 import GObject = fgui.GObject
-import Handler = Laya.Handler
 
 /**
  * 闪烁动画

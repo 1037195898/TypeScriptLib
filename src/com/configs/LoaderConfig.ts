@@ -1,4 +1,3 @@
-import {LoadRes} from "../interfaces/ICommon"
 import {MyLoader} from "../core/MyLoader"
 
 
