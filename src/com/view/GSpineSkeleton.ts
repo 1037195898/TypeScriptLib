@@ -3,7 +3,6 @@ import SpineVersion = Laya.SpineVersion;
 import Event = Laya.Event;
 import SpineTempletBase = Laya.SpineTempletBase;
 import Rectangle = Laya.Rectangle;
-import {ISkeletonPlay} from "../interfaces/ICommon";
 import {BaseSkeleton} from "../core/BaseSkeleton";
 
 export class GSpineSkeleton extends BaseSkeleton {

@@ -1488,7 +1488,7 @@ window.coreLib = {};
             if (typeof nameOrIndex === "number" && nameOrIndex < 0)
                 return;
             this.playAni({
-                nameOrIndex: nameOrIndex, loop: loop, force: force,
+                nameOrIndex: nameOrIndex, loop: loop !== null && loop !== void 0 ? loop : true, force: force,
                 start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
             });
         }

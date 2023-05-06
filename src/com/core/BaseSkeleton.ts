@@ -48,7 +48,7 @@ export abstract class BaseSkeleton extends GComponent implements ISkeleton {
      * @param    freshSkin    是否刷新皮肤数据
      * @param    playAudio    是否播放音频
      */
-    play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
+    play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop?: boolean, force = true, start = 0, end = 0, freshSkin = true, playAudio = false) {
         if (this.asSkeleton.templet == null) return
         this.playGroupIndex = 0
         if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
@@ -58,7 +58,7 @@ export abstract class BaseSkeleton extends GComponent implements ISkeleton {
         }
         if (typeof nameOrIndex === "number" && nameOrIndex < 0) return
         this.playAni({
-            nameOrIndex: nameOrIndex, loop: loop, force: force,
+            nameOrIndex: nameOrIndex, loop: loop ?? true, force: force,
             start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
         })
     }

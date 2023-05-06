@@ -684,7 +684,7 @@ declare namespace coreLib {
          * @param    freshSkin    是否刷新皮肤数据
          * @param    playAudio    是否播放音频
          */
-        play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
+        play(nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop?: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
         /**
          * 播放动画
          * @param skeletonPlay 播放数据
