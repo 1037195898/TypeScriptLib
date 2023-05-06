@@ -61,15 +61,17 @@ export class SpineUtils {
      * @param optional
      * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
      */
-    static createSpine<T extends GSkeleton | GSpineSkeleton>(url: string, optional?: ISkeletonData, skeletonClass?: {
-        new(): T
-    })
+    static createSpine(url: string, optional?: ISkeletonData, skeletonClass?: {
+        new(): GSkeleton | GSpineSkeleton
+    }): GSkeleton | GSpineSkeleton
     /**
      * 创建spine 骨骼动画组件
      * @param optional
      * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
      */
-    static createSpine<T extends GSkeleton | GSpineSkeleton>(optional?: ISkeletonData, skeletonClass?: { new(): T })
+    static createSpine(optional?: ISkeletonData, skeletonClass?: {
+        new(): GSkeleton | GSpineSkeleton
+    }): GSkeleton | GSpineSkeleton
 
     /**
      * 创建spine 骨骼动画组件
@@ -77,9 +79,8 @@ export class SpineUtils {
      * @param optional
      * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
      */
-    static createSpine<T extends GSkeleton | GSpineSkeleton>(url: string | ISkeletonData,
-                                                             optional?: ISkeletonData | { new(): T },
-                                                             skeletonClass?: { new(): T }): T {
+    static createSpine(url: string | ISkeletonData, optional?: ISkeletonData | { new(): GSkeleton | GSpineSkeleton },
+                       skeletonClass?: { new(): GSkeleton | GSpineSkeleton }) {
         if (optional && !this.isInterface(optional)) {
             skeletonClass = optional
             optional = null
