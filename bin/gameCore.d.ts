@@ -4848,7 +4848,7 @@ declare namespace coreLib {
          * 通过加载直接创建动画
          * @param    url        要加载的动画文件路径
          * @param    handler    加载完成的回调函数
-         * @param    aniMode        与<code>Skeleton.init</code>的<code>aniMode</code>作用一致
+         * @param    aniMode        与<code>Laya.Skeleton.init</code>的<code>aniMode</code>作用一致
          */
         load(url: string, handler: ParamHandler, aniMode?: number): void;
         /**

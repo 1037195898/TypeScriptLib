@@ -19,7 +19,7 @@ generate.libs = ["libs/**/*", "src/**/*.d.ts"]
 generate.project = "gameCore"
 generate.namespace = "coreLib"
 generate.saveTempPath = "bin"
-generate.saveTempTs = "d22.ts"
+generate.saveTempTs = "lib.ts"
 
 
 
