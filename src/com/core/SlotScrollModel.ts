@@ -20,10 +20,6 @@ export class SlotScrollModel extends SlotModel {
     /** 当前滚动的单列位置 */
     protected singleColumnIndex = -1
 
-    constructor() {
-        super()
-    }
-
     /**
      * 开始滚动指定列
      * @param index
@@ -197,6 +193,10 @@ export class SlotScrollModel extends SlotModel {
             duration = 1300;// 动画持续时间
         }
         return duration
+    }
+
+    protected getDelay(index: number, isTurboMode: boolean) {
+        return 0
     }
 
     /**

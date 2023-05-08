@@ -65,7 +65,7 @@ class GenerateModule {
      */
     createTS(files) {
         if (!fs.existsSync(this.saveTempPath + "/temp")) {
-            fs.mkdirSync(this.saveTempPath + "/temp")
+            fs.mkdirSync(this.saveTempPath + "/temp", {recursive: true})
         }
         return gulp.src(this.beforeTs.concat(files))
             .pipe(sort({

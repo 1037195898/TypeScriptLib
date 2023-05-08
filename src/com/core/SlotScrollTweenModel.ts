@@ -9,10 +9,6 @@ import {ISlotLotteryData} from "../interfaces/ISlotLotteryData"
  */
 export class SlotScrollTweenModel extends SlotModel {
 
-    constructor() {
-        super()
-    }
-
     protected playLottery(value: ISlotLotteryData[]) {
         super.playLottery(value)
         let list: GList
@@ -48,7 +44,6 @@ export class SlotScrollTweenModel extends SlotModel {
     }
 
     protected getDuration(index: number, isTurboMode: boolean): number {
-        super.getDuration(index, isTurboMode)
         let duration = index * 150 + 2000
         if (isTurboMode) {
             duration = 2000

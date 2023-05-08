@@ -3,7 +3,7 @@ import Tween = Laya.Tween
 import {GameModel} from "./GameModel"
 import {ISlotLotteryData} from "../interfaces/ISlotLotteryData"
 
-export class SlotModel extends GameModel {
+export abstract class SlotModel extends GameModel {
 
     /** 运动 list 数组列表 */
     protected listRolls: GList[] = []
@@ -76,8 +76,7 @@ export class SlotModel extends GameModel {
      * @param index 滚动的列
      * @param lotteryData 当前滚动列数据
      */
-    onScrollTween(index: number, lotteryData: ISlotLotteryData) {
-    }
+    onScrollTween(index: number, lotteryData: ISlotLotteryData) {}
 
     /** 开始播放结果动画 */
     protected startPlayResultTween() {
@@ -121,9 +120,7 @@ export class SlotModel extends GameModel {
      * @param isTurboMode 是否快速播放
      * @return 运行时长
      */
-    protected getDuration(index: number, isTurboMode: boolean) {
-        return 0
-    }
+    protected abstract getDuration(index: number, isTurboMode: boolean)
 
     /**
      * 获取 Tween 运行延迟
@@ -131,9 +128,7 @@ export class SlotModel extends GameModel {
      * @param isTurboMode 是否快速播放
      * @return 延迟值
      */
-    protected getDelay(index: number, isTurboMode: boolean) {
-        return 0
-    }
+    protected abstract getDelay(index: number, isTurboMode: boolean)
 
     /**
      * 判断此列表是否需要滚动
@@ -146,12 +141,10 @@ export class SlotModel extends GameModel {
     }
 
     /** 滚动结束一次调用方法 */
-    protected oneComplete(list: GList) {
-    }
+    protected oneComplete(list: GList) {}
 
     /** 全部滚动结束调用方法 */
-    protected rollComplete() {
-    }
+    protected rollComplete() {}
 
     /**
      * 判断当前开的奖里面是否有中奖线

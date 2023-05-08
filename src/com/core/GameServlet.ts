@@ -24,7 +24,7 @@ import {Cast} from "../utils/Cast"
  * 游戏基础类
  * @author boge
  */
-export class GameServlet extends BaseProxy implements IGameServlet {
+export abstract class GameServlet extends BaseProxy implements IGameServlet {
 
     protected _gameModel: IGameModel
     protected initHandler: ParamHandler
@@ -35,7 +35,7 @@ export class GameServlet extends BaseProxy implements IGameServlet {
     /** 网络通信名字 */
     networkName: string
 
-    constructor() {
+    protected constructor() {
         super()
         this.regGameAction(ActionLib.GAME_CHECK_STATE, this, this.checkState)
         this.regGameAction(ActionLib.GAME_INIT_SERVLET, this, this.init)
@@ -261,8 +261,7 @@ export class GameServlet extends BaseProxy implements IGameServlet {
      * @param data
      *
      */
-    protected parseInitData(data: any) {
-    }
+    protected abstract parseInitData(data: any)
 
     /**
      * 拉取账户金额

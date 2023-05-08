@@ -2,7 +2,7 @@ import {IGameModel} from "./IGameModel"
 
 /**
  * 游戏请求接口
- * @author xujinbo
+ * @author boge
  *
  */
 export interface IGameServlet {

@@ -22,7 +22,7 @@ import {LibStr} from "../LibStr"
 
 /**
  *
- * @author xujinbo
+ * @author boge
  *
  */
 export class GameModel extends BaseProxy implements IGameModel {
@@ -41,7 +41,7 @@ export class GameModel extends BaseProxy implements IGameModel {
     protected tasks: { args: any, handler: ParamHandler }[] = []
 
 
-    constructor() {
+    protected constructor() {
         super()
 
         this.regGameAction(ActionLib.GAME_CLEAR_RES, this, this.clearRes)
@@ -204,12 +204,10 @@ export class GameModel extends BaseProxy implements IGameModel {
     }
 
     /** 子类实现 */
-    insertExtension() {
-    }
+    insertExtension() {}
 
     /** 通知开奖结束  进入结束流程 */
-    protected lotteryComplete() {
-    }
+    protected lotteryComplete() {}
 
     /** 游戏进入后台执行 */
     blurGame() {
