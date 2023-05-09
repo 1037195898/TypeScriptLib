@@ -9,6 +9,7 @@ export class BaseGameData implements IGameData {
     /** 后端计算   当前赢的钱 */
     serverWinMoney = 0
     totalWinMoney = 0
+    playCount = 0
     /** 缓存 后端计算 当前赢的钱 */
     tempServerWinMoney = 0
     /** 当前玩家选择的自动下注次数 */

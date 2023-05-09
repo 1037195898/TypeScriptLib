@@ -7,10 +7,10 @@ export interface IGameData {
     getTotalBetMoney(): number
     /** 上报错误数据 */
     reportError(): any
-    /** 本次总共赢的钱 */
+    /** 本次总共盈利 */
     totalWinMoney?: number
     /** 玩的次数 计数 */
-    playCount?: number
+    playCount: number
     /** 是否是推荐游戏 */
     isRecommend?: boolean
 
