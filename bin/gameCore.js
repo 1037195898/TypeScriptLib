@@ -2928,14 +2928,8 @@ window.coreLib = {};
          * @param url
          * @param data
          * @param callback
-         * @deprecated 使用新的 bet
-         * @see GameServlet.bet
          */
         sendBet(url, data, callback) {
-            this.bet(url, data, callback);
-        }
-        /** 发送押注数据 */
-        bet(url, data, callback) {
             this.post(url, data, (data) => {
                 if (data.code != HttpCode.OK) {
                     MessageTip.showTip(StateCode.getShowMessage(data));

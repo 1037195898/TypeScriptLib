@@ -1152,12 +1152,8 @@ declare namespace coreLib {
          * @param url
          * @param data
          * @param callback
-         * @deprecated 使用新的 bet
-         * @see GameServlet.bet
          */
         sendBet(url: string, data: any, callback: ParamHandler): void;
-        /** 发送押注数据 */
-        bet(url: string, data: any, callback: ParamHandler): void;
         /**
          * 领取奖金池
          * @param id
