@@ -2937,15 +2937,16 @@ window.coreLib = {};
         }
         /** 发送押注数据 */
         bet(url, data, callback) {
-            if (Player.inst.isGuest) {
-                Player.inst.guestModel.guestPlayCount++;
-            }
-            Player.inst.playCount++;
-            Player.inst.gameData.playCount++;
             this.post(url, data, (data) => {
                 if (data.code != HttpCode.OK) {
                     MessageTip.showTip(StateCode.getShowMessage(data));
                     this.sendAction(ActionLib.GAME_RESET_BET);
+                }
+                else {
+                    Player.inst.gameData.playCount++;
+                    Player.inst.playCount++;
+                    if (Player.inst.isGuest)
+                        Player.inst.guestModel.guestPlayCount++;
                 }
                 runFun(callback, data);
             }, () => {
