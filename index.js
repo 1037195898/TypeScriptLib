@@ -10,7 +10,7 @@ const fs = require('fs')
 const path = require('path')
 const ts = require("gulp-typescript")
 const through2 = require("through2")
-const webp2 = require("webp/ToWebp")
+const webp2 = require("./webp/ToWebp")
 
 module.exports.webp = webp2
 
@@ -124,7 +124,7 @@ class GenerateModule {
             .pipe(inject.prepend('namespace ' + this.namespace + ' {\n'))
             .pipe(inject.append('\n}'))
             .pipe(gulp.dest(this.saveTempPath + "/temp"))
-            .pipe(print("生成代码文件"))
+            .pipe(this.print("生成代码文件"))
     }
 
     createJs() {
@@ -137,7 +137,7 @@ class GenerateModule {
             // .pipe(babel({presets: ['@babel/preset-env']}))
             .pipe(minify({ext: {min: ".min.js"}}))
             .pipe(gulp.dest(this.saveTempPath))
-            .pipe(print("生成js文件"))
+            .pipe(this.print("生成js文件"))
     }
 
     createDTs() {
@@ -146,7 +146,7 @@ class GenerateModule {
             .dts
             .pipe(concat(this.project + ".d.ts"))
             .pipe(gulp.dest(this.saveTempPath))
-            .pipe(print("生成d.ts文件"))
+            .pipe(this.print("生成d.ts文件"))
     }
 
     /**
@@ -158,7 +158,7 @@ class GenerateModule {
         return gulp.src(appendFile)
             .pipe(concat(this.project + ".d.ts"))
             .pipe(gulp.dest(this.saveTempPath))
-            .pipe(print("合并完成"))
+            .pipe(this.print("合并完成"))
     }
 
     removeTemp() {
@@ -168,7 +168,7 @@ class GenerateModule {
     /**
      * 一个通过流传输的自定义插件，每次都会调用操作
      * @param prefix {string}
-     * @return void
+     * @return {*}
      */
     print(prefix) {
         return through2.obj(function (file, encoding, callback) {
