@@ -1,3 +1,5 @@
+import Handler = Laya.Handler;
+
 /**
  * 数字变动动画
  */
@@ -11,12 +13,9 @@ export class NumberTween {
     private value = 0
     private target: any
     private complete: ParamHandler
-    private update: ParamHandler
+    private update: ((value: number) => void) | Handler
     /** 当前运行的动画 */
     tween: Laya.Tween
-
-    constructor() {
-    }
 
     /**
      * 创建一个动画
@@ -30,9 +29,9 @@ export class NumberTween {
      * @param delay 延迟执行
      */
     static createTween(target: any, start = 0, end = 0, duration = 300,
-                       ease: Function = null, complete?: ParamHandler, update?: ParamHandler, delay = 0) {
+                       ease: Function = null, complete?: ParamHandler, update?: ((value: number) => void) | Handler, delay = 0) {
         if (start == end) {
-            runFun(update)
+            runFun(update, 1)
             runFun(complete)
             return
         }

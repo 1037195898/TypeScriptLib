@@ -4056,7 +4056,6 @@ declare namespace coreLib {
         private update;
         /** 当前运行的动画 */
         tween: Laya.Tween;
-        constructor();
         /**
          * 创建一个动画
          * @param target 缓动动画绑定类  用于执行清楚动画
@@ -4068,7 +4067,7 @@ declare namespace coreLib {
          * @param update 执行更新
          * @param delay 延迟执行
          */
-        static createTween(target: any, start?: number, end?: number, duration?: number, ease?: Function, complete?: ParamHandler, update?: ParamHandler, delay?: number): void;
+        static createTween(target: any, start?: number, end?: number, duration?: number, ease?: Function, complete?: ParamHandler, update?: ((value: number) => void) | Laya.Handler, delay?: number): void;
         /**
          * 清理并销毁指定的动画
          * @param target 绑定的执行对象

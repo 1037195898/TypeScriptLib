@@ -8941,7 +8941,7 @@ window.coreLib = {};
          */
         static createTween(target, start = 0, end = 0, duration = 300, ease = null, complete, update, delay = 0) {
             if (start == end) {
-                runFun(update);
+                runFun(update, 1);
                 runFun(complete);
                 return;
             }
