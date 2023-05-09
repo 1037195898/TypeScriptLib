@@ -12,7 +12,7 @@ const ts = require("gulp-typescript")
 const through2 = require("through2")
 const webp2 = require("./webp/ToWebp")
 
-module.exports.Webp = webp2.Webp
+exports.Webp = webp2.Webp
 
 class GenerateModule {
     /**
