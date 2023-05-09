@@ -328,7 +328,7 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
                 MessageTip.showTip(StateCode.getShowMessage(data))
                 this.sendAction(ActionLib.GAME_RESET_BET)
             } else {
-                Player.inst.gameData.playCount++
+                Player.inst.gameData.playCount = (Player.inst.gameData.playCount || 0) + 1
                 Player.inst.playCount++
                 if (Player.inst.isGuest) Player.inst.guestModel.guestPlayCount++
 
