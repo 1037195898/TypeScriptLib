@@ -427,6 +427,7 @@ declare namespace coreLib {
         /** 后端计算   当前赢的钱 */
         serverWinMoney: number;
         totalWinMoney: number;
+        playCount: number;
         /** 缓存 后端计算 当前赢的钱 */
         tempServerWinMoney: number;
         /** 当前玩家选择的自动下注次数 */
@@ -1886,10 +1887,10 @@ declare namespace coreLib {
         getTotalBetMoney(): number;
         /** 上报错误数据 */
         reportError(): any;
-        /** 本次总共赢的钱 */
+        /** 本次总共盈利 */
         totalWinMoney?: number;
         /** 玩的次数 计数 */
-        playCount?: number;
+        playCount: number;
         /** 是否是推荐游戏 */
         isRecommend?: boolean;
     }

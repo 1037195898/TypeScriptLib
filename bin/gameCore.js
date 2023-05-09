@@ -819,6 +819,7 @@ window.coreLib = {};
             /** 后端计算   当前赢的钱 */
             this.serverWinMoney = 0;
             this.totalWinMoney = 0;
+            this.playCount = 0;
             /** 缓存 后端计算 当前赢的钱 */
             this.tempServerWinMoney = 0;
             /** 当前玩家选择的自动下注次数 */
@@ -2936,7 +2937,7 @@ window.coreLib = {};
                     this.sendAction(ActionLib.GAME_RESET_BET);
                 }
                 else {
-                    Player.inst.gameData.playCount = (Player.inst.gameData.playCount || 0) + 1;
+                    Player.inst.gameData.playCount++;
                     Player.inst.playCount++;
                     if (Player.inst.isGuest)
                         Player.inst.guestModel.guestPlayCount++;
@@ -2995,8 +2996,8 @@ window.coreLib = {};
             }
         }
         get gameModel() {
-            if (this._gameModel == null)
-                this._gameModel = SceneManager.inst.starter.gameModel;
+            var _a;
+            (_a = this._gameModel) !== null && _a !== void 0 ? _a : (this._gameModel = SceneManager.inst.starter.gameModel);
             return this._gameModel;
         }
         set gameModel(value) {
