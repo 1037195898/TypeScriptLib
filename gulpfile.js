@@ -21,8 +21,6 @@ generate.namespace = "coreLib"
 generate.saveTempPath = "bin"
 generate.saveTempTs = "lib.ts"
 
-
-
 gulp.task("clean", () => {
     return generate.clean(["bin/**/*.*", "!bin/*.html", "!bin/webp"])
 })

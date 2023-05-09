@@ -8,16 +8,11 @@ const sort = require('gulp-sort')
 const babel = require('gulp-babel')
 const fs = require('fs')
 const path = require('path')
-const ts = require("gulp-typescript");
-const through2 = require("through2");
+const ts = require("gulp-typescript")
+const through2 = require("through2")
+const webp2 = require("webp/ToWebp")
 
-// 一个通过流传输的自定义插件，每次都会调用操作
-module.exports.print = print = (prefix) => {
-    return through2.obj(function (file, encoding, callback) {
-        console.log(prefix + ": " + file.path);
-        return callback(null, file);
-    });
-}
+module.exports.webp = webp2
 
 class GenerateModule {
     /**
@@ -170,6 +165,11 @@ class GenerateModule {
         return del([this.saveTempPath + "/temp/"], {force: true})
     }
 
+    /**
+     * 一个通过流传输的自定义插件，每次都会调用操作
+     * @param prefix {string}
+     * @return void
+     */
     print(prefix) {
         return through2.obj(function (file, encoding, callback) {
             console.log(prefix + ": " + file.path)
@@ -181,6 +181,7 @@ class GenerateModule {
 
 
 module.exports = new GenerateModule()
+
 
 
 /**

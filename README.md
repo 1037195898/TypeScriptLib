@@ -13,12 +13,7 @@ TypeScript common lib    ( Laya 、 Fairygui)
   }
 }
 ```
-更新
-添加新的tag 在执行 
-````
-npm update game-lib
-````
-
+或
 ```json
 {
   "dependencies": {
@@ -26,7 +21,11 @@ npm update game-lib
   }
 }
 ```
-
+更新
+添加新的tag 在执行 
+````
+npm update game-lib
+````
 
 ### 使用gitee仓库 ###
 
@@ -41,14 +40,55 @@ npm update game-lib
 }
 ````
 
-如果您的gitee仓库中包含特定版本的代码，您可以在安装时指定版本号，例如：
+~~如果您的gitee仓库中包含特定版本的代码，您可以在安装时指定版本号，例如：~~
 
-````npm
-npm install username/repository#版本号
-````
-其中，"版本号"是您想要安装的代码版本号。
+~~npm install git@gitee.com:bogegit/TypeScriptLib.git#46db9be3~~
 
-例子
-````
-npm install -g git@gitee.com:bogegit/TypeScriptLib.git#46db9be3
-````
+
+
+
+
+
+
+### 使用 webp ###
+
+```
+const {webp} = require("game-lib")
+
+webp.cwebp('temp/img/a.jpg', 'temp/img/a.jpg.webp', '-q 60')
+
+```
+
+
+### 使用 GenerateModule ###
+```js
+
+const gulp = require("gulp")
+const merge = require('merge2')
+const pack = require("game-lib")
+
+pack.tsProject = 'tsconfig.json'
+pack.beforeTs = []
+pack.libs = ["../node_modules/game-lib/**/*.d.ts", "src/**/*.d.ts"]
+pack.namespace = "game"
+pack.project = "common"
+pack.saveTempPath = "dist"
+pack.saveTempTs = "code.ts"
+
+gulp.task("clean", () => {
+    return pack.clean(["dist"])
+})
+
+gulp.task("createTs", () => pack.createTS(["src/**/*.ts", "!src/**/*.d.ts"]))
+gulp.task("createJs", () => merge(pack.createJs(), pack.createDTs()))
+
+gulp.task('build', gulp.series("createTs", "createJs", () => {
+    return merge(
+        gulp.src(["dist/common.d.ts"]).pipe(gulp.dest("../libs")),
+        gulp.src(["dist/common.min.js"]).pipe(gulp.dest("../html-template"))
+            .pipe(gulp.dest('../bin/')).pipe(pack.print(files => "完成"))
+    )
+}))
+
+
+```

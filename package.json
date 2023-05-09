@@ -1,7 +1,7 @@
 {
   "name": "game-lib",
-  "version": "1.0.2",
-  "main": "webp/ToWebp.js",
+  "version": "1.0.3",
+  "main": "index.js",
   "scripts": {
     "build": "gulp build"
   },
@@ -26,8 +26,8 @@
     "bin/gameCore.js",
     "bin/gameCore.min.js",
     "bin/webp/",
-    "ToWebp.js",
     "index.js",
+    "webp/ToWebp.js",
     "webp/buffer_utils.js",
     "webp/cwebp.js",
     "webp/dwebp.js",
