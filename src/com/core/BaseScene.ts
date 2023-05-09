@@ -435,9 +435,9 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
         let gameData = Player.inst.gameData
         let winLimit = gameData ? gameData.getTotalBetMoney() * 3 : 0
         if (Player.inst.isGuest && Player.inst.guestModel.guestPlayCount >= CommonCmd.GUEST_MAX_PLAY_COUNT && (
-            gameData != null && !gameData["isRecommend"] && winLimit <= gameData["totalWinMoney"]
+            gameData != null && !gameData.isRecommend && winLimit <= gameData.totalWinMoney
         )) {
-            gameData["isRecommend"] = true
+            gameData.isRecommend = true
             this.showInviteRealMoney(handler)
             return
         }

@@ -40,7 +40,6 @@ export class GameModel extends BaseProxy implements IGameModel {
     /** 任务 */
     protected tasks: { args: any, handler: ParamHandler }[] = []
 
-
     protected constructor() {
         super()
 

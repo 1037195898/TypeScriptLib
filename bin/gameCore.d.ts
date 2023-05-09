@@ -426,7 +426,6 @@ declare namespace coreLib {
         currentBalance: number;
         /** 后端计算   当前赢的钱 */
         serverWinMoney: number;
-        /** 玩家当前这局总共赢的钱 */
         totalWinMoney: number;
         /** 缓存 后端计算 当前赢的钱 */
         tempServerWinMoney: number;
@@ -1891,8 +1890,12 @@ declare namespace coreLib {
         getTotalBetMoney(): number;
         /** 上报错误数据 */
         reportError(): any;
+        /** 本次总共赢的钱 */
+        totalWinMoney?: number;
         /** 玩的次数 计数 */
         playCount?: number;
+        /** 是否是推荐游戏 */
+        isRecommend?: boolean;
     }
     export interface IGameModel {
         /** 获取游戏番号 */
@@ -2776,6 +2779,7 @@ declare namespace coreLib {
         /** 更新当前游戏中的游戏金币 */
         updateGlod(): void;
         get starter(): BaseStarter;
+        get scene(): BaseScene;
         /**
          * 上传错误日志
          * @param data json格式的错误数据

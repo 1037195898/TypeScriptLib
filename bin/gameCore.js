@@ -818,7 +818,6 @@ window.coreLib = {};
             this.currentBalance = 0;
             /** 后端计算   当前赢的钱 */
             this.serverWinMoney = 0;
-            /** 玩家当前这局总共赢的钱 */
             this.totalWinMoney = 0;
             /** 缓存 后端计算 当前赢的钱 */
             this.tempServerWinMoney = 0;
@@ -1343,8 +1342,8 @@ window.coreLib = {};
         newGameStartLogic(handler) {
             let gameData = Player.inst.gameData;
             let winLimit = gameData ? gameData.getTotalBetMoney() * 3 : 0;
-            if (Player.inst.isGuest && Player.inst.guestModel.guestPlayCount >= CommonCmd.GUEST_MAX_PLAY_COUNT && (gameData != null && !gameData["isRecommend"] && winLimit <= gameData["totalWinMoney"])) {
-                gameData["isRecommend"] = true;
+            if (Player.inst.isGuest && Player.inst.guestModel.guestPlayCount >= CommonCmd.GUEST_MAX_PLAY_COUNT && (gameData != null && !gameData.isRecommend && winLimit <= gameData.totalWinMoney)) {
+                gameData.isRecommend = true;
                 this.showInviteRealMoney(handler);
                 return;
             }
@@ -6022,25 +6021,21 @@ window.coreLib = {};
         }
         /** 得到焦点开始渲染 */
         focusHandler() {
+            var _a, _b, _c, _d, _e;
             if (Player.inst.isGuest)
                 return;
             fgui.GRoot.inst.showModalWait(this.getString(1000 /* LibStr.WAITING */));
-            if (Player.inst.gameModel != CommonCmd.GAME_HOME
-                && Player.inst.gameModel != CommonCmd.GAME_SCRATCHER
-                && SceneManager.inst.starter
-                && SceneManager.inst.starter.gameModel
-                && SceneManager.inst.starter.gameServlet) {
+            if (Player.inst.gameModel != CommonCmd.GAME_HOME && Player.inst.gameModel != CommonCmd.GAME_SCRATCHER) {
                 // 告诉当前游戏进来了
-                SceneManager.inst.starter.gameModel.focusGame();
+                (_b = (_a = SceneManager.inst.starter) === null || _a === void 0 ? void 0 : _a.gameModel) === null || _b === void 0 ? void 0 : _b.focusGame();
                 if (HTTPUtils.getTimerSecond() - this.blurTimer >= 3) { // 超过3秒离开焦点
                     // 检查当前游戏
-                    SceneManager.inst.starter.gameServlet.checkGamePeriod(Laya.Handler.create(this, checkEnd));
-                    function checkEnd(sc) {
+                    (_d = (_c = SceneManager.inst.starter) === null || _c === void 0 ? void 0 : _c.gameServlet) === null || _d === void 0 ? void 0 : _d.checkGamePeriod((sc) => {
                         fgui.GRoot.inst.closeModalWait();
                         if (!sc) {
                             this.sendAction(ActionLib.GAME_SHOW_PROMPT_WINDOW, 1012 /* LibStr.SYSTEM_BACK_LOBBY */, Laya.Handler.create(this, JSUtils.gameClose));
                         }
-                    }
+                    });
                 }
                 else {
                     fgui.GRoot.inst.closeModalWait();
@@ -6048,7 +6043,7 @@ window.coreLib = {};
             }
             else {
                 if (Player.inst.token) {
-                    Player.inst.login.loginToken(Laya.Handler.create(this, function () {
+                    (_e = Player.inst.login) === null || _e === void 0 ? void 0 : _e.loginToken(Laya.Handler.create(this, function () {
                         fgui.GRoot.inst.closeModalWait();
                     }));
                 }
@@ -6059,15 +6054,15 @@ window.coreLib = {};
         }
         /** 失去焦点停止渲染 */
         blurHandler() {
+            var _a, _b;
             if (Player.inst.isGuest)
                 return;
             this.blurTimer = HTTPUtils.getTimerSecond();
             if (!SceneManager.inst.isAloneGame()
                 && Player.inst.gameModel != CommonCmd.GAME_HOME
-                && Player.inst.gameModel != CommonCmd.GAME_SCRATCHER
-                && SceneManager.inst.starter) {
+                && Player.inst.gameModel != CommonCmd.GAME_SCRATCHER) {
                 // 告诉当前游戏离开了
-                SceneManager.inst.starter.gameModel.blurGame();
+                (_b = (_a = SceneManager.inst.starter) === null || _a === void 0 ? void 0 : _a.gameModel) === null || _b === void 0 ? void 0 : _b.blurGame();
             }
         }
         /** 登录提示框 */
@@ -6193,7 +6188,7 @@ window.coreLib = {};
             if (this.initComplete && this.isLoaderResComplete || !this.isCall) {
                 // 不是游客模式 检查token
                 if (!Player.inst.isGuest && Player.inst.token) {
-                    Player.inst.login.loginToken(Laya.Handler.create(this, this.checkGameState));
+                    Player.inst.login.loginToken(this.checkGameState.bind(this));
                 }
                 else {
                     this.checkGameState({ code: 0 });
@@ -6202,8 +6197,12 @@ window.coreLib = {};
         }
         /** 检查游戏状态 */
         checkGameState(data) {
-            if ((data === null || data === void 0 ? void 0 : data.code) == -1)
+            if ((data === null || data === void 0 ? void 0 : data.code) == -1) {
+                LoadingWindow.inst.hide();
+                JSUtils.openModal(StateCode.getShowMessage(data));
+                JSUtils.gameClose();
                 return;
+            }
             // 如果是游客模式
             if (Player.inst.isGuest) {
                 Player.inst.cacheMoney = Player.inst.money;
@@ -6388,6 +6387,9 @@ window.coreLib = {};
         }
         get starter() {
             return this._starter;
+        }
+        get scene() {
+            return this._starter.baseScene;
         }
         /**
          * 上传错误日志

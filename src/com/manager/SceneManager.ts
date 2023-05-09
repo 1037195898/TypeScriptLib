@@ -34,6 +34,7 @@ import {PromptWindow} from "../view/PromptWindow"
 import {WaitResult} from "../view/WaitResult"
 import {CommonCmd} from "../net/CommonCmd"
 import {Cmd} from "../net/Cmd"
+import {StateCode} from "../utils/StateCode";
 
 /**
  * 舞台
@@ -124,31 +125,23 @@ export class SceneManager extends BaseProxy {
     private focusHandler() {
         if (Player.inst.isGuest) return
         GRoot.inst.showModalWait(this.getString(LibStr.WAITING))
-        if (Player.inst.gameModel != CommonCmd.GAME_HOME
-            && Player.inst.gameModel != CommonCmd.GAME_SCRATCHER
-            && SceneManager.inst.starter
-            && SceneManager.inst.starter.gameModel
-            && SceneManager.inst.starter.gameServlet
-        ) {
+        if (Player.inst.gameModel != CommonCmd.GAME_HOME && Player.inst.gameModel != CommonCmd.GAME_SCRATCHER) {
             // 告诉当前游戏进来了
-            SceneManager.inst.starter.gameModel.focusGame()
+            SceneManager.inst.starter?.gameModel?.focusGame()
             if (HTTPUtils.getTimerSecond() - this.blurTimer >= 3) { // 超过3秒离开焦点
                 // 检查当前游戏
-                SceneManager.inst.starter.gameServlet.checkGamePeriod(Handler.create(this, checkEnd))
-
-                function checkEnd(sc: boolean) {
+                SceneManager.inst.starter?.gameServlet?.checkGamePeriod((sc: boolean)=>{
                     GRoot.inst.closeModalWait()
                     if (!sc) {
-
                         this.sendAction(ActionLib.GAME_SHOW_PROMPT_WINDOW, LibStr.SYSTEM_BACK_LOBBY, Handler.create(this, JSUtils.gameClose))
                     }
-                }
+                })
             } else {
                 GRoot.inst.closeModalWait()
             }
         } else {
             if (Player.inst.token) {
-                Player.inst.login.loginToken(Handler.create(this, function () {
+                Player.inst.login?.loginToken(Handler.create(this, function () {
                     GRoot.inst.closeModalWait()
                 }))
             } else {
@@ -164,10 +157,9 @@ export class SceneManager extends BaseProxy {
         if (!SceneManager.inst.isAloneGame()
             && Player.inst.gameModel != CommonCmd.GAME_HOME
             && Player.inst.gameModel != CommonCmd.GAME_SCRATCHER
-            && SceneManager.inst.starter
         ) {
             // 告诉当前游戏离开了
-            SceneManager.inst.starter.gameModel.blurGame()
+            SceneManager.inst.starter?.gameModel?.blurGame()
         }
     }
 
@@ -309,7 +301,7 @@ export class SceneManager extends BaseProxy {
         if (this.initComplete && this.isLoaderResComplete || !this.isCall) {
             // 不是游客模式 检查token
             if (!Player.inst.isGuest && Player.inst.token) {
-                Player.inst.login.loginToken(Handler.create(this, this.checkGameState))
+                Player.inst.login.loginToken(this.checkGameState.bind(this))
             } else {
                 this.checkGameState({code: 0})
             }
@@ -318,7 +310,12 @@ export class SceneManager extends BaseProxy {
 
     /** 检查游戏状态 */
     private checkGameState(data: any) {
-        if (data?.code == -1) return
+        if (data?.code == -1) {
+            LoadingWindow.inst.hide()
+            JSUtils.openModal(StateCode.getShowMessage(data))
+            JSUtils.gameClose()
+            return
+        }
         // 如果是游客模式
         if (Player.inst.isGuest) {
             Player.inst.cacheMoney = Player.inst.money
@@ -522,6 +519,10 @@ export class SceneManager extends BaseProxy {
 
     get starter() {
         return this._starter
+    }
+
+    get scene() {
+        return this._starter.baseScene
     }
 
     /**
