@@ -12,7 +12,7 @@ declare type ParamHandler = ((...args) => any) | Laya.Handler
 declare function runFun(func: ParamHandler, ...args): any | null
 
 
-declare namespace Laya {
+declare module Laya {
 
 // @ts-ignore
     interface Text {
