@@ -45,7 +45,7 @@ export class AppRecordManager {
      */
     static addHistory(currentPage: IRecord, newPage: IRecord) {
         // console.log("addHistory")
-        this.history.push({current: currentPage, newPage: newPage})
+        AppRecordManager.history.push({current: currentPage, newPage: newPage})
     }
 
     /**
@@ -55,10 +55,10 @@ export class AppRecordManager {
      */
     static invalidHistory(value: IRecord) {
         // console.log("invalidHistory")
-        if (this.history.length > 0) {
-            for (let i = 0; i < this.history.length; i++) {
-                if (this.history[i]?.newPage == value) {
-                    this.history.splice(i, 1)
+        if (AppRecordManager.history.length > 0) {
+            for (let i = 0; i < AppRecordManager.history.length; i++) {
+                if (AppRecordManager.history[i]?.newPage == value) {
+                    AppRecordManager.history.splice(i, 1)
                     break
                 }
             }
@@ -71,7 +71,7 @@ export class AppRecordManager {
      *
      */
     static backGame(isBack = false) {
-        if (this.pauseHistory) {
+        if (AppRecordManager.pauseHistory) {
             if (isBack) {// 键盘返回
                 if (!Render.isConchApp) Browser.window.addNewHistory()
             } else {
@@ -80,13 +80,13 @@ export class AppRecordManager {
             return
         }
         if (history.length === 0) return
-        let array = this.history[this.history.length - 1]
-        if (array.newPage instanceof BaseScene) {
-            this.back(isBack)
+        let array = AppRecordManager.history[AppRecordManager.history.length - 1]
+        if (array?.newPage instanceof BaseScene) {
+            AppRecordManager.back(isBack)
         } else {
-            this.back(isBack)
+            AppRecordManager.back(isBack)
             if (Player.inst.gameModel != CommonCmd.GAME_HOME) {
-                this.backGame(isBack)
+                AppRecordManager.backGame(isBack)
             }
         }
     }
@@ -97,18 +97,18 @@ export class AppRecordManager {
      *
      */
     static backHistory(isBack = false) {
-        if (this.history.length > 0 && (this.history[this.history.length - 1].newPage instanceof fgui.Window || !this.pauseHistory)) {
-            let array = this.history[this.history.length - 1]
+        if (AppRecordManager.history.length > 0 && (AppRecordManager.history[AppRecordManager.history.length - 1].newPage instanceof fgui.Window || !AppRecordManager.pauseHistory)) {
+            let array = AppRecordManager.history[AppRecordManager.history.length - 1]
             if (isBack && array.newPage instanceof BaseScene) {
-                this.backGame(isBack)
+                AppRecordManager.backGame(isBack)
                 return
             }
-            this.back(isBack)
+            AppRecordManager.back(isBack)
         } else {
             // 没有缓存页  退出游戏
             if (Render.isConchApp && isBack) {// 非网页版并且是在安卓设备上
                 let timer = Browser.now()
-                if (timer - this.exitTimer < 2000) {// 在指定的时间内
+                if (timer - AppRecordManager.exitTimer < 2000) {// 在指定的时间内
                     AppRecordManager.exitTimer = 0
                     AppManager.exit()
                     return
@@ -123,8 +123,8 @@ export class AppRecordManager {
 
     /** 执行非大厅后退 */
     private static back(isBack = false) {
-        if (this.history.length > 0) {
-            let array = this.history.pop()
+        if (AppRecordManager.history.length > 0) {
+            let array = AppRecordManager.history.pop()
             array?.newPage?.hideRecord()
             array?.current?.showRecord()
             if (isBack) {// 键盘返回
@@ -209,7 +209,7 @@ export class AppRecordManager {
         if (typeof json === "string") {
             json = JSON.parse(json)
         }
-        if (this.customJavaSendOpen != null && this.customJavaSendOpen(json)) {
+        if (AppRecordManager.customJavaSendOpen != null && AppRecordManager.customJavaSendOpen(json)) {
             return
         }
 
@@ -230,7 +230,7 @@ export class AppRecordManager {
         switch (json.type) {
             case 1:// 打开网页
                 HtmlWindow.inst.showTip(json.data)
-                this.executeJson = null
+                AppRecordManager.executeJson = null
                 break
             case 2:// 进入游戏
                 SceneManager.inst.changeScene(json.gameName, Utils.parseInt(json.data) || Utils.parseInt(json.openGame) || -1)
@@ -249,7 +249,7 @@ export class AppRecordManager {
      * @return
      */
     static len() {
-        return this.history.length
+        return AppRecordManager.history.length
     }
 
     /** 清理所有页面缓存 */
@@ -259,7 +259,7 @@ export class AppRecordManager {
 //			let historyElement:IRecord = history[i]
 //			historyElement.hideRecord()
 //		}
-        this.history.splice(0, this.history.length)
+        AppRecordManager.history.splice(0, AppRecordManager.history.length)
     }
 
 }

@@ -1503,6 +1503,7 @@ declare namespace coreLib {
         static init(): void;
         private static defineLaya;
         private static defineFairy;
+        private static defineTimer;
         private static defineSpineSkeleton;
     }
     export class GoldEffect extends View {
@@ -5389,6 +5390,14 @@ declare namespace Laya {
          * @default null */
         removeLineColor: string
 
+    }
+
+    interface Stage {
+        /**
+         * 是否暂停更新所有的Laya.timer._update()
+         * @default false
+         */
+        pauseUpdateTimer?: boolean
     }
 
     interface CallLater {

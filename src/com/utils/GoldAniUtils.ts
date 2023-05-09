@@ -79,7 +79,7 @@ export class GoldAniUtils {
      */
     private specialAward(len: number) {
         for (let i = 0; i < len; i++) {
-            let loader: GoldLoader = new GoldLoader()
+            let loader = new GoldLoader()
             loader.icon = this.goldIconUrl
             loader.setXY(this.startPoint.x, this.startPoint.y)
             loader.setSize(this.goldW, this.goldH)
@@ -87,12 +87,14 @@ export class GoldAniUtils {
             let tempX = this.startPoint.x + Math.random() * 250 - 125
             let tempY = this.startPoint.y + Math.random() * 50 + 100
 
-            let endP: Point = new Point(this.endPoint.x - loader.width / 2, this.endPoint.y - loader.height / 2)
+            let endP = new Point(this.endPoint.x - loader.width / 2, this.endPoint.y - loader.height / 2)
 
             loader.setStartPoint(tempX, tempY)
             loader.setMiddlePoint(tempX + (endP.x - tempX) / 2 + UtilsTool.random(200, 300),
                 tempY + (endP.y - tempY) / 2 + UtilsTool.random(0, 100))
             loader.setEndPoint(endP.x, endP.y)
+            GRoot.inst.addChild(loader)
+            this.loaders.push(loader)
 
             Tween.to(loader, {x: tempX, y: tempY}, 600,
                 Ease.backOut, Laya.Handler.create(this, (loader: GLoader, i: number) => {
@@ -108,15 +110,12 @@ export class GoldAniUtils {
                             this.count++
                             if (this.count == len) {
                                 while (this.loaders.length) {
-                                    loader = this.loaders.shift()
-                                    loader.dispose()
+                                    this.loaders.shift().dispose()
                                 }
                                 runFun(this.endHandler)
                             }
                         }, [loader]), i * 5)
                 }, [loader, i]), i * 5)
-            GRoot.inst.addChild(loader)
-            this.loaders.push(loader)
         }
     }
 

@@ -36,6 +36,14 @@ declare namespace Laya {
 
     }
 
+    interface Stage {
+        /**
+         * 是否暂停更新所有的Laya.timer._update()
+         * @default false
+         */
+        pauseUpdateTimer?: boolean
+    }
+
     interface CallLater {
 
         /**

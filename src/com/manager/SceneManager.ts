@@ -203,6 +203,7 @@ export class SceneManager extends BaseProxy {
      */
     openGame(config: string, code = -1) {
         console.log("openGame -> " + config + " " + code)
+        Laya.stage.pauseUpdateTimer = false
         this.removeGroup(BaseProxy.GAME_GROUP)
         Player.inst.guestModel.clearData()
         HtmlWindow.inst.hide()
@@ -399,7 +400,9 @@ export class SceneManager extends BaseProxy {
         console.log("SceneManager.closeGame")
         if (Laya.loader == null) return
 
+        Laya.stage.pauseUpdateTimer = true
         Laya.timer.clearAllTimer()
+
         Laya.loader.clearUnLoaded()
         SoundManager.stopAll()
         AnalyticsManager.closeGame()

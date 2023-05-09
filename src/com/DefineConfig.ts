@@ -32,6 +32,16 @@ export class DefineConfig {
             }
         })
 
+        Object.defineProperty(Laya.Stage.prototype, "temp_updateTimers", {
+            // @ts-ignore
+            value: Laya.Stage.prototype._updateTimers
+        })
+        Object.defineProperty(Laya.Stage.prototype, "_updateTimers", {
+            value: function () {
+                if (!this.pauseUpdateTimer) this.temp_updateTimers()
+            }
+        })
+
         Object.defineProperty(Laya.KeyBoardManager, "_addEvent", {
             value: function (type) {
                 (window.parent || window).addEventListener(type, function (e: any) {
@@ -363,24 +373,7 @@ export class DefineConfig {
             }
         })
 
-        Object.defineProperty(Timer.prototype, "tempClearAll", {
-            value: Timer.prototype.clearAll
-        })
-        Object.defineProperty(Timer.prototype, "clearAll", {
-            value: function (caller: any) {
-                this.tempClearAll(caller)
-                CallLater.I.clear(caller)
-            }
-        })
-        Object.defineProperty(Timer.prototype, "clearAllTimer", {
-            value: function () {
-                //处理handler
-                for (let i = 0; i < this._handlers.length; i++) {
-                    if (i < this._handlers.length) this._handlers[i].clear()
-                }
-                CallLater.I.clearAll()
-            }
-        })
+        DefineConfig.defineTimer()
 
     }
 
@@ -410,6 +403,27 @@ export class DefineConfig {
         })
 
 
+    }
+
+    private static defineTimer() {
+        Object.defineProperty(Timer.prototype, "tempClearAll", {
+            value: Timer.prototype.clearAll
+        })
+        Object.defineProperty(Timer.prototype, "clearAll", {
+            value: function (caller: any) {
+                this.tempClearAll(caller)
+                CallLater.I.clear(caller)
+            }
+        })
+        Object.defineProperty(Timer.prototype, "clearAllTimer", {
+            value: function () {
+                //处理handler
+                for (let i = 0; i < this._handlers.length; i++) {
+                    if (i < this._handlers.length) this._handlers[i].clear()
+                }
+                CallLater.I.clearAll()
+            }
+        })
     }
 
     private static defineSpineSkeleton() {

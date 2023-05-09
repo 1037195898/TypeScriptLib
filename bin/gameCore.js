@@ -3848,6 +3848,16 @@ window.coreLib = {};
                     this.setScreenSize(Laya.Browser.clientWidth * Laya.Browser.pixelRatio, Laya.Browser.clientHeight * Laya.Browser.pixelRatio);
                 }
             });
+            Object.defineProperty(Laya.Stage.prototype, "temp_updateTimers", {
+                // @ts-ignore
+                value: Laya.Stage.prototype._updateTimers
+            });
+            Object.defineProperty(Laya.Stage.prototype, "_updateTimers", {
+                value: function () {
+                    if (!this.pauseUpdateTimer)
+                        this.temp_updateTimers();
+                }
+            });
             Object.defineProperty(Laya.KeyBoardManager, "_addEvent", {
                 value: function (type) {
                     (window.parent || window).addEventListener(type, function (e) {
@@ -4164,25 +4174,7 @@ window.coreLib = {};
                     }
                 }
             });
-            Object.defineProperty(Laya.Timer.prototype, "tempClearAll", {
-                value: Laya.Timer.prototype.clearAll
-            });
-            Object.defineProperty(Laya.Timer.prototype, "clearAll", {
-                value: function (caller) {
-                    this.tempClearAll(caller);
-                    Laya.CallLater.I.clear(caller);
-                }
-            });
-            Object.defineProperty(Laya.Timer.prototype, "clearAllTimer", {
-                value: function () {
-                    //处理handler
-                    for (let i = 0; i < this._handlers.length; i++) {
-                        if (i < this._handlers.length)
-                            this._handlers[i].clear();
-                    }
-                    Laya.CallLater.I.clearAll();
-                }
-            });
+            DefineConfig.defineTimer();
         }
         static defineFairy() {
             Object.defineProperty(fgui.PopupMenu.prototype, "__clickItem2", {
@@ -4205,6 +4197,27 @@ window.coreLib = {};
                     if (itemObject.data != null) {
                         itemObject.data.run();
                     }
+                }
+            });
+        }
+        static defineTimer() {
+            Object.defineProperty(Laya.Timer.prototype, "tempClearAll", {
+                value: Laya.Timer.prototype.clearAll
+            });
+            Object.defineProperty(Laya.Timer.prototype, "clearAll", {
+                value: function (caller) {
+                    this.tempClearAll(caller);
+                    Laya.CallLater.I.clear(caller);
+                }
+            });
+            Object.defineProperty(Laya.Timer.prototype, "clearAllTimer", {
+                value: function () {
+                    //处理handler
+                    for (let i = 0; i < this._handlers.length; i++) {
+                        if (i < this._handlers.length)
+                            this._handlers[i].clear();
+                    }
+                    Laya.CallLater.I.clearAll();
                 }
             });
         }
@@ -5248,7 +5261,7 @@ window.coreLib = {};
          */
         static addHistory(currentPage, newPage) {
             // console.log("addHistory")
-            this.history.push({ current: currentPage, newPage: newPage });
+            AppRecordManager.history.push({ current: currentPage, newPage: newPage });
         }
         /**
          * 作废指定的记录
@@ -5258,10 +5271,10 @@ window.coreLib = {};
         static invalidHistory(value) {
             var _a;
             // console.log("invalidHistory")
-            if (this.history.length > 0) {
-                for (let i = 0; i < this.history.length; i++) {
-                    if (((_a = this.history[i]) === null || _a === void 0 ? void 0 : _a.newPage) == value) {
-                        this.history.splice(i, 1);
+            if (AppRecordManager.history.length > 0) {
+                for (let i = 0; i < AppRecordManager.history.length; i++) {
+                    if (((_a = AppRecordManager.history[i]) === null || _a === void 0 ? void 0 : _a.newPage) == value) {
+                        AppRecordManager.history.splice(i, 1);
                         break;
                     }
                 }
@@ -5273,7 +5286,7 @@ window.coreLib = {};
          *
          */
         static backGame(isBack = false) {
-            if (this.pauseHistory) {
+            if (AppRecordManager.pauseHistory) {
                 if (isBack) { // 键盘返回
                     if (!Laya.Render.isConchApp)
                         Laya.Browser.window.addNewHistory();
@@ -5285,14 +5298,14 @@ window.coreLib = {};
             }
             if (history.length === 0)
                 return;
-            let array = this.history[this.history.length - 1];
-            if (array.newPage instanceof BaseScene) {
-                this.back(isBack);
+            let array = AppRecordManager.history[AppRecordManager.history.length - 1];
+            if ((array === null || array === void 0 ? void 0 : array.newPage) instanceof BaseScene) {
+                AppRecordManager.back(isBack);
             }
             else {
-                this.back(isBack);
+                AppRecordManager.back(isBack);
                 if (Player.inst.gameModel != CommonCmd.GAME_HOME) {
-                    this.backGame(isBack);
+                    AppRecordManager.backGame(isBack);
                 }
             }
         }
@@ -5302,19 +5315,19 @@ window.coreLib = {};
          *
          */
         static backHistory(isBack = false) {
-            if (this.history.length > 0 && (this.history[this.history.length - 1].newPage instanceof fgui.Window || !this.pauseHistory)) {
-                let array = this.history[this.history.length - 1];
+            if (AppRecordManager.history.length > 0 && (AppRecordManager.history[AppRecordManager.history.length - 1].newPage instanceof fgui.Window || !AppRecordManager.pauseHistory)) {
+                let array = AppRecordManager.history[AppRecordManager.history.length - 1];
                 if (isBack && array.newPage instanceof BaseScene) {
-                    this.backGame(isBack);
+                    AppRecordManager.backGame(isBack);
                     return;
                 }
-                this.back(isBack);
+                AppRecordManager.back(isBack);
             }
             else {
                 // 没有缓存页  退出游戏
                 if (Laya.Render.isConchApp && isBack) { // 非网页版并且是在安卓设备上
                     let timer = Laya.Browser.now();
-                    if (timer - this.exitTimer < 2000) { // 在指定的时间内
+                    if (timer - AppRecordManager.exitTimer < 2000) { // 在指定的时间内
                         AppRecordManager.exitTimer = 0;
                         AppManager.exit();
                         return;
@@ -5330,8 +5343,8 @@ window.coreLib = {};
         /** 执行非大厅后退 */
         static back(isBack = false) {
             var _a, _b;
-            if (this.history.length > 0) {
-                let array = this.history.pop();
+            if (AppRecordManager.history.length > 0) {
+                let array = AppRecordManager.history.pop();
                 (_a = array === null || array === void 0 ? void 0 : array.newPage) === null || _a === void 0 ? void 0 : _a.hideRecord();
                 (_b = array === null || array === void 0 ? void 0 : array.current) === null || _b === void 0 ? void 0 : _b.showRecord();
                 if (isBack) { // 键盘返回
@@ -5414,7 +5427,7 @@ window.coreLib = {};
             if (typeof json === "string") {
                 json = JSON.parse(json);
             }
-            if (this.customJavaSendOpen != null && this.customJavaSendOpen(json)) {
+            if (AppRecordManager.customJavaSendOpen != null && AppRecordManager.customJavaSendOpen(json)) {
                 return;
             }
             Player.inst.urlParam.parseData(json);
@@ -5434,7 +5447,7 @@ window.coreLib = {};
             switch (json.type) {
                 case 1: // 打开网页
                     HtmlWindow.inst.showTip(json.data);
-                    this.executeJson = null;
+                    AppRecordManager.executeJson = null;
                     break;
                 case 2: // 进入游戏
                     SceneManager.inst.changeScene(json.gameName, Laya.Utils.parseInt(json.data) || Laya.Utils.parseInt(json.openGame) || -1);
@@ -5451,7 +5464,7 @@ window.coreLib = {};
          * @return
          */
         static len() {
-            return this.history.length;
+            return AppRecordManager.history.length;
         }
         /** 清理所有页面缓存 */
         static clearHistory() {
@@ -5460,7 +5473,7 @@ window.coreLib = {};
             //			let historyElement:IRecord = history[i]
             //			historyElement.hideRecord()
             //		}
-            this.history.splice(0, this.history.length);
+            AppRecordManager.history.splice(0, AppRecordManager.history.length);
         }
     }
     /**
@@ -6072,6 +6085,7 @@ window.coreLib = {};
          */
         openGame(config, code = -1) {
             console.log("openGame -> " + config + " " + code);
+            Laya.stage.pauseUpdateTimer = false;
             this.removeGroup(BaseProxy.GAME_GROUP);
             Player.inst.guestModel.clearData();
             HtmlWindow.inst.hide();
@@ -6251,6 +6265,7 @@ window.coreLib = {};
             console.log("SceneManager.closeGame");
             if (Laya.loader == null)
                 return;
+            Laya.stage.pauseUpdateTimer = true;
             Laya.timer.clearAllTimer();
             Laya.loader.clearUnLoaded();
             Laya.SoundManager.stopAll();
@@ -8407,6 +8422,8 @@ window.coreLib = {};
                 loader.setStartPoint(tempX, tempY);
                 loader.setMiddlePoint(tempX + (endP.x - tempX) / 2 + UtilsTool.random(200, 300), tempY + (endP.y - tempY) / 2 + UtilsTool.random(0, 100));
                 loader.setEndPoint(endP.x, endP.y);
+                fgui.GRoot.inst.addChild(loader);
+                this.loaders.push(loader);
                 Laya.Tween.to(loader, { x: tempX, y: tempY }, 600, Laya.Ease.backOut, Laya.Handler.create(this, (loader, i) => {
                     Laya.Tween.to(loader, {
                         //                                    x: endP.x,
@@ -8419,15 +8436,12 @@ window.coreLib = {};
                         this.count++;
                         if (this.count == len) {
                             while (this.loaders.length) {
-                                loader = this.loaders.shift();
-                                loader.dispose();
+                                this.loaders.shift().dispose();
                             }
                             runFun(this.endHandler);
                         }
                     }, [loader]), i * 5);
                 }, [loader, i]), i * 5);
-                fgui.GRoot.inst.addChild(loader);
-                this.loaders.push(loader);
             }
         }
         /************************************  普通金币掉落动画  ***********************************/
