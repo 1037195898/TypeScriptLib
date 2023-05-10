@@ -2,9 +2,6 @@ window.coreLib = {};
 
 (function (coreLib) {
     class View extends fgui.GComponent {
-        constructor() {
-            super();
-        }
         regAction(action, caller, method, group) {
             Factory.inst.regAction(action, caller, method, group);
         }
@@ -963,9 +960,6 @@ window.coreLib = {};
     }
     coreLib.BaseGameData = BaseGameData;
     class BaseLabel extends fgui.GLabel {
-        constructor() {
-            super();
-        }
         regAction(action, caller, method, group) {
             Factory.inst.regAction(action, caller, method, group);
         }
@@ -2162,7 +2156,7 @@ window.coreLib = {};
     coreLib.BaseStarter = BaseStarter;
     class BaseWindow extends fgui.Window {
         constructor() {
-            super();
+            super(...arguments);
             /** 动画显示或关闭 */
             this.isAction = true;
             /** 是否加入后退记录 */
