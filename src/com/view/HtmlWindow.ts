@@ -15,6 +15,7 @@ import {AppManager} from "../manager/AppManager"
 import {SceneManager} from "../manager/SceneManager"
 import {ActionLib} from "../actions/ActionLib"
 import {CommonCmd} from "../net/CommonCmd"
+import {Log} from "../Log";
 
 export class HtmlWindow extends fgui.Window implements IRecord {
 
@@ -175,14 +176,14 @@ export class HtmlWindow extends fgui.Window implements IRecord {
 
                 Browser.document.body.appendChild(webElement)
 
-//			    console.log(Laya.stage.width, Render.canvas.width, Render._mainCanvas.width)
+//			    Log.debug(Laya.stage.width, Render.canvas.width, Render._mainCanvas.width)
                 webElement.appendChild(elementFrame)
 
             }
 
             let loadEnd = () => {
                 this.loadMovieClip.selectedIndex = 1
-                console.log("loadComplete")
+                Log.debug("loadComplete")
             }
 
             Browser.window.regIFrame(loadEnd)

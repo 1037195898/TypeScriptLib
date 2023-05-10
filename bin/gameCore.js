@@ -568,7 +568,7 @@ window.coreLib = {};
             if (agent.indexOf("applewebkit") > -1) {
                 if (/chrome\/(\d+\.\d)/i.test(agent)) {
                     let ver = +RegExp['\x241'];
-                    console.log("check browser version = " + ver);
+                    Log.debug("check browser version = " + ver);
                     if (ver >= checkVersion) {
                         return true;
                     }
@@ -736,8 +736,8 @@ window.coreLib = {};
     })(ActionLib = coreLib.ActionLib || (coreLib.ActionLib = {}));
     let EnvType;
     (function (EnvType) {
-        EnvType[EnvType["DEV"] = 0] = "DEV";
-        EnvType[EnvType["PROD"] = 1] = "PROD";
+        EnvType[EnvType["PROD"] = 0] = "PROD";
+        EnvType[EnvType["DEV"] = 1] = "DEV";
         EnvType[EnvType["TEST"] = 2] = "TEST";
     })(EnvType = coreLib.EnvType || (coreLib.EnvType = {}));
     /**
@@ -756,7 +756,7 @@ window.coreLib = {};
             }
             if (isWebp || Laya.Utils.getQueryString("webp")) {
                 MyLoader.isWebp = true;
-                console.log("Support webp");
+                Log.info("Support webp");
             }
             return isWebp;
         }
@@ -1325,7 +1325,7 @@ window.coreLib = {};
                     return;
                 }
             }
-            console.log("regStartupEvent -> name = " + name);
+            Log.debug("regStartupEvent -> name = " + name);
             this.startupEvent.push({ handler: handler, weight: weight, name: name });
         }
         /**
@@ -1336,7 +1336,7 @@ window.coreLib = {};
          * @param name 事件名字 默认 null
          */
         regStartupEventIndex(index, handler, weight = 0, name = null) {
-            console.log("regStartupEventIndex -> name = " + name);
+            Log.debug("regStartupEventIndex -> name = " + name);
             this.startupEvent.splice(index, 0, { handler: handler, weight: weight, name: name });
         }
         /**
@@ -1367,14 +1367,14 @@ window.coreLib = {};
                 if (this.startupEvent[i].name == name) {
                     this.startupEvent.splice(i, 1);
                     i--;
-                    console.log("Unload Startup event -> name = " + name);
+                    Log.debug("Unload Startup event -> name = " + name);
                 }
             }
         }
         runEvent() {
             if (this.startupEvent.length > 0) {
                 let event = this.startupEvent.shift();
-                console.log("execute event = " + event.name);
+                Log.debug("execute event = " + event.name);
                 runFun(event.handler);
             }
             else {
@@ -1387,7 +1387,7 @@ window.coreLib = {};
         }
         /** 运行事件结束 */
         runEventEnd() {
-            console.log("runEventEnd");
+            Log.debug("runEventEnd");
             if (this.isRunEvent) {
                 this.startGame();
             }
@@ -1590,7 +1590,7 @@ window.coreLib = {};
             if (this.asSkeleton.templet == null)
                 return;
             if (skeletonPlay == null && this.skeletonPlay == null) {
-                console.warn("not found play data " + skeletonPlay);
+                Log.warn("not found play data " + skeletonPlay);
                 return;
             }
             if (skeletonPlay) {
@@ -1929,7 +1929,7 @@ window.coreLib = {};
             if (wins.length == 0)
                 return;
             let currentLine = wins[this.showLineIndex] + 1;
-            // console.log(wins, currentLine)
+            // Log.debug(wins, currentLine)
             if (gameData.lottery.length < currentLine || this.showLineIndex >= wins.length) {
                 this.nextLine();
                 return;
@@ -2418,7 +2418,7 @@ window.coreLib = {};
             args.unshift(group);
             let result = this.sendActionEvent.apply(this, args);
             if (!result) {
-                console.warn("group[" + group + "], action [" + action + "] not exist! Call failure");
+                Log.warn("group[" + group + "], action [" + action + "] not exist! Call failure");
             }
         }
         sendAction(action, ...args) {
@@ -2433,7 +2433,7 @@ window.coreLib = {};
                     result = true;
             }
             if (!result)
-                console.warn("action [" + action + "] not exist! Call failure");
+                Log.warn("action [" + action + "] not exist! Call failure");
         }
         sendActionEvent(group, action, ...args) {
             let groupObj = this.getGroup(group);
@@ -2451,11 +2451,11 @@ window.coreLib = {};
                 key = this._getClassSign(key);
             }
             if (StringUtil.isEmpty(key)) {
-                console.warn("cannot be empty, key = " + key);
+                Log.warn("cannot be empty, key = " + key);
                 return false;
             }
             if (this.getView(key)) {
-                console.warn("already exist key = " + key + ", add failure!");
+                Log.warn("already exist key = " + key + ", add failure!");
                 return false;
             }
             view.setKey(key);
@@ -2485,11 +2485,11 @@ window.coreLib = {};
                 key = this._getClassSign(key);
             }
             if (StringUtil.isEmpty(key)) {
-                console.warn("Proxy name cannot be empty!");
+                Log.warn("Proxy name cannot be empty!");
                 return false;
             }
             if (this.getProxy(key)) {
-                console.warn("already exist key = " + key + ", add failure!");
+                Log.warn("already exist key = " + key + ", add failure!");
                 // return false
             }
             proxy.setKey(key);
@@ -2675,7 +2675,7 @@ window.coreLib = {};
                     fgui.UIPackage.removePackage(pack.id);
                 AssetsLoader.checkBranch(res);
                 LoaderConfig.clear(res);
-                console.log("GameModel.clearRes() " + fuiName + " uninstall");
+                Log.info("GameModel.clearRes() " + fuiName + " uninstall");
             }
         }
         /** 设置游戏音乐 */
@@ -2694,11 +2694,11 @@ window.coreLib = {};
         lotteryComplete() { }
         /** 游戏进入后台执行 */
         blurGame() {
-            console.log("blurGame");
+            Log.info("blurGame");
         }
         /** 游戏进入前台执行 */
         focusGame() {
-            console.log("focusGame");
+            Log.info("focusGame");
         }
         get gameScene() {
             if (this._gameScene == null)
@@ -3005,7 +3005,7 @@ window.coreLib = {};
             //             return
             //         }
             //     }
-            //     console.log("GameServlet.checkStateHandler(data)gameStatus=" + this.gameStatus + ", period=" + period + ", " + Player.inst.data.period)
+            //     Log.info("GameServlet.checkStateHandler(data)gameStatus=" + this.gameStatus + ", period=" + period + ", " + Player.inst.data.period)
             //     handler.runWith(false)
             // }, () => {
             //     handler.runWith(false)
@@ -3826,7 +3826,7 @@ window.coreLib = {};
          */
         completeHandler(list) {
             this.completeCount++;
-            //        console.log("a" + this.completeCount + "  " + Browser.now())
+            //        Log.debug("a" + this.completeCount + "  " + Browser.now())
             // 如果需要完成一次回调
             this.oneComplete(list);
             if (this.completeCount < this.tweenList.length) {
@@ -3933,9 +3933,9 @@ window.coreLib = {};
         static defineLaya() {
             Object.defineProperty(Laya.Stage.prototype, "_changeCanvasSize", {
                 value: function () {
-                    console.log("_changeCanvasSize = " + Laya.Browser.clientWidth + " | " + Laya.Browser.clientHeight);
+                    Log.debug("_changeCanvasSize = " + Laya.Browser.clientWidth + " | " + Laya.Browser.clientHeight);
                     if (Laya.Browser.clientHeight == Laya.Browser.clientWidth) {
-                        console.log("refuse =!");
+                        Log.debug("refuse =!");
                         this.setScreenSize(this._width, this._height);
                         return;
                     }
@@ -4554,7 +4554,7 @@ window.coreLib = {};
                 loader.visible = false;
                 loader.setXY(startX, startY);
                 loader.setStartPoint(startX, startY);
-                // console.log(startY, endPoint.y + (startY - endPoint.y)/2, endPoint.y)
+                // Log.debug(startY, endPoint.y + (startY - endPoint.y)/2, endPoint.y)
                 loader.setMiddlePoint(startX + 100, endPoint.y + (startY - endPoint.y) / 2);
                 loader.setEndPoint(endPoint.x, endPoint.y);
                 parent.addChild(loader);
@@ -4820,7 +4820,8 @@ window.coreLib = {};
         static init() {
             this._instance = new Factory();
             DefineConfig.init();
-            ConfigKit.env();
+            let envType = ConfigKit.env();
+            Log.debug("env", EnvType[envType]);
             // 使用自定义加载器加载资源
             fgui.AssetProxy.inst.setAsset(MyLoader.loader);
         }
@@ -4910,6 +4911,105 @@ window.coreLib = {};
         Method["GET"] = "get";
         Method["POST"] = "post";
     })(Method = coreLib.Method || (coreLib.Method = {}));
+    let LogLevel;
+    (function (LogLevel) {
+        LogLevel[LogLevel["ALL"] = 0] = "ALL";
+        /**
+         * 跟踪
+         */
+        LogLevel[LogLevel["TRACE"] = 1] = "TRACE";
+        LogLevel[LogLevel["DEBUG"] = 2] = "DEBUG";
+        LogLevel[LogLevel["INFO"] = 3] = "INFO";
+        LogLevel[LogLevel["WARN"] = 4] = "WARN";
+        LogLevel[LogLevel["ERROR"] = 5] = "ERROR";
+        /**
+         * 致命错误
+         */
+        LogLevel[LogLevel["FATAL"] = 6] = "FATAL";
+        LogLevel[LogLevel["OFF"] = 7] = "OFF";
+    })(LogLevel = coreLib.LogLevel || (coreLib.LogLevel = {}));
+    /**
+     * 定义日志格式
+     */
+    class Log {
+        static trace(...value) {
+            Log.append({ level: LogLevel.TRACE, data: value });
+            if (Environment.active === EnvType.PROD || Log.level > LogLevel.TRACE)
+                return;
+            // Log._log(value)
+            console.trace.apply(window, value);
+        }
+        static debug(...value) {
+            Log.append({ level: LogLevel.DEBUG, data: value });
+            if (Environment.active === EnvType.PROD || Log.level > LogLevel.DEBUG)
+                return;
+            Log._log(value);
+        }
+        static info(...value) {
+            Log.append({ level: LogLevel.INFO, data: value });
+            if (Log.level > LogLevel.INFO)
+                return;
+            Log._log(value);
+        }
+        static warn(...value) {
+            Log.append({ level: LogLevel.INFO, data: value });
+            if (Log.level > LogLevel.WARN)
+                return;
+            console.warn.apply(window, value);
+        }
+        static error(...value) {
+            Log.append({ level: LogLevel.ERROR, data: value });
+            if (Log.level > LogLevel.ERROR)
+                return;
+            console.error.apply(window, value);
+        }
+        static fatal(...value) {
+            Log.append({ level: LogLevel.FATAL, data: value });
+            if (Log.level > LogLevel.FATAL)
+                return;
+            console.error.apply(window, value);
+        }
+        static _log(value) {
+            console.log.apply(window, value);
+        }
+        /**
+         * @internal
+         */
+        static log() {
+            const logs = Log.history.concat();
+            for (const value of logs) {
+                switch (value.level) {
+                    case LogLevel.TRACE:
+                        console.trace.apply(window, value.data);
+                        break;
+                    case LogLevel.WARN:
+                        console.warn.apply(window, value.data);
+                        break;
+                    case LogLevel.FATAL:
+                    case LogLevel.ERROR:
+                        console.error.apply(window, value.data);
+                        break;
+                    case LogLevel.DEBUG:
+                    case LogLevel.INFO:
+                        console.log.apply(window, value.data);
+                        break;
+                }
+            }
+        }
+        static append(data) {
+            Log.history.push(data);
+            if (Log.history.length > Log.MAX_HISTORY + 500) {
+                Log.history.splice(0, 500);
+            }
+        }
+    }
+    /**
+     * @default LogLevel.ALL
+     */
+    Log.level = LogLevel.ALL;
+    Log.MAX_HISTORY = 3000;
+    Log.history = [];
+    coreLib.Log = Log;
     /**
      * 统计管理器
      * @author boge
@@ -4942,7 +5042,7 @@ window.coreLib = {};
                 AnalyticsManager.send(gameName + "_" + eventAction);
             }
             else {
-                console.warn("sendGameAnalysis : gameId=" + Player.inst.gameModel + " not exist");
+                Log.warn("sendGameAnalysis : gameId=" + Player.inst.gameModel + " not exist");
             }
         }
         /**
@@ -5147,7 +5247,7 @@ window.coreLib = {};
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
             }
             else {
-                console.log(value);
+                Log.info(value);
             }
         }
         /**
@@ -5357,7 +5457,7 @@ window.coreLib = {};
          * @param newPage 添加的新面板
          */
         static addHistory(currentPage, newPage) {
-            // console.log("addHistory")
+            // Log.debug("addHistory")
             AppRecordManager.history.push({ current: currentPage, newPage: newPage });
         }
         /**
@@ -5367,7 +5467,7 @@ window.coreLib = {};
          */
         static invalidHistory(value) {
             var _a;
-            // console.log("invalidHistory")
+            // Log.debug("invalidHistory")
             if (AppRecordManager.history.length > 0) {
                 for (let i = 0; i < AppRecordManager.history.length; i++) {
                     if (((_a = AppRecordManager.history[i]) === null || _a === void 0 ? void 0 : _a.newPage) == value) {
@@ -5485,7 +5585,7 @@ window.coreLib = {};
                     break;
                 case 1000: // 与java交互
                     let str = value[0];
-                    console.log(str);
+                    Log.info(str);
                     let json = JSON.parse(str);
                     let token = json.token;
                     if (token) {
@@ -5528,9 +5628,9 @@ window.coreLib = {};
                 return;
             }
             Player.inst.urlParam.parseData(json);
-            console.log("JavaSendOpen() type = " + json.type);
-            console.log("JavaSendOpen() openGame = " + json.openGame);
-            console.log("JavaSendOpen() gameName = " + json.gameName);
+            Log.info("JavaSendOpen() type = " + json.type);
+            Log.info("JavaSendOpen() openGame = " + json.openGame);
+            Log.info("JavaSendOpen() gameName = " + json.gameName);
             if (!Player.inst.isGuest && json.token) {
                 Player.inst.login.loginToken(Laya.Handler.create(null, function (data) {
                     AppRecordManager.open(json);
@@ -5565,7 +5665,7 @@ window.coreLib = {};
         }
         /** 清理所有页面缓存 */
         static clearHistory() {
-            console.log("clearHistory");
+            Log.debug("clearHistory");
             //		for (let i:number = 0; i < history.length; i++) {
             //			let historyElement:IRecord = history[i]
             //			historyElement.hideRecord()
@@ -5667,7 +5767,7 @@ window.coreLib = {};
                     return;
                 }
                 if (!this.addPackage("init/init")) {
-                    console.log("addPackage fail = init");
+                    Log.debug("addPackage fail = init");
                     loadErrorHandler();
                     return;
                 }
@@ -5936,7 +6036,7 @@ window.coreLib = {};
                 if (fuiName.indexOf("." + fairygui.UIConfig.packageFileExtension) != -1) {
                     fuiName = StringUtil.remove(fuiName, "." + fairygui.UIConfig.packageFileExtension);
                     if (!this.addPackage(fuiName)) {
-                        console.log("addPackage fail = " + fuiName);
+                        Log.info("addPackage fail = " + fuiName);
                         this.loadErrorHandler();
                         return;
                     }
@@ -6011,11 +6111,11 @@ window.coreLib = {};
                     let xmlList = xml.getElementsByName(tempName);
                     if (xmlList.length > 0) {
                         if (itemElement.textContent == xmlList[0].textContent) {
-                            console.log("xml-languages: name=" + tempName + " repeat");
+                            Log.debug("xml-languages: name=" + tempName + " repeat");
                         }
                         else {
                             // 发现有个存在一样的
-                            console.warn("xml-languages: name=" + tempName + " repeat," +
+                            Log.warn("xml-languages: name=" + tempName + " repeat," +
                                 " content=" + xmlList[0].textContent + ", content2=" + itemElement.textContent);
                         }
                     }
@@ -6061,7 +6161,7 @@ window.coreLib = {};
                 Laya.stage.off(Laya.Event.VISIBILITY_CHANGE, this, this.visibilityChange);
                 Laya.stage.on(Laya.Event.VISIBILITY_CHANGE, this, this.visibilityChange);
             }
-            console.log("SceneManager.showHomeScene");
+            Log.debug("SceneManager.showHomeScene");
             AppManager.sendAppData();
             if (AppRecordManager.executeJson != null) {
                 AppRecordManager.JavaSendOpen(AppRecordManager.executeJson);
@@ -6096,7 +6196,7 @@ window.coreLib = {};
         }
         /** 游戏是否进入后台 */
         visibilityChange() {
-            //		console.log("visibilityChange="+Laya.stage.isVisibility)
+            //		Log.debug("visibilityChange="+Laya.stage.isVisibility)
             if (Laya.stage.isVisibility) {
                 this.focusHandler();
             }
@@ -6177,7 +6277,7 @@ window.coreLib = {};
          * @param code 游戏id
          */
         openGame(config, code = -1) {
-            console.log("openGame -> " + config + " " + code);
+            Log.info("openGame -> " + config + " " + code);
             Laya.stage.pauseUpdateTimer = false;
             this.removeGroup(BaseProxy.GAME_GROUP);
             Player.inst.guestModel.clearData();
@@ -6191,7 +6291,7 @@ window.coreLib = {};
             if (code > 0 || config == null)
                 config = StringUtil.trimAll(ConfigUtils.gameName(code));
             if (config == null || code <= 0) {
-                console.error("config = " + config, "code = " + code);
+                Log.error("config = " + config, "code = " + code);
                 LoadingWindow.inst.hide();
                 JSUtils.openModal(this.getString(1017 /* LibStr.GAME_NOT_FOUND */));
                 JSUtils.gameClose();
@@ -6255,7 +6355,7 @@ window.coreLib = {};
          */
         loadResComplete() {
             this.isLoaderResComplete = true;
-            console.log("loadResComplete");
+            Log.debug("loadResComplete");
             this.startGameProcess();
         }
         /** 供外部调用 */
@@ -6264,7 +6364,7 @@ window.coreLib = {};
                 return;
             }
             this.initComplete = true;
-            console.log("showGameToView -> isDemo=" + isDemo);
+            Log.debug("showGameToView -> isDemo=" + isDemo);
             Player.inst.isGuest = isDemo;
             this.startGameProcess();
         }
@@ -6315,17 +6415,17 @@ window.coreLib = {};
             MessageTip.clearAll();
             this.sendAction(ActionLib.GAME_INIT_SOCKET_EVENT);
             SoundUtils.stopMusic(); // 关闭进入游戏前的音乐
-            console.log("create scene");
+            Log.debug("create scene");
             // 创建游戏到舞台上
             this.sendAction(ActionLib.GAME_CREATE_SCENE_SHOW, Laya.Handler.create(this, function () {
-                console.log("init model and load sound");
+                Log.debug("init model and load sound");
                 fgui.GRoot.inst.closeModalWait();
                 this.sendAction(ActionLib.GAME_INIT_MODEL);
                 AppRecordManager.executeJson = null;
                 SoundUtils.load();
                 //                // 放到下一帧去播放  不然 进入需要旋转的游戏 渲染跟不上
                 Laya.timer.callLater(this, function () {
-                    console.log("call close loading");
+                    Log.debug("call close loading");
                     LoadingWindow.inst.hide();
                     JSUtils.gameOnload();
                     Player.inst.guestModel.guestPlayCount = 0;
@@ -6359,7 +6459,7 @@ window.coreLib = {};
         }
         /** 关闭当前的游戏 */
         closeGame() {
-            console.log("SceneManager.closeGame");
+            Log.info("SceneManager.closeGame");
             if (Laya.loader == null)
                 return;
             Laya.stage.pauseUpdateTimer = true;
@@ -6718,7 +6818,7 @@ window.coreLib = {};
             if (typeof msg !== "string") {
                 msg = msg.data;
             }
-            console.log("GameSocket.closeHandler()" + msg);
+            Log.info("GameSocket.closeHandler()" + msg);
             Laya.timer.clear(this, this.heartbeat);
             Laya.timer.once(this.DELAY, this, this.reConnect);
         }
@@ -6750,19 +6850,19 @@ window.coreLib = {};
                 }
             }
             catch (e) {
-                console.log("error socket data", e + ' *** ' + evt);
+                Log.error("error socket data", e + ' *** ' + evt);
             }
         }
         errorHandler(e) {
             if (typeof e !== "string") {
                 e = e.data;
             }
-            console.log("GameSocket.errorHandler() " + e);
+            Log.debug("GameSocket.errorHandler() " + e);
             Laya.timer.clear(this, this.heartbeat);
             Laya.timer.once(this.DELAY, this, this.reConnect);
         }
         openHandler() {
-            console.log("GameSocket.openHandler()");
+            Log.debug("GameSocket.openHandler()");
             this.getAuth();
             this.event(Laya.Event.OPEN);
         }
@@ -6869,7 +6969,7 @@ window.coreLib = {};
         }
         /** 关闭链接 */
         close() {
-            console.log("close socket");
+            Log.debug("close socket");
             Laya.timer.clear(this, this.sendData);
             this._roomId = -1;
             if (this._client)
@@ -6908,10 +7008,10 @@ window.coreLib = {};
         }
         test(value) {
             if (typeof value == "string") {
-                console.log("string=" + JSON.stringify(value));
+                Log.debug("string=" + JSON.stringify(value));
             }
             else {
-                console.log("json=" + JSON.stringify(value));
+                Log.debug("json=" + JSON.stringify(value));
             }
         }
     }
@@ -7358,7 +7458,7 @@ window.coreLib = {};
             this._suitName = this.suitName(this.suit);
             this.nameCard = this.suit < 4 ? this.nameCard : 'JOKER';
             // var z = (52 - id) / 4
-            // console.log(value, nameCard, suit)
+            // Log.debug(value, nameCard, suit)
         }
         suitName(value) {
             // 黑红樱方
@@ -7420,7 +7520,7 @@ window.coreLib = {};
                 card.setPivot(tempPivot.x, tempPivot.y);
                 card.offset = i * card.offsetMultiple;
                 let _delay = i * 10;
-                // console.log(card.y, card.y + (- card.height * 1.5))
+                // Log.debug(card.y, card.y + (- card.height * 1.5))
                 Laya.Tween.to(card, {
                     x: card.initX - card.offset,
                     y: card.y + (-card.height * 1.5),
@@ -7878,7 +7978,7 @@ window.coreLib = {};
             return new Fn('return ' + fn)();
         }
         static loadScript(str) {
-            //		    console.log(Browser.document.head)
+            //		    Log.debug(Browser.document.head)
             let script = document.createElement('script');
             script.type = "text/javascript";
             script.text = str;
@@ -8064,7 +8164,7 @@ window.coreLib = {};
             }
             // 时区
             //		var localOffset:number = date.getTimezoneOffset() * 60000
-            //		console.log(localOffset)
+            //		Log.debug(localOffset)
             let tempStr = "";
             let match = fmt.match(/(y+)/);
             if ((match === null || match === void 0 ? void 0 : match.length) > 0) {
@@ -8086,12 +8186,12 @@ window.coreLib = {};
                 'S+': (isUTC ? date.getUTCMilliseconds() : date.getMilliseconds()),
                 "E+": DateUtils.weekday[(isUTC ? date.getUTCDay() : date.getDay())]
             };
-            //		console.log(o)
+            //		Log.debug(o)
             // 遍历这个对象
             for (let k in o) {
                 match = fmt.match(new RegExp("(" + k + ")"));
                 if ((match === null || match === void 0 ? void 0 : match.length) > 0) {
-                    //				 console.log('${k}')
+                    //				 Log.debug('${k}')
                     tempStr = match[0];
                     fmt = fmt.replace(tempStr, tempStr.length == 1 ? o[k] : ("00" + o[k]).substring(("" + o[k]).length));
                 }
@@ -8681,7 +8781,7 @@ window.coreLib = {};
             this.ghr.send(this.url, value, this.method, this.responseType, this.headers);
         }
         timeOutHandler() {
-            console.log("HTTPUtils.timeOutHandler()");
+            Log.debug("HTTPUtils.timeOutHandler()");
             if (this.timeout != null)
                 runFun(this.timeout);
             else if (this.error != null)
@@ -8689,7 +8789,7 @@ window.coreLib = {};
         }
         errorHandler(e) {
             var _a;
-            console.log("HTTPUtils.errorHandler()", e);
+            Log.debug("HTTPUtils.errorHandler()", e);
             (_a = HTTPUtils.filter) === null || _a === void 0 ? void 0 : _a.errorResult(e);
             runFun(this.error, e);
         }
@@ -8875,7 +8975,7 @@ window.coreLib = {};
             if (Laya.Browser.window.parent.GameToHall)
                 Laya.Browser.window.parent.GameToHall.outGameHttp(Player.inst.urlParam.roomId);
             else
-                console.log("debug");
+                Log.debug("debug");
         }
         /**
          * 分析邀请
@@ -8885,7 +8985,7 @@ window.coreLib = {};
             if (Laya.Browser.window.parent.GameToHall)
                 Laya.Browser.window.parent.GameToHall.shareDetail(Player.inst.gameModel, type);
             else
-                console.log("debug");
+                Log.debug("debug");
         }
         /** 上传头像 */
         static updateHead() {
@@ -9150,7 +9250,7 @@ window.coreLib = {};
                     source.filters = [ObjectUtil.colorTransform];
                 }
                 else {
-                    console.log("ObjectUtil.setColorTransform(source, value) 色值数量不对，应为8!");
+                    Log.fatal("ObjectUtil.setColorTransform(source, value) 色值数量不对，应为8!");
                 }
             }
             else {
@@ -9522,7 +9622,7 @@ window.coreLib = {};
             for (let i = 0; i < SoundUtils.autoPlay.length; i++) {
                 let url = SoundUtils.autoPlay[i];
                 SoundUtils.playMusic(url, SoundUtils.bgMusicLoop, SoundUtils.bgComplete, SoundUtils.bgVolume, SoundUtils.bgStartTime);
-                console.log("auto play = " + url);
+                Log.info("auto play = " + url);
             }
             SoundUtils.autoPlay.length = 0;
         }
@@ -9553,7 +9653,7 @@ window.coreLib = {};
                 return channel;
             }
             else {
-                console.log("sound not load " + url);
+                Log.info("sound not load " + url);
                 if (SoundUtils.autoPlay.indexOf(url) == -1)
                     SoundUtils.autoPlay.push(url);
                 const index = SoundUtils.loadAsset.findIndex(function (value) {
@@ -9582,7 +9682,7 @@ window.coreLib = {};
                 if (index < 0) {
                     SoundUtils.load(url);
                 }
-                console.log("sound not load " + url);
+                Log.info("sound not load " + url);
             }
             return null;
         }
@@ -9593,7 +9693,7 @@ window.coreLib = {};
                 Laya.loader.cancelLoadByUrl(loadRes.url);
                 Laya.SoundManager.destroySound(loadRes.url);
             }
-            console.log("clear sound");
+            Log.info("clear sound");
             SoundUtils.loadAsset.length = 0;
         }
         static stopSound(url) {
@@ -9772,7 +9872,7 @@ window.coreLib = {};
         static execute(code, msg = null) {
             switch (code) {
                 case 300: // 请登录
-                    console.log("StateCode.execute() 300");
+                    Log.debug("StateCode.execute() 300");
                     if (Player.inst.urlParam.isJumpPage()) {
                         JSUtils.login();
                         return true;
@@ -9801,7 +9901,7 @@ window.coreLib = {};
                     }, null, { cancelName: LanguageUtils.inst.getStr(1066 /* LibStr.OK */) });
                     return true;
                 case 8003: // 游戏暂停中
-                    console.log("StateCode.execute() 8003");
+                    Log.debug("StateCode.execute() 8003");
                     this.showGameOff();
                     return true;
             }
@@ -10596,7 +10696,7 @@ window.coreLib = {};
             for (let i = 0; i < msgLen; i++) {
                 this.aniText += this._defaultText;
             }
-            //        console.log("默认文本 = " + this.aniText, "len = " + this.aniText.length)
+            //        Log.debug("default Text : " + this.aniText, "len = " + this.aniText.length)
             let charData;
             this.playEndCount = 0;
             for (let i = 0; i < showTextLen; i++) {
@@ -10635,11 +10735,11 @@ window.coreLib = {};
             if (index > 0) {
                 this.aniText = this.replacePos(this.aniText, index, index, txt);
             }
-            //        console.log("changeTextHandler="+this.aniText, index, this.aniText.length)
+            //        Log.debug("changeTextHandler="+this.aniText, index, this.aniText.length)
             this._textField.text = this.aniText;
         }
         replacePos(text, start, end, replaceText) {
-            //        console.log("replacePos", text, start, replaceText)
+            //        Log.debug("replacePos", text, start, replaceText)
             return text.substring(0, start - 1) + replaceText + text.substring(end);
         }
         /**
@@ -10674,7 +10774,7 @@ window.coreLib = {};
                         tempText += this._defaultText;
                     }
                 }
-                //                console.log(tempText, tempText.length)
+                //                Log.debug(tempText, tempText.length)
                 this._textField.text = tempText;
                 this.twinkleCount--;
             }
@@ -11499,7 +11599,7 @@ window.coreLib = {};
          * 解析失败
          */
         _parseFail() {
-            console.log("[Error]:" + this._aniPath + "解析失败");
+            Log.error("[Error]:" + this._aniPath + "解析失败");
         }
         /**
          * 延迟播放动画
@@ -11622,7 +11722,7 @@ window.coreLib = {};
                 this.clearCache();
             }
             else {
-                console.warn("not found Laya.BoneSlot name = " + slotName);
+                Log.warn("not found Laya.BoneSlot name = " + slotName);
             }
         }
         /**
@@ -12055,12 +12155,12 @@ window.coreLib = {};
                     elementFrame.style.height = "100%";
                     elementFrame.style.display = "none";
                     Laya.Browser.document.body.appendChild(webElement);
-                    //			    console.log(Laya.stage.width, Render.canvas.width, Render._mainCanvas.width)
+                    //			    Log.debug(Laya.stage.width, Render.canvas.width, Render._mainCanvas.width)
                     webElement.appendChild(elementFrame);
                 }
                 let loadEnd = () => {
                     this.loadMovieClip.selectedIndex = 1;
-                    console.log("loadComplete");
+                    Log.debug("loadComplete");
                 };
                 Laya.Browser.window.regIFrame(loadEnd);
                 if (isHtmlUrl) {

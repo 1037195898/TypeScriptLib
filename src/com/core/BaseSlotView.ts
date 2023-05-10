@@ -128,7 +128,7 @@ export class BaseSlotView extends BaseView {
         let wins = gameData.userWinArray
         if (wins.length == 0) return
         let currentLine = wins[this.showLineIndex] + 1
-        // console.log(wins, currentLine)
+        // Log.debug(wins, currentLine)
         if (gameData.lottery.length < currentLine || this.showLineIndex >= wins.length) {
             this.nextLine()
             return

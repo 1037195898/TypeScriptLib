@@ -1,6 +1,7 @@
 import {Cast} from "./Cast"
 import {BindInputButton} from "./BindInputButton"
 import {LongPressBtn} from "./LongPressBtn"
+import {Log} from "../Log";
 
 export class UtilsTool {
 
@@ -135,7 +136,7 @@ export class UtilsTool {
         if (agent.indexOf("applewebkit") > -1) {
             if (/chrome\/(\d+\.\d)/i.test(agent)) {
                 let ver = +RegExp['\x241']
-                console.log("check browser version = " + ver)
+                Log.debug("check browser version = " + ver)
                 if (ver >= checkVersion) {
                     return true
                 }

@@ -2,6 +2,7 @@ import Browser = Laya.Browser
 import {Player} from "../Player"
 import {AppManager} from "./AppManager"
 import {ConfigUtils} from "../utils/ConfigUtils"
+import {Log} from "../Log";
 
 /**
  * 统计管理器
@@ -40,7 +41,7 @@ export class AnalyticsManager {
             if (Player.inst.isGuest) eventAction += "_demo"
             AnalyticsManager.send(gameName + "_" + eventAction)
         } else {
-            console.warn("sendGameAnalysis : gameId=" + Player.inst.gameModel + " not exist")
+            Log.warn("sendGameAnalysis : gameId=" + Player.inst.gameModel + " not exist")
         }
     }
 

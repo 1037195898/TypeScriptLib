@@ -1,6 +1,7 @@
 import SoundManager = Laya.SoundManager
 import Sound = Laya.Sound
 import URL = Laya.URL
+import {Log} from "../Log";
 
 export class SoundUtils {
 
@@ -28,7 +29,7 @@ export class SoundUtils {
         for (let i = 0; i < SoundUtils.autoPlay.length; i++) {
             let url = SoundUtils.autoPlay[i]
             SoundUtils.playMusic(url, SoundUtils.bgMusicLoop, SoundUtils.bgComplete, SoundUtils.bgVolume, SoundUtils.bgStartTime)
-            console.log("auto play = " + url)
+            Log.info("auto play = " + url)
         }
         SoundUtils.autoPlay.length = 0
     }
@@ -56,7 +57,7 @@ export class SoundUtils {
             if (volume > -1) channel.volume = volume
             return channel
         } else {
-            console.log("sound not load " + url)
+            Log.info("sound not load " + url)
             if (SoundUtils.autoPlay.indexOf(url) == -1) SoundUtils.autoPlay.push(url)
             const index = SoundUtils.loadAsset.findIndex(function (value: LoadRes) {
                 return value.url == url
@@ -82,7 +83,7 @@ export class SoundUtils {
             if (index < 0) {
                 SoundUtils.load(url)
             }
-            console.log("sound not load " + url)
+            Log.info("sound not load " + url)
         }
         return null
     }
@@ -94,7 +95,7 @@ export class SoundUtils {
             Laya.loader.cancelLoadByUrl(loadRes.url)
             SoundManager.destroySound(loadRes.url)
         }
-        console.log("clear sound")
+        Log.info("clear sound")
         SoundUtils.loadAsset.length = 0
     }
 

@@ -29,7 +29,7 @@ export class DateUtils {
         }
         // 时区
         //		var localOffset:number = date.getTimezoneOffset() * 60000
-        //		console.log(localOffset)
+        //		Log.debug(localOffset)
         let tempStr = ""
         let match = fmt.match(/(y+)/)
         if (match?.length > 0) {
@@ -50,12 +50,12 @@ export class DateUtils {
             'S+': (isUTC ? date.getUTCMilliseconds() : date.getMilliseconds()),
             "E+": DateUtils.weekday[(isUTC ? date.getUTCDay() : date.getDay())]
         }
-//		console.log(o)
+//		Log.debug(o)
         // 遍历这个对象
         for (let k in o) {
             match = fmt.match(new RegExp("(" + k + ")"))
             if (match?.length > 0) {
-//				 console.log('${k}')
+//				 Log.debug('${k}')
                 tempStr = match[0]
                 fmt = fmt.replace(tempStr, tempStr.length == 1 ? o[k] : ("00" + o[k]).substring(("" + o[k]).length))
             }

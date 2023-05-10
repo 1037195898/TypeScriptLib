@@ -2,8 +2,9 @@ import {MyLoader} from "./core/MyLoader";
 import Utils = Laya.Utils;
 import Render = Laya.Render;
 import {StringUtil} from "./utils/StringUtil";
+import {Log} from "./Log";
 
-export enum EnvType { DEV, PROD, TEST}
+export enum EnvType { PROD, DEV, TEST}
 
 /**
  * 配置工具
@@ -22,7 +23,7 @@ export class ConfigKit {
         }
         if (isWebp || Utils.getQueryString("webp")) {
             MyLoader.isWebp = true
-            console.log("Support webp")
+            Log.info("Support webp")
         }
         return isWebp
     }

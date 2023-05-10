@@ -35,6 +35,7 @@ import {WaitResult} from "../view/WaitResult"
 import {CommonCmd} from "../net/CommonCmd"
 import {Cmd} from "../net/Cmd"
 import {StateCode} from "../utils/StateCode";
+import {Log} from "../Log";
 
 /**
  * 舞台
@@ -69,7 +70,7 @@ export class SceneManager extends BaseProxy {
             Laya.stage.off(Laya.Event.VISIBILITY_CHANGE, this, this.visibilityChange)
             Laya.stage.on(Laya.Event.VISIBILITY_CHANGE, this, this.visibilityChange)
         }
-        console.log("SceneManager.showHomeScene")
+        Log.debug("SceneManager.showHomeScene")
         AppManager.sendAppData()
         if (AppRecordManager.executeJson != null) {
             AppRecordManager.JavaSendOpen(AppRecordManager.executeJson)
@@ -113,7 +114,7 @@ export class SceneManager extends BaseProxy {
 
     /** 游戏是否进入后台 */
     private visibilityChange() {
-//		console.log("visibilityChange="+Laya.stage.isVisibility)
+//		Log.debug("visibilityChange="+Laya.stage.isVisibility)
         if (Laya.stage.isVisibility) {
             this.focusHandler()
         } else {
@@ -194,7 +195,7 @@ export class SceneManager extends BaseProxy {
      * @param code 游戏id
      */
     openGame(config: string, code = -1) {
-        console.log("openGame -> " + config + " " + code)
+        Log.info("openGame -> " + config + " " + code)
         Laya.stage.pauseUpdateTimer = false
         this.removeGroup(BaseProxy.GAME_GROUP)
         Player.inst.guestModel.clearData()
@@ -205,7 +206,7 @@ export class SceneManager extends BaseProxy {
         // 处理房间名字
         if (code > 0 || config == null) config = StringUtil.trimAll(ConfigUtils.gameName(code))
         if (config == null || code <= 0) {
-            console.error("config = " + config, "code = " + code)
+            Log.error("config = " + config, "code = " + code)
             LoadingWindow.inst.hide()
             JSUtils.openModal(this.getString(LibStr.GAME_NOT_FOUND))
             JSUtils.gameClose()
@@ -281,7 +282,7 @@ export class SceneManager extends BaseProxy {
      */
     private loadResComplete() {
         this.isLoaderResComplete = true
-        console.log("loadResComplete")
+        Log.debug("loadResComplete")
         this.startGameProcess()
     }
 
@@ -291,7 +292,7 @@ export class SceneManager extends BaseProxy {
             return
         }
         this.initComplete = true
-        console.log("showGameToView -> isDemo=" + isDemo)
+        Log.debug("showGameToView -> isDemo=" + isDemo)
         Player.inst.isGuest = isDemo
         this.startGameProcess()
     }
@@ -346,10 +347,10 @@ export class SceneManager extends BaseProxy {
         MessageTip.clearAll()
         this.sendAction(ActionLib.GAME_INIT_SOCKET_EVENT)
         SoundUtils.stopMusic();// 关闭进入游戏前的音乐
-        console.log("create scene")
+        Log.debug("create scene")
         // 创建游戏到舞台上
         this.sendAction(ActionLib.GAME_CREATE_SCENE_SHOW, Handler.create(this, function () {
-            console.log("init model and load sound")
+            Log.debug("init model and load sound")
             GRoot.inst.closeModalWait()
             this.sendAction(ActionLib.GAME_INIT_MODEL)
             AppRecordManager.executeJson = null
@@ -357,7 +358,7 @@ export class SceneManager extends BaseProxy {
 
 //                // 放到下一帧去播放  不然 进入需要旋转的游戏 渲染跟不上
             Laya.timer.callLater(this, function () {
-                console.log("call close loading")
+                Log.debug("call close loading")
                 LoadingWindow.inst.hide()
                 JSUtils.gameOnload()
                 Player.inst.guestModel.guestPlayCount = 0
@@ -394,7 +395,7 @@ export class SceneManager extends BaseProxy {
 
     /** 关闭当前的游戏 */
     closeGame() {
-        console.log("SceneManager.closeGame")
+        Log.info("SceneManager.closeGame")
         if (Laya.loader == null) return
 
         Laya.stage.pauseUpdateTimer = true

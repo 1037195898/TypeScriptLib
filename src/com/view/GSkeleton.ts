@@ -13,6 +13,7 @@ import UIPackage = fgui.UIPackage;
 import BoneSlot = Laya.BoneSlot;
 import TextureFormat = Laya.TextureFormat;
 import {BaseSkeleton} from "../core/BaseSkeleton";
+import {Log} from "../Log";
 
 export class GSkeleton extends BaseSkeleton {
 
@@ -132,7 +133,7 @@ export class GSkeleton extends BaseSkeleton {
      * 解析失败
      */
     private _parseFail() {
-        console.log("[Error]:" + this._aniPath + "解析失败")
+        Log.error("[Error]:" + this._aniPath + "解析失败")
     }
 
     /**
@@ -264,7 +265,7 @@ export class GSkeleton extends BaseSkeleton {
             slot.currTexture = texture
             this.clearCache()
         } else {
-            console.warn("not found BoneSlot name = " + slotName)
+            Log.warn("not found BoneSlot name = " + slotName)
         }
     }
 

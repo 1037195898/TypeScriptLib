@@ -60,7 +60,7 @@ export class GoldLaunch {
             loader.visible = false
             loader.setXY(startX, startY)
             loader.setStartPoint(startX, startY)
-            // console.log(startY, endPoint.y + (startY - endPoint.y)/2, endPoint.y)
+            // Log.debug(startY, endPoint.y + (startY - endPoint.y)/2, endPoint.y)
             loader.setMiddlePoint(startX + 100, endPoint.y + (startY - endPoint.y) / 2)
             loader.setEndPoint(endPoint.x, endPoint.y)
             parent.addChild(loader)

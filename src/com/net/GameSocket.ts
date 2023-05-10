@@ -1,5 +1,6 @@
 import {StringUtil} from "../utils/StringUtil"
 import {NativeUtils} from "../runtime/NativeUtils"
+import {Log} from "../Log";
 
 export class GameSocket extends Laya.EventDispatcher {
 
@@ -48,7 +49,7 @@ export class GameSocket extends Laya.EventDispatcher {
         if (typeof msg !== "string") {
             msg = msg.data
         }
-        console.log("GameSocket.closeHandler()" + msg)
+        Log.info("GameSocket.closeHandler()" + msg)
         Laya.timer.clear(this, this.heartbeat)
         Laya.timer.once(this.DELAY, this, this.reConnect)
     }
@@ -79,7 +80,7 @@ export class GameSocket extends Laya.EventDispatcher {
                 }
             }
         } catch (e) {
-            console.log("error socket data", e + ' *** ' + evt)
+            Log.error("error socket data", e + ' *** ' + evt)
         }
     }
 
@@ -87,13 +88,13 @@ export class GameSocket extends Laya.EventDispatcher {
         if (typeof e !== "string") {
             e = e.data
         }
-        console.log("GameSocket.errorHandler() " + e)
+        Log.debug("GameSocket.errorHandler() " + e)
         Laya.timer.clear(this, this.heartbeat)
         Laya.timer.once(this.DELAY, this, this.reConnect)
     }
 
     openHandler() {
-        console.log("GameSocket.openHandler()")
+        Log.debug("GameSocket.openHandler()")
         this.getAuth()
         this.event(Laya.Event.OPEN)
     }

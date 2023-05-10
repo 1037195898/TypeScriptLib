@@ -3,6 +3,7 @@ import Render = Laya.Render
 import {IPlatform} from "../runtime/IPlatform"
 import {NativeUtils} from "../runtime/NativeUtils"
 import {StringUtil} from "../utils/StringUtil"
+import {Log} from "../Log";
 
 /** app管理器 */
 export class AppManager {
@@ -160,7 +161,7 @@ export class AppManager {
             let obj = {action: 10010, data: value}
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
         } else {
-            console.log(value)
+            Log.info(value)
         }
     }
 

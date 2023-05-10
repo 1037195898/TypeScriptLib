@@ -3,6 +3,7 @@ import Texture = Laya.Texture;
 import Sprite = Laya.Sprite;
 import Point = Laya.Point;
 import {StringUtil} from "./StringUtil"
+import {Log} from "../Log";
 
 export class ObjectUtil {
 
@@ -28,7 +29,7 @@ export class ObjectUtil {
                 ObjectUtil.colorTransform.color(array[4], array[5], array[6], array[7])
                 source.filters = [ObjectUtil.colorTransform]
             } else {
-                console.log("ObjectUtil.setColorTransform(source, value) 色值数量不对，应为8!")
+                Log.fatal("ObjectUtil.setColorTransform(source, value) 色值数量不对，应为8!")
             }
         } else {
             // ObjectUtil.colorTransform.redMultiplier = 1

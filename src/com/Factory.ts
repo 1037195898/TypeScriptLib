@@ -7,7 +7,8 @@ import {IKey} from "./interfaces/IKey"
 import {Controller} from "./core/Controller"
 import Handler = Laya.Handler;
 import {MyLoader} from "./core/MyLoader";
-import {ConfigKit} from "./ConfigKit";
+import {ConfigKit, EnvType} from "./ConfigKit";
+import {Log} from "./Log";
 
 export class Factory implements IAction {
 
@@ -38,7 +39,8 @@ export class Factory implements IAction {
     static init() {
         this._instance = new Factory()
         DefineConfig.init()
-        ConfigKit.env()
+        let envType = ConfigKit.env()
+        Log.debug("env", EnvType[envType])
         // 使用自定义加载器加载资源
         fgui.AssetProxy.inst.setAsset(MyLoader.loader)
     }

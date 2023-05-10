@@ -11,6 +11,7 @@ import GObject = fgui.GObject;
 import GButton = fgui.GButton;
 import GRoot = fgui.GRoot;
 import {StringUtil} from "./utils/StringUtil";
+import {Log} from "./Log";
 
 export class DefineConfig {
 
@@ -22,9 +23,9 @@ export class DefineConfig {
     private static defineLaya() {
         Object.defineProperty(Laya.Stage.prototype, "_changeCanvasSize", {
             value: function () {
-                console.log("_changeCanvasSize = " + Laya.Browser.clientWidth + " | " + Laya.Browser.clientHeight)
+                Log.debug("_changeCanvasSize = " + Laya.Browser.clientWidth + " | " + Laya.Browser.clientHeight)
                 if (Laya.Browser.clientHeight == Laya.Browser.clientWidth) {
-                    console.log("refuse =!")
+                    Log.debug("refuse =!")
                     this.setScreenSize(this._width, this._height)
                     return
                 }

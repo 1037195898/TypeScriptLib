@@ -165,7 +165,7 @@ export class TextAniUtils {
         for (let i = 0; i < msgLen; i++) {
             this.aniText += this._defaultText
         }
-//        console.log("默认文本 = " + this.aniText, "len = " + this.aniText.length)
+//        Log.debug("default Text : " + this.aniText, "len = " + this.aniText.length)
         let charData: any
         this.playEndCount = 0
         for (let i = 0; i < showTextLen; i++) {
@@ -204,12 +204,12 @@ export class TextAniUtils {
         if (index > 0) {
             this.aniText = this.replacePos(this.aniText, index, index, txt)
         }
-//        console.log("changeTextHandler="+this.aniText, index, this.aniText.length)
+//        Log.debug("changeTextHandler="+this.aniText, index, this.aniText.length)
         this._textField.text = this.aniText
     }
 
     private replacePos(text: string, start: number, end: number, replaceText: string) {
-//        console.log("replacePos", text, start, replaceText)
+//        Log.debug("replacePos", text, start, replaceText)
         return text.substring(0, start - 1) + replaceText + text.substring(end)
     }
 
@@ -246,7 +246,7 @@ export class TextAniUtils {
                     tempText += this._defaultText
                 }
             }
-//                console.log(tempText, tempText.length)
+//                Log.debug(tempText, tempText.length)
             this._textField.text = tempText
             this.twinkleCount--
         } else {

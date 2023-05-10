@@ -53,7 +53,7 @@ export class Deck {
             card.offset = i * card.offsetMultiple
             let _delay = i * 10
 
-            // console.log(card.y, card.y + (- card.height * 1.5))
+            // Log.debug(card.y, card.y + (- card.height * 1.5))
             Laya.Tween.to(card, {
                 x: card.initX - card.offset,
                 y: card.y + (-card.height * 1.5),

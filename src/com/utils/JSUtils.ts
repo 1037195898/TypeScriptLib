@@ -3,6 +3,7 @@ import Render = Laya.Render
 import {AppManager} from "../manager/AppManager"
 import {SceneManager} from "../manager/SceneManager"
 import {Player} from "../Player"
+import {Log} from "../Log";
 
 export class JSUtils {
 
@@ -108,7 +109,7 @@ export class JSUtils {
         if (Browser.window.parent.GameToHall)
             Browser.window.parent.GameToHall.outGameHttp(Player.inst.urlParam.roomId)
         else
-            console.log("debug")
+            Log.debug("debug")
     }
 
     /**
@@ -119,7 +120,7 @@ export class JSUtils {
         if (Browser.window.parent.GameToHall)
             Browser.window.parent.GameToHall.shareDetail(Player.inst.gameModel, type)
         else
-            console.log("debug")
+            Log.debug("debug")
     }
 
     /** 上传头像 */

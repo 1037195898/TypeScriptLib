@@ -384,8 +384,8 @@ declare namespace coreLib {
         GAME_UPDATE_BOUNDS_INFO = "game_update_bounds_info"
     }
     export enum EnvType {
-        DEV = 0,
-        PROD = 1,
+        PROD = 0,
+        DEV = 1,
         TEST = 2
     }
     /**
@@ -2380,6 +2380,44 @@ declare namespace coreLib {
         RESEND = 1068,
         /** 赢钱展示 */
         WINS = 1069
+    }
+    export enum LogLevel {
+        ALL = 0,
+        /**
+         * 跟踪
+         */
+        TRACE = 1,
+        DEBUG = 2,
+        INFO = 3,
+        WARN = 4,
+        ERROR = 5,
+        /**
+         * 致命错误
+         */
+        FATAL = 6,
+        OFF = 7
+    }
+    /**
+     * 定义日志格式
+     */
+    export class Log {
+        /**
+         * @default LogLevel.ALL
+         */
+        static level: LogLevel;
+        static MAX_HISTORY: number;
+        static history: {
+            level: number;
+            data: any[];
+        }[];
+        static trace(...value: any[]): void;
+        static debug(...value: any[]): void;
+        static info(...value: any[]): void;
+        static warn(...value: any[]): void;
+        static error(...value: any[]): void;
+        static fatal(...value: any[]): void;
+        private static _log;
+        private static append;
     }
     /**
      * 统计管理器
@@ -5421,7 +5459,6 @@ declare namespace coreLib {
     }
     export {};
 }
-
 
 /**
  * 动态参数 function 或 Laya.Handler

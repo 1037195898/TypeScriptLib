@@ -5,6 +5,7 @@ import {Factory} from "../Factory"
 import {IView} from "../interfaces/IView"
 import {IProxy} from "../interfaces/IProxy"
 import {IKey} from "../interfaces/IKey"
+import {Log} from "../Log";
 
 export class Controller implements IController {
 
@@ -124,7 +125,7 @@ export class Controller implements IController {
         args.unshift(group)
         let result: boolean = this.sendActionEvent.apply(this, args)
         if (!result) {
-            console.warn("group[" + group + "], action [" + action + "] not exist! Call failure")
+            Log.warn("group[" + group + "], action [" + action + "] not exist! Call failure")
         }
     }
 
@@ -139,7 +140,7 @@ export class Controller implements IController {
             if (tempResult) result = true
         }
         if (!result)
-            console.warn("action [" + action + "] not exist! Call failure")
+            Log.warn("action [" + action + "] not exist! Call failure")
     }
 
     sendActionEvent(group: string, action: string, ...args) {
@@ -160,11 +161,11 @@ export class Controller implements IController {
             key = this._getClassSign(key)
         }
         if (StringUtil.isEmpty(key)) {
-            console.warn("cannot be empty, key = " + key)
+            Log.warn("cannot be empty, key = " + key)
             return false
         }
         if (this.getView(key)) {
-            console.warn("already exist key = " + key + ", add failure!")
+            Log.warn("already exist key = " + key + ", add failure!")
             return false
         }
         view.setKey(key)
@@ -195,11 +196,11 @@ export class Controller implements IController {
             key = this._getClassSign(key)
         }
         if (StringUtil.isEmpty(key)) {
-            console.warn("Proxy name cannot be empty!")
+            Log.warn("Proxy name cannot be empty!")
             return false
         }
         if (this.getProxy(key)) {
-            console.warn("already exist key = " + key + ", add failure!")
+            Log.warn("already exist key = " + key + ", add failure!")
             // return false
         }
         proxy.setKey(key)

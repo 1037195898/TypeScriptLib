@@ -1,6 +1,7 @@
 import GComponent = fgui.GComponent;
 import Point = Laya.Point;
 import {ISkeleton} from "../interfaces/ISkeleton"
+import {Log} from "../Log";
 
 export abstract class BaseSkeleton extends GComponent implements ISkeleton {
 
@@ -69,7 +70,7 @@ export abstract class BaseSkeleton extends GComponent implements ISkeleton {
     playAni(skeletonPlay: ISkeletonPlay, playGroupIndex = -1) {
         if (this.asSkeleton.templet == null) return
         if (skeletonPlay == null && this.skeletonPlay == null) {
-            console.warn("not found play data " + skeletonPlay)
+            Log.warn("not found play data " + skeletonPlay)
             return;
         }
         if (skeletonPlay) {

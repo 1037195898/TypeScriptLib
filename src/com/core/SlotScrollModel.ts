@@ -205,7 +205,7 @@ export class SlotScrollModel extends SlotModel {
      */
     protected completeHandler(list: GList) {
         this.completeCount++
-//        console.log("a" + this.completeCount + "  " + Browser.now())
+//        Log.debug("a" + this.completeCount + "  " + Browser.now())
         // 如果需要完成一次回调
         this.oneComplete(list)
         if (this.completeCount < this.tweenList.length) {

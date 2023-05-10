@@ -307,7 +307,7 @@ export class Cast {
     }
 
     static loadScript(str: string) {
-//		    console.log(Browser.document.head)
+//		    Log.debug(Browser.document.head)
         let script = document.createElement('script')
         script.type = "text/javascript"
         script.text = str

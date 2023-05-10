@@ -27,6 +27,7 @@ import {AppManager} from "../manager/AppManager"
 import {IGuideScene} from "../interfaces/IGuideScene"
 import {CommonCmd} from "../net/CommonCmd"
 import {Urls} from "../net/Urls"
+import {Log} from "../Log";
 
 /** 游戏主页必须继承的类 */
 export class BaseScene extends BaseView implements IGameScene, IGuideScene {
@@ -321,7 +322,7 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
                 return
             }
         }
-        console.log("regStartupEvent -> name = " + name)
+        Log.debug("regStartupEvent -> name = " + name)
         this.startupEvent.push({handler: handler, weight: weight, name: name})
     }
 
@@ -333,7 +334,7 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
      * @param name 事件名字 默认 null
      */
     regStartupEventIndex(index: number, handler: ParamHandler, weight = 0, name = null) {
-        console.log("regStartupEventIndex -> name = " + name)
+        Log.debug("regStartupEventIndex -> name = " + name)
         this.startupEvent.splice(index, 0, {handler: handler, weight: weight, name: name})
     }
 
@@ -367,7 +368,7 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
             if (this.startupEvent[i].name == name) {
                 this.startupEvent.splice(i, 1)
                 i--
-                console.log("Unload Startup event -> name = " + name)
+                Log.debug("Unload Startup event -> name = " + name)
             }
         }
     }
@@ -375,7 +376,7 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
     runEvent() {
         if (this.startupEvent.length > 0) {
             let event = this.startupEvent.shift()
-            console.log("execute event = " + event.name)
+            Log.debug("execute event = " + event.name)
             runFun(event.handler)
         } else {
             this.runEventEnd()
@@ -389,7 +390,7 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
 
     /** 运行事件结束 */
     protected runEventEnd() {
-        console.log("runEventEnd")
+        Log.debug("runEventEnd")
         if (this.isRunEvent) {
             this.startGame()
         }

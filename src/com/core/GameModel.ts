@@ -19,6 +19,7 @@ import {AssetsLoader} from "../manager/AssetsLoader"
 import {LoaderConfig} from "../configs/LoaderConfig"
 import {SceneManager} from "../manager/SceneManager"
 import {LibStr} from "../LibStr"
+import {Log} from "../Log";
 
 /**
  *
@@ -186,7 +187,7 @@ export class GameModel extends BaseProxy implements IGameModel {
             if (pack) UIPackage.removePackage(pack.id)
             AssetsLoader.checkBranch(res)
             LoaderConfig.clear(res)
-            console.log("GameModel.clearRes() " + fuiName + " uninstall")
+            Log.info("GameModel.clearRes() " + fuiName + " uninstall")
         }
     }
 
@@ -210,12 +211,12 @@ export class GameModel extends BaseProxy implements IGameModel {
 
     /** 游戏进入后台执行 */
     blurGame() {
-        console.log("blurGame")
+        Log.info("blurGame")
     }
 
     /** 游戏进入前台执行 */
     focusGame() {
-        console.log("focusGame")
+        Log.info("focusGame")
     }
 
     get gameScene() {

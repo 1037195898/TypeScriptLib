@@ -2,6 +2,7 @@ import Browser = Laya.Browser
 import {BaseSocket} from "../core/BaseSocket"
 import {GameSocket} from "./GameSocket"
 import {StringUtil} from "../utils/StringUtil"
+import {Log} from "../Log";
 
 /** socket管理 */
 export class SocketManager extends BaseSocket {
@@ -73,7 +74,7 @@ export class SocketManager extends BaseSocket {
 
     /** 关闭链接 */
     close() {
-        console.log("close socket")
+        Log.debug("close socket")
         Laya.timer.clear(this, this.sendData)
         this._roomId = -1
         if (this._client) this._client.alive = false
@@ -113,9 +114,9 @@ export class SocketManager extends BaseSocket {
 
     test(value: string) {
         if (typeof value == "string") {
-            console.log("string=" + JSON.stringify(value))
+            Log.debug("string=" + JSON.stringify(value))
         } else {
-            console.log("json=" + JSON.stringify(value))
+            Log.debug("json=" + JSON.stringify(value))
         }
     }
 

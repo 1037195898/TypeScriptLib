@@ -308,7 +308,7 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
         //             return
         //         }
         //     }
-        //     console.log("GameServlet.checkStateHandler(data)gameStatus=" + this.gameStatus + ", period=" + period + ", " + Player.inst.data.period)
+        //     Log.info("GameServlet.checkStateHandler(data)gameStatus=" + this.gameStatus + ", period=" + period + ", " + Player.inst.data.period)
         //     handler.runWith(false)
         // }, () => {
         //     handler.runWith(false)

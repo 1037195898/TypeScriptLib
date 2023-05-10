@@ -10,6 +10,7 @@ import {WaitResult} from "../view/WaitResult"
 import {HomePrompt} from "../view/HomePrompt"
 import {SceneManager} from "../manager/SceneManager"
 import {LibStr} from "../LibStr"
+import {Log} from "../Log";
 
 /** 状态吗获取显示信息 */
 export class StateCode {
@@ -61,7 +62,7 @@ export class StateCode {
     static execute(code: number, msg: string = null) {
         switch (code) {
             case 300:// 请登录
-                console.log("StateCode.execute() 300")
+                Log.debug("StateCode.execute() 300")
                 if (Player.inst.urlParam.isJumpPage()) {
                     JSUtils.login()
                     return true
@@ -88,7 +89,7 @@ export class StateCode {
                 }, null, {cancelName: LanguageUtils.inst.getStr(LibStr.OK)})
                 return true
             case 8003:// 游戏暂停中
-                console.log("StateCode.execute() 8003")
+                Log.debug("StateCode.execute() 8003")
                 this.showGameOff()
                 return true
         }

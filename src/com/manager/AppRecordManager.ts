@@ -15,6 +15,7 @@ import {CommonCmd} from "../net/CommonCmd"
 import {LanguageUtils} from "../utils/LanguageUtils"
 import {ActionLib} from "../actions/ActionLib"
 import {LibStr} from "../LibStr"
+import {Log} from "../Log";
 
 /**
  * app 访问记录管理
@@ -44,7 +45,7 @@ export class AppRecordManager {
      * @param newPage 添加的新面板
      */
     static addHistory(currentPage: IRecord, newPage: IRecord) {
-        // console.log("addHistory")
+        // Log.debug("addHistory")
         AppRecordManager.history.push({current: currentPage, newPage: newPage})
     }
 
@@ -54,7 +55,7 @@ export class AppRecordManager {
      *
      */
     static invalidHistory(value: IRecord) {
-        // console.log("invalidHistory")
+        // Log.debug("invalidHistory")
         if (AppRecordManager.history.length > 0) {
             for (let i = 0; i < AppRecordManager.history.length; i++) {
                 if (AppRecordManager.history[i]?.newPage == value) {
@@ -167,7 +168,7 @@ export class AppRecordManager {
                 break
             case 1000:// 与java交互
                 let str: string = value[0]
-                console.log(str)
+                Log.info(str)
                 let json = JSON.parse(str)
                 let token: string = json.token
                 if (token) {
@@ -214,9 +215,9 @@ export class AppRecordManager {
         }
 
         Player.inst.urlParam.parseData(json)
-        console.log("JavaSendOpen() type = " + json.type)
-        console.log("JavaSendOpen() openGame = " + json.openGame)
-        console.log("JavaSendOpen() gameName = " + json.gameName)
+        Log.info("JavaSendOpen() type = " + json.type)
+        Log.info("JavaSendOpen() openGame = " + json.openGame)
+        Log.info("JavaSendOpen() gameName = " + json.gameName)
         if (!Player.inst.isGuest && json.token) {
             Player.inst.login.loginToken(Handler.create(null, function (data: any) {
                 AppRecordManager.open(json)
@@ -254,7 +255,7 @@ export class AppRecordManager {
 
     /** 清理所有页面缓存 */
     static clearHistory() {
-        console.log("clearHistory")
+        Log.debug("clearHistory")
 //		for (let i:number = 0; i < history.length; i++) {
 //			let historyElement:IRecord = history[i]
 //			historyElement.hideRecord()

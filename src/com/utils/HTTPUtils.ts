@@ -2,6 +2,7 @@ import {IHttpFilter} from "../net/IHttpFilter"
 import {GameHttpRequest} from "../net/GameHttpRequest"
 import {HttpCode} from "../net/HttpCode"
 import {Method} from "../interfaces/ICommon";
+import {Log} from "../Log";
 
 export class HTTPUtils {
 
@@ -127,13 +128,13 @@ export class HTTPUtils {
     }
 
     private timeOutHandler() {
-        console.log("HTTPUtils.timeOutHandler()")
+        Log.debug("HTTPUtils.timeOutHandler()")
         if (this.timeout != null) runFun(this.timeout)
         else if (this.error != null) runFun(this.error, "time out")
     }
 
     private errorHandler(e: any) {
-        console.log("HTTPUtils.errorHandler()", e)
+        Log.debug("HTTPUtils.errorHandler()", e)
         HTTPUtils.filter?.errorResult(e)
         runFun(this.error, e)
     }

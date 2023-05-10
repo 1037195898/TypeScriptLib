@@ -22,6 +22,7 @@ import {Factory} from "../Factory"
 import {LanguageUtils} from "../utils/LanguageUtils"
 import {ActionLib} from "../actions/ActionLib"
 import {LibStr} from "../LibStr"
+import {Log} from "../Log";
 
 /**
  * 资源管理类
@@ -146,7 +147,7 @@ export class AssetsLoader implements IFormatVer {
             }
 
             if (!this.addPackage("init/init")) {
-                console.log("addPackage fail = init")
+                Log.debug("addPackage fail = init")
                 loadErrorHandler()
                 return
             }
@@ -440,7 +441,7 @@ export class AssetsLoader implements IFormatVer {
             if (fuiName.indexOf("." + fairygui.UIConfig.packageFileExtension) != -1) {
                 fuiName = StringUtil.remove(fuiName, "." + fairygui.UIConfig.packageFileExtension)
                 if (!this.addPackage(fuiName)) {
-                    console.log("addPackage fail = " + fuiName)
+                    Log.info("addPackage fail = " + fuiName)
                     this.loadErrorHandler()
                     return
                 }
@@ -521,10 +522,10 @@ export class AssetsLoader implements IFormatVer {
                 let xmlList = xml.getElementsByName(tempName)
                 if (xmlList.length > 0) {
                     if (itemElement.textContent == xmlList[0].textContent) {
-                        console.log("xml-languages: name=" + tempName + " repeat")
+                        Log.debug("xml-languages: name=" + tempName + " repeat")
                     } else {
                         // 发现有个存在一样的
-                        console.warn("xml-languages: name=" + tempName + " repeat," +
+                        Log.warn("xml-languages: name=" + tempName + " repeat," +
                             " content=" + xmlList[0].textContent + ", content2=" + itemElement.textContent)
                     }
                 } else {

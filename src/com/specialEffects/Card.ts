@@ -37,7 +37,7 @@ export class Card extends BaseLabel {
         this._suitName = this.suitName(this.suit)
         this.nameCard = this.suit < 4 ? this.nameCard : 'JOKER'
         // var z = (52 - id) / 4
-        // console.log(value, nameCard, suit)
+        // Log.debug(value, nameCard, suit)
     }
 
     protected suitName(value: number): string {//spades-黑桃,hearts-红桃,clubs-樱花,diamonds-方块,joker-小丑
