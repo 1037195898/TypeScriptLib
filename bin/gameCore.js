@@ -4978,27 +4978,12 @@ window.coreLib = {};
         /**
          * @internal
          */
-        static log() {
-            var _a;
+        static log(fmt = "[HH:mm:ss]") {
             const logs = Log.history.concat();
+            let time;
             for (const value of logs) {
-                (_a = value.data) === null || _a === void 0 ? void 0 : _a.unshift(DateUtils.formatDate(value.time, "[HH:mm:ss]"));
-                switch (value.level) {
-                    case LogLevel.TRACE:
-                        console.trace.apply(window, value.data);
-                        break;
-                    case LogLevel.WARN:
-                        console.warn.apply(window, value.data);
-                        break;
-                    case LogLevel.FATAL:
-                    case LogLevel.ERROR:
-                        console.error.apply(window, value.data);
-                        break;
-                    case LogLevel.DEBUG:
-                    case LogLevel.INFO:
-                        console.log.apply(window, value.data);
-                        break;
-                }
+                time = [DateUtils.formatDate(value.time, fmt), LogLevel[value.level]];
+                console.log.apply(window, time.concat(value.data));
             }
         }
         /**

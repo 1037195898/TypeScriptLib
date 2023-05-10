@@ -78,26 +78,12 @@ export class Log {
     /**
      * @internal
      */
-    static log() {
+    static log(fmt = "[HH:mm:ss]") {
         const logs = Log.history.concat()
+        let time: any[]
         for (const value of logs) {
-            value.data?.unshift(DateUtils.formatDate(value.time, "[HH:mm:ss]"))
-            switch (value.level) {
-                case LogLevel.TRACE:
-                    console.trace.apply(window, value.data)
-                    break
-                case LogLevel.WARN:
-                    console.warn.apply(window, value.data)
-                    break
-                case LogLevel.FATAL:
-                case LogLevel.ERROR:
-                    console.error.apply(window, value.data)
-                    break
-                case LogLevel.DEBUG:
-                case LogLevel.INFO:
-                    console.log.apply(window, value.data)
-                    break
-            }
+            time = [DateUtils.formatDate(value.time, fmt), LogLevel[value.level]]
+            console.log.apply(window, time.concat(value.data))
         }
     }
 
