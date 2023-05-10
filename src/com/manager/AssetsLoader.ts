@@ -7,7 +7,6 @@ import Loader = Laya.Loader
 import LocalStorage = Laya.LocalStorage
 import Utils = Laya.Utils
 import URL = Laya.URL
-import {IFormatVer} from "../interfaces/IFormatVer"
 import {MyLoader} from "../core/MyLoader"
 import {StringUtil} from "../utils/StringUtil"
 import {Player} from "../Player"
@@ -23,6 +22,7 @@ import {LanguageUtils} from "../utils/LanguageUtils"
 import {ActionLib} from "../actions/ActionLib"
 import {LibStr} from "../LibStr"
 import {Log} from "../Log";
+import {IFormatVer} from "../interfaces/ICommon";
 
 /**
  * 资源管理类
@@ -109,6 +109,7 @@ export class AssetsLoader implements IFormatVer {
      */
     loadMain(handler: ParamHandler) {
         let loadXmlComplete = () => {
+
             let vUrl = Browser.window.versionUrl
             let loadInitJson = [{url: vUrl, type: Loader.JSON}]
 
