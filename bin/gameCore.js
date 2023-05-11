@@ -8638,7 +8638,7 @@ window.coreLib = {};
                         scaleX: .7,
                         scaleY: .7
                     }, 600, Laya.Ease.linearNone, Laya.Handler.create(this, (loader) => {
-                        loader.removeFromParent();
+                        loader.visible = false;
                         this.count++;
                         if (this.count == len) {
                             while (this.loaders.length) {

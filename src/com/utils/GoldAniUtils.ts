@@ -106,7 +106,7 @@ export class GoldAniUtils {
                             scaleY: .7
                         }, 600,
                         Ease.linearNone, Laya.Handler.create(this, (loader: GLoader) => {
-                            loader.removeFromParent()
+                            loader.visible = false
                             this.count++
                             if (this.count == len) {
                                 while (this.loaders.length) {
