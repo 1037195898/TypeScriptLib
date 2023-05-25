@@ -10169,7 +10169,7 @@ window.coreLib = {};
         /** 支持字符串格式 ("{0}"). 格式化 */
         static format(format, ...args) {
             if (args.length == 1) {
-                format = format.replace(/\\{(\\d+)\\}/g, args[0]);
+                format = format.replace(/\{(\d+)}/g, args[0]);
             }
             else {
                 for (let i = 0; i < args.length; ++i)
