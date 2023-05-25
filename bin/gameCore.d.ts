@@ -5297,17 +5297,6 @@ declare namespace coreLib {
         /** 清楚所有提示 */
         static clearAll(): void;
     }
-    export class MyGLoader extends fgui.GLoader {
-        /**
-         * 加载重试次数
-         */
-        loadRetryCount: number;
-        loadCount: number;
-        protected loadExternal(): void;
-        protected onExternalLoadSuccess(texture: Laya.Texture): void;
-        protected loadFromPackage(itemURL: string): void;
-        protected onExternalLoadFailed(): void;
-    }
     export class NoticeView extends BaseView {
         static NAME: string;
         private richText;

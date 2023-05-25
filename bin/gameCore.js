@@ -12709,41 +12709,6 @@ window.coreLib = {};
      */
     MessageTip.displayTime = 1800;
     coreLib.MessageTip = MessageTip;
-    class MyGLoader extends fgui.GLoader {
-        constructor() {
-            super(...arguments);
-            /**
-             * 加载重试次数
-             */
-            this.loadRetryCount = 0;
-            this.loadCount = 0;
-        }
-        loadExternal() {
-            this.loadCount = 0;
-            super.loadExternal();
-        }
-        onExternalLoadSuccess(texture) {
-            super.onExternalLoadSuccess(texture);
-            if (this.displayObject)
-                this.displayObject.event(Laya.Event.COMPLETE);
-        }
-        loadFromPackage(itemURL) {
-            super.loadFromPackage(itemURL);
-            if (this.displayObject)
-                this.displayObject.event(Laya.Event.COMPLETE);
-        }
-        onExternalLoadFailed() {
-            if (this.loadRetryCount > 0 && this.loadCount < this.loadRetryCount) {
-                this.loadCount++;
-                super.loadExternal();
-                return;
-            }
-            super.onExternalLoadFailed();
-            if (this.displayObject)
-                this.displayObject.event(Laya.Event.COMPLETE);
-        }
-    }
-    coreLib.MyGLoader = MyGLoader;
     class NoticeView extends BaseView {
         constructor() {
             super();
