@@ -16,7 +16,11 @@ export class StringUtil {
     /* 删除指定标签 */
     static removeTag = /<\/?TEXTFORMAT[^>]*>/gi
 
-    /** 支持字符串格式 ("{0}"). 格式化 */
+    /**
+     * 支持字符串格式 ("{0}"). 格式化
+     * @param format 带占位符的字符串
+     * @param args 替换文本，如果只有一个值，将会被用来替换所有的占位符
+     */
     static format(format: string, ...args) {
         if (args.length == 1) {
             format = format.replace(/\{(\d+)}/g, args[0])

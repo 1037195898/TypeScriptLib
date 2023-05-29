@@ -1,11 +1,11 @@
-import GLoader = fgui.GLoader
-import GComponent = fgui.GComponent
-import Point = Laya.Point
-import GRoot = fgui.GRoot
-import LocalStorage = Laya.LocalStorage
-import Browser = Laya.Browser
-import Handler = Laya.Handler
-import LoaderFillType = fgui.LoaderFillType
+import GLoader = fgui.GLoader;
+import GComponent = fgui.GComponent;
+import Point = Laya.Point;
+import GRoot = fgui.GRoot;
+import LocalStorage = Laya.LocalStorage;
+import Browser = Laya.Browser;
+import Handler = Laya.Handler;
+import LoaderFillType = fgui.LoaderFillType;
 import {BaseView} from "./BaseView"
 import {IGameScene} from "../interfaces/IGameScene"
 import {IGameModel} from "../interfaces/IGameModel"
@@ -459,7 +459,7 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
         let obj: IPromptData = {okName: "Ok"}
         if (Player.inst.token) {
             WaitResult.inst.show()
-            this.gameModel.gameServlet.post(Player.inst.data.getWapUrl(Urls.URL_USER_ACCOUNT_ASSET),
+            this.gameModel.gameServlet.postData(Player.inst.data.getWapUrl(Urls.URL_USER_ACCOUNT_ASSET),
                 {token: Player.inst.token}, (data) => {
                     WaitResult.inst.hide()
                     if (data.code == HttpCode.OK && data.data) {

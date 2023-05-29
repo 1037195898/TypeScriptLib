@@ -29,7 +29,6 @@ declare namespace coreLib {
     export class Proxys implements IProxy, IKey {
         /** 独有的名字 */
         protected key: string;
-        constructor();
         regAction(action: string, caller: any, method: Function, group?: string): void;
         regActionHandler(action: string, handler: Laya.Handler, group?: string): void;
         removeAllAction(...args: string[]): void;
@@ -1155,24 +1154,59 @@ declare namespace coreLib {
         networkName: string;
         protected constructor();
         /**
-         * @param url
+         * 封装的get请求
+         *
+         * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+         *
+         * @param url 使用 Player.inst.data.getGameUrl 格式化的url
+         * @param data
+         * @param callback
+         * @param error
+         * @param timeout
+         * @deprecated
+         * @see getData
+         */
+        getURL(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler): void;
+        /**
+         * 封装的get请求
+         *
+         * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+         *
+         * @param url 使用 Player.inst.data.getGameUrl 格式化的url
          * @param data
          * @param callback
          * @param error
          * @param timeout
          */
-        getURL(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler): void;
+        getData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler): void;
         /**
          * post 请求
-         * @param url 请求连接 相对路径
+         *
+         * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+         * @param url 请求连接 使用Player.inst.data.getGameUrl()格式化的url
          * @param data 请求数据
          * @param callback 请求完成返回调用函数
          * @param error 错误调用函数
-         * @param timeout
-         * @param headers
+         * @param timeout 超时回调函数
+         * @param headers (default = null) HTTP 请求的头部信息。参数形如key-value数组：key是头部的名称，不应该包括空白、冒号或换行；value是头部的值，不应该包括换行。比如["Content-Type", "application/json"]。
          * @param overtime
+         * @deprecated
+         * @see postData
          */
         post(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: string[], overtime?: number): void;
+        /**
+         * post 请求
+         *
+         * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+         * @param url 请求连接 使用Player.inst.data.getGameUrl()格式化的url
+         * @param data 请求数据
+         * @param callback 请求完成返回调用函数
+         * @param error 错误调用函数
+         * @param timeout 超时回调函数
+         * @param headers (default = null) HTTP 请求的头部信息。参数形如key-value数组：key是头部的名称，不应该包括空白、冒号或换行；value是头部的值，不应该包括换行。比如["Content-Type", "application/json"]。
+         * @param overtime
+         */
+        postData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: string[], overtime?: number): void;
         /**
          *
          * @param handler
@@ -2108,9 +2142,33 @@ declare namespace coreLib {
          * @param callback
          * @param error
          * @param timeout
-         *
+         * @deprecated
+         * @see getData
          */
         getURL(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler): void;
+        /**
+         * get 获取数据
+         * @param url
+         * @param data
+         * @param callback
+         * @param error
+         * @param timeout
+         *
+         */
+        getData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler): void;
+        /**
+         * post 请求数据
+         * @param url
+         * @param data
+         * @param callback
+         * @param error
+         * @param timeout
+         * @param headers
+         * @param overtime
+         * @deprecated
+         * @see postData
+         */
+        post(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: any[], overtime?: number): void;
         /**
          * post 请求数据
          * @param url
@@ -2122,7 +2180,7 @@ declare namespace coreLib {
          * @param overtime
          *
          */
-        post(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: any[], overtime?: number): void;
+        postData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: any[], overtime?: number): void;
         /**
          *
          * @param callback
@@ -4513,7 +4571,11 @@ declare namespace coreLib {
         /** 根据大写字母分隔 */
         static UPPERCASE_SPLIT: RegExp;
         static removeTag: RegExp;
-        /** 支持字符串格式 ("{0}"). 格式化 */
+        /**
+         * 支持字符串格式 ("{0}"). 格式化
+         * @param format 带占位符的字符串
+         * @param args 替换文本，如果只有一个值，将会被用来替换所有的占位符
+         */
         static format(format: string, ...args: any[]): string;
         /**
          * 忽略大小字母比较字符是否相等
@@ -4829,6 +4891,15 @@ declare namespace coreLib {
         play(target: fgui.GObject, count: number, callback: ParamHandler): void;
         private twinkleHandler;
         dispose(): void;
+    }
+    export class VerifyUtil {
+        /**
+         * 验证指定的键今日已经使用过
+         * @param key 键
+         * @param callback 自定义在未使用的情况下调用的方法.如果此值为null,那么将不会自动更改使用状态
+         * @return boolean 返回指定键在检查前是否已经被使用
+         */
+        verifyData(key: string, callback?: () => boolean): boolean;
     }
     export class ActivityButton extends BaseButton {
         private tempValue;

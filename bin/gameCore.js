@@ -66,8 +66,6 @@ window.coreLib = {};
     }
     coreLib.View = View;
     class Proxys {
-        constructor() {
-        }
         regAction(action, caller, method, group) {
             Factory.inst.regAction(action, caller, method, group);
         }
@@ -1515,7 +1513,7 @@ window.coreLib = {};
             let obj = { okName: "Ok" };
             if (Player.inst.token) {
                 WaitResult.inst.show();
-                this.gameModel.gameServlet.post(Player.inst.data.getWapUrl(Urls.URL_USER_ACCOUNT_ASSET), { token: Player.inst.token }, (data) => {
+                this.gameModel.gameServlet.postData(Player.inst.data.getWapUrl(Urls.URL_USER_ACCOUNT_ASSET), { token: Player.inst.token }, (data) => {
                     WaitResult.inst.hide();
                     if (data.code == HttpCode.OK && data.data) {
                         if (data.data.balance == 0) {
@@ -2811,13 +2809,33 @@ window.coreLib = {};
             this.regGameAction(ActionLib.GAME_DISPOSE, this, this.dispose);
         }
         /**
-         * @param url
+         * 封装的get请求
+         *
+         * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+         *
+         * @param url 使用 Player.inst.data.getGameUrl 格式化的url
+         * @param data
+         * @param callback
+         * @param error
+         * @param timeout
+         * @deprecated
+         * @see getData
+         */
+        getURL(url, data, callback, error, timeout) {
+            this.getData(url, data, callback, error, timeout);
+        }
+        /**
+         * 封装的get请求
+         *
+         * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+         *
+         * @param url 使用 Player.inst.data.getGameUrl 格式化的url
          * @param data
          * @param callback
          * @param error
          * @param timeout
          */
-        getURL(url, data, callback, error, timeout) {
+        getData(url, data, callback, error, timeout) {
             HTTPUtils.create()
                 .setUrl(Player.inst.data.getGameUrl(url))
                 .setData(data)
@@ -2844,15 +2862,34 @@ window.coreLib = {};
         }
         /**
          * post 请求
-         * @param url 请求连接 相对路径
+         *
+         * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+         * @param url 请求连接 使用Player.inst.data.getGameUrl()格式化的url
          * @param data 请求数据
          * @param callback 请求完成返回调用函数
          * @param error 错误调用函数
-         * @param timeout
-         * @param headers
+         * @param timeout 超时回调函数
+         * @param headers (default = null) HTTP 请求的头部信息。参数形如key-value数组：key是头部的名称，不应该包括空白、冒号或换行；value是头部的值，不应该包括换行。比如["Content-Type", "application/json"]。
          * @param overtime
+         * @deprecated
+         * @see postData
          */
         post(url, data, callback, error, timeout, headers, overtime = 0) {
+            this.postData(url, data, callback, error, timeout, headers, overtime);
+        }
+        /**
+         * post 请求
+         *
+         * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+         * @param url 请求连接 使用Player.inst.data.getGameUrl()格式化的url
+         * @param data 请求数据
+         * @param callback 请求完成返回调用函数
+         * @param error 错误调用函数
+         * @param timeout 超时回调函数
+         * @param headers (default = null) HTTP 请求的头部信息。参数形如key-value数组：key是头部的名称，不应该包括空白、冒号或换行；value是头部的值，不应该包括换行。比如["Content-Type", "application/json"]。
+         * @param overtime
+         */
+        postData(url, data, callback, error, timeout, headers, overtime = 0) {
             HTTPUtils.create()
                 .setMethod("post")
                 .setUrl(Player.inst.data.getGameUrl(url))
@@ -2861,10 +2898,10 @@ window.coreLib = {};
                 .setHeaders(headers)
                 .onComplete((data) => {
                 var _a;
-                if (Player.inst.isGuest && (data === null || data === void 0 ? void 0 : data.code) == HttpCode.OK) {
-                    Player.inst.guestModel.playAdd(url, data.data);
-                }
                 if (Player.inst.gameModel == ((_a = this.gameModel) === null || _a === void 0 ? void 0 : _a.gameCode)) {
+                    if (Player.inst.isGuest && (data === null || data === void 0 ? void 0 : data.code) == HttpCode.OK) {
+                        Player.inst.guestModel.playAdd(url, data.data);
+                    }
                     if (data == null)
                         runFun(error, "data is null");
                     else
@@ -2948,7 +2985,7 @@ window.coreLib = {};
             obj.token = Player.inst.token;
             obj.game_id = Player.inst.gameModel;
             obj.is_gift = Player.inst.urlParam.isGift;
-            this.post("/game/" + this.networkName + "/init", obj, this.userDataHandler.bind(this), this.userDataErrorHandler.bind(this));
+            this.postData("/game/" + this.networkName + "/init", obj, this.userDataHandler.bind(this), this.userDataErrorHandler.bind(this));
         }
         /** 连接该游戏的socket */
         connectSocket() {
@@ -3008,7 +3045,7 @@ window.coreLib = {};
         }
         /** 获取投注劵 */
         getCoupon() {
-            this.getURL(Urls.URL_GAME_ALL_COUPON + Player.inst.getRequestToken(), null, this.couponHandler.bind(this), this.userDataErrorHandler.bind(this));
+            this.getData(Urls.URL_GAME_ALL_COUPON + Player.inst.getRequestToken(), null, this.couponHandler.bind(this), this.userDataErrorHandler.bind(this));
         }
         /** 收到投注劵数据 */
         couponHandler(data) {
@@ -3089,7 +3126,7 @@ window.coreLib = {};
          * @param callback
          */
         sendBet(url, data, callback) {
-            this.post(url, data, (data) => {
+            this.postData(url, data, (data) => {
                 if (data.code != HttpCode.OK) {
                     MessageTip.showTip(StateCode.getShowMessage(data));
                     this.sendAction(ActionLib.GAME_RESET_BET);
@@ -3118,7 +3155,7 @@ window.coreLib = {};
             obj.token = Player.inst.token;
             obj.game_id = Player.inst.gameModel;
             obj.id = id;
-            this.post(Urls.URL_GAME_SCRATCHER_LOTTERY, obj, Laya.Handler.create(this, this.jackPotClaimHandler, [handler]), () => {
+            this.postData(Urls.URL_GAME_SCRATCHER_LOTTERY, obj, Laya.Handler.create(this, this.jackPotClaimHandler, [handler]), () => {
                 runFun(handler, false);
             });
         }
@@ -10225,7 +10262,11 @@ window.coreLib = {};
      *
      */
     class StringUtil {
-        /** 支持字符串格式 ("{0}"). 格式化 */
+        /**
+         * 支持字符串格式 ("{0}"). 格式化
+         * @param format 带占位符的字符串
+         * @param args 替换文本，如果只有一个值，将会被用来替换所有的占位符
+         */
         static format(format, ...args) {
             if (args.length == 1) {
                 format = format.replace(/\{(\d+)}/g, args[0]);
@@ -11031,6 +11072,24 @@ window.coreLib = {};
         }
     }
     coreLib.TwinkleAniUtils = TwinkleAniUtils;
+    class VerifyUtil {
+        /**
+         * 验证指定的键今日已经使用过
+         * @param key 键
+         * @param callback 自定义在未使用的情况下调用的方法.如果此值为null,那么将不会自动更改使用状态
+         * @return boolean 返回指定键在检查前是否已经被使用
+         */
+        verifyData(key, callback) {
+            const value = Laya.LocalStorage.getJSON(key);
+            let time;
+            if (!value || !DateUtils.isSameDay(value, time = Date.now())) {
+                (callback === null || callback === void 0 ? void 0 : callback.call(null)) && Laya.LocalStorage.setJSON(key, time);
+                return false;
+            }
+            return true;
+        }
+    }
+    coreLib.VerifyUtil = VerifyUtil;
     class ActivityButton extends BaseButton {
         constructor() {
             super();

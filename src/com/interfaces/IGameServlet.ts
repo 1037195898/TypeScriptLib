@@ -34,9 +34,35 @@ export interface IGameServlet {
      * @param callback
      * @param error
      * @param timeout
-     *
+     * @deprecated
+     * @see getData
      */
     getURL(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler): void
+
+    /**
+     * get 获取数据
+     * @param url
+     * @param data
+     * @param callback
+     * @param error
+     * @param timeout
+     *
+     */
+    getData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler): void
+
+    /**
+     * post 请求数据
+     * @param url
+     * @param data
+     * @param callback
+     * @param error
+     * @param timeout
+     * @param headers
+     * @param overtime
+     * @deprecated
+     * @see postData
+     */
+    post(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: any[], overtime?: number): void
 
     /**
      * post 请求数据
@@ -49,7 +75,7 @@ export interface IGameServlet {
      * @param overtime
      *
      */
-    post(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: any[], overtime?: number): void
+    postData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: any[], overtime?: number): void
 
     /**
      *

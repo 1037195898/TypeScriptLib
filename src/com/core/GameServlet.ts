@@ -44,13 +44,33 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
     }
 
     /**
-     * @param url
+     * 封装的get请求
+     *
+     * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+     *
+     * @param url 使用 Player.inst.data.getGameUrl 格式化的url
+     * @param data
+     * @param callback
+     * @param error
+     * @param timeout
+     * @deprecated
+     * @see getData
+     */
+    getURL(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler) {
+        this.getData(url, data, callback, error, timeout)
+    }
+    /**
+     * 封装的get请求
+     *
+     * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+     *
+     * @param url 使用 Player.inst.data.getGameUrl 格式化的url
      * @param data
      * @param callback
      * @param error
      * @param timeout
      */
-    getURL(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler) {
+    getData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler) {
         HTTPUtils.create()
             .setUrl(Player.inst.data.getGameUrl(url))
             .setData(data)
@@ -71,15 +91,34 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
 
     /**
      * post 请求
-     * @param url 请求连接 相对路径
+     *
+     * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+     * @param url 请求连接 使用Player.inst.data.getGameUrl()格式化的url
      * @param data 请求数据
      * @param callback 请求完成返回调用函数
      * @param error 错误调用函数
-     * @param timeout
-     * @param headers
+     * @param timeout 超时回调函数
+     * @param headers (default = null) HTTP 请求的头部信息。参数形如key-value数组：key是头部的名称，不应该包括空白、冒号或换行；value是头部的值，不应该包括换行。比如["Content-Type", "application/json"]。
      * @param overtime
+     * @deprecated
+     * @see postData
      */
     post(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: string[], overtime = 0) {
+        this.postData(url, data, callback, error, timeout, headers, overtime)
+    }
+    /**
+     * post 请求
+     *
+     * 所有的返回结果，都会执行id判断 Player.inst.gameModel == this.gameModel?.gameCode
+     * @param url 请求连接 使用Player.inst.data.getGameUrl()格式化的url
+     * @param data 请求数据
+     * @param callback 请求完成返回调用函数
+     * @param error 错误调用函数
+     * @param timeout 超时回调函数
+     * @param headers (default = null) HTTP 请求的头部信息。参数形如key-value数组：key是头部的名称，不应该包括空白、冒号或换行；value是头部的值，不应该包括换行。比如["Content-Type", "application/json"]。
+     * @param overtime
+     */
+    postData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: string[], overtime = 0) {
         HTTPUtils.create()
             .setMethod("post")
             .setUrl(Player.inst.data.getGameUrl(url))
@@ -87,10 +126,10 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
             .setOvertime(overtime)
             .setHeaders(headers)
             .onComplete((data: any) => {
-                if (Player.inst.isGuest && data?.code == HttpCode.OK) {
-                    Player.inst.guestModel.playAdd(url, data.data)
-                }
                 if (Player.inst.gameModel == this.gameModel?.gameCode) {
+                    if (Player.inst.isGuest && data?.code == HttpCode.OK) {
+                        Player.inst.guestModel.playAdd(url, data.data)
+                    }
                     if (data == null) runFun(error, "data is null")
                     else runFun(callback, data)
                 }
@@ -107,6 +146,7 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
                 }
             }).call()
     }
+
 
     /**
      *
@@ -172,7 +212,7 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
         obj.game_id = Player.inst.gameModel
         obj.is_gift = Player.inst.urlParam.isGift
 
-        this.post("/game/" + this.networkName + "/init", obj, this.userDataHandler.bind(this), this.userDataErrorHandler.bind(this))
+        this.postData("/game/" + this.networkName + "/init", obj, this.userDataHandler.bind(this), this.userDataErrorHandler.bind(this))
     }
 
     /** 连接该游戏的socket */
@@ -234,7 +274,7 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
 
     /** 获取投注劵 */
     protected getCoupon() {
-        this.getURL(Urls.URL_GAME_ALL_COUPON + Player.inst.getRequestToken(),
+        this.getData(Urls.URL_GAME_ALL_COUPON + Player.inst.getRequestToken(),
             null, this.couponHandler.bind(this), this.userDataErrorHandler.bind(this))
     }
 
@@ -327,7 +367,7 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
      * @param callback
      */
     sendBet(url: string, data: any, callback: ParamHandler) {
-        this.post(url, data, (data: any) => {
+        this.postData(url, data, (data: any) => {
             if (data.code != HttpCode.OK) {
                 MessageTip.showTip(StateCode.getShowMessage(data))
                 this.sendAction(ActionLib.GAME_RESET_BET)
@@ -356,7 +396,7 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
         obj.token = Player.inst.token
         obj.game_id = Player.inst.gameModel
         obj.id = id
-        this.post(Urls.URL_GAME_SCRATCHER_LOTTERY, obj,
+        this.postData(Urls.URL_GAME_SCRATCHER_LOTTERY, obj,
             Laya.Handler.create(this, this.jackPotClaimHandler, [handler]), () => {
                 runFun(handler, false)
             })

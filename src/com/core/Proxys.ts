@@ -6,9 +6,6 @@ export class Proxys implements IProxy, IKey {
     /** 独有的名字 */
     protected key: string
 
-    constructor() {
-    }
-
     regAction(action: string, caller: any, method: Function, group?: string) {
         Factory.inst.regAction(action, caller, method, group)
     }
