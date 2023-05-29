@@ -8,7 +8,8 @@ window["runFun"] = (func?: ParamHandler, ...args) => {
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never
 
 // 获取构造函数的实例类型
-type InstanceTypeOfConstructor<T> = T extends new (...args: any[]) => infer R ? R : any
+// type InstanceTypeOfConstructor<T> = T extends new (...args: any[]) => infer R ? R : any
+type InstanceTypeOfConstructor<T> = T extends Constructor<infer R> ? R : never
 
 // 修改 mixin 函数
 function mixin<T extends Constructor[]>(...classes: T): Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>> {
