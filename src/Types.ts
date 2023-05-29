@@ -1,4 +1,3 @@
-
 window["runFun"] = (func?: ParamHandler, ...args) => {
     if (func != null) return func instanceof Laya.Handler ? func.runWith(args) : func.apply(null, args)
     return null
@@ -29,9 +28,10 @@ function mixin<T extends Constructor[]>(...classes: T): Constructor<UnionToInter
         //     }
         // }
     }
+
     // 将每个类的原型链添加到 MixinClass 的原型链上
     classes.forEach((BaseClass) => {
-        MixinClass.prototype = Object.create(BaseClass.prototype, Object.getOwnPropertyDescriptors(MixinClass.prototype))
+        Object.setPrototypeOf(MixinClass.prototype, Object.create(BaseClass.prototype, Object.getOwnPropertyDescriptors(MixinClass.prototype)))
     })
     // for (const Class of classes) {
     //     copyProperties(MixinClass.prototype, Class.prototype)
