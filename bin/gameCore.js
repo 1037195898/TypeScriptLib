@@ -13420,10 +13420,20 @@ window.coreLib = {};
     function copyProperties(target, source) {
         for (const key of getAllPropertyNames(source)) {
             if (key !== "constructor" && key !== "prototype" && key !== "name") {
-                const descriptor = Object.getOwnPropertyDescriptor(source, key);
+                const descriptor = getAllPropertyDescriptor(source, key);
                 descriptor && Object.defineProperty(target, key, descriptor);
             }
         }
+    }
+    function getAllPropertyDescriptor(source, key) {
+        let currentObj = source;
+        var descriptor = Object.getOwnPropertyDescriptor(currentObj, key);
+        while (!descriptor && currentObj) {
+            // 沿着原型链向上查找
+            currentObj = Object.getPrototypeOf(currentObj);
+            descriptor = Object.getOwnPropertyDescriptor(currentObj, key);
+        }
+        return descriptor;
     }
     function getAllPropertyNames(obj) {
         const allPropertyNames = new Set();

@@ -28,10 +28,21 @@ function mixin<T extends Constructor[]>(...classes: T): Constructor<UnionToInter
 function copyProperties(target: any, source: any) {
     for (const key of getAllPropertyNames(source)) {
         if (key !== "constructor" && key !== "prototype" && key !== "name") {
-            const descriptor = Object.getOwnPropertyDescriptor(source, key)
+            const descriptor = getAllPropertyDescriptor(source, key)
             descriptor && Object.defineProperty(target, key, descriptor)
         }
     }
+}
+
+function getAllPropertyDescriptor(source: any, key: string | symbol) {
+    let currentObj = source
+    var descriptor = Object.getOwnPropertyDescriptor(currentObj, key)
+    while (!descriptor && currentObj) {
+        // 沿着原型链向上查找
+        currentObj = Object.getPrototypeOf(currentObj)
+        descriptor = Object.getOwnPropertyDescriptor(currentObj, key)
+    }
+    return descriptor
 }
 
 function getAllPropertyNames(obj) {
