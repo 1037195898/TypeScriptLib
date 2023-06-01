@@ -52,6 +52,9 @@ declare namespace coreLib {
         /** 清除所有分组和包含的事件 */
         clearGroup(): void;
     }
+    /**
+     * 只有 getProxy 和 getView
+     */
     export class ViewProxy {
         getProxy<T>(name: string | {
             new (): T;
@@ -447,6 +450,8 @@ declare namespace coreLib {
         GAME_PLAY_COLLECT_GOLD_COINS_ANI = "game_play_collect_gold_coins_ani",
         /** 显示free窗口 */
         GAME_SHOW_FREE_WINDOW = "game_show_free_window",
+        /** 隐藏free窗口 */
+        GAME_HIDE_FREE_WINDOW = "game_hide_free_window",
         /** 显示freeUI */
         GAME_SHOW_FREE_UI = "game_show_free_ui",
         /** 隐藏freeUI */
@@ -1014,7 +1019,7 @@ declare namespace coreLib {
         /** 创建并显示一个舞台 */
         protected createShowScene(url: string, cls: any): void;
     }
-    const BaseWindow_base: Constructor<ActionEvent & ViewProxy & fairygui.Window>;
+    const BaseWindow_base: Constructor<ActionEvent & StringBlock & ViewProxy & fairygui.Window>;
     export class BaseWindow extends BaseWindow_base implements IRecord {
         /** 动画显示或关闭 */
         protected isAction: boolean;
@@ -1031,31 +1036,6 @@ declare namespace coreLib {
         hideRecord(): void;
         showRecord(): void;
         dispose(): void;
-        regAction(action: string, caller: any, method: Function, group?: string): void;
-        regActionHandler(action: string, handler: Laya.Handler, group?: string): void;
-        removeAllAction(...arge: any[]): void;
-        removeGroup(group: string): void;
-        removeGroupActions(group: string, ...arge: any[]): void;
-        removeActionHandler(action: string, method: Function, group?: string): void;
-        sendAction(action: string, ...arge: any[]): void;
-        sendGroupAction(group: string, action: string, ...arge: any[]): void;
-        /** 注册游戏数据 */
-        regGameAction(action: string, caller: any, method: Function): void;
-        /** 根据语言包id获取字符串 */
-        getString(id: string | number, ...args: any[]): string;
-        removeFunction(groupObj: any, action: string, method: Function): void;
-        removeTarget(groupObj: any, caller: any): void;
-        removeTargetAll(caller: any): void;
-        getProxy<T>(name: string | {
-            new (): T;
-        }): T;
-        addView<T extends IView & IKey>(key: string | {
-            new (): T;
-        }, view: T): boolean;
-        getView<T>(key: string | {
-            new (): T;
-        }): T;
-        removeView<T extends IView & IKey>(key: string | T): void;
     }
     export class Controller implements IController {
         /** 事件缓存的所有组 组名字->组object */
@@ -3248,19 +3228,19 @@ declare namespace coreLib {
         get isGift(): number;
         set isGift(value: number);
     }
-    export enum Urls {
+    export class Urls {
         /** 获取服务器时间 */
-        GAME_SERVER_TIME = "/game/server-time",
+        static GAME_SERVER_TIME: string;
         /** 优惠券投注 */
-        URL_COUPON_BET = "/game/coupon/bet",
+        static URL_COUPON_BET: string;
         /** 获取用户信息 */
-        URL_USER_INFO = "/user/info",
+        static URL_USER_INFO: string;
         /** 获取用户账户金额 */
-        URL_USER_ACCOUNT_ASSET = "/account/asset",
+        static URL_USER_ACCOUNT_ASSET: string;
         /** gift 抽奖开奖结果 */
-        URL_GAME_SCRATCHER_LOTTERY = "/game/scratcher/handle",
+        static URL_GAME_SCRATCHER_LOTTERY: string;
         /** 获取所有优惠券 */
-        URL_GAME_ALL_COUPON = "/coupon/all?"
+        static URL_GAME_ALL_COUPON: string;
     }
     /** 用户数据 */
     export class Player {

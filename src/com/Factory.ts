@@ -140,6 +140,9 @@ export class Factory implements IAction {
 
 }
 
+/**
+ * 只有 getProxy 和 getView
+ */
 export class ViewProxy {
 
     getProxy<T>(name: string | { new(): T }): T {

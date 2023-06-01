@@ -145,6 +145,8 @@ export enum ActionLib {
     GAME_PLAY_COLLECT_GOLD_COINS_ANI = "game_play_collect_gold_coins_ani",
     /** 显示free窗口 */
     GAME_SHOW_FREE_WINDOW = "game_show_free_window",
+    /** 隐藏free窗口 */
+    GAME_HIDE_FREE_WINDOW = "game_hide_free_window",
     /** 显示freeUI */
     GAME_SHOW_FREE_UI = "game_show_free_ui",
     /** 隐藏freeUI */

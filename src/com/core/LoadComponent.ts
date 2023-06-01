@@ -69,7 +69,7 @@ export class LoadComponent extends BaseView {
         }
     }
 
-    get contentPane(): GComponent {
+    get contentPane() {
         return this._contentPane
     }
 

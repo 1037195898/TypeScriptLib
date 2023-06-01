@@ -6,13 +6,10 @@ import Handler = Laya.Handler;
 import {SceneManager} from "../manager/SceneManager"
 import {AppRecordManager} from "../manager/AppRecordManager"
 import {ActionLib} from "../actions/ActionLib"
-import {ActionEvent, Factory, ViewProxy} from "../Factory"
-import {BaseProxy} from "./BaseProxy"
-import {LanguageUtils} from "../utils/LanguageUtils"
-import {StringUtil} from "../utils/StringUtil"
-import {IKey, IRecord, IView} from "../interfaces/ICommon";
+import {ActionEvent, StringBlock, ViewProxy} from "../Factory"
+import {IRecord} from "../interfaces/ICommon";
 
-export class BaseWindow extends mixinExt(ViewProxy, ActionEvent, fgui.Window) implements IRecord {
+export class BaseWindow extends mixinExt(StringBlock, ViewProxy, ActionEvent, fgui.Window) implements IRecord {
 
     /** 动画显示或关闭 */
     protected isAction = true
@@ -107,82 +104,6 @@ export class BaseWindow extends mixinExt(ViewProxy, ActionEvent, fgui.Window) im
         if (this.displayObject != null) this.displayObject.stage.off(Laya.Event.RESIZE, this, this.updateSizePoint)
         if (this.displayObject != null && !this.displayObject.destroyed)
             super.dispose()
-    }
-
-    regAction(action: string, caller: any, method: Function, group: string = null) {
-        Factory.inst.regAction(action, caller, method, group)
-    }
-
-    regActionHandler(action: string, handler: Handler, group: string = null) {
-        Factory.inst.regActionHandler(action, handler, group)
-    }
-
-    removeAllAction(...arge: any[]) {
-        Factory.inst.removeAllAction.apply(Factory.inst, arge)
-    }
-
-    removeGroup(group: string) {
-        Factory.inst.removeGroup(group)
-    }
-
-    removeGroupActions(group: string, ...arge) {
-        arge.unshift(group)
-        Factory.inst.removeGroupActions.apply(Factory.inst, arge)
-    }
-
-    removeActionHandler(action: string, method: Function, group: string = null) {
-        Factory.inst.removeActionHandler(action, method, group)
-    }
-
-    sendAction(action: string, ...arge) {
-        arge.unshift(action)
-        Factory.inst.sendAction.apply(Factory.inst, arge)
-    }
-
-    sendGroupAction(group: string, action: string, ...arge) {
-        arge.unshift(action)
-        arge.unshift(group)
-        Factory.inst.sendGroupAction.apply(Factory.inst, arge)
-    }
-
-    /** 注册游戏数据 */
-    regGameAction(action: string, caller: any, method: Function) {
-        this.regAction(action, caller, method, BaseProxy.GAME_GROUP)
-    }
-
-    /** 根据语言包id获取字符串 */
-    getString(id: string | number, ...args): string {
-        let content = LanguageUtils.inst.getStr(id)
-        args.unshift(content)
-        return StringUtil.format.apply(null, args)
-    }
-
-    removeFunction(groupObj: any, action: string, method: Function): void {
-        Factory.inst.removeFunction(groupObj, action, method)
-    }
-
-    removeTarget(groupObj: any, caller: any): void {
-        Factory.inst.removeTarget(groupObj, caller)
-    }
-
-    removeTargetAll(caller: any): void {
-        Factory.inst.removeTargetAll(caller)
-    }
-
-    getProxy<T>(name: string | { new(): T }): T {
-        return Factory.inst.getProxy(name)
-    }
-
-    addView<T extends IView & IKey>(key: string | { new(): T }, view: T): boolean {
-        return Factory.inst.addView(key, view)
-    }
-
-    getView<T>(key: string | { new(): T }): T {
-        return Factory.inst.getView(key)
-    }
-
-    removeView<T extends IView & IKey>(key: string | T) {
-        Factory.inst.removeView(key)
     }
 
 }

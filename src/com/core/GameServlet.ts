@@ -271,7 +271,7 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
 
     /** 获取投注劵 */
     protected getCoupon() {
-        this.getData(Urls.URL_GAME_ALL_COUPON + Player.inst.getRequestToken(),
+        this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(),
             null, this.couponHandler.bind(this), this.userDataErrorHandler.bind(this))
     }
 

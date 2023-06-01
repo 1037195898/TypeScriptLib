@@ -104,6 +104,9 @@ window.coreLib = {};
      */
     Factory.GAME_GROUP = "game_group";
     coreLib.Factory = Factory;
+    /**
+     * 只有 getProxy 和 getView
+     */
     class ViewProxy {
         getProxy(name) {
             return Factory.inst.getProxy(name);
@@ -831,6 +834,8 @@ window.coreLib = {};
         ActionLib["GAME_PLAY_COLLECT_GOLD_COINS_ANI"] = "game_play_collect_gold_coins_ani";
         /** 显示free窗口 */
         ActionLib["GAME_SHOW_FREE_WINDOW"] = "game_show_free_window";
+        /** 隐藏free窗口 */
+        ActionLib["GAME_HIDE_FREE_WINDOW"] = "game_hide_free_window";
         /** 显示freeUI */
         ActionLib["GAME_SHOW_FREE_UI"] = "game_show_free_ui";
         /** 隐藏freeUI */
@@ -2222,7 +2227,7 @@ window.coreLib = {};
         }
     }
     coreLib.BaseStarter = BaseStarter;
-    class BaseWindow extends mixinExt(ViewProxy, ActionEvent, fgui.Window) {
+    class BaseWindow extends mixinExt(StringBlock, ViewProxy, ActionEvent, fgui.Window) {
         constructor() {
             super(...arguments);
             /** 动画显示或关闭 */
@@ -2310,65 +2315,6 @@ window.coreLib = {};
                 this.displayObject.stage.off(Laya.Event.RESIZE, this, this.updateSizePoint);
             if (this.displayObject != null && !this.displayObject.destroyed)
                 super.dispose();
-        }
-        regAction(action, caller, method, group = null) {
-            Factory.inst.regAction(action, caller, method, group);
-        }
-        regActionHandler(action, handler, group = null) {
-            Factory.inst.regActionHandler(action, handler, group);
-        }
-        removeAllAction(...arge) {
-            Factory.inst.removeAllAction.apply(Factory.inst, arge);
-        }
-        removeGroup(group) {
-            Factory.inst.removeGroup(group);
-        }
-        removeGroupActions(group, ...arge) {
-            arge.unshift(group);
-            Factory.inst.removeGroupActions.apply(Factory.inst, arge);
-        }
-        removeActionHandler(action, method, group = null) {
-            Factory.inst.removeActionHandler(action, method, group);
-        }
-        sendAction(action, ...arge) {
-            arge.unshift(action);
-            Factory.inst.sendAction.apply(Factory.inst, arge);
-        }
-        sendGroupAction(group, action, ...arge) {
-            arge.unshift(action);
-            arge.unshift(group);
-            Factory.inst.sendGroupAction.apply(Factory.inst, arge);
-        }
-        /** 注册游戏数据 */
-        regGameAction(action, caller, method) {
-            this.regAction(action, caller, method, BaseProxy.GAME_GROUP);
-        }
-        /** 根据语言包id获取字符串 */
-        getString(id, ...args) {
-            let content = LanguageUtils.inst.getStr(id);
-            args.unshift(content);
-            return StringUtil.format.apply(null, args);
-        }
-        removeFunction(groupObj, action, method) {
-            Factory.inst.removeFunction(groupObj, action, method);
-        }
-        removeTarget(groupObj, caller) {
-            Factory.inst.removeTarget(groupObj, caller);
-        }
-        removeTargetAll(caller) {
-            Factory.inst.removeTargetAll(caller);
-        }
-        getProxy(name) {
-            return Factory.inst.getProxy(name);
-        }
-        addView(key, view) {
-            return Factory.inst.addView(key, view);
-        }
-        getView(key) {
-            return Factory.inst.getView(key);
-        }
-        removeView(key) {
-            Factory.inst.removeView(key);
         }
     }
     coreLib.BaseWindow = BaseWindow;
@@ -3041,7 +2987,7 @@ window.coreLib = {};
         }
         /** 获取投注劵 */
         getCoupon() {
-            this.getData(Urls.URL_GAME_ALL_COUPON + Player.inst.getRequestToken(), null, this.couponHandler.bind(this), this.userDataErrorHandler.bind(this));
+            this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(), null, this.couponHandler.bind(this), this.userDataErrorHandler.bind(this));
         }
         /** 收到投注劵数据 */
         couponHandler(data) {
@@ -7276,21 +7222,21 @@ window.coreLib = {};
         }
     }
     coreLib.UrlParam = UrlParam;
-    let Urls;
-    (function (Urls) {
-        /** 获取服务器时间 */
-        Urls["GAME_SERVER_TIME"] = "/game/server-time";
-        /** 优惠券投注 */
-        Urls["URL_COUPON_BET"] = "/game/coupon/bet";
-        /** 获取用户信息 */
-        Urls["URL_USER_INFO"] = "/user/info";
-        /** 获取用户账户金额 */
-        Urls["URL_USER_ACCOUNT_ASSET"] = "/account/asset";
-        /** gift 抽奖开奖结果 */
-        Urls["URL_GAME_SCRATCHER_LOTTERY"] = "/game/scratcher/handle";
-        /** 获取所有优惠券 */
-        Urls["URL_GAME_ALL_COUPON"] = "/coupon/all?";
-    })(Urls = coreLib.Urls || (coreLib.Urls = {}));
+    class Urls {
+    }
+    /** 获取服务器时间 */
+    Urls.GAME_SERVER_TIME = "/game/server-time";
+    /** 优惠券投注 */
+    Urls.URL_COUPON_BET = "/game/coupon/bet";
+    /** 获取用户信息 */
+    Urls.URL_USER_INFO = "/user/info";
+    /** 获取用户账户金额 */
+    Urls.URL_USER_ACCOUNT_ASSET = "/account/asset";
+    /** gift 抽奖开奖结果 */
+    Urls.URL_GAME_SCRATCHER_LOTTERY = "/game/scratcher/handle";
+    /** 获取所有优惠券 */
+    Urls.URL_GAME_ALL_COUPON = "/coupon/all";
+    coreLib.Urls = Urls;
     /** 用户数据 */
     class Player {
         constructor() {
