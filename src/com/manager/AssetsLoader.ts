@@ -151,9 +151,13 @@ export class AssetsLoader implements IFormatVer {
             }
 
             function loadInit() {
-                // init 资源加载
-                let loads: LoadRes[] = Browser.window[AssetsLoader.DEFAULT_INIT_RES_NAME]
-                MyLoader.loader.load(loads, Laya.Handler.create(this, loadBaseComplete, [loads]))
+                if (StringUtil.isEmpty(AssetsLoader.DEFAULT_INIT_RES_NAME)) {
+                    runFun(handler)
+                } else {
+                    // init 资源加载
+                    let loads: LoadRes[] = Browser.window[AssetsLoader.DEFAULT_INIT_RES_NAME]
+                    MyLoader.loader.load(loads, Laya.Handler.create(this, loadBaseComplete, [loads]))
+                }
             }
         }
 

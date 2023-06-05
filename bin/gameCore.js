@@ -5792,9 +5792,14 @@ window.coreLib = {};
                     loadInit();
                 }
                 function loadInit() {
-                    // init 资源加载
-                    let loads = Laya.Browser.window[AssetsLoader.DEFAULT_INIT_RES_NAME];
-                    MyLoader.loader.load(loads, Laya.Handler.create(this, loadBaseComplete, [loads]));
+                    if (StringUtil.isEmpty(AssetsLoader.DEFAULT_INIT_RES_NAME)) {
+                        runFun(handler);
+                    }
+                    else {
+                        // init 资源加载
+                        let loads = Laya.Browser.window[AssetsLoader.DEFAULT_INIT_RES_NAME];
+                        MyLoader.loader.load(loads, Laya.Handler.create(this, loadBaseComplete, [loads]));
+                    }
                 }
             };
             let loadErrorHandler = () => {
