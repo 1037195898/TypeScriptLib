@@ -12,6 +12,7 @@ import {SceneManager} from "../manager/SceneManager"
 import {LibStr} from "../LibStr"
 import {Log} from "../Log";
 import {PromptWindow} from "../view/PromptWindow";
+import {HttpCode} from "../net/Common";
 
 /** 状态吗获取显示信息 */
 export class StateCode {
@@ -62,6 +63,8 @@ export class StateCode {
     /** 此错误是后在执行范围内 */
     static execute(code: number, msg: string = null) {
         switch (code) {
+            case HttpCode.OK:
+                return false
             case 300:// 请登录
                 Log.debug("StateCode.execute() 300")
                 if (Player.inst.urlParam.isJumpPage()) {
