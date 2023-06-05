@@ -30,6 +30,7 @@ import {IFormatVer} from "../interfaces/ICommon";
 export class AssetsLoader implements IFormatVer {
 
     private static _instance: AssetsLoader
+
     static get inst(): AssetsLoader {
         if (this._instance == null) this._instance = new AssetsLoader()
         return this._instance
@@ -38,12 +39,20 @@ export class AssetsLoader implements IFormatVer {
     static readonly ma = Browser.now()
     /** 资源配置文件名 */
     static CONFIG_RES_NAME = "resConfig.xml"
+    /** 资源配置文件名 */
+    static DEFAULT_INIT_RES_NAME = null
+    /**
+     * 版本加载路径
+     * @example
+     * https://res.game.co/assetsversion.json
+     */
+    static VERSION_RES_URL = null
     /** 下载成功 */
     private handler: ParamHandler
     /** 下载失败 */
     private errorHandler: ParamHandler
     /** 加载对象 */
-    private loadObj: any
+    private loadObj: ResConfig
     /** 是否是http  */
     readonly httpProtocol = Browser.window.location.protocol == "http:"
     /**
@@ -120,26 +129,31 @@ export class AssetsLoader implements IFormatVer {
      */
     loadMain(handler: ParamHandler) {
         let loadXmlComplete = () => {
-
-            let vUrl = Browser.window.versionUrl
-            let loadInitJson = [{url: vUrl, type: Loader.JSON}]
-
-            MyLoader.loader.load(loadInitJson, Laya.Handler.create(this, loadJsonComplete))
+            if (AssetsLoader.VERSION_RES_URL) {
+                let loadInitJson = [{url: AssetsLoader.VERSION_RES_URL, type: Loader.JSON}]
+                MyLoader.loader.load(loadInitJson, Laya.Handler.create(this, loadJsonComplete))
+            } else {
+                loadInit()
+            }
 
             function loadJsonComplete(success: boolean) {
                 if (!success) {
                     loadErrorHandler()
                     return
                 }
-                let versionJson = AssetProxy.inst.getRes(vUrl)
-                MyLoader.loader.clearRes(vUrl)
+                let versionJson = AssetProxy.inst.getRes(AssetsLoader.VERSION_RES_URL)
+                MyLoader.loader.clearRes(AssetsLoader.VERSION_RES_URL)
                 Player.DOWNLOAD_APK_URL = versionJson.url
                 Player.VERSION = versionJson.version
                 Player.VERSION_CODE = versionJson.versionCode
                 Player.HOME_URL = versionJson.appUrl
+                loadInit()
+            }
+
+            function loadInit() {
                 // init 资源加载
-                let loads: any[] = Browser.window.init
-                MyLoader.loader.load(loads, Laya.Handler.create(this, loadBaseComplete))
+                let loads: LoadRes[] = Browser.window[AssetsLoader.DEFAULT_INIT_RES_NAME]
+                MyLoader.loader.load(loads, Laya.Handler.create(this, loadBaseComplete, [loads]))
             }
         }
 
@@ -152,13 +166,12 @@ export class AssetsLoader implements IFormatVer {
             AppManager.gameRestart()
         }
 
-        let loadBaseComplete = (success: boolean) => {
+        let loadBaseComplete = (loads: LoadRes[], success: boolean) => {
             if (!success) {
                 loadErrorHandler()
                 return
             }
-
-            if (!this.addPackage("init/init")) {
+            if (!this.addPackages(loads)) {
                 Log.debug("addPackage fail = init")
                 loadErrorHandler()
                 return
@@ -378,14 +391,14 @@ export class AssetsLoader implements IFormatVer {
         for (const value of spines) {
             value.type = Loader.JSON
             let temp = value.url.replace(".json", ".atlas")
-            if(data.findIndex(function (value, index, obj) {
+            if (data.findIndex(function (value, index, obj) {
                 return temp === value.url
             }) === -1) {
                 data.push({url: value.url.replace(".json", ".atlas"), type: Loader.TEXT, branch: value.branch})
             }
 
             temp = value.url.replace(".json", ".png")
-            if(data.findIndex(function (value, index, obj) {
+            if (data.findIndex(function (value, index, obj) {
                 return temp === value.url
             }) === -1) {
                 data.push({url: value.url.replace(".json", ".png"), type: Loader.IMAGE, branch: value.branch})
@@ -450,27 +463,39 @@ export class AssetsLoader implements IFormatVer {
             Factory.inst.sendAction(ActionLib.GAME_REG_GAME_COMMON_CLASS)
         }
 
-        let fuiName: string
-        let res = this.loadObj.res
-        for (let k = 0; k < res.length; k++) {
-            fuiName = res[k].url
-            if (fuiName.indexOf("." + fairygui.UIConfig.packageFileExtension) != -1) {
-                fuiName = StringUtil.remove(fuiName, "." + fairygui.UIConfig.packageFileExtension)
-                if (!this.addPackage(fuiName)) {
-                    Log.info("addPackage fail = " + fuiName)
-                    this.loadErrorHandler()
-                    return
-                }
-            }
+        if (!this.addPackages(this.loadObj.res)) {
+            this.loadErrorHandler()
+            return
         }
+
         runFun(this.handler)
     }
+
 
     private loadErrorHandler() {
         MyLoader.loader.clearUnLoaded()
         JSUtils.gameClose()
         AnalyticsManager.sendGameAnalysis("loader_game_res_error")
         runFun(this.errorHandler)
+    }
+
+    /**
+     * 将一个 loadRes数组对象  添加资源
+     * @param res
+     */
+    addPackages(res: LoadRes[]) {
+        let fuiName: string
+        for (let k = 0; k < res.length; k++) {
+            fuiName = res[k].url
+            if (fuiName.indexOf("." + fairygui.UIConfig.packageFileExtension) != -1) {
+                fuiName = StringUtil.remove(fuiName, "." + fairygui.UIConfig.packageFileExtension)
+                if (!this.addPackage(fuiName)) {
+                    Log.info("addPackage fail = " + fuiName)
+                    return false
+                }
+            }
+        }
+        return true
     }
 
 

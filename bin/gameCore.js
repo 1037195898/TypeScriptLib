@@ -5771,23 +5771,30 @@ window.coreLib = {};
          */
         loadMain(handler) {
             let loadXmlComplete = () => {
-                let vUrl = Laya.Browser.window.versionUrl;
-                let loadInitJson = [{ url: vUrl, type: Laya.Loader.JSON }];
-                MyLoader.loader.load(loadInitJson, Laya.Handler.create(this, loadJsonComplete));
+                if (AssetsLoader.VERSION_RES_URL) {
+                    let loadInitJson = [{ url: AssetsLoader.VERSION_RES_URL, type: Laya.Loader.JSON }];
+                    MyLoader.loader.load(loadInitJson, Laya.Handler.create(this, loadJsonComplete));
+                }
+                else {
+                    loadInit();
+                }
                 function loadJsonComplete(success) {
                     if (!success) {
                         loadErrorHandler();
                         return;
                     }
-                    let versionJson = fgui.AssetProxy.inst.getRes(vUrl);
-                    MyLoader.loader.clearRes(vUrl);
+                    let versionJson = fgui.AssetProxy.inst.getRes(AssetsLoader.VERSION_RES_URL);
+                    MyLoader.loader.clearRes(AssetsLoader.VERSION_RES_URL);
                     Player.DOWNLOAD_APK_URL = versionJson.url;
                     Player.VERSION = versionJson.version;
                     Player.VERSION_CODE = versionJson.versionCode;
                     Player.HOME_URL = versionJson.appUrl;
+                    loadInit();
+                }
+                function loadInit() {
                     // init 资源加载
-                    let loads = Laya.Browser.window.init;
-                    MyLoader.loader.load(loads, Laya.Handler.create(this, loadBaseComplete));
+                    let loads = Laya.Browser.window[AssetsLoader.DEFAULT_INIT_RES_NAME];
+                    MyLoader.loader.load(loads, Laya.Handler.create(this, loadBaseComplete, [loads]));
                 }
             };
             let loadErrorHandler = () => {
@@ -5798,12 +5805,12 @@ window.coreLib = {};
                 JSUtils.gameClose();
                 AppManager.gameRestart();
             };
-            let loadBaseComplete = (success) => {
+            let loadBaseComplete = (loads, success) => {
                 if (!success) {
                     loadErrorHandler();
                     return;
                 }
-                if (!this.addPackage("init/init")) {
+                if (!this.addPackages(loads)) {
                     Log.debug("addPackage fail = init");
                     loadErrorHandler();
                     return;
@@ -6069,18 +6076,9 @@ window.coreLib = {};
                 // 通知开始注册游戏公共类 事件
                 Factory.inst.sendAction(ActionLib.GAME_REG_GAME_COMMON_CLASS);
             }
-            let fuiName;
-            let res = this.loadObj.res;
-            for (let k = 0; k < res.length; k++) {
-                fuiName = res[k].url;
-                if (fuiName.indexOf("." + fairygui.UIConfig.packageFileExtension) != -1) {
-                    fuiName = StringUtil.remove(fuiName, "." + fairygui.UIConfig.packageFileExtension);
-                    if (!this.addPackage(fuiName)) {
-                        Log.info("addPackage fail = " + fuiName);
-                        this.loadErrorHandler();
-                        return;
-                    }
-                }
+            if (!this.addPackages(this.loadObj.res)) {
+                this.loadErrorHandler();
+                return;
             }
             runFun(this.handler);
         }
@@ -6089,6 +6087,24 @@ window.coreLib = {};
             JSUtils.gameClose();
             AnalyticsManager.sendGameAnalysis("loader_game_res_error");
             runFun(this.errorHandler);
+        }
+        /**
+         * 将一个 loadRes数组对象  添加资源
+         * @param res
+         */
+        addPackages(res) {
+            let fuiName;
+            for (let k = 0; k < res.length; k++) {
+                fuiName = res[k].url;
+                if (fuiName.indexOf("." + fairygui.UIConfig.packageFileExtension) != -1) {
+                    fuiName = StringUtil.remove(fuiName, "." + fairygui.UIConfig.packageFileExtension);
+                    if (!this.addPackage(fuiName)) {
+                        Log.info("addPackage fail = " + fuiName);
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
         /**
          * 添加游戏UI资源
@@ -6176,6 +6192,14 @@ window.coreLib = {};
     AssetsLoader.ma = Laya.Browser.now();
     /** 资源配置文件名 */
     AssetsLoader.CONFIG_RES_NAME = "resConfig.xml";
+    /** 资源配置文件名 */
+    AssetsLoader.DEFAULT_INIT_RES_NAME = null;
+    /**
+     * 版本加载路径
+     * @example
+     * https://res.game.co/assetsversion.json
+     */
+    AssetsLoader.VERSION_RES_URL = null;
     coreLib.AssetsLoader = AssetsLoader;
     /**
      * 舞台

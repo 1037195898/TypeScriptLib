@@ -2754,6 +2754,14 @@ declare namespace coreLib {
         static readonly ma: number;
         /** 资源配置文件名 */
         static CONFIG_RES_NAME: string;
+        /** 资源配置文件名 */
+        static DEFAULT_INIT_RES_NAME: any;
+        /**
+         * 版本加载路径
+         * @example
+         * https://res.game.co/assetsversion.json
+         */
+        static VERSION_RES_URL: any;
         /** 下载成功 */
         private handler;
         /** 下载失败 */
@@ -2838,6 +2846,11 @@ declare namespace coreLib {
         private progressComplete;
         private loadComplete;
         private loadErrorHandler;
+        /**
+         * 将一个 loadRes数组对象  添加资源
+         * @param res
+         */
+        addPackages(res: LoadRes[]): boolean;
         /**
          * 添加游戏UI资源
          * @param resKey 资源名字
