@@ -5148,8 +5148,6 @@ window.coreLib = {};
     coreLib.APP = APP;
     /** app管理器 */
     class AppManager {
-        constructor() {
-        }
         /** 关闭app自定义返回 */
         static closeAppBack() {
             if (Laya.Browser.window.conch && Laya.Browser.window.conch.setOnBackPressedFunction) {
@@ -8043,7 +8041,8 @@ window.coreLib = {};
          * @param code
          */
         static gameName(code) {
-            return ConfigUtils.gameConfig()[code];
+            const config = ConfigUtils.gameConfig();
+            return config ? config[code] : null;
         }
         /**
          * 根据游戏名获取游戏id 如果不存在返回-1
@@ -8051,9 +8050,11 @@ window.coreLib = {};
          */
         static gameCode(name) {
             const config = ConfigUtils.gameConfig();
-            for (const key in config) {
-                if (config[key] == name) {
-                    return parseInt(key);
+            if (config) {
+                for (const key in config) {
+                    if (config[key] == name) {
+                        return parseInt(key);
+                    }
                 }
             }
             return -1;

@@ -10,9 +10,6 @@ export class AppManager {
 
     private static jsToJava: IPlatform
 
-    constructor() {
-    }
-
     /** 关闭app自定义返回 */
     static closeAppBack() {
         if (Browser.window.conch && Browser.window.conch.setOnBackPressedFunction) {

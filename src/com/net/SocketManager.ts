@@ -22,16 +22,16 @@ export class SocketManager extends BaseSocket {
     private _client: GameSocket
     public static SocketClass = GameSocket
     /**
-     * 自定义额外加载操作
+     * 自定义socket url
      * @example
-     * AssetsLoader.customLoader = (complete: ParamHandler, errorHandler: ParamHandler) => {
+     * SocketManager.inst.customUrl = (url: string) => {
      *      ...
-     *     runFun(complete)
+     *     return url
      * }
      *
-     * AssetsLoader.customLoader = Laya.Handler.create(this, function(complete: ParamHandler, errorHandler: ParamHandler) {
+     * SocketManager.inst.customUrl = Laya.Handler.create(this, function(url: string) {
      *  ...
-     *  runFun(complete)
+     *  return url
      *
      * })
      */

@@ -2543,7 +2543,6 @@ declare namespace coreLib {
     /** app管理器 */
     export class AppManager {
         private static jsToJava;
-        constructor();
         /** 关闭app自定义返回 */
         static closeAppBack(): void;
         /** 进入游戏 */
@@ -3186,16 +3185,16 @@ declare namespace coreLib {
         private _client;
         static SocketClass: typeof GameSocket;
         /**
-         * 自定义额外加载操作
+         * 自定义socket url
          * @example
-         * AssetsLoader.customLoader = (complete: ParamHandler, errorHandler: ParamHandler) => {
+         * SocketManager.inst.customUrl = (url: string) => {
          *      ...
-         *     runFun(complete)
+         *     return url
          * }
          *
-         * AssetsLoader.customLoader = Laya.Handler.create(this, function(complete: ParamHandler, errorHandler: ParamHandler) {
+         * SocketManager.inst.customUrl = Laya.Handler.create(this, function(url: string) {
          *  ...
-         *  runFun(complete)
+         *  return url
          *
          * })
          */

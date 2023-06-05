@@ -21,7 +21,8 @@ export class ConfigUtils {
      * @param code
      */
     static gameName(code: number) {
-        return ConfigUtils.gameConfig()[code]
+        const config = ConfigUtils.gameConfig()
+        return config ? config[code] : null
     }
 
     /**
@@ -30,9 +31,11 @@ export class ConfigUtils {
      */
     static gameCode(name: string) {
         const config = ConfigUtils.gameConfig()
-        for (const key in config) {
-            if (config[key] == name) {
-                return parseInt(key)
+        if (config) {
+            for (const key in config) {
+                if (config[key] == name) {
+                    return parseInt(key)
+                }
             }
         }
         return -1
