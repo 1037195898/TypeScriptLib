@@ -9932,6 +9932,8 @@ window.coreLib = {};
         /** 此错误是后在执行范围内 */
         static execute(code, msg = null) {
             switch (code) {
+                case HttpCode.OK:
+                    return false;
                 case 300: // 请登录
                     Log.debug("StateCode.execute() 300");
                     if (Player.inst.urlParam.isJumpPage()) {
