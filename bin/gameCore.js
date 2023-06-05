@@ -5827,14 +5827,17 @@ window.coreLib = {};
         /**
          * 加载公共资源
          * @param handler
+         * @param assets
          */
-        loadCommon(handler) {
-            let assets = [];
-            // 公共资源
-            let serverUrl = Laya.Browser.window.serverState;
-            let commonRes = Laya.Browser.window.common;
-            commonRes.push({ url: serverUrl, type: Laya.Loader.TEXT });
-            assets = assets.concat(commonRes);
+        loadCommon(handler, assets = null) {
+            if (assets == null) {
+                assets = [];
+                // 公共资源
+                let commonRes = Laya.Browser.window.common;
+                let serverUrl = Laya.Browser.window.serverState;
+                assets = assets.concat(commonRes);
+                assets.push({ url: serverUrl, type: Laya.Loader.TEXT });
+            }
             AssetsLoader.checkBranch(assets);
             function loadCommonErrorHandler() {
                 MyLoader.loader.clearUnLoaded();
@@ -5863,7 +5866,7 @@ window.coreLib = {};
                     loadCommonErrorHandler();
                     return;
                 }
-                if (!this.addPackage("common/common")) {
+                if (!this.addPackages(assets)) {
                     loadCommonErrorHandler();
                     return;
                 }

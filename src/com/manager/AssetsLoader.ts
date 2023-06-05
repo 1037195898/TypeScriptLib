@@ -1,12 +1,12 @@
-import UIObjectFactory = fgui.UIObjectFactory
-import Render = Laya.Render
-import AssetProxy = fgui.AssetProxy
-import UIPackage = fgui.UIPackage
-import Browser = Laya.Browser
-import Loader = Laya.Loader
-import LocalStorage = Laya.LocalStorage
-import Utils = Laya.Utils
-import URL = Laya.URL
+import UIObjectFactory = fgui.UIObjectFactory;
+import Render = Laya.Render;
+import AssetProxy = fgui.AssetProxy;
+import UIPackage = fgui.UIPackage;
+import Browser = Laya.Browser;
+import Loader = Laya.Loader;
+import LocalStorage = Laya.LocalStorage;
+import Utils = Laya.Utils;
+import URL = Laya.URL;
 import {MyLoader} from "../core/MyLoader"
 import {StringUtil} from "../utils/StringUtil"
 import {Player} from "../Player"
@@ -191,18 +191,19 @@ export class AssetsLoader implements IFormatVer {
     /**
      * 加载公共资源
      * @param handler
+     * @param assets
      */
-    loadCommon(handler: ParamHandler) {
-        let assets: LoadRes[] = []
-        // 公共资源
-        let serverUrl = Browser.window.serverState
-        let commonRes: LoadRes[] = Browser.window.common
-        commonRes.push({url: serverUrl, type: Loader.TEXT})
-        assets = assets.concat(commonRes)
+    loadCommon(handler: ParamHandler, assets: LoadRes[] = null) {
+        if (assets == null) {
+            assets = []
+            // 公共资源
+            let commonRes: LoadRes[] = Browser.window.common
+            let serverUrl = Browser.window.serverState
+            assets = assets.concat(commonRes)
+            assets.push({url: serverUrl, type: Loader.TEXT})
+        }
 
         AssetsLoader.checkBranch(assets)
-
-
         function loadCommonErrorHandler() {
             MyLoader.loader.clearUnLoaded()
             if (!Render.isConchApp) JSUtils.openModal(LanguageUtils.inst.getStr(LibStr.NET_ERROR))
@@ -229,7 +230,7 @@ export class AssetsLoader implements IFormatVer {
                 loadCommonErrorHandler()
                 return
             }
-            if (!this.addPackage("common/common")) {
+            if (!this.addPackages(assets)) {
                 loadCommonErrorHandler()
                 return
             }

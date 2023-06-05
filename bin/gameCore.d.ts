@@ -2815,8 +2815,9 @@ declare namespace coreLib {
         /**
          * 加载公共资源
          * @param handler
+         * @param assets
          */
-        loadCommon(handler: ParamHandler): void;
+        loadCommon(handler: ParamHandler, assets?: LoadRes[]): void;
         /**
          * 加载游戏代码
          * @param config 配置表
