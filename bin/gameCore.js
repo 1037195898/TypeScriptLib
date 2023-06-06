@@ -8109,7 +8109,7 @@ window.coreLib = {};
             const config = ConfigUtils.gameConfig();
             if (config) {
                 for (const key in config) {
-                    if (config[key] == name) {
+                    if (StringUtil.trimAll(config[key]) == name) {
                         return parseInt(key);
                     }
                 }
