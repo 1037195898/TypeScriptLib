@@ -3263,13 +3263,8 @@ window.coreLib = {};
                 resInfo.ignoreCache = ignoreCache;
                 resInfo.useWorkerLoader = useWorkerLoader;
                 resInfo.useIndex = 0;
-                this.updateBaseUrl(resInfo.useIndex);
                 this._load(url, resInfo, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
             }
-        }
-        /** 更新基础路径 */
-        updateBaseUrl(useIndex) {
-            Laya.URL.basePath = this.baseUrls[useIndex];
         }
         loadAssets(arr, complete, progress, type, priority, cache, group) {
             let itemCount = arr.length;
@@ -3313,6 +3308,8 @@ window.coreLib = {};
             }
         }
         _load(url, resInfo = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = false) {
+            MyLoader.loader.formatURL(url, resInfo);
+            url = StringUtil.replace(url, "{host}", window.location.host);
             Laya.loader.load(url, Laya.Handler.create(this, this.singleCompleteHandler, [resInfo]), progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
         }
         singleCompleteHandler(resInfo, content = null) {
@@ -3335,15 +3332,22 @@ window.coreLib = {};
          */
         getRes(url) {
             let content = null;
-            for (let i = 0; i < this.baseUrls.length; i++) {
-                Laya.URL.basePath = this.baseUrls[i];
-                content = Laya.Loader.getRes(url);
-                if (content != null) {
-                    break;
+            let allBaseUrl = this.baseUrls;
+            if (MyLoader.getAllBaseUrl)
+                allBaseUrl = MyLoader.getAllBaseUrl();
+            if (url.indexOf(":") == -1 && allBaseUrl && allBaseUrl.length > 0) { // 不是完整路径走这里
+                let tempUrl = null;
+                for (const baseUrl of allBaseUrl) {
+                    if (url.charAt(0) != "/")
+                        tempUrl = baseUrl + Laya.URL.customFormat(url);
+                    content = Laya.Loader.getRes(tempUrl);
+                    if (content != null) {
+                        return content;
+                    }
                 }
             }
-            Laya.URL.basePath = this.baseUrls[0];
-            return content;
+            url = StringUtil.replace(url, "{host}", window.location.host);
+            return Laya.Loader.getRes(url);
         }
         /**
          * 获取指定资源地址的资源。
@@ -3351,15 +3355,36 @@ window.coreLib = {};
          * @return    返回资源。
          */
         clearRes(url) {
-            for (let i = 0; i < this.baseUrls.length; i++) {
-                Laya.URL.basePath = this.baseUrls[i];
-                Laya.Loader.clearRes(url);
+            let allBaseUrl = this.baseUrls;
+            if (MyLoader.getAllBaseUrl)
+                allBaseUrl = MyLoader.getAllBaseUrl();
+            if (url.indexOf(":") == -1 && allBaseUrl && allBaseUrl.length > 0) { // 不是完整路径走这里
+                let tempUrl = null;
+                for (const baseUrl of allBaseUrl) {
+                    //如果不是全路径，处理url
+                    if (url.charAt(0) != "/")
+                        tempUrl = baseUrl + Laya.URL.customFormat(url);
+                    Laya.Loader.clearRes(tempUrl);
+                }
             }
-            Laya.URL.basePath = this.baseUrls[0];
+            Laya.Loader.clearRes(url);
         }
         /** 清理当前未完成的加载，所有未加载的内容全部停止加载。*/
         clearUnLoaded() {
             Laya.loader.clearUnLoaded();
+        }
+        formatURL(url, resInfo) {
+            if (MyLoader.checkBaseUrl != null)
+                this.baseUrls = MyLoader.checkBaseUrl(url);
+            if (this.baseUrls) {
+                let index = resInfo.useIndex;
+                if (this.baseUrls.length <= index) {
+                    index = 0;
+                }
+                let basePath = this.baseUrls[index];
+                basePath = StringUtil.replace(basePath, "{host}", window.location.host);
+                Laya.URL.basePath = basePath;
+            }
         }
     }
     MyLoader.isWebp = false;
@@ -13086,9 +13111,6 @@ window.coreLib = {};
             this.content.text = msg;
             this.callback = callback;
             this.continueFun = continueFun;
-        }
-        doShowAnimation() {
-            super.doShowAnimation();
         }
         dispose() {
             this.clearCache();

@@ -141,11 +141,7 @@ export class PromptWindow extends BaseWindow {
         this.continueFun = continueFun
     }
 
-    protected doShowAnimation() {
-        super.doShowAnimation()
 
-
-    }
 
     dispose() {
         this.clearCache()

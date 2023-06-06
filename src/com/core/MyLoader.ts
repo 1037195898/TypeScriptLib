@@ -15,6 +15,8 @@ export class MyLoader {
     static loader: MyLoader = new MyLoader()
     /** 检查baseUrl 如果需要设置baseUrls 可以在这里处理  例如： checkBaseUrl = function(url?:string):string[] {} */
     static checkBaseUrl: (url?: string) => string[]
+    /** 获取所有的baseUrl 主要在多路径环境下，用来获取资源或者清理资源  例如： getAllBaseUrl = function():string[] {} */
+    static getAllBaseUrl: () => string[]
     /** 加载路径格式化 */
     static format: IFormatVer[] = []
 
@@ -67,14 +69,8 @@ export class MyLoader {
             resInfo.ignoreCache = ignoreCache
             resInfo.useWorkerLoader = useWorkerLoader
             resInfo.useIndex = 0
-            this.updateBaseUrl(resInfo.useIndex)
             this._load(url, resInfo, progress, type, priority, cache, group, ignoreCache, useWorkerLoader)
         }
-    }
-
-    /** 更新基础路径 */
-    private updateBaseUrl(useIndex: number) {
-        URL.basePath = this.baseUrls[useIndex]
     }
 
     private loadAssets(arr: Array<string | LoadRes>, complete: Handler, progress: Handler, type: string, priority: number, cache: boolean, group: string) {
@@ -119,6 +115,8 @@ export class MyLoader {
     }
 
     private _load(url: string, resInfo: ResInfo = null, progress: Handler = null, type: string = null, priority: number = 1, cache: boolean = true, group: string = null, ignoreCache: boolean = false, useWorkerLoader: boolean = false) {
+        MyLoader.loader.formatURL(url, resInfo)
+        url = StringUtil.replace(url, "{host}", window.location.host)
         Laya.loader.load(url, Handler.create(this, this.singleCompleteHandler, [resInfo]), progress, type, priority, cache, group, ignoreCache, useWorkerLoader)
     }
 
@@ -145,15 +143,21 @@ export class MyLoader {
      */
     getRes(url: string) {
         let content = null
-        for (let i = 0; i < this.baseUrls.length; i++) {
-            URL.basePath = this.baseUrls[i]
-            content = Loader.getRes(url)
-            if (content != null) {
-                break
+        let allBaseUrl = this.baseUrls
+        if (MyLoader.getAllBaseUrl) allBaseUrl = MyLoader.getAllBaseUrl()
+        if (url.indexOf(":") == -1 && allBaseUrl && allBaseUrl.length > 0) { // 不是完整路径走这里
+            let tempUrl = null
+            for (const baseUrl of allBaseUrl) {
+                if (url.charAt(0) != "/")
+                    tempUrl = baseUrl + URL.customFormat(url)
+                content = Loader.getRes(tempUrl)
+                if (content != null) {
+                    return content
+                }
             }
         }
-        URL.basePath = this.baseUrls[0]
-        return content
+        url = StringUtil.replace(url, "{host}", window.location.host)
+        return Loader.getRes(url)
     }
 
     /**
@@ -162,16 +166,36 @@ export class MyLoader {
      * @return    返回资源。
      */
     clearRes(url: string) {
-        for (let i = 0; i < this.baseUrls.length; i++) {
-            URL.basePath = this.baseUrls[i]
-            Loader.clearRes(url)
+        let allBaseUrl = this.baseUrls
+        if (MyLoader.getAllBaseUrl) allBaseUrl = MyLoader.getAllBaseUrl()
+        if (url.indexOf(":") == -1 && allBaseUrl && allBaseUrl.length > 0) { // 不是完整路径走这里
+            let tempUrl = null
+            for (const baseUrl of allBaseUrl) {
+                //如果不是全路径，处理url
+                if (url.charAt(0) != "/")
+                    tempUrl = baseUrl + URL.customFormat(url)
+                Loader.clearRes(tempUrl)
+            }
         }
-        URL.basePath = this.baseUrls[0]
+        Loader.clearRes(url)
     }
 
     /** 清理当前未完成的加载，所有未加载的内容全部停止加载。*/
     clearUnLoaded() {
         Laya.loader.clearUnLoaded()
+    }
+
+    private formatURL(url: string, resInfo: ResInfo) {
+        if (MyLoader.checkBaseUrl != null) this.baseUrls = MyLoader.checkBaseUrl(url)
+        if (this.baseUrls) {
+            let index = resInfo.useIndex
+            if (this.baseUrls.length <= index) {
+                index = 0
+            }
+            let basePath = this.baseUrls[index]
+            basePath = StringUtil.replace(basePath, "{host}", window.location.host)
+            Laya.URL.basePath = basePath
+        }
     }
 
 }

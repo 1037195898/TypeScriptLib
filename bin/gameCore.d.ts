@@ -1333,6 +1333,8 @@ declare namespace coreLib {
         static loader: MyLoader;
         /** 检查baseUrl 如果需要设置baseUrls 可以在这里处理  例如： checkBaseUrl = function(url?:string):string[] {} */
         static checkBaseUrl: (url?: string) => string[];
+        /** 获取所有的baseUrl 主要在多路径环境下，用来获取资源或者清理资源  例如： getAllBaseUrl = function():string[] {} */
+        static getAllBaseUrl: () => string[];
         /** 加载路径格式化 */
         static format: IFormatVer[];
         constructor();
@@ -1352,8 +1354,6 @@ declare namespace coreLib {
          * @return 此 LoaderManager 对象本身。
          */
         load(url: string | Array<string | LoadRes>, complete?: Laya.Handler, progress?: Laya.Handler, type?: string, priority?: number, cache?: boolean, group?: string, ignoreCache?: boolean, useWorkerLoader?: boolean): void;
-        /** 更新基础路径 */
-        private updateBaseUrl;
         private loadAssets;
         private _load;
         private singleCompleteHandler;
@@ -1371,6 +1371,7 @@ declare namespace coreLib {
         clearRes(url: string): void;
         /** 清理当前未完成的加载，所有未加载的内容全部停止加载。*/
         clearUnLoaded(): void;
+        private formatURL;
     }
     /**
      * 碰撞类
@@ -5498,7 +5499,6 @@ declare namespace coreLib {
          * @see ActionLib.GAME_SHOW_PROMPT_CANCEL_WINDOW
          */
         showCancelTip(msg: string | number | any[], obj?: IPromptData, callback?: ParamHandler, continueFun?: ParamHandler, isAction?: boolean): void;
-        protected doShowAnimation(): void;
         dispose(): void;
     }
     /** 提示框 */
