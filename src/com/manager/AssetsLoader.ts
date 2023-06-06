@@ -23,6 +23,7 @@ import {ActionLib} from "../actions/ActionLib"
 import {LibStr} from "../LibStr"
 import {Log} from "../Log";
 import {IFormatVer} from "../interfaces/ICommon";
+import Value2D = Laya.Value2D;
 
 /**
  * 资源管理类
@@ -379,6 +380,26 @@ export class AssetsLoader implements IFormatVer {
      */
     private parseRes(res: LoadRes[]) {
         let data: LoadRes[] = res.concat()
+
+        // 先检查批量加载
+        for (let i = 0; i < data.length; i++) {
+            const value = data[i]
+            let matchArray = value.url.match(/\{(\d+,\d+)}/)
+            if (matchArray?.length == 2) {
+                let nums = matchArray[1].split(",")
+                if (nums?.length == 2) {
+                    data.splice(i, 1)
+                    i--
+                    let start = StringUtil.getNumbers(nums[0])
+                    let end = StringUtil.getNumbers(nums[1]) + 1
+                    for (let j = start; j < end; j++) {
+                        let newValue = Object.create(value)
+                        newValue.url = newValue.url.replace(/\{(\d+,\d+)}/, j + "")
+                        data.push(newValue)
+                    }
+                }
+            }
+        }
         let sks = data.filter(function (value, index, array) {
             let temp
             return Utils.getFileExtension(value.url) === "sk" && value.type === "spine"
@@ -396,18 +417,21 @@ export class AssetsLoader implements IFormatVer {
         }
         for (const value of spines) {
             value.type = Loader.JSON
-            let temp = value.url.replace(".json", ".atlas")
-            if (data.findIndex(function (value, index, obj) {
-                return temp === value.url
-            }) === -1) {
-                data.push({url: value.url.replace(".json", ".atlas"), type: Loader.TEXT, branch: value.branch})
+            if (value.ignoreSuffix !== "atlas") {
+                let temp = value.url.replace(".json", ".atlas")
+                if (data.findIndex(function (value, index, obj) {
+                    return temp === value.url
+                }) === -1) {
+                    data.push({url: value.url.replace(".json", ".atlas"), type: Loader.TEXT, branch: value.branch})
+                }
             }
-
-            temp = value.url.replace(".json", ".png")
-            if (data.findIndex(function (value, index, obj) {
-                return temp === value.url
-            }) === -1) {
-                data.push({url: value.url.replace(".json", ".png"), type: Loader.IMAGE, branch: value.branch})
+            if (value.ignoreSuffix !== "png") {
+                let temp = value.url.replace(".json", ".png")
+                if (data.findIndex(function (value, index, obj) {
+                    return temp === value.url
+                }) === -1) {
+                    data.push({url: value.url.replace(".json", ".png"), type: Loader.IMAGE, branch: value.branch})
+                }
             }
         }
         return data

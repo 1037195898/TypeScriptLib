@@ -220,10 +220,16 @@ declare type LoadRes = {
     /** 加载地址 */
     url: string
     /**
-     * 类型字符串
+     * 类型字符串 复合类型  spine  可以配合
      * @see Laya.Loader.IMAGE
      */
     type?: string
+    /**
+     * 忽略复合加载类型中的后缀
+     * @example
+     * png   jpg
+     */
+    ignoreSuffix?:string
     /** 强制加载 */
     forceLoad?: boolean
     /** 分支 */
