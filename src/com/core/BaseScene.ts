@@ -376,34 +376,31 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
                             obj.okName = this.getString(LibStr.DEPOSIT_PLAY)
                         }
                     }
-                    PromptWindow.inst.showCancelTip(LibStr.SHOW_INVITE_REAL_MONEY, obj, handler, () => {
-                            if (obj.okName == this.getString(LibStr.DEPOSIT_PLAY)) {
-                                JSUtils.gameClose(1)
-                                JSUtils.deposit()
-                            } else {
-                                JSUtils.gameClose(1)
-                            }
-                        }
-                    )
-                }, () => {
-                    WaitResult.inst.hide()
-                    PromptWindow.inst.showCancelTip(LibStr.SHOW_INVITE_REAL_MONEY, obj, handler, () => {
+                    this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.SHOW_INVITE_REAL_MONEY, obj, handler,  () => {
+                        if (obj.okName == this.getString(LibStr.DEPOSIT_PLAY)) {
+                            JSUtils.gameClose(1)
+                            JSUtils.deposit()
+                        } else {
                             JSUtils.gameClose(1)
                         }
-                    )
+                    })
+                }, () => {
+                    WaitResult.inst.hide()
+                    this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.SHOW_INVITE_REAL_MONEY, obj, handler, () => {
+                        JSUtils.gameClose(1)
+                    })
                 })
             return
         } else {
             obj.okName = this.getString(LibStr.LOGIN_PLAY)
         }
-        PromptWindow.inst.showCancelTip(LibStr.SHOW_INVITE_REAL_MONEY, obj, handler, () => {
-                if (obj.okName == this.getString(LibStr.LOGIN_PLAY)) {
-                    JSUtils.login()
-                } else {
-                    this.backHandler()
-                }
+        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.SHOW_INVITE_REAL_MONEY, obj, handler, () => {
+            if (obj.okName == this.getString(LibStr.LOGIN_PLAY)) {
+                JSUtils.login()
+            } else {
+                this.backHandler()
             }
-        )
+        })
     }
 
     /**
@@ -471,7 +468,7 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
         // let value: string = LocalStorage.getItem(Player.inst.gameModel + "_demo")
         // if (Player.inst.isGuest && value == null) {
         if (Player.inst.isGuest) {
-            PromptWindow.inst.showTip(LibStr.PROMPT_GUEST)
+            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.PROMPT_GUEST)
             // LocalStorage.setItem(Player.inst.gameModel + "_demo", "1")
         } else {
             this.runEvent()

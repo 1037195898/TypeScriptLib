@@ -1440,7 +1440,7 @@ window.coreLib = {};
                             obj.okName = this.getString(1035 /* LibStr.DEPOSIT_PLAY */);
                         }
                     }
-                    PromptWindow.inst.showCancelTip(1015 /* LibStr.SHOW_INVITE_REAL_MONEY */, obj, handler, () => {
+                    this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1015 /* LibStr.SHOW_INVITE_REAL_MONEY */, obj, handler, () => {
                         if (obj.okName == this.getString(1035 /* LibStr.DEPOSIT_PLAY */)) {
                             JSUtils.gameClose(1);
                             JSUtils.deposit();
@@ -1451,7 +1451,7 @@ window.coreLib = {};
                     });
                 }, () => {
                     WaitResult.inst.hide();
-                    PromptWindow.inst.showCancelTip(1015 /* LibStr.SHOW_INVITE_REAL_MONEY */, obj, handler, () => {
+                    this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1015 /* LibStr.SHOW_INVITE_REAL_MONEY */, obj, handler, () => {
                         JSUtils.gameClose(1);
                     });
                 });
@@ -1460,7 +1460,7 @@ window.coreLib = {};
             else {
                 obj.okName = this.getString(1036 /* LibStr.LOGIN_PLAY */);
             }
-            PromptWindow.inst.showCancelTip(1015 /* LibStr.SHOW_INVITE_REAL_MONEY */, obj, handler, () => {
+            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1015 /* LibStr.SHOW_INVITE_REAL_MONEY */, obj, handler, () => {
                 if (obj.okName == this.getString(1036 /* LibStr.LOGIN_PLAY */)) {
                     JSUtils.login();
                 }
@@ -1524,7 +1524,7 @@ window.coreLib = {};
             // let value: string = Laya.LocalStorage.getItem(Player.inst.gameModel + "_demo")
             // if (Player.inst.isGuest && value == null) {
             if (Player.inst.isGuest) {
-                PromptWindow.inst.showTip(1013 /* LibStr.PROMPT_GUEST */);
+                this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1013 /* LibStr.PROMPT_GUEST */);
                 // Laya.LocalStorage.setItem(Player.inst.gameModel + "_demo", "1")
             }
             else {
@@ -2605,7 +2605,7 @@ window.coreLib = {};
                     case Cmd.SOCKET_TOP_UP_CHANGE:
                         Player.inst.money = obj.balance;
                         this.sendAction(ActionLib.GAME_UPDATE_MONEY);
-                        PromptWindow.inst.showTip([1018 /* LibStr.RECHARGE_SUCCESS */,
+                        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, [1018 /* LibStr.RECHARGE_SUCCESS */,
                             Player.inst.getCurrencyUnit() + " " + obj.amount]);
                         break;
                     default:
@@ -3097,7 +3097,7 @@ window.coreLib = {};
                 runFun(callback, data);
             }, () => {
                 WaitResult.inst.hide();
-                PromptWindow.inst.showTip(1005 /* LibStr.NET_ERROR */, () => {
+                this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1005 /* LibStr.NET_ERROR */, null, () => {
                     this.sendAction(ActionLib.GAME_RESET_BET);
                 });
             });
@@ -3145,7 +3145,7 @@ window.coreLib = {};
                 JSUtils.gameClose();
             }
             else {
-                PromptWindow.inst.showTip(str);
+                this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, str);
             }
         }
         get gameModel() {
@@ -10109,7 +10109,7 @@ window.coreLib = {};
                     if (typeof msg !== "string")
                         msg = this.getShowMessage(msg);
                     msg = msg ? msg : getString(1005 /* LibStr.NET_ERROR */);
-                    PromptWindow.inst.showTip(msg);
+                    Factory.inst.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, msg);
                     return true;
             }
             return false;

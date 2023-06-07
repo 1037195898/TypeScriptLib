@@ -86,7 +86,7 @@ export class GameModel extends BaseProxy implements IGameModel {
                 case Cmd.SOCKET_TOP_UP_CHANGE:
                     Player.inst.money = obj.balance
                     this.sendAction(ActionLib.GAME_UPDATE_MONEY)
-                    PromptWindow.inst.showTip([LibStr.RECHARGE_SUCCESS,
+                    this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, [LibStr.RECHARGE_SUCCESS,
                         Player.inst.getCurrencyUnit() + " " + obj.amount])
                     break
                 default:

@@ -375,7 +375,7 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
             runFun(callback, data)
         }, () => {
             WaitResult.inst.hide()
-            PromptWindow.inst.showTip(LibStr.NET_ERROR, () => {
+            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.NET_ERROR, null, () => {
                 this.sendAction(ActionLib.GAME_RESET_BET)
             })
         })
@@ -426,7 +426,7 @@ export abstract class GameServlet extends BaseProxy implements IGameServlet {
             JSUtils.openModal(str)
             JSUtils.gameClose()
         } else {
-            PromptWindow.inst.showTip(str)
+            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, str)
         }
     }
 

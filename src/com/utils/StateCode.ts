@@ -1,6 +1,6 @@
-import GRoot = fgui.GRoot
-import UIPackage = fgui.UIPackage
-import LocalStorage = Laya.LocalStorage
+import GRoot = fgui.GRoot;
+import UIPackage = fgui.UIPackage;
+import LocalStorage = Laya.LocalStorage;
 import {LanguageUtils} from "./LanguageUtils"
 import {Player} from "../Player"
 import {JSUtils} from "./JSUtils"
@@ -11,8 +11,9 @@ import {HomePrompt} from "../view/HomePrompt"
 import {SceneManager} from "../manager/SceneManager"
 import {LibStr} from "../LibStr"
 import {Log} from "../Log";
-import {PromptWindow} from "../view/PromptWindow";
 import {HttpCode} from "../net/Common";
+import {Factory} from "../Factory";
+import {ActionLib} from "../actions/ActionLib";
 
 /** 状态吗获取显示信息 */
 export class StateCode {
@@ -99,7 +100,7 @@ export class StateCode {
             default:
                 if (typeof msg !== "string") msg = this.getShowMessage(msg)
                 msg = msg ? msg : getString(LibStr.NET_ERROR)
-                PromptWindow.inst.showTip(msg)
+                Factory.inst.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, msg)
                 return true
         }
         return false
