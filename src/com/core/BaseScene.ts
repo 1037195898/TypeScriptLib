@@ -205,105 +205,16 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
     protected regEvent() {
         this.isRunEvent = true
         // 启动房间选择
-        this.regStartupEvent(() => {
-            this.sendAction(ActionLib.GAME_SHOW_ROOM_SELECT)
-        }, -1, this.EVENT_SELECT_ROOM)
+        this.regStartupEvent(this.eventSelectRoom.bind(this), -1, this.EVENT_SELECT_ROOM)
         // demo试玩提示
-        this.regStartupEvent(() => {
-            // let value: string = LocalStorage.getItem(Player.inst.gameModel + "_demo")
-            // if (Player.inst.isGuest && value == null) {
-            if (Player.inst.isGuest) {
-                PromptWindow.inst.showTip(LibStr.PROMPT_GUEST)
-                // LocalStorage.setItem(Player.inst.gameModel + "_demo", "1")
-            } else {
-                this.runEvent()
-            }
-        }, -1, this.EVENT_DEMO_TIP)
+        this.regStartupEvent(this.eventGuestTip.bind(this), -1, this.EVENT_DEMO_TIP)
         // 显示引导页
-        this.regStartupEvent(Handler.create(this, this.onGuideEvent), 0, this.EVENT_GUIDE)
-        // 判断是否有可以使用的优惠券
-        if (!Player.inst.isGuest) { // demo 场不弹
-            this.regStartupEvent(() => {
-                let giftOpenTimerStr = LocalStorage.getItem("giftOpenTimer" + Player.inst.gameModel)
-                let giftOpenTimer: number
-                if (StringUtil.isEmpty(giftOpenTimerStr)) {
-                    giftOpenTimerStr = "0"
-                }
-                giftOpenTimer = parseFloat(giftOpenTimerStr)
-                if (!DateUtils.isSameDay(giftOpenTimer, Browser.now())) {
-                    let coupon = Player.inst.getCouponGame(Player.inst.gameModel)
-                    if (coupon.length > 0) {
-                        this.activityHandler()
-                        LocalStorage.setItem("giftOpenTimer" + Player.inst.gameModel, Browser.now() + "")
-                    } else {
-                        this.runEvent()
-                    }
-                } else {
-                    this.runEvent()
-                }
-            }, 0, this.EVENT_COUPON)
-        }
+        this.regStartupEvent(this.eventGuideTip.bind(this), 0, this.EVENT_GUIDE)
+        // 判断是否有可以使用的优惠券 // demo 场不弹
+        if (!Player.inst.isGuest) this.regStartupEvent(this.eventCouponTip.bind(this), 0, this.EVENT_COUPON)
         // 判断时候有可以使用的bonus
-        this.regStartupEvent(() => {
-            if (Player.inst.jackpotData.length > 0 && this.jackpotBtn != null) {
-                this.jackpotBtn.jackpotBtn.displayObject.event(Laya.Event.CLICK)
-            } else {
-                this.runEvent()
-            }
-        }, 0, this.EVENT_BONUS)
+        this.regStartupEvent(this.eventBonusTip.bind(this), 0, this.EVENT_BONUS)
         this.runEventStart()
-    }
-
-    /** 引导事件执行 */
-    protected onGuideEvent() {
-        let value = LocalStorage.getItem("GameGuide_" + Player.inst.gameModel)
-        if (value == null) {
-            let result = this.showGuide()
-            if (result) {
-                LocalStorage.setItem("GameGuide_" + Player.inst.gameModel, "true")
-            } else {
-                this.runEvent()
-            }
-        } else {
-            this.runEvent()
-        }
-    }
-
-    /** 显示引导页 默认不显示引导页 */
-    protected showGuide() {
-        let gameIdConfig = Browser.window.gameIdConfig
-        let configName: string = gameIdConfig[Player.inst.gameModel]
-        configName = StringUtil.trimAll(configName)
-        let obj = Browser.window[configName]
-        if (obj.guide) {// 如果存在引导页配置  默认使用全屏展示
-            this.loadFillImage(obj.guide)
-            return true
-        }
-        return false
-    }
-
-    /**
-     * 加载全屏图片
-     * @param value
-     */
-    protected loadFillImage(value: any) {
-        let urls: any[] = value instanceof Array ? value : [value]
-        let index = 0
-        this.guideSprite = new GLoader()
-        this.guideSprite.setSize(GRoot.inst.width, GRoot.inst.height)
-        this.guideSprite.fill = LoaderFillType.ScaleFree
-        this.guideSprite.onClick(this, () => {
-            index++
-            if (index >= urls.length) {
-                this.guideSprite.dispose()
-                this.guideSprite = null
-                this.runEvent()
-            } else {
-                this.guideSprite.url = urls[index]
-            }
-        })
-        this.guideSprite.url = urls[index]
-        GRoot.inst.addChild(this.guideSprite)
     }
 
     /**
@@ -545,6 +456,109 @@ export class BaseScene extends BaseView implements IGameScene, IGuideScene {
         if (this.parent)
             AppRecordManager.backGame()
     }
+
+
+    // *********************        Event         **********************************
+
+    protected eventSelectRoom() {
+        this.sendAction(ActionLib.GAME_SHOW_ROOM_SELECT)
+    }
+
+    /**
+     * demo场弹窗
+     */
+    protected eventGuestTip() {
+        // let value: string = LocalStorage.getItem(Player.inst.gameModel + "_demo")
+        // if (Player.inst.isGuest && value == null) {
+        if (Player.inst.isGuest) {
+            PromptWindow.inst.showTip(LibStr.PROMPT_GUEST)
+            // LocalStorage.setItem(Player.inst.gameModel + "_demo", "1")
+        } else {
+            this.runEvent()
+        }
+    }
+
+    protected eventCouponTip() {
+        let giftOpenTimerStr = LocalStorage.getItem("giftOpenTimer" + Player.inst.gameModel)
+        let giftOpenTimer: number
+        if (StringUtil.isEmpty(giftOpenTimerStr)) {
+            giftOpenTimerStr = "0"
+        }
+        giftOpenTimer = parseFloat(giftOpenTimerStr)
+        if (!DateUtils.isSameDay(giftOpenTimer, Browser.now())) {
+            let coupon = Player.inst.getCouponGame(Player.inst.gameModel)
+            if (coupon.length > 0) {
+                this.activityHandler()
+                LocalStorage.setItem("giftOpenTimer" + Player.inst.gameModel, Browser.now() + "")
+            } else {
+                this.runEvent()
+            }
+        } else {
+            this.runEvent()
+        }
+    }
+
+    protected eventBonusTip() {
+        if (Player.inst.jackpotData.length > 0 && this.jackpotBtn != null) {
+            this.jackpotBtn.jackpotBtn.displayObject.event(Laya.Event.CLICK)
+        } else {
+            this.runEvent()
+        }
+    }
+
+
+    /** 引导事件执行 */
+    protected eventGuideTip() {
+        let value = LocalStorage.getItem("GameGuide_" + Player.inst.gameModel)
+        if (value == null) {
+            let result = this.showGuide()
+            if (result) {
+                LocalStorage.setItem("GameGuide_" + Player.inst.gameModel, "true")
+            } else {
+                this.runEvent()
+            }
+        } else {
+            this.runEvent()
+        }
+    }
+
+    /** 显示引导页 默认不显示引导页 */
+    protected showGuide() {
+        let gameIdConfig = Browser.window.gameIdConfig
+        let configName: string = gameIdConfig[Player.inst.gameModel]
+        configName = StringUtil.trimAll(configName)
+        let obj = Browser.window[configName]
+        if (obj.guide) {// 如果存在引导页配置  默认使用全屏展示
+            this.loadFillImage(obj.guide)
+            return true
+        }
+        return false
+    }
+
+    /**
+     * 加载全屏图片
+     * @param value
+     */
+    protected loadFillImage(value: any) {
+        let urls: any[] = value instanceof Array ? value : [value]
+        let index = 0
+        this.guideSprite = new GLoader()
+        this.guideSprite.setSize(GRoot.inst.width, GRoot.inst.height)
+        this.guideSprite.fill = LoaderFillType.ScaleFree
+        this.guideSprite.onClick(this, () => {
+            index++
+            if (index >= urls.length) {
+                this.guideSprite.dispose()
+                this.guideSprite = null
+                this.runEvent()
+            } else {
+                this.guideSprite.url = urls[index]
+            }
+        })
+        this.guideSprite.url = urls[index]
+        GRoot.inst.addChild(this.guideSprite)
+    }
+
 
 }
 

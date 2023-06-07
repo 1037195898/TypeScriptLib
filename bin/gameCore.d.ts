@@ -422,7 +422,7 @@ declare namespace coreLib {
         /**
          * 显示提示文案窗口 带多参数设置:
          *  ```
-         *  msg:string 显示提示 {}
+         *  msg:string|number|any[] 显示提示 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
          *  obj:IPromptData 附带设置 (okName:'', cancelName:'')
          *  callback:ParamHandler 取消回调方法
          *  continueFun:ParamHandler 确定回调方法
@@ -693,15 +693,6 @@ declare namespace coreLib {
         guideEnd(guideView: IGuide): void;
         /** 注册进入事件 */
         protected regEvent(): void;
-        /** 引导事件执行 */
-        protected onGuideEvent(): void;
-        /** 显示引导页 默认不显示引导页 */
-        protected showGuide(): boolean;
-        /**
-         * 加载全屏图片
-         * @param value
-         */
-        protected loadFillImage(value: any): void;
         /**
          * 注册启动事件
          * @param handler 执行的方法
@@ -763,6 +754,22 @@ declare namespace coreLib {
         resetBet(): void;
         dispose(): void;
         protected backHandler(): void;
+        protected eventSelectRoom(): void;
+        /**
+         * demo场弹窗
+         */
+        protected eventGuestTip(): void;
+        protected eventCouponTip(): void;
+        protected eventBonusTip(): void;
+        /** 引导事件执行 */
+        protected eventGuideTip(): void;
+        /** 显示引导页 默认不显示引导页 */
+        protected showGuide(): boolean;
+        /**
+         * 加载全屏图片
+         * @param value
+         */
+        protected loadFillImage(value: any): void;
     }
     const BaseSkeleton_base: Constructor<ActionEvent & fairygui.GComponent>;
     export abstract class BaseSkeleton extends BaseSkeleton_base implements ISkeleton {

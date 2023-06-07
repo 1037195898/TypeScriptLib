@@ -805,7 +805,7 @@ window.coreLib = {};
         /**
          * 显示提示文案窗口 带多参数设置:
          *  ```
-         *  msg:string 显示提示 {}
+         *  msg:string|number|any[] 显示提示 参数多个类型:string-直接显示文本 、int-从语言包里面操作文本、array-带替换内容 [int|string, ...string]
          *  obj:IPromptData 附带设置 (okName:'', cancelName:'')
          *  callback:ParamHandler 取消回调方法
          *  continueFun:ParamHandler 确定回调方法
@@ -1269,109 +1269,17 @@ window.coreLib = {};
         regEvent() {
             this.isRunEvent = true;
             // 启动房间选择
-            this.regStartupEvent(() => {
-                this.sendAction(ActionLib.GAME_SHOW_ROOM_SELECT);
-            }, -1, this.EVENT_SELECT_ROOM);
+            this.regStartupEvent(this.eventSelectRoom.bind(this), -1, this.EVENT_SELECT_ROOM);
             // demo试玩提示
-            this.regStartupEvent(() => {
-                // let value: string = Laya.LocalStorage.getItem(Player.inst.gameModel + "_demo")
-                // if (Player.inst.isGuest && value == null) {
-                if (Player.inst.isGuest) {
-                    PromptWindow.inst.showTip(1013 /* LibStr.PROMPT_GUEST */);
-                    // Laya.LocalStorage.setItem(Player.inst.gameModel + "_demo", "1")
-                }
-                else {
-                    this.runEvent();
-                }
-            }, -1, this.EVENT_DEMO_TIP);
+            this.regStartupEvent(this.eventGuestTip.bind(this), -1, this.EVENT_DEMO_TIP);
             // 显示引导页
-            this.regStartupEvent(Laya.Handler.create(this, this.onGuideEvent), 0, this.EVENT_GUIDE);
-            // 判断是否有可以使用的优惠券
-            if (!Player.inst.isGuest) { // demo 场不弹
-                this.regStartupEvent(() => {
-                    let giftOpenTimerStr = Laya.LocalStorage.getItem("giftOpenTimer" + Player.inst.gameModel);
-                    let giftOpenTimer;
-                    if (StringUtil.isEmpty(giftOpenTimerStr)) {
-                        giftOpenTimerStr = "0";
-                    }
-                    giftOpenTimer = parseFloat(giftOpenTimerStr);
-                    if (!DateUtils.isSameDay(giftOpenTimer, Laya.Browser.now())) {
-                        let coupon = Player.inst.getCouponGame(Player.inst.gameModel);
-                        if (coupon.length > 0) {
-                            this.activityHandler();
-                            Laya.LocalStorage.setItem("giftOpenTimer" + Player.inst.gameModel, Laya.Browser.now() + "");
-                        }
-                        else {
-                            this.runEvent();
-                        }
-                    }
-                    else {
-                        this.runEvent();
-                    }
-                }, 0, this.EVENT_COUPON);
-            }
+            this.regStartupEvent(this.eventGuideTip.bind(this), 0, this.EVENT_GUIDE);
+            // 判断是否有可以使用的优惠券 // demo 场不弹
+            if (!Player.inst.isGuest)
+                this.regStartupEvent(this.eventCouponTip.bind(this), 0, this.EVENT_COUPON);
             // 判断时候有可以使用的bonus
-            this.regStartupEvent(() => {
-                if (Player.inst.jackpotData.length > 0 && this.jackpotBtn != null) {
-                    this.jackpotBtn.jackpotBtn.displayObject.event(Laya.Event.CLICK);
-                }
-                else {
-                    this.runEvent();
-                }
-            }, 0, this.EVENT_BONUS);
+            this.regStartupEvent(this.eventBonusTip.bind(this), 0, this.EVENT_BONUS);
             this.runEventStart();
-        }
-        /** 引导事件执行 */
-        onGuideEvent() {
-            let value = Laya.LocalStorage.getItem("GameGuide_" + Player.inst.gameModel);
-            if (value == null) {
-                let result = this.showGuide();
-                if (result) {
-                    Laya.LocalStorage.setItem("GameGuide_" + Player.inst.gameModel, "true");
-                }
-                else {
-                    this.runEvent();
-                }
-            }
-            else {
-                this.runEvent();
-            }
-        }
-        /** 显示引导页 默认不显示引导页 */
-        showGuide() {
-            let gameIdConfig = Laya.Browser.window.gameIdConfig;
-            let configName = gameIdConfig[Player.inst.gameModel];
-            configName = StringUtil.trimAll(configName);
-            let obj = Laya.Browser.window[configName];
-            if (obj.guide) { // 如果存在引导页配置  默认使用全屏展示
-                this.loadFillImage(obj.guide);
-                return true;
-            }
-            return false;
-        }
-        /**
-         * 加载全屏图片
-         * @param value
-         */
-        loadFillImage(value) {
-            let urls = value instanceof Array ? value : [value];
-            let index = 0;
-            this.guideSprite = new fgui.GLoader();
-            this.guideSprite.setSize(fgui.GRoot.inst.width, fgui.GRoot.inst.height);
-            this.guideSprite.fill = fgui.LoaderFillType.ScaleFree;
-            this.guideSprite.onClick(this, () => {
-                index++;
-                if (index >= urls.length) {
-                    this.guideSprite.dispose();
-                    this.guideSprite = null;
-                    this.runEvent();
-                }
-                else {
-                    this.guideSprite.url = urls[index];
-                }
-            });
-            this.guideSprite.url = urls[index];
-            fgui.GRoot.inst.addChild(this.guideSprite);
         }
         /**
          * 注册启动事件
@@ -1593,6 +1501,105 @@ window.coreLib = {};
         backHandler() {
             if (this.parent)
                 AppRecordManager.backGame();
+        }
+        // *********************        Event         **********************************
+        eventSelectRoom() {
+            this.sendAction(ActionLib.GAME_SHOW_ROOM_SELECT);
+        }
+        /**
+         * demo场弹窗
+         */
+        eventGuestTip() {
+            // let value: string = Laya.LocalStorage.getItem(Player.inst.gameModel + "_demo")
+            // if (Player.inst.isGuest && value == null) {
+            if (Player.inst.isGuest) {
+                PromptWindow.inst.showTip(1013 /* LibStr.PROMPT_GUEST */);
+                // Laya.LocalStorage.setItem(Player.inst.gameModel + "_demo", "1")
+            }
+            else {
+                this.runEvent();
+            }
+        }
+        eventCouponTip() {
+            let giftOpenTimerStr = Laya.LocalStorage.getItem("giftOpenTimer" + Player.inst.gameModel);
+            let giftOpenTimer;
+            if (StringUtil.isEmpty(giftOpenTimerStr)) {
+                giftOpenTimerStr = "0";
+            }
+            giftOpenTimer = parseFloat(giftOpenTimerStr);
+            if (!DateUtils.isSameDay(giftOpenTimer, Laya.Browser.now())) {
+                let coupon = Player.inst.getCouponGame(Player.inst.gameModel);
+                if (coupon.length > 0) {
+                    this.activityHandler();
+                    Laya.LocalStorage.setItem("giftOpenTimer" + Player.inst.gameModel, Laya.Browser.now() + "");
+                }
+                else {
+                    this.runEvent();
+                }
+            }
+            else {
+                this.runEvent();
+            }
+        }
+        eventBonusTip() {
+            if (Player.inst.jackpotData.length > 0 && this.jackpotBtn != null) {
+                this.jackpotBtn.jackpotBtn.displayObject.event(Laya.Event.CLICK);
+            }
+            else {
+                this.runEvent();
+            }
+        }
+        /** 引导事件执行 */
+        eventGuideTip() {
+            let value = Laya.LocalStorage.getItem("GameGuide_" + Player.inst.gameModel);
+            if (value == null) {
+                let result = this.showGuide();
+                if (result) {
+                    Laya.LocalStorage.setItem("GameGuide_" + Player.inst.gameModel, "true");
+                }
+                else {
+                    this.runEvent();
+                }
+            }
+            else {
+                this.runEvent();
+            }
+        }
+        /** 显示引导页 默认不显示引导页 */
+        showGuide() {
+            let gameIdConfig = Laya.Browser.window.gameIdConfig;
+            let configName = gameIdConfig[Player.inst.gameModel];
+            configName = StringUtil.trimAll(configName);
+            let obj = Laya.Browser.window[configName];
+            if (obj.guide) { // 如果存在引导页配置  默认使用全屏展示
+                this.loadFillImage(obj.guide);
+                return true;
+            }
+            return false;
+        }
+        /**
+         * 加载全屏图片
+         * @param value
+         */
+        loadFillImage(value) {
+            let urls = value instanceof Array ? value : [value];
+            let index = 0;
+            this.guideSprite = new fgui.GLoader();
+            this.guideSprite.setSize(fgui.GRoot.inst.width, fgui.GRoot.inst.height);
+            this.guideSprite.fill = fgui.LoaderFillType.ScaleFree;
+            this.guideSprite.onClick(this, () => {
+                index++;
+                if (index >= urls.length) {
+                    this.guideSprite.dispose();
+                    this.guideSprite = null;
+                    this.runEvent();
+                }
+                else {
+                    this.guideSprite.url = urls[index];
+                }
+            });
+            this.guideSprite.url = urls[index];
+            fgui.GRoot.inst.addChild(this.guideSprite);
         }
     }
     coreLib.BaseScene = BaseScene;
