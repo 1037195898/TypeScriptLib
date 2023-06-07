@@ -53,7 +53,7 @@ export class SpineUtils {
 
     /**
      * 创建spine 骨骼动画组件
-     * @param url 根据传入的json 或 sk自动创建 GSpineSkeleton、GSkeleton
+     * @param url 根据传入的json或sk自动创建实现类GSpineSkeleton、GSkeleton。如果为null，skeletonClass参数必须传入
      * @param optional
      * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
      */
@@ -100,11 +100,11 @@ export class SpineUtils {
     }
 
     /**
-     * 判断是否是接口 用_displayObject 是否存在判断
+     * 判断是否是接口 用 prototype 是否存在判断
      * @param optional
      */
     static isInterface(optional): optional is ISkeletonData {
-        return !("_displayObject" in optional)
+        return !("prototype" in optional)
     }
 
 
