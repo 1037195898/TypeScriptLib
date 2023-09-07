@@ -1,0 +1,32 @@
+{
+  "name": "game-lib",
+  "version": "1.0.9",
+  "main": "index.js",
+  "scripts": {
+    "build": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/bogegit/TypeScriptLib.git"
+  },
+  "keywords": [
+    "webp",
+    "webpconverter",
+    "webp-converter",
+    "cwebp",
+    "dwebp",
+    "gif2webp",
+    "webpmux"
+  ],
+  "files": [
+    "assets",
+    "libs",
+    "dist",
+    "webp",
+    "template",
+    "nameCache.json",
+    "version_info.txt",
+    "index.js",
+    "types.js"
+  ]
+}
