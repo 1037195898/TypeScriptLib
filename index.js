@@ -355,16 +355,33 @@ class GenerateModule {
         return stream
     }
 
-    createJsStream() {
-        return runStream(this.createJs.bind(this))
+    /**
+     *
+     * @param [files=null] {string[]} 压缩文件数组
+     * @return {*}
+     */
+    createJsStream(files) {
+        return runStream(this.createJs.bind(this), null, files)
     }
 
-    minifyJsStream() {
-        return runStream(this.minifyJs.bind(this))
+    /**
+     * @param [files=null] {string[]} 文件 默认 path.join(this.distPath, this.project + ".js")
+     * @param [minDir=null] {string} 生成压缩保存位置 默认 this.minifyPath
+     * @return {*}
+     */
+    minifyJsStream(files, minDir) {
+        return runStream(this.minifyJs.bind(this), null, files, minDir)
     }
 
-    mangleJsStream(...args) {
-        return runStream(this.mangleJs.bind(this), null, ...args)
+    /**
+     * @param terserOpt {MinifyOptions} gulp-terser 压缩传入参数. 默认: {timings: true, compress: {properties:false}, format: {quote_keys: true}}
+     * @param [files=null] {string[]} 文件 默认 path.join(this.distPath, this.project + ".js")
+     * @param [minDir=null] {string} 生成压缩保存位置 默认 this.minifyPath
+     * @param [mapFile=null] {string} 生成的map映射位置 相对路径是 minDir目录
+     * @return {*}
+     */
+    mangleJsStream(terserOpt, files, minDir, mapFile) {
+        return runStream(this.mangleJs.bind(this), null, terserOpt, files, minDir, mapFile)
     }
 
     createDTsStream() {
