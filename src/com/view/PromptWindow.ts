@@ -7,9 +7,10 @@ import {ActionLib} from "../actions/ActionLib"
 import {AppRecordManager} from "../manager/AppRecordManager"
 import {LibStr} from "../LibStr"
 import {StringUtil} from "../utils/StringUtil"
+import {BaseGameData} from "../core/BaseGameData";
 
 /** 提示框 */
-export class PromptWindow extends BaseWindow {
+export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
 
     private static _instance: PromptWindow
 

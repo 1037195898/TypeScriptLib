@@ -1,8 +1,9 @@
 import UIPackage = fgui.UIPackage
 import {BaseWindow} from "../core/BaseWindow"
+import {BaseGameData} from "../core/BaseGameData";
 
 /** 图片窗口 */
-export class ImageWindow extends BaseWindow {
+export class ImageWindow<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
 
     private static _instance: ImageWindow
 

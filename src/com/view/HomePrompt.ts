@@ -5,9 +5,10 @@ import UIPackage = fgui.UIPackage
 import {BaseWindow} from "../core/BaseWindow"
 import {AppRecordManager} from "../manager/AppRecordManager"
 import {LibStr} from "../LibStr"
+import {BaseGameData} from "../core/BaseGameData";
 
 /** 提示框 */
-export class HomePrompt extends BaseWindow {
+export class HomePrompt<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
 
     private static _instance: HomePrompt
     static get instance(): HomePrompt {

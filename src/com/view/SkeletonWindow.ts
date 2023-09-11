@@ -2,11 +2,12 @@ import {BaseWindow} from "../core/BaseWindow";
 import {SpineUtils} from "../utils/SpineUtils";
 import {GSkeleton} from "./GSkeleton";
 import {GSpineSkeleton} from "./GSpineSkeleton";
+import {BaseGameData} from "../core/BaseGameData";
 
 /**
  * 带 Skeleton 动画
  */
-export class SkeletonWindow extends BaseWindow {
+export class SkeletonWindow<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
 
     protected skeleton: GSkeleton | GSpineSkeleton
     protected loadComplete = false

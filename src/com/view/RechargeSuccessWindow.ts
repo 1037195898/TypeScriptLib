@@ -3,9 +3,10 @@ import GButton = fgui.GButton;
 import UIPackage = fgui.UIPackage;
 import {BaseWindow} from "../core/BaseWindow"
 import {AppRecordManager} from "../manager/AppRecordManager"
+import {BaseGameData} from "../core/BaseGameData";
 
 /** 提示框 */
-export class RechargeSuccessWindow extends BaseWindow {
+export class RechargeSuccessWindow<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
 
     private static _instance: RechargeSuccessWindow
 
