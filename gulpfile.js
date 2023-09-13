@@ -12,7 +12,7 @@ const {SourceMapConsumer, SourceNode} = require('source-map');
 const typescript = require("typescript")
 
 // 需要添加到最前面的类
-let beforeTs = ["src/com/Factory.ts", "src/com/core/View.ts", "src/com/core/Proxys.ts",
+let beforeTs = ["src/com/Factory.ts", "src/com/block/Block.ts", "src/com/core/View.ts", "src/com/core/Proxys.ts",
     "src/com/core/BaseView.ts", "src/com/utils/ChangeValue.ts",
     "src/com/utils/UtilKit.ts"]
 

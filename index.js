@@ -1,3 +1,5 @@
+const fs = require('fs')
+const path = require('path')
 const gulp = require("gulp")
 const terser = require("gulp-terser")
 const inject = require("gulp-inject-string")
@@ -7,8 +9,6 @@ const each = require("gulp-each")
 const sort = require('gulp-sort')
 const rename = require('gulp-rename')
 const sourcemaps = require('gulp-sourcemaps')
-const fs = require('fs')
-const path = require('path')
 const ts = require("gulp-typescript")
 const through2 = require("through2").obj
 const webp = require("./webp/ToWebp")
@@ -96,19 +96,19 @@ class GenerateModule {
             content.push(fs.readFileSync(this.global[i], "utf-8"))
         }
         return gulp.src(this.beforeTs.concat(files, this.global.map(value => "!" + value)))
-            .pipe(sort((a, b) => {
-                    let aIndex = this.beforeTs.indexOf(path.relative(a.cwd, a.path).replaceAll("\\", "/"))
-                    let bIndex = this.beforeTs.indexOf(path.relative(b.cwd, b.path).replaceAll("\\", "/"))
-                    if (aIndex >= 0 && bIndex >= 0) {
-                        return aIndex - bIndex
-                    } else if (aIndex >= 0) {
-                        return -1
-                    } else if (bIndex >= 0) {
-                        return 1
-                    }
-                    return a.path.localeCompare(b.path);
-                }
-            ))
+            // .pipe(sort((a, b) => {
+            //         // let aIndex = this.beforeTs.indexOf(path.relative(a.cwd, aPath).replaceAll("\\", "/"))
+            //         // let bIndex = this.beforeTs.indexOf(path.relative(b.cwd, bPath).replaceAll("\\", "/"))
+            //         if (aIndex >= 0 && bIndex >= 0) {
+            //             return aIndex - bIndex
+            //         } else if (aIndex >= 0) {
+            //             return -1
+            //         } else if (bIndex >= 0) {
+            //             return 1
+            //         }
+            //         return aPath.localeCompare(bPath)
+            //     }
+            // ))
             .pipe(each((content, file, callback) => {
                 // console.log(file.history[0])
                 /** @type string[] */
@@ -116,11 +116,15 @@ class GenerateModule {
                 let arr = []
                 /** @type string[] */
                 let newContent = []
+                let isNamespace = false
                 for (let line of contents) {
                     // if (line.startsWith("declare namespace ")) {
                     //     break
                     // } else
-                    if (line.trimStart().startsWith("import ")) {// 将 import导入的库 缓存起来
+                    if (/\s?namespace(\s+)?\w*\s*.*\{/.test(line)) {
+                        isNamespace = true
+                        // 忽略掉 已有命名空间
+                    } else if (line.trimStart().startsWith("import ")) {// 将 import导入的库 缓存起来
                         if (!line.match(/((\s|})from(\s|"|{))/g) && line.indexOf("=") > -1) {
                             arr.push(line)
                         }
@@ -148,10 +152,18 @@ class GenerateModule {
                         newContent.push(line)
                     }
                 }
+                if (isNamespace) { // 如果有命名空间  那么在末尾删除一个}
+                    for (let i = newContent.length - 1; i >= 0; i--) {
+                        if (newContent.indexOf("}") > -1) {
+                            newContent[i] = newContent[i].replace(/}(?!.*})/, "")
+                            break
+                        }
+                    }
+                }
                 callback(null, newContent.join("\n"))
             }))
             .pipe(concat(this.saveTempTs))
-            .pipe(through2((chunk, encoding, callback) => {
+            .pipe(run((chunk) => {
                 let chunkString = chunk.contents.toString('utf8')
                 if (this.namespace) {
                     chunkString = 'namespace ' + this.namespace + ' {\n' + chunkString + '\n}'
@@ -159,7 +171,6 @@ class GenerateModule {
                 chunkString += '\n\n' + content.join("\n\n")
                 chunk.contents = Buffer.from(chunkString)
                 customFun && customFun(chunk)
-                callback(null, chunk)
             }))
             .pipe(gulp.dest(tempPath))
             .pipe(print("生成代码文件"))

@@ -17,6 +17,7 @@ import {StringUtil} from "../utils/StringUtil"
 import {MathKit} from "../utils/MathKit"
 import {CommonCmd, HttpCode, Urls} from "../net/Common";
 import {BaseGameData} from "./BaseGameData";
+import {Log} from "../Log";
 
 /**
  * 游戏基础类
@@ -43,6 +44,10 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
 
     protected get gameData(): T {
         return Player.inst.gameData as T
+    }
+
+    protected set gameData(value: T) {
+        Log.debug(value)
     }
 
     /**

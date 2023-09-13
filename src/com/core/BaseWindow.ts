@@ -6,10 +6,11 @@ import Handler = Laya.Handler;
 import {SceneManager} from "../manager/SceneManager"
 import {AppRecordManager} from "../manager/AppRecordManager"
 import {ActionLib} from "../actions/ActionLib"
-import {ActionEvent, StringBlock, ViewProxy} from "../Factory"
+import {ActionEvent, StringBlock, ViewProxy} from "../block/Block"
 import {IRecord} from "../interfaces/ICommon";
 import {Player} from "../Player";
 import {BaseGameData} from "./BaseGameData";
+import {Log} from "../Log";
 
 export class BaseWindow<T extends BaseGameData = BaseGameData> extends mixinExt(StringBlock, ViewProxy, ActionEvent, fgui.Window) implements IRecord {
 
@@ -142,6 +143,10 @@ export class BaseWindow<T extends BaseGameData = BaseGameData> extends mixinExt(
 
     protected get gameData(): T {
         return Player.inst.gameData as T
+    }
+
+    protected set gameData(value: T) {
+        Log.debug(value)
     }
 
 }

@@ -12,6 +12,12 @@ declare function runFun(func: ParamHandler, ...args): any | null
 
 declare type Constructor<T = {}> = new (...args: any[]) => T
 
+/** 使用交叉类型连接多个类型 */
+declare type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never
+
+/** 获取构造函数的实例类型 */
+declare type InstanceTypeOfConstructor<T> = T extends Constructor<infer R> ? R : never
+
 /**
  * 根据语言包id获取字符串
  * @param id 获取文案的key

@@ -1,8 +1,8 @@
 import GComponent = fgui.GComponent;
 import {ISkeleton} from "../interfaces/ISkeleton"
 import {Log} from "../Log";
-import {ActionEvent} from "../Factory";
 import {BezierCurves} from "../block/BezierCurves";
+import {ActionEvent} from "../block/Block";
 
 export abstract class BaseSkeleton extends mixinExt(BezierCurves, ActionEvent, GComponent) implements ISkeleton {
 

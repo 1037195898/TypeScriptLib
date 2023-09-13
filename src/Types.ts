@@ -13,15 +13,8 @@ function getString(id: string | number, ...args) {
     return coreLib.StringUtil.format(content, ...args)
 }
 
-// 使用交叉类型连接多个类型
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never
-
-// 获取构造函数的实例类型
-// type InstanceTypeOfConstructor<T> = T extends new (...args: any[]) => infer R ? R : any
-type InstanceTypeOfConstructor<T> = T extends Constructor<infer R> ? R : never
-
-// 修改 mixin 函数
 /**
+ * 修改 mixin 函数
  * @deprecated
  * @param classes
  */

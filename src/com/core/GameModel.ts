@@ -26,7 +26,7 @@ import {BaseGameData} from "./BaseGameData";
  * @author boge
  *
  */
-export class GameModel<T extends BaseGameData = BaseGameData> extends BaseProxy implements IGameModel {
+export class GameModel<T = BaseGameData> extends BaseProxy implements IGameModel {
 
     protected _gameScene: IGameScene
     protected _gameServlet: IGameServlet
@@ -50,10 +50,6 @@ export class GameModel<T extends BaseGameData = BaseGameData> extends BaseProxy 
         this.regGameAction(ActionLib.GAME_DISPOSE, this, this.dispose)
         this.regGameAction(ActionLib.GAME_LOTTERY_ANI_COMPLETE, this, this.lotteryComplete)
 
-    }
-
-    protected get gameData(): T {
-        return Player.inst.gameData as T
     }
 
     initModel() {
@@ -227,7 +223,7 @@ export class GameModel<T extends BaseGameData = BaseGameData> extends BaseProxy 
     }
 
     get gameServlet() {
-        if (this._gameServlet == null) this._gameServlet = SceneManager.inst.starter.gameServlet
+        this._gameServlet ??= SceneManager.inst.starter.gameServlet
         return this._gameServlet
     }
 
@@ -257,6 +253,14 @@ export class GameModel<T extends BaseGameData = BaseGameData> extends BaseProxy 
 
     set gameServlet(value: IGameServlet) {
         this._gameServlet = value
+    }
+
+    protected get gameData(): T {
+        return Player.inst.gameData as T
+    }
+
+    protected set gameData(value: T) {
+        Log.debug(value)
     }
 
 }

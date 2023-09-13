@@ -2,7 +2,7 @@ import GProgressBar = fgui.GProgressBar;
 import GTweener = fgui.GTweener;
 import GTween = fgui.GTween;
 import EaseType = fgui.EaseType;
-import {ActionEvent, ViewBlock} from "../Factory"
+import {ActionEvent, ViewBlock} from "../block/Block"
 
 export class ProgressBar extends mixinExt(ActionEvent, ViewBlock, GProgressBar) {
 

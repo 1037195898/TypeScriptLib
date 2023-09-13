@@ -66,6 +66,10 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
         return Player.inst.gameData as T
     }
 
+    protected set gameData(value: T) {
+        Log.debug(value)
+    }
+
     protected override constructFromXML(xml: any) {
 
         this.jackpotBtn = this.getChild("jackpot")
