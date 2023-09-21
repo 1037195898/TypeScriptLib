@@ -13,7 +13,9 @@
 //      "core/*": ["./bin"]
 //    }
   },
-  "exclude": [],
+  "exclude": [
+
+  ],
   "include": [
     "../libs",
     "src"

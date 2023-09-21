@@ -1021,7 +1021,7 @@ window.tsCore = {};
             }
             if (ELoader.isWebp && StringUtil.endsWithAny(url, "png", "jpg"))
                 url += ".webp";
-            if (!Laya.Render.isConchApp && version)
+            if (!Laya.Browser.onLayaRuntime && version)
                 url += "?v=" + version;
             return url;
         }
@@ -1047,7 +1047,7 @@ window.tsCore = {};
                 //增加延迟回掉，防止快速回掉导致执行顺序错误
                 Laya.systemTimer.frameOnce(1, null, function () {
                     progress && progress.runWith(1);
-                    complete && complete.runWith(content instanceof Array ? [content] : content);
+                    complete && complete.runWith(Array.isArray(content) ? [content] : content);
                 });
             }
             else {
@@ -1089,8 +1089,8 @@ window.tsCore = {};
                 item.progress = 1;
                 if (!content)
                     success = false;
-                if (loadedCount === itemCount && complete) {
-                    complete.runWith(success);
+                if (loadedCount === itemCount) {
+                    complete === null || complete === void 0 ? void 0 : complete.runWith(success);
                 }
             }
             function loadProgress(item, value) {
@@ -1122,6 +1122,8 @@ window.tsCore = {};
                     }
                 }
             }
+            if (!content)
+                Log.debug("load res fail : " + resInfo.url + " " + content);
             (_a = resInfo.complete) === null || _a === void 0 ? void 0 : _a.runWith(content);
             this._infoPool.push(resInfo);
         }

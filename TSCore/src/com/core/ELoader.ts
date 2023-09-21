@@ -4,6 +4,8 @@ import URL = Laya.URL
 import Render = Laya.Render
 import {StringUtil} from "../utils/StringUtil"
 import {IFormatVer} from "../interfaces/ICommon";
+import Browser = Laya.Browser;
+import {Log} from "../Log";
 
 export class ELoader {
 
@@ -30,7 +32,7 @@ export class ELoader {
             version = ELoader.format[i].call(url, version)
         }
         if (ELoader.isWebp && StringUtil.endsWithAny(url, "png", "jpg")) url += ".webp"
-        if (!Render.isConchApp && version) url += "?v=" + version
+        if (!Browser.onLayaRuntime && version) url += "?v=" + version
         return url
     }
 
@@ -45,17 +47,17 @@ export class ELoader {
      * @param    cache        是否缓存加载结果。
      * @param    group        分组，方便对资源进行管理。
      * @param    ignoreCache    是否忽略缓存，强制重新加载。
-     * @param    useWorkerLoader(default = false)是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
+     * @param    useWorkerLoader (default = false)是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
      * @return 此 LoaderManager 对象本身。
      */
-    load(url: string | Array<string | LoadRes>, complete?: Handler, progress?: Handler, type?: string, priority = 1, cache = true, group?: string, ignoreCache = false, useWorkerLoader = false) {
-        if (url instanceof Array) return this.loadAssets(url, complete, progress, type, priority, cache, group)
+    load(url: string | (string | LoadRes)[], complete?: Handler, progress?: Handler, type?: string, priority = 1, cache = true, group?: string, ignoreCache = false, useWorkerLoader = false) {
+        if (Array.isArray(url)) return this.loadAssets(url, complete, progress, type, priority, cache, group)
         let content = this.getRes(url)
         if (!ignoreCache && content) {
             //增加延迟回掉，防止快速回掉导致执行顺序错误
             Laya.systemTimer.frameOnce(1, null, function () {
                 progress && progress.runWith(1)
-                complete && complete.runWith(content instanceof Array ? [content] : content)
+                complete && complete.runWith(Array.isArray(content) ? [content] : content)
             })
         } else {
             let resInfo = this._infoPool.length ? this._infoPool.pop() : new ResInfo()
@@ -73,11 +75,11 @@ export class ELoader {
         }
     }
 
-    private loadAssets(arr: Array<string | LoadRes>, complete: Handler, progress: Handler, type: string, priority: number, cache: boolean, group: string) {
+    private loadAssets(arr: (string | LoadRes)[], complete: Handler, progress: Handler, type: string, priority: number, cache: boolean, group: string) {
         let itemCount = arr.length
         let loadedCount = 0
         let totalSize = 0
-        let items = []
+        let items: LoadRes[] = []
         let success = true
         for (let i = 0; i < itemCount; i++) {
             let item = arr[i]
@@ -86,21 +88,21 @@ export class ELoader {
             item.progress = 0
             totalSize += item.size
             items.push(item)
-            let progressHandler: any = progress ? Handler.create(null, loadProgress, [item], false) : null
-            let completeHandler: any = (complete || progress) ? Handler.create(null, loadComplete, [item]) : null
+            let progressHandler = progress ? Handler.create(null, loadProgress, [item], false) : null
+            let completeHandler = (complete || progress) ? Handler.create(null, loadComplete, [item]) : null
             this.load(item.url, completeHandler, progressHandler, item.type, item.priority || 1, cache, item.group || group, false, item.useWorkerLoader)
         }
 
-        function loadComplete(item: any, content = null) {
+        function loadComplete(item: LoadRes, content?) {
             loadedCount++
             item.progress = 1
             if (!content) success = false
-            if (loadedCount === itemCount && complete) {
-                complete.runWith(success)
+            if (loadedCount === itemCount) {
+                complete?.runWith(success)
             }
         }
 
-        function loadProgress(item: any, value: number) {
+        function loadProgress(item: LoadRes, value: number) {
             if (progress) {
                 item.progress = value
                 let num = 0
@@ -132,6 +134,7 @@ export class ELoader {
                 }
             }
         }
+        if (!content) Log.debug("load res fail : " + resInfo.url + " " + content)
         resInfo.complete?.runWith(content)
         this._infoPool.push(resInfo)
     }
