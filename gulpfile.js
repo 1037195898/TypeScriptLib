@@ -279,3 +279,6 @@ gulp.task('build-Temp', () => {
 gulp.task("min-js", () => {
     return generate.minifyJs(["./template/domparserinone.js"], "./template")
 })
+
+
+gulp.task('default', gulp.series("build"))

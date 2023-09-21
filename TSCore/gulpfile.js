@@ -135,3 +135,5 @@ gulp.task('buildStream', gulp.series("clean", () => {
 
 
 }, "removeTemp"))
+
+gulp.task('default', gulp.series("buildStream"))

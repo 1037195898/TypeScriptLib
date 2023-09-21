@@ -1196,6 +1196,10 @@ declare namespace tsCore {
          * @default LogLevel.ALL
          */
         static level: LogLevel;
+        /**
+         * 最大保存日志条数
+         * @default 1000
+         */
         static MAX_HISTORY: number;
         static history: {
             level: number;

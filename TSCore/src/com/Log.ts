@@ -1,4 +1,4 @@
-import {Environment, EnvType} from "./ConfigKit";
+import {Environment, EnvType} from "./kit/ConfigKit";
 import {DateUtils} from "./utils/DateUtils";
 import Render = Laya.Render;
 
@@ -28,20 +28,24 @@ export class Log {
      * @default LogLevel.ALL
      */
     static level = LogLevel.ALL
-    static MAX_HISTORY = 3000
+    /**
+     * 最大保存日志条数
+     * @default 1000
+     */
+    static MAX_HISTORY = 1000
     static history: { level: number, time?: number, data: any[] }[] = []
 
     static trace(...value) {
         Log.append({level: LogLevel.TRACE, data: value})
         if (Environment.active === EnvType.PROD || Log.level > LogLevel.TRACE) return
         // Log._log(value)
-        console.trace(...value)
+        Laya.Browser.onLayaRuntime ? console.log(...value) : console.trace(...value)
     }
 
     static debug(...value) {
         Log.append({level: LogLevel.DEBUG, data: value})
         if (Environment.active === EnvType.PROD || Log.level > LogLevel.DEBUG) return
-        console.debug(...value)
+        Laya.Browser.onLayaRuntime ? console.log(...value) : console.debug(...value)
     }
 
     static info(...value) {
@@ -53,7 +57,7 @@ export class Log {
     static warn(...value) {
         Log.append({level: LogLevel.INFO, data: value})
         if (Log.level > LogLevel.WARN) return
-        console.warn(...value)
+        Laya.Browser.onLayaRuntime ? console.log(...value) : console.warn(...value)
     }
 
     /**
@@ -63,7 +67,7 @@ export class Log {
     static error(...value) {
         Log.append({level: LogLevel.ERROR, data: value})
         if (Log.level > LogLevel.ERROR) return
-        console.error(...value)
+        Laya.Browser.onLayaRuntime ? console.log(...value) : console.error(...value)
     }
 
     /**
@@ -73,14 +77,14 @@ export class Log {
     static fatal(...value) {
         Log.append({level: LogLevel.FATAL, data: value})
         if (Log.level > LogLevel.FATAL) return
-        console.error(...value)
+        Laya.Browser.onLayaRuntime ? console.log(...value) : console.error(...value)
     }
 
     /**
      * @internal
      */
     static log(fmt = "[HH:mm:ss]") {
-        const logs = Log.history.concat()
+        const logs = [...Log.history]
         let time: any[]
         for (const value of logs) {
             time = [DateUtils.formatDate(value.time, fmt), LogLevel[value.level]]
