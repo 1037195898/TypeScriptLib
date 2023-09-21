@@ -25,7 +25,7 @@
   },
   //  "references": [
   //    {
-  //      "path": "./EnhanceLib/tsconfig.json"
+  //      "path": "./TSCore/tsconfig.json"
   //    },
   //    {
   //      "path": "./GameLib/tsconfig.json"
@@ -35,6 +35,6 @@
     "dist",
     "bin",
     "GameLib",
-    "EnhanceLib"
+    "TSCore"
   ]
 }

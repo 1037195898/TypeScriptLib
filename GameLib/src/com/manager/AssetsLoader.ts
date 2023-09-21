@@ -108,7 +108,7 @@ export class AssetsLoader implements IFormatVer {
         let resConfigUrl = AssetsLoader.CONFIG_RES_NAME + (Render.isConchApp ? "" : "?v=" + Browser.now())
         ELoader.loader.load(resConfigUrl,
             Laya.Handler.create(this, this.loadXMLComplete, [complete, errorHandler, resConfigUrl]),
-            null, Loader.XML)
+            null, Loader.TEXT)
     }
 
     private loadXMLComplete(complete: ParamHandler, errorHandler: ParamHandler, resConfigUrl: string, source: XMLDocument) {
@@ -117,7 +117,7 @@ export class AssetsLoader implements IFormatVer {
             return
         }
         ELoader.loader.clearRes(resConfigUrl)
-        this.parseUrl(source)
+        this.parseUrl(Laya.Utils.parseXMLFromString(source))
         if (this.customLoader) {
             runFun(this.customLoader, complete, errorHandler)
         } else {

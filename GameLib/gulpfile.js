@@ -15,14 +15,14 @@ let beforeTs = ["src/com/core/BaseView.ts"]
 generate.global = []
 generate.tsProject = 'tsconfig.json'
 generate.beforeTs = beforeTs
-generate.libs = ["../libs/**/*", "./src/**/*.d.ts", "../EnhanceLib/bin/*.d.ts"]
+generate.libs = ["../libs/**/*", "./src/**/*.d.ts", "../TSCore/bin/*.d.ts"]
 generate.project = generate.namespace = "gameLib"
 generate.saveTempPath = "./bin"
 generate.distPath = generate.minifyPath = "./bin"
 generate.saveTempTs = "lib.ts"
 // generate.settings = {typescript: typescript}
 
-const libCache = path.join("../EnhanceLib/bin", "nameCache.json")
+const libCache = path.join("../TSCore/bin", "nameCache.json")
 
 gulp.task("clean", () => {
     return generate.clean([

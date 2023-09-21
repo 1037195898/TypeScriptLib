@@ -22,8 +22,8 @@ export class WaitResult extends GComponent {
     private img: GImage
     private graph: GGraph
 
-    protected override constructFromXML(xml: any): void {
-        super.constructFromXML(xml)
+    protected override onConstruct() {
+        super.onConstruct();
         this.addRelation(GRoot.inst, RelationType.Size)
         this.setSize(GRoot.inst.width, GRoot.inst.height)
 

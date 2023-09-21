@@ -12,8 +12,8 @@ export class RoomNotice extends GComponent {
     private userName: GTextField
     private money: GTextField
 
-    protected override constructFromXML(xml: any) {
-        super.constructFromXML(xml)
+    protected override onConstruct() {
+        super.onConstruct();
 
         this.loader = this.getChild("n1").asLoader
         this.userName = this.getChild("n2").asTextField

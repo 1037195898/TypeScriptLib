@@ -22,8 +22,8 @@ export class ActivityButton extends EButton {
     /** 自定义更新文字显示 */
     updateText: ParamHandler
 
-    protected override constructFromXML(xml: any) {
-        super.constructFromXML(xml)
+    protected override onConstruct() {
+        super.onConstruct();
         this.draggable = false
 
         if (this.getChild("n10")) {

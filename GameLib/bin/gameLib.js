@@ -296,7 +296,7 @@ window.gameLib = {};
             tsCore.Log.debug(value);
         }
         /*@override*/
-        constructFromXML(xml) {
+        onConstruct() {
             this.jackpotBtn = this.getChild("jackpot");
             this.regGameAction(ActionLib.GAME_RECONNECTION_NET, this, this.reconnectionNet);
             this.regGameAction(ActionLib.GAME_UPDATE_MONEY, this, this.updateMoney);
@@ -308,7 +308,7 @@ window.gameLib = {};
             this.regGameAction(ActionLib.GAME_BET_CHANGE, this, this.betChangeHandler);
             this.regGameAction(ActionLib.GAME_UPDATE_ROOM_ID_CHANGE, this, this.updateRoomIdChange);
             this.regGameAction(ActionLib.GAME_RUN_SCENE_EVENT, this, this.runEvent);
-            super.constructFromXML(xml);
+            super.onConstruct();
         }
         /**
          * 房间号变更
@@ -3686,7 +3686,7 @@ window.gameLib = {};
          */
         loadVersionXML(complete, errorHandler) {
             let resConfigUrl = AssetsLoader.CONFIG_RES_NAME + (Laya.Render.isConchApp ? "" : "?v=" + Laya.Browser.now());
-            tsCore.ELoader.loader.load(resConfigUrl, Laya.Handler.create(this, this.loadXMLComplete, [complete, errorHandler, resConfigUrl]), null, Laya.Loader.XML);
+            tsCore.ELoader.loader.load(resConfigUrl, Laya.Handler.create(this, this.loadXMLComplete, [complete, errorHandler, resConfigUrl]), null, Laya.Loader.TEXT);
         }
         loadXMLComplete(complete, errorHandler, resConfigUrl, source) {
             if (!source) {
@@ -3694,7 +3694,7 @@ window.gameLib = {};
                 return;
             }
             tsCore.ELoader.loader.clearRes(resConfigUrl);
-            this.parseUrl(source);
+            this.parseUrl(Laya.Utils.parseXMLFromString(source));
             if (this.customLoader) {
                 runFun(this.customLoader, complete, errorHandler);
             }
@@ -6739,8 +6739,8 @@ window.gameLib = {};
             this.isAutoHide = true;
         }
         /*@override*/
-        constructFromXML(xml) {
-            super.constructFromXML(xml);
+        onConstruct() {
+            super.onConstruct();
             this.draggable = false;
             if (this.getChild("n10")) {
                 this.contentText = this.getChild("n10").asTextField;
@@ -6912,8 +6912,8 @@ window.gameLib = {};
      */
     class CardDeck extends BaseView {
         /*@override*/
-        constructFromXML(xml) {
-            super.constructFromXML(xml);
+        onConstruct() {
+            super.onConstruct();
             this.load = this.getChild("n0").asLoader;
             this.scaleX = this.scaleY = .9;
         }
@@ -6955,8 +6955,8 @@ window.gameLib = {};
     gameLib.CardDeck = CardDeck;
     class GlobalWaiting extends fgui.GComponent {
         /*@override*/
-        constructFromXML(xml) {
-            super.constructFromXML(xml);
+        onConstruct() {
+            super.onConstruct();
             this.addRelation(fgui.GRoot.inst, fgui.RelationType.Size);
             this.onInit();
             this.setSize(fgui.GRoot.inst.width, fgui.GRoot.inst.height);
@@ -7825,8 +7825,8 @@ window.gameLib = {};
      */
     class RoomNotice extends fgui.GComponent {
         /*@override*/
-        constructFromXML(xml) {
-            super.constructFromXML(xml);
+        onConstruct() {
+            super.onConstruct();
             this.loader = this.getChild("n1").asLoader;
             this.userName = this.getChild("n2").asTextField;
             this.money = this.getChild("n3").asTextField;
@@ -7858,8 +7858,8 @@ window.gameLib = {};
             return this._instance;
         }
         /*@override*/
-        constructFromXML(xml) {
-            super.constructFromXML(xml);
+        onConstruct() {
+            super.onConstruct();
             this.addRelation(fgui.GRoot.inst, fgui.RelationType.Size);
             this.setSize(fgui.GRoot.inst.width, fgui.GRoot.inst.height);
             this.img = this.getChild("n0").asImage;

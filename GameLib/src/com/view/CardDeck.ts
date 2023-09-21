@@ -17,8 +17,8 @@ export class CardDeck extends BaseView {
     /** 在数组中的位置 */
     pos: number
 
-    protected override constructFromXML(xml: any) {
-        super.constructFromXML(xml)
+    protected override onConstruct() {
+        super.onConstruct();
         this.load = this.getChild("n0").asLoader
         this.scaleX = this.scaleY = .9
     }

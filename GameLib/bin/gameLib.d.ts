@@ -274,7 +274,7 @@ declare namespace gameLib {
          * @deprecated
          */
         protected set gameData(value: T);
-        protected constructFromXML(xml: any): void;
+        protected onConstruct(): void;
         /**
          * 房间号变更
          * @param value 房间号
@@ -3115,7 +3115,7 @@ declare namespace gameLib {
         isAutoHide: boolean;
         /** 自定义更新文字显示 */
         updateText: ParamHandler;
-        protected constructFromXML(xml: any): void;
+        protected onConstruct(): void;
         private stopUseActivityHandler;
         private useActivityHandler;
         private updateShow;
@@ -3151,7 +3151,7 @@ declare namespace gameLib {
         private load;
         /** 在数组中的位置 */
         pos: number;
-        protected constructFromXML(xml: any): void;
+        protected onConstruct(): void;
         shuffle(func: ParamHandler): void;
         private plusMinus;
         setUrl(url: string): void;
@@ -3161,7 +3161,7 @@ declare namespace gameLib {
     export class GlobalWaiting extends fgui.GComponent {
         /** 显示内容 */
         private messageText;
-        protected constructFromXML(xml: any): void;
+        protected onConstruct(): void;
         private onInit;
         set text(value: string);
     }
@@ -3419,7 +3419,7 @@ declare namespace gameLib {
         private loader;
         private userName;
         private money;
-        protected constructFromXML(xml: any): void;
+        protected onConstruct(): void;
         show(name: string, money: number, url: string): void;
         hide(): void;
         dispose(): void;
@@ -3430,7 +3430,7 @@ declare namespace gameLib {
         static get inst(): WaitResult;
         private img;
         private graph;
-        protected constructFromXML(xml: any): void;
+        protected onConstruct(): void;
         show(): void;
         private showContent;
         hide(): void;

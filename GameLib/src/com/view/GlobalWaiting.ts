@@ -10,8 +10,8 @@ export class GlobalWaiting extends GComponent {
     /** 显示内容 */
     private messageText: GTextField
 
-    protected override constructFromXML(xml: any) {
-        super.constructFromXML(xml)
+    protected override onConstruct() {
+        super.onConstruct();
         this.addRelation(GRoot.inst, RelationType.Size)
         this.onInit()
         this.setSize(GRoot.inst.width, GRoot.inst.height)
