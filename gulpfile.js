@@ -123,7 +123,7 @@ gulp.task('build', gulp.series("clean", () => {
         return gulp.src([
             "./TSCore/bin/**/*", "!./TSCore/bin/**/*.json",
             "./GameLib/bin/**/*"
-        ]).pipe(gulp.dest("./bin2"))
+        ]).pipe(gulp.dest("./bin"))
     }
     // , () => {
     //     return gulp.src("./bin2/*Lib.js")
