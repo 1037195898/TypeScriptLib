@@ -20,7 +20,6 @@ import {LibStr} from "../LibStr"
 import {WaitResult} from "../view/WaitResult"
 import {JSUtils} from "../utils/JSUtils"
 import {SceneManager} from "../manager/SceneManager"
-import {AppManager} from "../manager/AppManager"
 import {IGuideScene} from "../interfaces/IGuideScene"
 import {CommonCmd, HttpCode, Urls} from "../net/Common";
 import {BaseGameData} from "./BaseGameData";
@@ -457,7 +456,7 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
     }
 
     override dispose() {
-        AppManager.log("game dispose")
+        Log.debug("game dispose")
         Player.inst.stopAllCoupon()
         if (this.guideSprite) this.guideSprite.dispose()
         if (this.promptTip) this.promptTip.dispose()

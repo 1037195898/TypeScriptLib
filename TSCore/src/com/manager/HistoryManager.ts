@@ -11,7 +11,7 @@ export class HistoryManager {
     /**
      * 访问记录
      */
-    private static history: PageNavigator[] = []
+    protected static history: PageNavigator[] = []
     /** 暂停返回上一页 */
     static pauseHistory = false
 

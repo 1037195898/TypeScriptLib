@@ -1,5 +1,4 @@
 import Browser = Laya.Browser
-import Render = Laya.Render
 import IPlatform = tsCore.IPlatform;
 import StringUtil = tsCore.StringUtil;
 import Log = tsCore.Log;
@@ -12,16 +11,14 @@ export class AppManager {
 
     /** 关闭app自定义返回 */
     static closeAppBack() {
-        if (Browser.window.conch && Browser.window.conch.setOnBackPressedFunction) {
-            Browser.window.conch.setOnBackPressedFunction(function () {
-            })
-        }
+        // @ts-ignore
+        window.conch?.setOnBackPressedFunction(function () {})
     }
 
     /** 进入游戏 */
     static sendAppData() {
         this.log("sendAppData")
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_enterBBS(JSON.stringify(''), this.nullFun)
     }
 
@@ -32,7 +29,7 @@ export class AppManager {
      *
      */
     static enterFeedback(sData: any, callback: Function) {
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_enterFeedback(JSON.stringify(sData), callback)
     }
 
@@ -43,21 +40,21 @@ export class AppManager {
      *
      */
     static enterInvite(sData: any, callback: Function) {
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_enterInvite(JSON.stringify(sData), callback)
     }
 
     /** Toast 提示 */
     static toast(sData: string) {
         let obj = {action: 10005, value: sData}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
     /** 退出APP */
     static exit() {
         let obj = {action: 10008}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -65,21 +62,21 @@ export class AppManager {
     static UpdateHead(token: string) {
         // type 1.返回选择的图片路径  2.返回图片base64数据
         let obj = {action: 10004, value: token, type: 1}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
     /** 游戏重启 */
     static gameRestart() {
         let obj = {action: 10021}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
     /** 关闭网页 */
     static closeHtml() {
         let obj = {action: 10000}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -89,14 +86,14 @@ export class AppManager {
      */
     static getIMEI(callback: Function) {
         let obj = {action: 10001}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), callback)
     }
 
 
     static IsBackHome() {
         let obj = {action: 10002}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -106,7 +103,7 @@ export class AppManager {
      */
     static sendNotification(value: any) {
         let obj = {action: 10003, data: value}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -115,7 +112,7 @@ export class AppManager {
      */
     static startServer() {
         let obj = {action: 10007}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -126,7 +123,7 @@ export class AppManager {
      * @param type 0.调用公用分享窗口 1.facebook 2.whatsapp 3.instagram 4.sms 5.twitter
      */
     static openShare(content: string, url = "", type = 0) {
-        if (!Render.isConchApp) return
+        if (!Browser.onLayaRuntime) return
         let obj: any = {}
         if (type === 0) {
             obj.content = content + (StringUtil.isEmpty(url) ? "" : "\n" + url)
@@ -145,7 +142,7 @@ export class AppManager {
     static executionJavascript(method: string, value: any) {
         if (!(typeof value == "string")) value = JSON.stringify(value)
         let obj = {action: 10009, method: method, data: value}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -154,7 +151,7 @@ export class AppManager {
      * @param value
      */
     static log(value: string) {
-        if (Render.isConchApp) {
+        if (Browser.onLayaRuntime) {
             let obj = {action: 10010, data: value}
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
         } else {
@@ -168,7 +165,7 @@ export class AppManager {
      */
     static openBrowser(url: string) {
         let obj = {action: 10012, data: url}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -178,7 +175,7 @@ export class AppManager {
      */
     static clipData(data: string) {
         let obj = {action: 10013, data: data}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -190,7 +187,7 @@ export class AppManager {
      */
     static downloadFile(url: string, title: string, des: string) {
         let obj = {action: 10014, data: url, title: title, des: des}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -200,7 +197,7 @@ export class AppManager {
      */
     static sendShortcutBadger(value: number) {
         let obj = {action: 10015, data: value}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -219,7 +216,7 @@ export class AppManager {
             url: url,
             jsonData: JSON.stringify(jsonData)
         }
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun)
     }
 
@@ -230,27 +227,27 @@ export class AppManager {
      */
     static getMetaData(key: string, callback: Function) {
         let obj = {action: 10017, key: key}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), callback)
     }
 
     /** 显示游戏 */
     static showGame(value: any) {
         let obj = {action: 10018, data: value}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), null)
     }
 
     /** 显示网页 */
     static showWeb(value: any) {
         let obj = {action: 10019, data: value}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), null)
     }
 
     static umengTest() {
         let obj = {action: -100, method: "test", data: ["s", "2"]}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), null)
     }
 
@@ -261,7 +258,7 @@ export class AppManager {
      */
     static onProfileSignIn(Provider: string, ID: string) {
         let obj = {action: -100, method: "onProfileSignIn", data: [Provider, ID]}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), null)
     }
 
@@ -270,7 +267,7 @@ export class AppManager {
      */
     static onProfileSignOff() {
         let obj = {action: -100, method: "onProfileSignIn", data: []}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), null)
     }
 
@@ -283,7 +280,7 @@ export class AppManager {
      */
     static pay(money: number, coin: number, source: number) {
         let obj = {action: -100, method: "pay", data: [money, coin, source]}
-        if (Render.isConchApp)
+        if (Browser.onLayaRuntime)
             this.LP_SendMessageToPlatform(JSON.stringify(obj), null)
     }
 

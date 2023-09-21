@@ -471,10 +471,10 @@ declare namespace tsCore {
          * @param    cache        是否缓存加载结果。
          * @param    group        分组，方便对资源进行管理。
          * @param    ignoreCache    是否忽略缓存，强制重新加载。
-         * @param    useWorkerLoader(default = false)是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
+         * @param    useWorkerLoader (default = false)是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
          * @return 此 LoaderManager 对象本身。
          */
-        load(url: string | Array<string | LoadRes>, complete?: Laya.Handler, progress?: Laya.Handler, type?: string, priority?: number, cache?: boolean, group?: string, ignoreCache?: boolean, useWorkerLoader?: boolean): void;
+        load(url: string | (string | LoadRes)[], complete?: Laya.Handler, progress?: Laya.Handler, type?: string, priority?: number, cache?: boolean, group?: string, ignoreCache?: boolean, useWorkerLoader?: boolean): void;
         private loadAssets;
         private _load;
         private singleCompleteHandler;
@@ -1229,7 +1229,7 @@ declare namespace tsCore {
         /**
          * 访问记录
          */
-        private static history;
+        protected static history: PageNavigator[];
         /** 暂停返回上一页 */
         static pauseHistory: boolean;
         /**

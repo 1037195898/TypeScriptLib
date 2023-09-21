@@ -1036,11 +1036,11 @@ window.tsCore = {};
          * @param    cache        是否缓存加载结果。
          * @param    group        分组，方便对资源进行管理。
          * @param    ignoreCache    是否忽略缓存，强制重新加载。
-         * @param    useWorkerLoader(default = false)是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
+         * @param    useWorkerLoader (default = false)是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
          * @return 此 LoaderManager 对象本身。
          */
         load(url, complete, progress, type, priority = 1, cache = true, group, ignoreCache = false, useWorkerLoader = false) {
-            if (url instanceof Array)
+            if (Array.isArray(url))
                 return this.loadAssets(url, complete, progress, type, priority, cache, group);
             let content = this.getRes(url);
             if (!ignoreCache && content) {
@@ -1084,7 +1084,7 @@ window.tsCore = {};
                 let completeHandler = (complete || progress) ? Laya.Handler.create(null, loadComplete, [item]) : null;
                 this.load(item.url, completeHandler, progressHandler, item.type, item.priority || 1, cache, item.group || group, false, item.useWorkerLoader);
             }
-            function loadComplete(item, content = null) {
+            function loadComplete(item, content) {
                 loadedCount++;
                 item.progress = 1;
                 if (!content)

@@ -42,8 +42,7 @@ export class AppRecordManager extends tsCore.HistoryManager {
 //			    MessageTip.showTip(CommonCmd.NOT_EXIT_GAME)
             return
         }
-        // @ts-ignore
-        const history = HistoryManager.history
+        const history = AppRecordManager.history
         if (history.length === 0) return
         let array = history[history.length - 1]
         if (array?.newPage instanceof BaseScene) {
@@ -62,9 +61,7 @@ export class AppRecordManager extends tsCore.HistoryManager {
      * @internal
      */
     static _backHistory(isBack = false) {
-        // HistoryManager.backHistory(isBack)
-        // @ts-ignore
-        const history = HistoryManager.history
+        const history = AppRecordManager.history
         if (history.length > 0 && (history[history.length - 1].newPage instanceof fgui.Window || !AppRecordManager.pauseHistory)) {
             let array = history[history.length - 1]
             if (isBack && array.newPage instanceof BaseScene) {

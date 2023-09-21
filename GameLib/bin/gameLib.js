@@ -658,7 +658,7 @@ window.gameLib = {};
         }
         /*@override*/
         dispose() {
-            AppManager.log("game dispose");
+            tsCore.Log.debug("game dispose");
             Player.inst.stopAllCoupon();
             if (this.guideSprite)
                 this.guideSprite.dispose();
@@ -3143,15 +3143,14 @@ window.gameLib = {};
     class AppManager {
         /** 关闭app自定义返回 */
         static closeAppBack() {
-            if (Laya.Browser.window.conch && Laya.Browser.window.conch.setOnBackPressedFunction) {
-                Laya.Browser.window.conch.setOnBackPressedFunction(function () {
-                });
-            }
+            var _a;
+            // @ts-ignore
+            (_a = window.conch) === null || _a === void 0 ? void 0 : _a.setOnBackPressedFunction(function () { });
         }
         /** 进入游戏 */
         static sendAppData() {
             this.log("sendAppData");
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_enterBBS(JSON.stringify(''), this.nullFun);
         }
         /**
@@ -3161,7 +3160,7 @@ window.gameLib = {};
          *
          */
         static enterFeedback(sData, callback) {
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_enterFeedback(JSON.stringify(sData), callback);
         }
         /**
@@ -3171,38 +3170,38 @@ window.gameLib = {};
          *
          */
         static enterInvite(sData, callback) {
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_enterInvite(JSON.stringify(sData), callback);
         }
         /** Toast 提示 */
         static toast(sData) {
             let obj = { action: 10005, value: sData };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /** 退出APP */
         static exit() {
             let obj = { action: 10008 };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /** 上传头像 */
         static UpdateHead(token) {
             // type 1.返回选择的图片路径  2.返回图片base64数据
             let obj = { action: 10004, value: token, type: 1 };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /** 游戏重启 */
         static gameRestart() {
             let obj = { action: 10021 };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /** 关闭网页 */
         static closeHtml() {
             let obj = { action: 10000 };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /**
@@ -3211,12 +3210,12 @@ window.gameLib = {};
          */
         static getIMEI(callback) {
             let obj = { action: 10001 };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), callback);
         }
         static IsBackHome() {
             let obj = { action: 10002 };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /**
@@ -3225,7 +3224,7 @@ window.gameLib = {};
          */
         static sendNotification(value) {
             let obj = { action: 10003, data: value };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /**
@@ -3233,7 +3232,7 @@ window.gameLib = {};
          */
         static startServer() {
             let obj = { action: 10007 };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /**
@@ -3243,7 +3242,7 @@ window.gameLib = {};
          * @param type 0.调用公用分享窗口 1.facebook 2.whatsapp 3.instagram 4.sms 5.twitter
          */
         static openShare(content, url = "", type = 0) {
-            if (!Laya.Render.isConchApp)
+            if (!Laya.Browser.onLayaRuntime)
                 return;
             let obj = {};
             if (type === 0) {
@@ -3264,7 +3263,7 @@ window.gameLib = {};
             if (!(typeof value == "string"))
                 value = JSON.stringify(value);
             let obj = { action: 10009, method: method, data: value };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /**
@@ -3272,7 +3271,7 @@ window.gameLib = {};
          * @param value
          */
         static log(value) {
-            if (Laya.Render.isConchApp) {
+            if (Laya.Browser.onLayaRuntime) {
                 let obj = { action: 10010, data: value };
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
             }
@@ -3286,7 +3285,7 @@ window.gameLib = {};
          */
         static openBrowser(url) {
             let obj = { action: 10012, data: url };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /**
@@ -3295,7 +3294,7 @@ window.gameLib = {};
          */
         static clipData(data) {
             let obj = { action: 10013, data: data };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /**
@@ -3306,7 +3305,7 @@ window.gameLib = {};
          */
         static downloadFile(url, title, des) {
             let obj = { action: 10014, data: url, title: title, des: des };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /**
@@ -3315,7 +3314,7 @@ window.gameLib = {};
          */
         static sendShortcutBadger(value) {
             let obj = { action: 10015, data: value };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /**
@@ -3333,7 +3332,7 @@ window.gameLib = {};
                 url: url,
                 jsonData: JSON.stringify(jsonData)
             };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), this.nullFun);
         }
         /**
@@ -3343,24 +3342,24 @@ window.gameLib = {};
          */
         static getMetaData(key, callback) {
             let obj = { action: 10017, key: key };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), callback);
         }
         /** 显示游戏 */
         static showGame(value) {
             let obj = { action: 10018, data: value };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), null);
         }
         /** 显示网页 */
         static showWeb(value) {
             let obj = { action: 10019, data: value };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), null);
         }
         static umengTest() {
             let obj = { action: -100, method: "test", data: ["s", "2"] };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), null);
         }
         /**
@@ -3370,7 +3369,7 @@ window.gameLib = {};
          */
         static onProfileSignIn(Provider, ID) {
             let obj = { action: -100, method: "onProfileSignIn", data: [Provider, ID] };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), null);
         }
         /**
@@ -3378,7 +3377,7 @@ window.gameLib = {};
          */
         static onProfileSignOff() {
             let obj = { action: -100, method: "onProfileSignIn", data: [] };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), null);
         }
         /**
@@ -3390,7 +3389,7 @@ window.gameLib = {};
          */
         static pay(money, coin, source) {
             let obj = { action: -100, method: "pay", data: [money, coin, source] };
-            if (Laya.Render.isConchApp)
+            if (Laya.Browser.onLayaRuntime)
                 this.LP_SendMessageToPlatform(JSON.stringify(obj), null);
         }
         /**
@@ -3497,8 +3496,7 @@ window.gameLib = {};
                 //			    MessageTip.showTip(CommonCmd.NOT_EXIT_GAME)
                 return;
             }
-            // @ts-ignore
-            const history = HistoryManager.history;
+            const history = AppRecordManager.history;
             if (history.length === 0)
                 return;
             let array = history[history.length - 1];
@@ -3518,9 +3516,7 @@ window.gameLib = {};
          * @internal
          */
         static _backHistory(isBack = false) {
-            // HistoryManager.backHistory(isBack)
-            // @ts-ignore
-            const history = HistoryManager.history;
+            const history = AppRecordManager.history;
             if (history.length > 0 && (history[history.length - 1].newPage instanceof fgui.Window || !AppRecordManager.pauseHistory)) {
                 let array = history[history.length - 1];
                 if (isBack && array.newPage instanceof BaseScene) {
@@ -3686,7 +3682,7 @@ window.gameLib = {};
          */
         loadVersionXML(complete, errorHandler) {
             let resConfigUrl = AssetsLoader.CONFIG_RES_NAME + (Laya.Render.isConchApp ? "" : "?v=" + Laya.Browser.now());
-            tsCore.ELoader.loader.load(resConfigUrl, Laya.Handler.create(this, this.loadXMLComplete, [complete, errorHandler, resConfigUrl]), null, Laya.Loader.TEXT);
+            tsCore.ELoader.loader.load(resConfigUrl, Laya.Handler.create(this, this.loadXMLComplete, [complete, errorHandler, resConfigUrl]), null, Laya.Loader.XML);
         }
         loadXMLComplete(complete, errorHandler, resConfigUrl, source) {
             if (!source) {
@@ -3694,7 +3690,7 @@ window.gameLib = {};
                 return;
             }
             tsCore.ELoader.loader.clearRes(resConfigUrl);
-            this.parseUrl(Laya.Utils.parseXMLFromString(source));
+            this.parseUrl(source);
             if (this.customLoader) {
                 runFun(this.customLoader, complete, errorHandler);
             }
@@ -6048,27 +6044,19 @@ window.gameLib = {};
         }
         /** 进入登录界面 */
         static login() {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.comeWebPage("/login");
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.comeWebPage('/login')" });
-            SceneManager.inst.closeGame();
+            JSUtils.openPage("/login");
         }
         /** 充值 */
         static deposit() {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.comeWebPage("/deposit");
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.comeWebPage('/deposit')" });
-            SceneManager.inst.closeGame();
+            JSUtils.openPage("/deposit");
         }
         /** 进入刮刮卡 */
         static jackpot() {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.comeWebPage("/jackpot");
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.comeWebPage('/jackpot')" });
-            SceneManager.inst.closeGame();
+            JSUtils.openPage("/jackpot");
+        }
+        /** 打开指定的web页面 不关闭游戏的前提下 */
+        static openWebPageWithoutLeaveGame(value) {
+            JSUtils.openPage(value, false);
         }
         /** 关闭游戏
          * @param [type = 0]  0 默认直接退出  1 退出切换到新游戏
@@ -6087,64 +6075,70 @@ window.gameLib = {};
                     Laya.Browser.window.location.href = "//" + Laya.Browser.window.location.host;
                 }
             }
-            AppManager.showWeb({ javascript: "window.GameToHall.gameClose(" + type + ", " + data + ")" });
+            AppManager.showWeb({ javascript: `window.GameToHall.gameClose(${type}, ${data})` });
             SceneManager.inst.closeGame();
         }
         /** 弹窗 */
         static openModal(value) {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.openModal(value);
-            }
-            AppManager.showWeb({ javascript: "window.GameToHall.openModal('" + value + "')" });
+            var _a, _b, _c;
+            (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.openModal) === null || _c === void 0 ? void 0 : _c.call(_b, value);
+            AppManager.showWeb({ javascript: `window.GameToHall.openModal('${value}')` });
         }
-        /** 打开指定的web页面 不关闭游戏的前提下 */
-        static openWebPageWithoutLeaveGame(value) {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.openWebPageWithoutLeaveGame(value);
+        /**
+         * 打开一个原生页面
+         * @param page 页面 如： "/giftPage?token=***"
+         * @param [isCloseGame=true] 是否关闭游戏
+         */
+        static openPage(page, isCloseGame = true) {
+            var _a, _b, _c, _d, _e, _f;
+            if (isCloseGame) {
+                (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.comeWebPage) === null || _c === void 0 ? void 0 : _c.call(_b, page);
+                AppManager.showWeb({ javascript: `window.GameToHall.comeWebPage('${page}')` });
+                SceneManager.inst.closeGame();
             }
-            AppManager.showWeb({ javascript: "window.GameToHall.openWebPageWithoutLeaveGame('" + value + "')" });
+            else {
+                (_f = (_e = (_d = Laya.Browser.window.parent) === null || _d === void 0 ? void 0 : _d.GameToHall) === null || _e === void 0 ? void 0 : _e.openWebPageWithoutLeaveGame) === null || _f === void 0 ? void 0 : _f.call(_e, page);
+                AppManager.showWeb({ javascript: `window.GameToHall.openWebPageWithoutLeaveGame('${page}')` });
+            }
         }
         /** 进入游戏进度条 */
-        static getProgress(value) {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.getProgress(value);
-            }
+        static progress(value) {
+            var _a, _b, _c, _d, _e, _f;
+            (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.progress) === null || _c === void 0 ? void 0 : _c.call(_b, value);
+            (_f = (_e = (_d = Laya.Browser.window.parent) === null || _d === void 0 ? void 0 : _d.GameToHall) === null || _e === void 0 ? void 0 : _e.getProgress) === null || _f === void 0 ? void 0 : _f.call(_e, value);
             AppManager.executionJavascript("window.GameToHall.getProgress", value);
         }
         /** 通知进入游戏了 */
         static gameOnload() {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.gameOnload();
-            }
+            var _a, _b, _c;
+            (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.gameOnload) === null || _c === void 0 ? void 0 : _c.call(_b);
             AppManager.executionJavascript("window.GameToHall.gameOnload", null);
         }
         /**
          * 通知服务器直接离开的房间
          */
         static outGameHttp() {
-            if (Laya.Browser.window.parent.GameToHall)
-                Laya.Browser.window.parent.GameToHall.outGameHttp(Player.inst.urlParam.roomId);
-            else
-                tsCore.Log.debug("debug");
+            var _a, _b, _c;
+            (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.outGameHttp) === null || _c === void 0 ? void 0 : _c.call(_b, Player.inst.urlParam.roomId);
         }
         /**
          * 分析邀请
          * @param type 1 开  2 关
          */
         static shareDetail(type) {
-            if (Laya.Browser.window.parent.GameToHall)
-                Laya.Browser.window.parent.GameToHall.shareDetail(Player.inst.gameModel, type);
-            else
-                tsCore.Log.debug("debug");
+            var _a, _b, _c;
+            (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.shareDetail) === null || _c === void 0 ? void 0 : _c.call(_b, Player.inst.gameModel, type);
         }
         /** 上传头像 */
-        static updateHead() {
-            if (Laya.Browser.window.parent.GameToHall) {
-                Laya.Browser.window.parent.GameToHall.openReviseAvatarNickNameDrawer();
-            }
+        static uploadAvatar() {
+            var _a, _b, _c, _d, _e, _f;
+            (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.uploadAvatar) === null || _c === void 0 ? void 0 : _c.call(_b);
+            (_f = (_e = (_d = Laya.Browser.window.parent) === null || _d === void 0 ? void 0 : _d.GameToHall) === null || _e === void 0 ? void 0 : _e.openReviseAvatarNickNameDrawer) === null || _f === void 0 ? void 0 : _f.call(_e);
             AppManager.showWeb({ javascript: "window.GameToHall.openReviseAvatarNickNameDrawer()" });
         }
     }
+    JSUtils.getProgress = JSUtils.progress;
+    JSUtils.updateHead = JSUtils.uploadAvatar;
     gameLib.JSUtils = JSUtils;
     class ObjectUtil {
         static setColorTransform(source, value) {

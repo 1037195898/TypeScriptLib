@@ -3,7 +3,6 @@ import Render = Laya.Render
 import {AppManager} from "../manager/AppManager"
 import {SceneManager} from "../manager/SceneManager"
 import {Player} from "../Player"
-import Log = tsCore.Log;
 
 export class JSUtils {
 
@@ -25,29 +24,22 @@ export class JSUtils {
 
     /** 进入登录界面 */
     static login() {
-        if (Browser.window.parent.GameToHall) {
-            Browser.window.parent.GameToHall.comeWebPage("/login")
-        }
-        AppManager.showWeb({javascript: "window.GameToHall.comeWebPage('/login')"})
-        SceneManager.inst.closeGame()
+        JSUtils.openPage("/login")
     }
 
     /** 充值 */
     static deposit() {
-        if (Browser.window.parent.GameToHall) {
-            Browser.window.parent.GameToHall.comeWebPage("/deposit")
-        }
-        AppManager.showWeb({javascript: "window.GameToHall.comeWebPage('/deposit')"})
-        SceneManager.inst.closeGame()
+        JSUtils.openPage("/deposit")
     }
 
     /** 进入刮刮卡 */
     static jackpot() {
-        if (Browser.window.parent.GameToHall) {
-            Browser.window.parent.GameToHall.comeWebPage("/jackpot")
-        }
-        AppManager.showWeb({javascript: "window.GameToHall.comeWebPage('/jackpot')"})
-        SceneManager.inst.closeGame()
+        JSUtils.openPage("/jackpot")
+    }
+
+    /** 打开指定的web页面 不关闭游戏的前提下 */
+    static openWebPageWithoutLeaveGame(value: string) {
+        JSUtils.openPage(value, false)
     }
 
     /** 关闭游戏
@@ -66,39 +58,44 @@ export class JSUtils {
                 Browser.window.location.href = "//" + Browser.window.location.host
             }
         }
-        AppManager.showWeb({javascript: "window.GameToHall.gameClose(" + type + ", " + data + ")"})
+        AppManager.showWeb({javascript: `window.GameToHall.gameClose(${type}, ${data})`})
         SceneManager.inst.closeGame()
     }
 
     /** 弹窗 */
     static openModal(value: string) {
-        if (Browser.window.parent.GameToHall) {
-            Browser.window.parent.GameToHall.openModal(value)
-        }
-        AppManager.showWeb({javascript: "window.GameToHall.openModal('" + value + "')"})
+        Browser.window.parent?.GameToHall?.openModal?.(value)
+        AppManager.showWeb({javascript: `window.GameToHall.openModal('${value}')`})
     }
 
-    /** 打开指定的web页面 不关闭游戏的前提下 */
-    static openWebPageWithoutLeaveGame(value: string) {
-        if (Browser.window.parent.GameToHall) {
-            Browser.window.parent.GameToHall.openWebPageWithoutLeaveGame(value)
+    /**
+     * 打开一个原生页面
+     * @param page 页面 如： "/giftPage?token=***"
+     * @param [isCloseGame=true] 是否关闭游戏
+     */
+    static openPage(page: string, isCloseGame = true) {
+        if (isCloseGame) {
+            Browser.window.parent?.GameToHall?.comeWebPage?.(page)
+            AppManager.showWeb({javascript: `window.GameToHall.comeWebPage('${page}')`})
+            SceneManager.inst.closeGame()
+        } else {
+            Browser.window.parent?.GameToHall?.openWebPageWithoutLeaveGame?.(page)
+            AppManager.showWeb({javascript: `window.GameToHall.openWebPageWithoutLeaveGame('${page}')`})
         }
-        AppManager.showWeb({javascript: "window.GameToHall.openWebPageWithoutLeaveGame('" + value + "')"})
     }
 
     /** 进入游戏进度条 */
-    static getProgress(value: number) {
-        if (Browser.window.parent.GameToHall) {
-            Browser.window.parent.GameToHall.getProgress(value)
-        }
+    static progress(value: number) {
+        Browser.window.parent?.GameToHall?.progress?.(value)
+        Browser.window.parent?.GameToHall?.getProgress?.(value)
         AppManager.executionJavascript("window.GameToHall.getProgress", value)
     }
 
+    static getProgress = JSUtils.progress
+
     /** 通知进入游戏了 */
     static gameOnload() {
-        if (Browser.window.parent.GameToHall) {
-            Browser.window.parent.GameToHall.gameOnload()
-        }
+        Browser.window.parent?.GameToHall?.gameOnload?.()
         AppManager.executionJavascript("window.GameToHall.gameOnload", null)
     }
 
@@ -106,9 +103,7 @@ export class JSUtils {
      * 通知服务器直接离开的房间
      */
     static outGameHttp() {
-        if (Browser.window.parent.GameToHall)
-            Browser.window.parent.GameToHall.outGameHttp(Player.inst.urlParam.roomId)
-        else Log.debug("debug")
+        Browser.window.parent?.GameToHall?.outGameHttp?.(Player.inst.urlParam.roomId)
     }
 
     /**
@@ -116,17 +111,16 @@ export class JSUtils {
      * @param type 1 开  2 关
      */
     static shareDetail(type: number) {
-        if (Browser.window.parent.GameToHall)
-            Browser.window.parent.GameToHall.shareDetail(Player.inst.gameModel, type)
-        else Log.debug("debug")
+        Browser.window.parent?.GameToHall?.shareDetail?.(Player.inst.gameModel, type)
     }
 
     /** 上传头像 */
-    static updateHead() {
-        if (Browser.window.parent.GameToHall) {
-            Browser.window.parent.GameToHall.openReviseAvatarNickNameDrawer()
-        }
+    static uploadAvatar() {
+        Browser.window.parent?.GameToHall?.uploadAvatar?.()
+        Browser.window.parent?.GameToHall?.openReviseAvatarNickNameDrawer?.()
         AppManager.showWeb({javascript: "window.GameToHall.openReviseAvatarNickNameDrawer()"})
     }
+
+    static updateHead = JSUtils.uploadAvatar
 
 }

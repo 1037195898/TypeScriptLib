@@ -2906,6 +2906,8 @@ declare namespace gameLib {
         static deposit(): void;
         /** 进入刮刮卡 */
         static jackpot(): void;
+        /** 打开指定的web页面 不关闭游戏的前提下 */
+        static openWebPageWithoutLeaveGame(value: string): void;
         /** 关闭游戏
          * @param [type = 0]  0 默认直接退出  1 退出切换到新游戏
          * @param [data = null]
@@ -2913,10 +2915,15 @@ declare namespace gameLib {
         static gameClose(type?: number, data?: any): void;
         /** 弹窗 */
         static openModal(value: string): void;
-        /** 打开指定的web页面 不关闭游戏的前提下 */
-        static openWebPageWithoutLeaveGame(value: string): void;
+        /**
+         * 打开一个原生页面
+         * @param page 页面 如： "/giftPage?token=***"
+         * @param [isCloseGame=true] 是否关闭游戏
+         */
+        static openPage(page: string, isCloseGame?: boolean): void;
         /** 进入游戏进度条 */
-        static getProgress(value: number): void;
+        static progress(value: number): void;
+        static getProgress: typeof JSUtils.progress;
         /** 通知进入游戏了 */
         static gameOnload(): void;
         /**
@@ -2929,7 +2936,8 @@ declare namespace gameLib {
          */
         static shareDetail(type: number): void;
         /** 上传头像 */
-        static updateHead(): void;
+        static uploadAvatar(): void;
+        static updateHead: typeof JSUtils.uploadAvatar;
     }
     export class ObjectUtil {
         private static colorTransform;
