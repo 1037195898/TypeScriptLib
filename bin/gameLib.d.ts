@@ -1820,7 +1820,7 @@ declare namespace gameLib {
          * @param action
          * @param label
          */
-        static ga(type: gaType, category: string, action: string, label: string | number): void;
+        static ga(type: gaType, category: string, action: string, label: string): void;
     }
     type gaType = "pageview" | "event" | "timing" | "social" | "screenview" | "transaction" | "item" | "exception";
     export class APP {

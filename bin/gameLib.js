@@ -3098,6 +3098,13 @@ window.gameLib = {};
          */
         static ga(type, category, action, label) {
             this.isOpenAnalytics = tsCore.ConfigKit.get("openAnalytics");
+            if (Player.inst.urlParam.debug) {
+                const encoder = new TextEncoder();
+                const categoryLen = encoder.encode(category).length;
+                const actionLen = encoder.encode(action).length;
+                const labelLen = encoder.encode(label).length;
+                tsCore.Log.debug(`category=${categoryLen} action=${actionLen} label=${labelLen}`);
+            }
             // @ts-ignore
             if (this.isOpenAnalytics && Player.inst.isWeb && window.ga)
                 ga('send', type, category, action, label);

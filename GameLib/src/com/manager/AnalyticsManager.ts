@@ -73,8 +73,15 @@ export class AnalyticsManager {
      * @param action
      * @param label
      */
-    static ga(type: gaType, category: string, action: string, label: string | number) {
+    static ga(type: gaType, category: string, action: string, label: string) {
         this.isOpenAnalytics = ConfigKit.get("openAnalytics")
+        if (Player.inst.urlParam.debug) {
+            const encoder = new TextEncoder()
+            const categoryLen = encoder.encode(category).length
+            const actionLen = encoder.encode(action).length
+            const labelLen = encoder.encode(label).length
+            Log.debug(`category=${categoryLen} action=${actionLen} label=${labelLen}`)
+        }
         // @ts-ignore
         if (this.isOpenAnalytics && Player.inst.isWeb && window.ga) ga('send', type, category, action, label)
         if (this.isOpenAnalytics && !Player.inst.isWeb)
