@@ -37,6 +37,8 @@ import MessageTip = tsCore.MessageTip;
 import SoundUtils = tsCore.SoundUtils;
 import {AssetsLoader} from "./AssetsLoader";
 import {StateCode} from "../utils/StateCode";
+import MouseManager = Laya.MouseManager;
+import TouchManager = Laya.TouchManager;
 
 /**
  * 舞台
@@ -368,7 +370,8 @@ export class SceneManager extends EProxy {
             SoundUtils.load()
             // 开始加载运行加载的资源
             AssetsLoader.inst.runLoad()
-
+            // 启动按键
+            TouchManager.I.enable = MouseManager.enabled = true
 //                // 放到下一帧去播放  不然 进入需要旋转的游戏 渲染跟不上
             Laya.timer.callLater(this, function () {
                 Log.debug("call close loading")
@@ -410,7 +413,8 @@ export class SceneManager extends EProxy {
     closeGame() {
         Log.debug("SceneManager.closeGame")
         if (!Laya.loader) return
-
+        // 关闭所有按键
+        TouchManager.I.enable = MouseManager.enabled = false
         Laya.stage.pauseUpdateTimer = true
         Laya.timer.clearAllTimer()
 

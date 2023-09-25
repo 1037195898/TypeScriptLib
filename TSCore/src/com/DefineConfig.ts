@@ -34,13 +34,11 @@ export class DefineConfig {
             }
         })
 
-        Object.defineProperty(Laya.Stage.prototype, "temp_updateTimers", {
-            // @ts-ignore
-            value: Laya.Stage.prototype._updateTimers
-        })
+        // @ts-ignore
+        const temp_updateTimers = Laya.Stage.prototype._updateTimers
         Object.defineProperty(Laya.Stage.prototype, "_updateTimers", {
             value: function () {
-                if (!this.pauseUpdateTimer) this.temp_updateTimers()
+                if (!this.pauseUpdateTimer) temp_updateTimers()
             }
         })
 
