@@ -153,15 +153,15 @@ window.gameLib = {};
         /** 更新赢钱的值 */
         ActionLib["GAME_UPDATE_WIN_VALUE"] = "game_update_win_value";
         /**
+         * 游戏更新自动bet次数
+         */
+        ActionLib["GAME_UPDATE_AUTO_BET_NUMBER"] = "game_update_auto_bet_number";
+        /**
          * 游戏更新免费次数
          * @deprecated
          * @see GAME_UPDATE_AUTO_BET_NUMBER
          */
-        ActionLib["GAME_UPDATE_FREE_COUNT"] = "game_update_free_count";
-        /**
-         * 游戏更新自动bet次数
-         */
-        ActionLib["GAME_UPDATE_AUTO_BET_NUMBER"] = "game_update_auto_bet_number";
+        ActionLib["GAME_UPDATE_FREE_COUNT"] = "game_update_auto_bet_number";
         /** 播放收金币动画 */
         ActionLib["GAME_PLAY_COLLECT_GOLD_COINS_ANI"] = "game_play_collect_gold_coins_ani";
         /** 显示free窗口 */
@@ -225,9 +225,9 @@ window.gameLib = {};
             this.autoBetCount = 0;
             /** 当前玩家选择的自动bet次数 (缓存) */
             this.tempAutoBetCount = 0;
-            /** 下注额度切换值 */
+            /** bet 额度切换值 */
             this.betMoney = [];
-            /** 当前押注的钱 */
+            /** 当前bet值 */
             this.betValue = 0;
             /** 是否已经弹出过一次推荐现金游戏 */
             this.isRecommend = false;
@@ -235,6 +235,11 @@ window.gameLib = {};
             this.noticeData = [];
             /** 默认bet位置 */
             this.defaultBetIndex = 0;
+            /**
+             * 重置默认bet值
+             * @default false
+             */
+            this.isResetBetValue = false;
             /** 游戏类型 */
             this.gameType = GameType.NORMAL;
         }

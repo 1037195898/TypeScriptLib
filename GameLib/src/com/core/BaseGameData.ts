@@ -29,9 +29,9 @@ export class BaseGameData implements IGameData {
     autoBetCount = 0
     /** 当前玩家选择的自动bet次数 (缓存) */
     tempAutoBetCount = 0
-    /** 下注额度切换值 */
+    /** bet 额度切换值 */
     betMoney = []
-    /** 当前押注的钱 */
+    /** 当前bet值 */
     betValue = 0
     /** 开奖结果 */
     lotteryId: any[]
@@ -41,6 +41,11 @@ export class BaseGameData implements IGameData {
     noticeData = []
     /** 默认bet位置 */
     defaultBetIndex = 0
+    /**
+     * 重置默认bet值
+     * @default false
+     */
+    isResetBetValue = false
     /** 游戏类型 */
     gameType = GameType.NORMAL
 

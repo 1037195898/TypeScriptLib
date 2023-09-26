@@ -143,15 +143,15 @@ declare namespace gameLib {
         /** 更新赢钱的值 */
         GAME_UPDATE_WIN_VALUE = "game_update_win_value",
         /**
+         * 游戏更新自动bet次数
+         */
+        GAME_UPDATE_AUTO_BET_NUMBER = "game_update_auto_bet_number",
+        /**
          * 游戏更新免费次数
          * @deprecated
          * @see GAME_UPDATE_AUTO_BET_NUMBER
          */
-        GAME_UPDATE_FREE_COUNT = "game_update_free_count",
-        /**
-         * 游戏更新自动bet次数
-         */
-        GAME_UPDATE_AUTO_BET_NUMBER = "game_update_auto_bet_number",
+        GAME_UPDATE_FREE_COUNT = "game_update_auto_bet_number",
         /** 播放收金币动画 */
         GAME_PLAY_COLLECT_GOLD_COINS_ANI = "game_play_collect_gold_coins_ani",
         /** 显示free窗口 */
@@ -210,9 +210,9 @@ declare namespace gameLib {
         autoBetCount: number;
         /** 当前玩家选择的自动bet次数 (缓存) */
         tempAutoBetCount: number;
-        /** 下注额度切换值 */
+        /** bet 额度切换值 */
         betMoney: any[];
-        /** 当前押注的钱 */
+        /** 当前bet值 */
         betValue: number;
         /** 开奖结果 */
         lotteryId: any[];
@@ -222,6 +222,11 @@ declare namespace gameLib {
         noticeData: any[];
         /** 默认bet位置 */
         defaultBetIndex: number;
+        /**
+         * 重置默认bet值
+         * @default false
+         */
+        isResetBetValue: boolean;
         /** 游戏类型 */
         gameType: GameType;
         /**
