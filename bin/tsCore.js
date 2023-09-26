@@ -495,6 +495,9 @@ window.tsCore = {};
                 this.minusBtn.onClick(this, this.onChangeAnte, [2]);
             }
         }
+        setOpenLong(value) {
+            this.openLong = value;
+        }
         /**
          * 设置到最大
          * @param [isEvent = true] 是否派发本次改变值的事件
@@ -534,6 +537,9 @@ window.tsCore = {};
             this.addBtn.enabled = this.minusBtn.enabled = this.isEnabled;
             this.checkAutoEnabled();
         }
+        setEnabled(value) {
+            this.enabled = value;
+        }
         /**
          * 设置切换值
          * @param value 值
@@ -549,6 +555,14 @@ window.tsCore = {};
                 this.sendEventValue(this.nums[defaultValue]);
             // 初始化的时候就判断是否可以点击
             this.checkAutoEnabled();
+        }
+        /**
+         * 设置切换值 setValues的简版
+         * @param value 值
+         * @see setValues
+         */
+        set values(value) {
+            this.setValues(value);
         }
         /**
          * @deprecated

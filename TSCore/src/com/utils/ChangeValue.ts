@@ -60,6 +60,10 @@ export class ChangeValue {
         }
     }
 
+    setOpenLong(value: boolean) {
+        this.openLong = value
+    }
+
     /**
      * 设置到最大
      * @param [isEvent = true] 是否派发本次改变值的事件
@@ -92,11 +96,14 @@ export class ChangeValue {
         if (isEvent) this.sendEventValue(ante)
     }
 
-
     set enabled(value: boolean) {
         this.isEnabled = value
         this.addBtn.enabled = this.minusBtn.enabled = this.isEnabled
         this.checkAutoEnabled()
+    }
+
+    setEnabled(value: boolean) {
+        this.enabled = value
     }
 
     /**
@@ -112,6 +119,15 @@ export class ChangeValue {
         if (isEvent) this.sendEventValue(this.nums[defaultValue])
         // 初始化的时候就判断是否可以点击
         this.checkAutoEnabled()
+    }
+
+    /**
+     * 设置切换值 setValues的简版
+     * @param value 值
+     * @see setValues
+     */
+    set values(value: number[]) {
+        this.setValues(value)
     }
 
     /**

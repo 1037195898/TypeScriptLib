@@ -232,6 +232,7 @@ declare namespace tsCore {
         constructor(addBtn: fgui.GButton, minusBtn: fgui.GButton, label: fgui.GTextField);
         /** 开通按钮长按 */
         set openLong(value: boolean);
+        setOpenLong(value: boolean): void;
         /**
          * 设置到最大
          * @param [isEvent = true] 是否派发本次改变值的事件
@@ -243,6 +244,7 @@ declare namespace tsCore {
          */
         min(isEvent?: boolean): void;
         set enabled(value: boolean);
+        setEnabled(value: boolean): void;
         /**
          * 设置切换值
          * @param value 值
@@ -250,6 +252,12 @@ declare namespace tsCore {
          * @param [isEvent = true] 是否派发本次改变值的事件
          */
         setValues(value?: number[], defaultValue?: number, isEvent?: boolean): void;
+        /**
+         * 设置切换值 setValues的简版
+         * @param value 值
+         * @see setValues
+         */
+        set values(value: number[]);
         /**
          * @deprecated
          * @see setValues
