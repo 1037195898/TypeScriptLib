@@ -33,7 +33,7 @@ export class EWindow extends mixinExt(StringBlock, ViewProxy, ActionEvent, fgui.
     override getChild<T = fgui.GObject>(...name: string[]): T {
         let child = null
         for (const key of name) {
-            child = super.getChild(key)
+            child = this.contentPane?.getChild(key) || super.getChild(key)
             if (child) return child
         }
         return child
