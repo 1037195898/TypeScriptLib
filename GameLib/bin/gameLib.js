@@ -4916,7 +4916,7 @@ window.gameLib = {};
          */
         connect(roomId, token, userId = 110, url) {
             if (this.isConnect) {
-                close();
+                this.close();
             }
             this.isConnect = true;
             if (tsCore.StringUtil.isEmpty(url))

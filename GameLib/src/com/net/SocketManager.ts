@@ -46,7 +46,7 @@ export class SocketManager extends ESocket {
      */
     connect(roomId: number, token: string, userId = 110, url?: string) {
         if (this.isConnect) {
-            close()
+            this.close()
         }
         this.isConnect = true
         if (StringUtil.isEmpty(url)) url = Browser.window.socketUrl
