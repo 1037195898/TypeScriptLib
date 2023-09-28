@@ -4555,7 +4555,7 @@ window.gameLib = {};
             // 已经加载的游戏代码
             if (!Player.inst.urlParam.isJumpPage())
                 fgui.GRoot.inst.closeModalWait();
-            LoadingWindow.inst.show(1, getString(1001 /* LibStr.LOADING */));
+            LoadingWindow.inst.changeView(1, getString(1001 /* LibStr.LOADING */));
             AssetsLoader.inst.loadRes(obj, Laya.Handler.create(this, this.loadResComplete), Laya.Handler.create(this, this.loadResErrorHandler));
         }
         /**
@@ -7538,15 +7538,18 @@ window.gameLib = {};
          *
          */
         show(index = 0, headText) {
-            headText !== null && headText !== void 0 ? headText : (headText = getString(1001 /* LibStr.LOADING */).split(".").join(""));
             tsCore.HistoryManager.pauseHistory = true;
+            this.changeView(index, headText);
+            fgui.GRoot.inst.addChild(this);
+        }
+        changeView(index = 0, headText) {
+            headText !== null && headText !== void 0 ? headText : (headText = getString(1001 /* LibStr.LOADING */).split(".").join(""));
             this.headText = headText;
             this.controller.selectedIndex = index;
             this.mesText.text = "";
             //		loaderUrl("init_atlas_evpb2.jpg")
             Laya.timer.clear(this, this.changeHandler);
             Laya.timer.loop(500, this, this.changeHandler);
-            fgui.GRoot.inst.addChild(this);
         }
         changeHandler() {
             this.mesText.text = this.getMsg() + this.tempValue + "%";

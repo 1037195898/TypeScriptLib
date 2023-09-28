@@ -3357,6 +3357,7 @@ declare namespace gameLib {
          *
          */
         show(index?: number, headText?: string): void;
+        changeView(index?: number, headText?: string): void;
         private changeHandler;
         /**
          * 更新进度

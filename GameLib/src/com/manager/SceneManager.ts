@@ -301,7 +301,7 @@ export class SceneManager extends EProxy {
         // 已经加载的游戏代码
         if (!Player.inst.urlParam.isJumpPage())
             GRoot.inst.closeModalWait()
-        LoadingWindow.inst.show(1, getString(LibStr.LOADING))
+        LoadingWindow.inst.changeView(1, getString(LibStr.LOADING))
         AssetsLoader.inst.loadRes(obj, Handler.create(this, this.loadResComplete),
             Handler.create(this, this.loadResErrorHandler))
     }

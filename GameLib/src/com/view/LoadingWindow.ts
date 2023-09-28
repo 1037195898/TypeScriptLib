@@ -14,7 +14,7 @@ export class LoadingWindow extends BaseView {
 
     private static _instance: LoadingWindow
 
-    static get inst(): LoadingWindow {
+    static get inst() {
         this._instance ??= UIPackage.createObjectFromURL("//init/LoadingWindow", LoadingWindow) as LoadingWindow
         return this._instance
     }
@@ -45,15 +45,19 @@ export class LoadingWindow extends BaseView {
      *
      */
     show(index = 0, headText?: string) {
-        headText ??= getString(LibStr.LOADING).split(".").join("")
         HistoryManager.pauseHistory = true
+        this.changeView(index, headText)
+        GRoot.inst.addChild(this)
+    }
+
+    changeView(index = 0, headText?: string) {
+        headText ??= getString(LibStr.LOADING).split(".").join("")
         this.headText = headText
         this.controller.selectedIndex = index
         this.mesText.text = ""
 //		loaderUrl("init_atlas_evpb2.jpg")
         Laya.timer.clear(this, this.changeHandler)
         Laya.timer.loop(500, this, this.changeHandler)
-        GRoot.inst.addChild(this)
     }
 
     private changeHandler() {
@@ -85,11 +89,11 @@ export class LoadingWindow extends BaseView {
      */
     static getProgress(value: number, tempCount = 1, totalCount = 1) {
         // 先算出每一份 占用的百分比份量
-        let pieces: number = 100 / totalCount
+        let pieces = 100 / totalCount
         // 得出当前加载所占百分比的数量
-        let pro: number = value / 100 * pieces
-        let totalPro: number = pieces * (tempCount - 1) + pro
-        let finalTotalPro: number = Math.ceil(totalPro)
+        let pro = value / 100 * pieces
+        let totalPro = pieces * (tempCount - 1) + pro
+        let finalTotalPro = Math.ceil(totalPro)
         return finalTotalPro
     }
 
@@ -104,8 +108,8 @@ export class LoadingWindow extends BaseView {
     }
 
     private getMsg() {
-        let str: string = this.headText
-        for (let i: number = 0; i < 3; i++) {
+        let str = this.headText
+        for (let i = 0; i < 3; i++) {
             if (i < this.dian) {
                 str += "."
             } else {
