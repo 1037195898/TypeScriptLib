@@ -21,7 +21,7 @@ export class HistoryManager {
      * @param newPage 添加的新面板
      */
     static addHistory(currentPage: IRecord, newPage: IRecord) {
-        // Log.debug("addHistory")
+        Log.debug(`history add currentPage=${currentPage} newPage=${newPage}`)
         HistoryManager.history.push({current: currentPage, newPage: newPage})
     }
 
@@ -31,7 +31,7 @@ export class HistoryManager {
      *
      */
     static invalidHistory(value: IRecord) {
-        // Log.debug("invalidHistory")
+        Log.debug(`history invalidHistory value=${value}`)
         if (HistoryManager.history.length > 0) {
             for (let i = 0; i < HistoryManager.history.length; i++) {
                 if (HistoryManager.history[i]?.newPage == value) {
@@ -48,11 +48,13 @@ export class HistoryManager {
      *
      */
     static backHistory(isBack = false) {
+        Log.debug(`history backHistory isBack=${isBack}`)
         HistoryManager.back(isBack)
     }
 
     /** 执行非大厅后退 */
     static back(isBack = false) {
+        Log.debug(`history back isBack=${isBack}`)
         // 取出最后一个页面关闭
         let array = HistoryManager.history.pop()
         // 新页面隐藏
@@ -88,6 +90,7 @@ export class HistoryManager {
     static init() {
         if (!Laya.Browser.onLayaRuntime) {
             HistoryManager.addNewHistory()
+            Log.debug("history add event Listener")
             window.addEventListener("popstate", function (e) {
                 HistoryManager.backHistory(true)
             }, false)
@@ -101,6 +104,7 @@ export class HistoryManager {
 
     /** 添加历史记录 */
     static pushHistory(title: string, url: string) {
+        Log.debug(`history push state title=${title} url=${url}`)
         const state = {title: title, url: url}
         window.history.pushState(state, title, url)
     }

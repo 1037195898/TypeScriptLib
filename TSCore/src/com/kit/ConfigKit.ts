@@ -1,4 +1,4 @@
-import {ELoader} from "../core/ELoader";
+import {ELoader} from "../extends/ELoader";
 import Utils = Laya.Utils;
 import Render = Laya.Render;
 import {StringUtil} from "../utils/StringUtil";

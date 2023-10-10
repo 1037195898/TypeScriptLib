@@ -25,6 +25,11 @@ declare type InstanceTypeOfConstructor<T> = T extends Constructor<infer R> ? R :
  */
 declare function getString(id: string | number, ...args): string
 
+/**
+ * 获取设备刘海屏的高度
+ * @param [offsetH=5] 便宜高度
+ */
+declare function notchHeight(offsetH?: number): number
 
 declare module Laya {
 
@@ -148,37 +153,43 @@ declare interface String {
      * @param search
      */
     contains(...search: string[]): boolean
+
     /**
      * 获取指定符号之后的字符串
      * @param separator
      */
     substringAfter(separator: string): string
+
     /**
      * 获取指定符号之后的字符串 从最后一个符合的开始
      * @param separator
      */
     substringAfterLast(separator: string): string
+
     /**
      * 获取指定符号之前的字符串
      * @param separator
      */
     substringBefore(separator: string): string
+
     /**
      * 获取指定符号之前的字符串 从最后一个符合的开始
      * @param separator
      */
     substringBeforeLast(separator: string): string
+
     /**
      * 获取指定开始和结束的符号之间的字符串
      * @param open
      * @param close
      */
-    substringBetween(open: string, close:string): string
+    substringBetween(open: string, close: string): string
+
     /**
      * 获取指定开始和结束的符号之间的所有字符串
      * @param open
      * @param close
      */
-    substringsBetween(open: string, close:string): string[]
+    substringsBetween(open: string, close: string): string[]
 
 }

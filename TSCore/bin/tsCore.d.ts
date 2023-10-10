@@ -33,7 +33,7 @@ declare namespace tsCore {
          */
         static init(): void;
         private static _init;
-        static initClass(...args: any[]): void;
+        static initClass(...args: (new () => any)[]): void;
         constructor();
         private static startSize;
         private onResize;
@@ -433,10 +433,135 @@ declare namespace tsCore {
      * @see UtilKit
      */
     export const UtilsTool: typeof UtilKit;
+    export class EventController implements IController {
+        /** 事件缓存的所有组 组名字->组object */
+        private obj;
+        /**
+         * 键值的缓存对象
+         */
+        private cacheTarget;
+        private static _CLSID;
+        regActionHandler(action: string, handler: Laya.Handler, group?: string): void;
+        /**
+         * 分组存储对象
+         * @param groupKey 分组key
+         * @return
+         */
+        getGroup(groupKey: string): {
+            [key: string]: Laya.Handler[];
+        };
+        regAction(action: string, caller: any, method: Function, group?: string): void;
+        clearView(): void;
+        clearGroup(): void;
+        removeAllAction(...args: string[]): void;
+        removeGroup(group: string): void;
+        removeGroupActions(groupKey: string, ...args: any[]): void;
+        removeActionHandler(action: string, method: Function, group?: string): void;
+        removeFunction(groupObj: any, action: string, method: Function): void;
+        removeTargetAll(caller: any): void;
+        removeTarget(groupObj: {
+            [p: string]: Laya.Handler[];
+        }, caller: any): void;
+        sendGroupAction(group: string, action: string, ...args: any[]): void;
+        sendAction(action: string, ...args: any[]): void;
+        sendActionEvent(group: string, action: string, ...args: any[]): boolean;
+        addView<T extends IView & IKey>(key: string | {
+            new (): T;
+        }, view: T): boolean;
+        removeView<T extends IView & IKey>(key: string | T): void;
+        getView<T>(key: string | {
+            new (): T;
+        }): T;
+        addProxy<T extends IProxy & IKey>(key: string | {
+            new (): T;
+        }, proxy: T): boolean;
+        removeProxy<T extends IProxy & IKey>(key: string | T): void;
+        getProxy<T>(name: string | {
+            new (): T;
+        }): T;
+        getMap(): {
+            [key: string]: any;
+        };
+        /**
+         * 返回类的唯一标识
+         */
+        private _getClassSign;
+    }
+    /**
+     * 碰撞类
+     */
+    export class OBB extends View {
+        /** 轴心 0 X轴 1 Y轴 */
+        private _axes;
+        /** 变径长度 */
+        protected _extents: number[];
+        private _point;
+        constructor();
+        /**
+         * 碰撞检测 判断2矩形最终是否碰撞，需要依次检测4个分离轴，如果在一个轴上没有碰撞，则2个矩形就没有碰撞。
+         * @param obb 要参与检测的对象
+         * @return
+         */
+        detectorOBBvsOBB(obb: OBB): boolean;
+        setSize(wv: number, hv: number, ignorePivot?: boolean): void;
+        /**
+         * 通过旋转设置x轴和y轴
+         * @param value 0-360
+         */
+        set rotation(value: number);
+        setXY(xv: number, yv: number): void;
+        /**
+         * 获取轴上的axisX和axisY投影半径距离
+         * @param axis
+         */
+        getProjectionRadius(axis: Vector2): number;
+        get axes(): Vector2[];
+        get point(): Vector2;
+    }
+    class Vector2 {
+        private x;
+        private y;
+        constructor(x?: number, y?: number);
+        setXY(x: number, y: number): void;
+        sub(v: Vector2): Vector2;
+        /**
+         * 算出自己在参数v上投影的长度
+         * @param v
+         */
+        dot(v: Vector2): number;
+    }
+    export class DefineConfig {
+        static init(): void;
+        private static defineLaya;
+        private static defineFairy;
+        private static defineText;
+        private static defineTimer;
+        private static defineSkeleton;
+        private static defineSpineSkeleton;
+    }
     const EButton_base: Constructor<ViewBlock & StringBlock & ActionEvent & fairygui.GButton>;
     export class EButton extends EButton_base {
         protected onConstruct(): void;
         protected onInit(): void;
+        /**
+         * 获取子组件
+         * @param name 传入子组件多种命名方式
+         */
+        getChild<T = fgui.GObject>(...name: string[]): T;
+    }
+    const EComboBox_base: Constructor<ViewBlock & StringBlock & ActionEvent & fairygui.GComboBox>;
+    export class EComboBox extends EComboBox_base {
+        /**
+         * 是否根据选择数据改变 icon  text
+         * @default true
+         */
+        isUpdateValue: boolean;
+        protected _updateValue: boolean;
+        protected onConstruct(): void;
+        protected onInit(): void;
+        set selectedIndex(val: number);
+        set icon(value: string);
+        set text(value: string);
         /**
          * 获取子组件
          * @param name 传入子组件多种命名方式
@@ -609,60 +734,6 @@ declare namespace tsCore {
          */
         sendEventManager(type: number, ...obj: any[]): void;
     }
-    export class EventController implements IController {
-        /** 事件缓存的所有组 组名字->组object */
-        private obj;
-        /**
-         * 键值的缓存对象
-         */
-        private cacheTarget;
-        private static _CLSID;
-        regActionHandler(action: string, handler: Laya.Handler, group?: string): void;
-        /**
-         * 分组存储对象
-         * @param groupKey 分组key
-         * @return
-         */
-        getGroup(groupKey: string): {
-            [key: string]: Laya.Handler[];
-        };
-        regAction(action: string, caller: any, method: Function, group?: string): void;
-        clearView(): void;
-        clearGroup(): void;
-        removeAllAction(...args: string[]): void;
-        removeGroup(group: string): void;
-        removeGroupActions(groupKey: string, ...args: any[]): void;
-        removeActionHandler(action: string, method: Function, group?: string): void;
-        removeFunction(groupObj: any, action: string, method: Function): void;
-        removeTargetAll(caller: any): void;
-        removeTarget(groupObj: {
-            [p: string]: Laya.Handler[];
-        }, caller: any): void;
-        sendGroupAction(group: string, action: string, ...args: any[]): void;
-        sendAction(action: string, ...args: any[]): void;
-        sendActionEvent(group: string, action: string, ...args: any[]): boolean;
-        addView<T extends IView & IKey>(key: string | {
-            new (): T;
-        }, view: T): boolean;
-        removeView<T extends IView & IKey>(key: string | T): void;
-        getView<T>(key: string | {
-            new (): T;
-        }): T;
-        addProxy<T extends IProxy & IKey>(key: string | {
-            new (): T;
-        }, proxy: T): boolean;
-        removeProxy<T extends IProxy & IKey>(key: string | T): void;
-        getProxy<T>(name: string | {
-            new (): T;
-        }): T;
-        getMap(): {
-            [key: string]: any;
-        };
-        /**
-         * 返回类的唯一标识
-         */
-        private _getClassSign;
-    }
     const EWindow_base: Constructor<StringBlock & ActionEvent & ViewProxy & fairygui.Window>;
     export class EWindow extends EWindow_base implements IRecord {
         /** 动画显示或关闭 */
@@ -689,58 +760,6 @@ declare namespace tsCore {
         hideRecord(): void;
         showRecord(): void;
         dispose(): void;
-    }
-    /**
-     * 碰撞类
-     */
-    export class OBB extends View {
-        /** 轴心 0 X轴 1 Y轴 */
-        private _axes;
-        /** 变径长度 */
-        protected _extents: number[];
-        private _point;
-        constructor();
-        /**
-         * 碰撞检测 判断2矩形最终是否碰撞，需要依次检测4个分离轴，如果在一个轴上没有碰撞，则2个矩形就没有碰撞。
-         * @param obb 要参与检测的对象
-         * @return
-         */
-        detectorOBBvsOBB(obb: OBB): boolean;
-        setSize(wv: number, hv: number, ignorePivot?: boolean): void;
-        /**
-         * 通过旋转设置x轴和y轴
-         * @param value 0-360
-         */
-        set rotation(value: number);
-        setXY(xv: number, yv: number): void;
-        /**
-         * 获取轴上的axisX和axisY投影半径距离
-         * @param axis
-         */
-        getProjectionRadius(axis: Vector2): number;
-        get axes(): Vector2[];
-        get point(): Vector2;
-    }
-    class Vector2 {
-        private x;
-        private y;
-        constructor(x?: number, y?: number);
-        setXY(x: number, y: number): void;
-        sub(v: Vector2): Vector2;
-        /**
-         * 算出自己在参数v上投影的长度
-         * @param v
-         */
-        dot(v: Vector2): number;
-    }
-    export class DefineConfig {
-        static init(): void;
-        private static defineLaya;
-        private static defineFairy;
-        private static defineText;
-        private static defineTimer;
-        private static defineSkeleton;
-        private static defineSpineSkeleton;
     }
     export interface IAction {
         /**
@@ -1810,13 +1829,23 @@ declare namespace tsCore {
     export class SoundUtils {
         /** 需要立即播放的 */
         private static autoPlay;
-        /** 加载资源 */
+        /** 需要使用load加载的资源 */
         private static loadAsset;
         private static bgMusicLoop;
         private static bgVolume;
         private static bgComplete;
         private static bgStartTime;
-        static addRes(res: LoadRes[]): void;
+        /**
+         * 添加需要使用 SoundUtils.load() 加载的资源文件
+         * @param res
+         * @see SoundUtils.load
+         */
+        static addRes(res: LoadRes | LoadRes[]): void;
+        /**
+         * 执行加载音频文件
+         * @param url 加载文件地址  默认使用 SoundUtils.loadAsset
+         * @see SoundUtils.loadAsset
+         */
         static load(url?: string): void;
         private static onLoader;
         /**
@@ -2702,6 +2731,11 @@ declare type InstanceTypeOfConstructor<T> = T extends Constructor<infer R> ? R :
  */
 declare function getString(id: string | number, ...args): string
 
+/**
+ * 获取设备刘海屏的高度
+ * @param [offsetH=5] 便宜高度
+ */
+declare function notchHeight(offsetH?: number): number
 
 declare module Laya {
 
@@ -2825,38 +2859,44 @@ declare interface String {
      * @param search
      */
     contains(...search: string[]): boolean
+
     /**
      * 获取指定符号之后的字符串
      * @param separator
      */
     substringAfter(separator: string): string
+
     /**
      * 获取指定符号之后的字符串 从最后一个符合的开始
      * @param separator
      */
     substringAfterLast(separator: string): string
+
     /**
      * 获取指定符号之前的字符串
      * @param separator
      */
     substringBefore(separator: string): string
+
     /**
      * 获取指定符号之前的字符串 从最后一个符合的开始
      * @param separator
      */
     substringBeforeLast(separator: string): string
+
     /**
      * 获取指定开始和结束的符号之间的字符串
      * @param open
      * @param close
      */
-    substringBetween(open: string, close:string): string
+    substringBetween(open: string, close: string): string
+
     /**
      * 获取指定开始和结束的符号之间的所有字符串
      * @param open
      * @param close
      */
-    substringsBetween(open: string, close:string): string[]
+    substringsBetween(open: string, close: string): string[]
 
 }
 declare type InitApp = {

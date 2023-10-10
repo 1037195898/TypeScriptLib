@@ -1,9 +1,8 @@
 import GRoot = fgui.GRoot;
 import RelationType = fgui.RelationType;
 import UIObjectFactory = fgui.UIObjectFactory;
-import Render = Laya.Render;
 import {HistoryManager} from "../manager/HistoryManager"
-import {View} from "./View"
+import {View} from "../core/View"
 import {IRecord} from "../interfaces/ICommon";
 import {App} from "../App";
 

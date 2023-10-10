@@ -9,7 +9,7 @@ export class SoundUtils {
 
     /** 需要立即播放的 */
     private static autoPlay: string[] = []
-    /** 加载资源 */
+    /** 需要使用load加载的资源 */
     private static loadAsset: LoadRes[] = []
 
     private static bgMusicLoop = 0
@@ -17,13 +17,23 @@ export class SoundUtils {
     private static bgComplete: Laya.Handler
     private static bgStartTime = 0
 
-    static addRes(res: LoadRes[]) {
+    /**
+     * 添加需要使用 SoundUtils.load() 加载的资源文件
+     * @param res
+     * @see SoundUtils.load
+     */
+    static addRes(res: LoadRes | LoadRes[]) {
         SoundManager.autoReleaseSound = false
-        SoundUtils.loadAsset = res
+        SoundUtils.loadAsset = Array.isArray(res) ? res : [res]
     }
 
+    /**
+     * 执行加载音频文件
+     * @param url 加载文件地址  默认使用 SoundUtils.loadAsset
+     * @see SoundUtils.loadAsset
+     */
     static load(url?: string) {
-        Laya.loader.load(!url ? SoundUtils.loadAsset : url, Laya.Handler.create(null, SoundUtils.onLoader))
+        Laya.loader.load(url ?? SoundUtils.loadAsset, Laya.Handler.create(null, SoundUtils.onLoader))
     }
 
     private static onLoader() {

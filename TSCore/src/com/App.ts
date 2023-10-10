@@ -1,7 +1,7 @@
 import {IAction} from "./interfaces/IAction"
 import {DefineConfig} from "./DefineConfig"
 import {EventController} from "./core/EventController"
-import {ELoader} from "./core/ELoader";
+import {ELoader} from "./extends/ELoader";
 import {ConfigKit, EnvType} from "./kit/ConfigKit";
 import {Log} from "./Log";
 import {IController, IInitEngine, IKey, IProxy, IView} from "./interfaces/ICommon";
@@ -89,7 +89,7 @@ export class App implements IAction {
         HistoryManager.init()
     }
 
-    static initClass(...args) {
+    static initClass(...args: (new () => any)[]) {
         for (let i = 0; i < args.length; i++) {
             new args[i]()
         }
@@ -122,7 +122,7 @@ export class App implements IAction {
         let contentScaleFactor = Math.min(s1, s2)
         fgui.GRoot.inst.setSize(Math.round(screenWidth / contentScaleFactor), Math.round(screenHeight / contentScaleFactor))
         fgui.GRoot.inst.setScale(contentScaleFactor, contentScaleFactor)
-        Log.debug(screenWidth, screenHeight, contentScaleFactor)
+        Log.debug(`onResize ${screenWidth} ${screenHeight} ${contentScaleFactor}`)
     }
 
     protected initController() {

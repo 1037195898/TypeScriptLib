@@ -1,7 +1,6 @@
 import Handler = Laya.Handler
 import Loader = Laya.Loader
 import URL = Laya.URL
-import Render = Laya.Render
 import {StringUtil} from "../utils/StringUtil"
 import {IFormatVer} from "../interfaces/ICommon";
 import Browser = Laya.Browser;

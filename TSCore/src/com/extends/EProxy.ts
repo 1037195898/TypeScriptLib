@@ -1,5 +1,5 @@
 import UIObjectFactory = fgui.UIObjectFactory
-import {Proxys} from "./Proxys"
+import {Proxys} from "../core/Proxys"
 import {App} from "../App";
 
 export class EProxy extends Proxys {

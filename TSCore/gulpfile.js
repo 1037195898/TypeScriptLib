@@ -10,7 +10,7 @@ const {reserved} = require("../reserved")
 
 // 需要添加到最前面的类
 let beforeTs = ["src/com/App.ts", "src/com/block/Block.ts", "src/com/core/View.ts", "src/com/core/Proxys.ts",
-    "src/com/core/EView.ts", "src/com/utils/ChangeValue.ts",
+    "src/com/extends/EView.ts", "src/com/utils/ChangeValue.ts",
     "src/com/kit/UtilKit.ts"]
 
 generate.global = ["src/Types.ts"]
