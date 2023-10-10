@@ -90,7 +90,7 @@ window.tsCore = {};
             let contentScaleFactor = Math.min(s1, s2);
             fgui.GRoot.inst.setSize(Math.round(screenWidth / contentScaleFactor), Math.round(screenHeight / contentScaleFactor));
             fgui.GRoot.inst.setScale(contentScaleFactor, contentScaleFactor);
-            Log.debug(screenWidth, screenHeight, contentScaleFactor);
+            Log.debug(`onResize ${screenWidth} ${screenHeight} ${contentScaleFactor}`);
         }
         initController() {
             this._controller = new EventController();
@@ -981,505 +981,6 @@ window.tsCore = {};
      * @see UtilKit
      */
     tsCore.UtilsTool = UtilKit;
-    class EButton extends mixinExt(StringBlock, ViewBlock, ActionEvent, fgui.GButton) {
-        /*@override*/
-        onConstruct() {
-            super.onConstruct();
-            this.onInit();
-        }
-        onInit() { }
-        /**
-         * 获取子组件
-         * @param name 传入子组件多种命名方式
-         */
-        /*@override*/
-        getChild(...name) {
-            let child = null;
-            for (const key of name) {
-                child = super.getChild(key);
-                if (child)
-                    return child;
-            }
-            return child;
-        }
-    }
-    tsCore.EButton = EButton;
-    class EDrawTextureCmd extends Laya.DrawTextureCmd {
-        /*@override*/
-        recover() {
-            this.colorFlt = null; // 自己修改的 Laya Bug
-            super.recover();
-        }
-    }
-    tsCore.EDrawTextureCmd = EDrawTextureCmd;
-    class ELabel extends mixinExt(ViewBlock, ActionEvent, fgui.GLabel) {
-        /*@override*/
-        onConstruct() {
-            super.onConstruct();
-            this.onInit();
-        }
-        onInit() { }
-        /**
-         * 获取子组件
-         * @param name 传入子组件多种命名方式
-         */
-        /*@override*/
-        getChild(...name) {
-            let child = null;
-            for (const key of name) {
-                child = super.getChild(key);
-                if (child)
-                    return child;
-            }
-            return child;
-        }
-    }
-    tsCore.ELabel = ELabel;
-    class ELoader {
-        constructor() {
-            /** 加载域名备用 */
-            this.baseUrls = [];
-            this._infoPool = [];
-            Laya.URL.customFormat = ELoader.formatUrl;
-        }
-        static formatUrl(url) {
-            let version = Laya.URL.version[url];
-            for (let i = 0; i < ELoader.format.length; i++) {
-                version = ELoader.format[i].call(url, version);
-            }
-            if (ELoader.isWebp && StringUtil.endsWithAny(url, "png", "jpg"))
-                url += ".webp";
-            if (!Laya.Browser.onLayaRuntime && version)
-                url += "?v=" + version;
-            return url;
-        }
-        /**
-         * <p>加载资源。资源加载错误时，本对象会派发 Event.ERROR 事件，事件回调参数值为加载出错的资源地址。</p>
-         * <p>因为返回值为 LoaderManager 对象本身，所以可以使用如下语法：loaderManager.load(...).load(...);</p>
-         * @param    url            要加载的单个资源地址或资源信息数组。比如：简单数组：["a.png","b.png"]；复杂数组[{url:"a.png",type:Laya.Loader.IMAGE,size:100,priority:1},{url:"b.json",type:Laya.Loader.JSON,size:50,priority:1}]。
-         * @param    complete    加载结束回调。根据url类型不同分为2种情况：1. url为String类型，也就是单个资源地址，如果加载成功，则回调参数值为加载完成的资源，否则为null；2. url为数组类型，指定了一组要加载的资源，如果全部加载成功，则回调参数值为true，否则为false。
-         * @param    progress    加载进度回调。回调参数值为当前资源的加载进度信息(0-1)。
-         * @param    type        资源类型。比如：Loader.IMAGE。
-         * @param    priority    (default = 1)加载的优先级，优先级高的优先加载。有0-4共5个优先级，0最高，4最低。
-         * @param    cache        是否缓存加载结果。
-         * @param    group        分组，方便对资源进行管理。
-         * @param    ignoreCache    是否忽略缓存，强制重新加载。
-         * @param    useWorkerLoader (default = false)是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
-         * @return 此 LoaderManager 对象本身。
-         */
-        load(url, complete, progress, type, priority = 1, cache = true, group, ignoreCache = false, useWorkerLoader = false) {
-            if (Array.isArray(url))
-                return this.loadAssets(url, complete, progress, type, priority, cache, group);
-            let content = this.getRes(url);
-            if (!ignoreCache && content) {
-                //增加延迟回掉，防止快速回掉导致执行顺序错误
-                Laya.systemTimer.frameOnce(1, null, function () {
-                    progress && progress.runWith(1);
-                    complete && complete.runWith(Array.isArray(content) ? [content] : content);
-                });
-            }
-            else {
-                let resInfo = this._infoPool.length ? this._infoPool.pop() : new ResInfo();
-                resInfo.url = url;
-                resInfo.complete = complete;
-                resInfo.progress = progress;
-                resInfo.type = type;
-                resInfo.priority = priority;
-                resInfo.cache = cache;
-                resInfo.group = group;
-                resInfo.ignoreCache = ignoreCache;
-                resInfo.useWorkerLoader = useWorkerLoader;
-                resInfo.useIndex = 0;
-                this._load(url, resInfo, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
-            }
-        }
-        loadAssets(arr, complete, progress, type, priority, cache, group) {
-            let itemCount = arr.length;
-            let loadedCount = 0;
-            let totalSize = 0;
-            let items = [];
-            let success = true;
-            for (let i = 0; i < itemCount; i++) {
-                let item = arr[i];
-                if (typeof item === "string")
-                    item = { url: item, type: type, size: 1, priority: priority };
-                if (!item.size)
-                    item.size = 1;
-                item.progress = 0;
-                totalSize += item.size;
-                items.push(item);
-                let progressHandler = progress ? Laya.Handler.create(null, loadProgress, [item], false) : null;
-                let completeHandler = (complete || progress) ? Laya.Handler.create(null, loadComplete, [item]) : null;
-                this.load(item.url, completeHandler, progressHandler, item.type, item.priority || 1, cache, item.group || group, false, item.useWorkerLoader);
-            }
-            function loadComplete(item, content) {
-                loadedCount++;
-                item.progress = 1;
-                if (!content)
-                    success = false;
-                if (loadedCount === itemCount) {
-                    complete === null || complete === void 0 ? void 0 : complete.runWith(success);
-                }
-            }
-            function loadProgress(item, value) {
-                if (progress) {
-                    item.progress = value;
-                    let num = 0;
-                    for (let j = 0; j < items.length; j++) {
-                        let item1 = items[j];
-                        num += item1.size * item1.progress;
-                    }
-                    let v = num / totalSize;
-                    progress.runWith(v);
-                }
-            }
-        }
-        _load(url, resInfo = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = false) {
-            ELoader.loader.formatURL(url, resInfo);
-            url = StringUtil.replace(url, "{host}", window.location.host);
-            Laya.loader.load(url, Laya.Handler.create(this, this.singleCompleteHandler, [resInfo]), progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
-        }
-        singleCompleteHandler(resInfo, content) {
-            var _a;
-            if (!content) {
-                if (this.baseUrls) {
-                    resInfo.useIndex++;
-                    if (resInfo.useIndex < this.baseUrls.length) {
-                        this._load(resInfo.url, resInfo, resInfo.progress, resInfo.type, resInfo.priority, resInfo.cache, resInfo.group, resInfo.ignoreCache, resInfo.useWorkerLoader);
-                        return;
-                    }
-                }
-            }
-            if (!content)
-                Log.debug("load res fail : " + resInfo.url + " " + content);
-            (_a = resInfo.complete) === null || _a === void 0 ? void 0 : _a.runWith(content);
-            this._infoPool.push(resInfo);
-        }
-        /**
-         * 获取指定资源地址的资源。
-         * @param    url 资源地址。
-         * @return    返回资源。
-         */
-        getRes(url) {
-            let content = null;
-            let allBaseUrl = this.baseUrls;
-            if (ELoader.getAllBaseUrl)
-                allBaseUrl = ELoader.getAllBaseUrl();
-            if (url.indexOf(":") == -1 && allBaseUrl && allBaseUrl.length > 0) { // 不是完整路径走这里
-                let tempUrl = null;
-                for (const baseUrl of allBaseUrl) {
-                    if (url.charAt(0) != "/")
-                        tempUrl = baseUrl + Laya.URL.customFormat(url);
-                    content = Laya.Loader.getRes(tempUrl);
-                    if (content) {
-                        return content;
-                    }
-                }
-            }
-            url = StringUtil.replace(url, "{host}", window.location.host);
-            return Laya.Loader.getRes(url);
-        }
-        /**
-         * 获取指定资源地址的资源。
-         * @param    url 资源地址。
-         * @return    返回资源。
-         */
-        clearRes(url) {
-            let allBaseUrl = this.baseUrls;
-            if (ELoader.getAllBaseUrl)
-                allBaseUrl = ELoader.getAllBaseUrl();
-            if (url.indexOf(":") == -1 && allBaseUrl && allBaseUrl.length > 0) { // 不是完整路径走这里
-                let tempUrl = null;
-                for (const baseUrl of allBaseUrl) {
-                    //如果不是全路径，处理url
-                    if (url.charAt(0) != "/")
-                        tempUrl = baseUrl + Laya.URL.customFormat(url);
-                    Laya.Loader.clearRes(tempUrl);
-                }
-            }
-            Laya.Loader.clearRes(url);
-        }
-        /** 清理当前未完成的加载，所有未加载的内容全部停止加载。*/
-        clearUnLoaded() {
-            Laya.loader.clearUnLoaded();
-        }
-        formatURL(url, resInfo) {
-            if (ELoader.checkBaseUrl)
-                this.baseUrls = ELoader.checkBaseUrl(url);
-            if (this.baseUrls) {
-                let index = resInfo.useIndex;
-                if (this.baseUrls.length <= index) {
-                    index = 0;
-                }
-                let basePath = this.baseUrls[index];
-                basePath = StringUtil.replace(basePath, "{host}", window.location.host);
-                Laya.URL.basePath = basePath;
-            }
-        }
-    }
-    ELoader.isWebp = false;
-    ELoader.loader = new ELoader();
-    /** 加载路径格式化 */
-    ELoader.format = [];
-    tsCore.ELoader = ELoader;
-    class ResInfo {
-    }
-    class EProxy extends Proxys {
-        /** 注册游戏数据 */
-        /*@override*/
-        regGameAction(action, caller, method) {
-            super.regAction(action, caller, method, App.GAME_GROUP);
-        }
-        /** 设置扩展 */
-        insertExt(pkgName, resName, clas) {
-            this.insertExtUrl("//" + pkgName + "/" + resName, clas);
-        }
-        /** 设置扩展 */
-        insertExtUrl(url, clas) {
-            fgui.UIObjectFactory.setPackageItemExtension(url, clas);
-        }
-    }
-    /**
-     *  游戏公用组
-     * @deprecated
-     * @see App.GAME_GROUP
-     */
-    EProxy.GAME_GROUP = App.GAME_GROUP;
-    tsCore.EProxy = EProxy;
-    class ESkeleton extends mixinExt(BezierCurves, ActionEvent, fgui.GComponent) {
-        constructor() {
-            super(...arguments);
-            /** 播放动画数组的索引 */
-            this.playGroupIndex = 0;
-            /** 播放结束执行函数 */
-            this.stoppedHandler = [];
-            /**
-             * 动画播放速率 1为标准速率
-             * @default 1
-             */
-            this.playbackRate = 1;
-            /**
-             * 播放循环次数
-             * @private
-             */
-            this._loopCount = 0;
-        }
-        get aniPath() {
-            return this._aniPath;
-        }
-        /**
-         * 播放动画
-         *
-         * @param    nameOrIndex    动画名字或者索引 如果此值是ISkeletonPlay对象，后面设置的全部将失效
-         * @param    [loop=true]        是否循环播放
-         * @param    [force=true]        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-         * @param    [start=0]        起始时间
-         * @param    [end=0]            结束时间
-         * @param    [freshSkin=true]    是否刷新皮肤数据
-         * @param    [playAudio=true]    是否播放音频
-         */
-        play(nameOrIndex, loop = true, force = true, start = 0, end = 0, freshSkin = true, playAudio = true) {
-            if (!this.asSkeleton.templet)
-                return;
-            // 如果不是数组 而是一个 object
-            if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
-                if (nameOrIndex.nameOrIndex && (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0))
-                    return;
-                this.playAni(nameOrIndex, 0);
-                return;
-            }
-            if (typeof nameOrIndex === "number" && nameOrIndex < 0)
-                return;
-            this.playAni({
-                nameOrIndex: nameOrIndex, loop: loop, force: force,
-                start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
-            });
-        }
-        /**
-         * 播放动画
-         * @param skeletonPlay 播放数据
-         * @param [playGroupIndex=-1] 如果是播放数组动画 需要要播放动画的位置
-         */
-        playAni(skeletonPlay, playGroupIndex = -1) {
-            var _a, _b;
-            if (!this.asSkeleton.templet)
-                return;
-            if (!skeletonPlay && !this.skeletonPlay) {
-                Log.warn("not found play data " + skeletonPlay);
-                return;
-            }
-            this.playGroupIndex = playGroupIndex;
-            if (skeletonPlay) {
-                (_a = skeletonPlay.loop) !== null && _a !== void 0 ? _a : (skeletonPlay.loop = true);
-                this.skeletonPlay = skeletonPlay;
-            }
-            let delayPlay = this.skeletonPlay.delayPlay;
-            if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
-                playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex;
-                let play = this.skeletonPlay.nameOrIndex[playGroupIndex];
-                if (typeof play === "object") {
-                    if (play.delayPlay)
-                        delayPlay = play.delayPlay;
-                    play = play.nameOrIndex;
-                }
-                this.nameOrIndex = play;
-            }
-            else {
-                this.nameOrIndex = (_b = this.skeletonPlay.nameOrIndex) !== null && _b !== void 0 ? _b : 0;
-            }
-            if (delayPlay && delayPlay > 0) {
-                Laya.timer.once(delayPlay, this, this._play);
-            }
-            else {
-                this._play();
-            }
-        }
-        _play() {
-            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
-            if (this.skeletonPlay.progress) {
-                if ("before" in this.skeletonPlay.progress) {
-                    runFun(this.skeletonPlay.progress.before, this.nameOrIndex);
-                }
-            }
-            let force = (_a = this.skeletonPlay.force) !== null && _a !== void 0 ? _a : true;
-            let start = (_b = this.skeletonPlay.start) !== null && _b !== void 0 ? _b : 0;
-            let end = (_c = this.skeletonPlay.end) !== null && _c !== void 0 ? _c : 0;
-            let freshSkin = (_d = this.skeletonPlay.freshSkin) !== null && _d !== void 0 ? _d : true;
-            let playAudio = (_e = this.skeletonPlay.playAudio) !== null && _e !== void 0 ? _e : true;
-            let playbackRate = (_f = this.skeletonPlay.playbackRate) !== null && _f !== void 0 ? _f : this.playbackRate;
-            if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
-                let play = this.skeletonPlay.nameOrIndex[this.playGroupIndex];
-                if (typeof play === "object") {
-                    force = (_g = play.force) !== null && _g !== void 0 ? _g : force;
-                    start = (_h = play.start) !== null && _h !== void 0 ? _h : start;
-                    end = (_j = play.end) !== null && _j !== void 0 ? _j : end;
-                    freshSkin = (_k = play.freshSkin) !== null && _k !== void 0 ? _k : freshSkin;
-                    playAudio = (_l = play.playAudio) !== null && _l !== void 0 ? _l : playAudio;
-                    playbackRate = (_m = play.playbackRate) !== null && _m !== void 0 ? _m : playbackRate;
-                }
-            }
-            this.asSkeleton.playbackRate(playbackRate);
-            this.asSkeleton.play(this.nameOrIndex, false, force, start, end, freshSkin, playAudio);
-        }
-        onPlayStopped() {
-            if (this.skeletonPlay.progress) {
-                if ("after" in this.skeletonPlay.progress) {
-                    runFun(this.skeletonPlay.progress.after, this.nameOrIndex);
-                }
-                else {
-                    runFun(this.skeletonPlay.progress, this.nameOrIndex);
-                }
-            }
-            if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
-                const playData = this.skeletonPlay.nameOrIndex[this.playGroupIndex];
-                // 当前动画播放完成后需要循环播放的次数
-                let loopCount = 0;
-                if (typeof playData === "object") {
-                    loopCount = playData.loopCount || loopCount;
-                    runFun(playData.playComplete);
-                }
-                // 在播放动画数组
-                if (loopCount > 0 && loopCount != this._loopCount) {
-                    this._loopCount++;
-                }
-                else {
-                    this.playGroupIndex++;
-                    this._loopCount = 0;
-                }
-                let isNewPro = false;
-                if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex
-                    || (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
-                    if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
-                        // 循环播放有延迟的时候  单独处理
-                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
-                    }
-                    else {
-                        this.playAni(this.skeletonPlay, this.playGroupIndex);
-                    }
-                    return;
-                }
-                // 当全局数组动画loop是false loopPlayIndex > -1
-                if (this.skeletonPlay.loopPlayIndex > -1 && this.skeletonPlay.loopPlayIndex < this.skeletonPlay.nameOrIndex.length) {
-                    this.playGroupIndex = this.skeletonPlay.loopPlayIndex;
-                    this.playAni(this.skeletonPlay, this.playGroupIndex);
-                    return;
-                }
-            }
-            else {
-                if (this.skeletonPlay.loop && this.getAnimDuration(0) > 0 && this.getAnimFrame(0) > 1) {
-                    if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
-                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
-                    }
-                    else {
-                        this.playAni(this.skeletonPlay, this.playGroupIndex);
-                    }
-                    return;
-                }
-            }
-            runFun(this.skeletonPlay.playComplete);
-            for (let i = 0; i < this.stoppedHandler.length; i++) {
-                this.stoppedHandler[i].run();
-            }
-        }
-        paused() {
-            this.asSkeleton.paused();
-        }
-        resume() {
-            this.asSkeleton.resume();
-        }
-        stop() {
-            this.asSkeleton.stop();
-        }
-        getAniNameByIndex(index) {
-            var _a;
-            return (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.getAniNameByIndex(index);
-        }
-        getSkeletonPlay() {
-            return this.skeletonPlay;
-        }
-    }
-    tsCore.ESkeleton = ESkeleton;
-    class ESocket {
-        constructor() {
-            /** 是否已经连接 */
-            this.isConnect = false;
-            /** socket类型注册监听 */
-            this.eventManager = {};
-        }
-        /** 关闭链接 */
-        close() {
-            this.isConnect = false;
-            this.eventManager = {};
-        }
-        /**
-         * 删除socket 事件
-         * @param type
-         */
-        removeSocketEvent(type) {
-            delete this.eventManager["event_" + type];
-        }
-        /**
-         * 注册socket 事件
-         * @param type
-         * @param handler
-         */
-        addSocketEvent(type, handler) {
-            this.eventManager["event_" + type] = handler;
-        }
-        /**
-         * 发送socket type事件
-         * @param type
-         * @param obj
-         */
-        sendEventManager(type, ...obj) {
-            let fun = this.eventManager["event_" + type];
-            if (fun) {
-                obj.unshift(fun);
-                runFun.apply(null, obj);
-            }
-        }
-    }
-    tsCore.ESocket = ESocket;
     class EventController {
         constructor() {
             /** 事件缓存的所有组 组名字->组object */
@@ -1700,137 +1201,6 @@ window.tsCore = {};
     }
     EventController._CLSID = 0;
     tsCore.EventController = EventController;
-    class EWindow extends mixinExt(StringBlock, ViewProxy, ActionEvent, fgui.Window) {
-        constructor() {
-            super(...arguments);
-            /** 动画显示或关闭 */
-            this.isAction = true;
-            /** 是否加入后退记录 */
-            this.joinRecord = true;
-        }
-        /*@override*/
-        onInit() {
-            let scale = App.inst.getEqualRatioScale();
-            this.contentPane.setSize(this.width * scale, this.height * scale);
-            this.setSize(this.contentPane.width, this.contentPane.height);
-            if (this.isAction) {
-                this.setPivot(0.5, 0.5);
-            }
-        }
-        /**
-         * 获取子组件
-         * @param name 传入子组件多种命名方式
-         */
-        /*@override*/
-        getChild(...name) {
-            var _a;
-            let child = null;
-            for (const key of name) {
-                child = ((_a = this.contentPane) === null || _a === void 0 ? void 0 : _a.getChild(key)) || super.getChild(key);
-                if (child)
-                    return child;
-            }
-            return child;
-        }
-        /*@override*/
-        getTransition(transName) {
-            var _a;
-            return ((_a = this.contentPane) === null || _a === void 0 ? void 0 : _a.getTransition(transName)) || super.getTransition(transName);
-        }
-        /*@override*/
-        getTransitionAt(index) {
-            var _a;
-            return ((_a = this.contentPane) === null || _a === void 0 ? void 0 : _a.getTransitionAt(index)) || super.getTransitionAt(index);
-        }
-        /*@override*/
-        getController(name) {
-            var _a;
-            return ((_a = this.contentPane) === null || _a === void 0 ? void 0 : _a.getController(name)) || super.getController(name);
-        }
-        /*@override*/
-        getControllerAt(index) {
-            var _a;
-            return ((_a = this.contentPane) === null || _a === void 0 ? void 0 : _a.getControllerAt(index)) || super.getControllerAt(index);
-        }
-        updateSizePoint() {
-            this.center();
-        }
-        /*@override*/
-        doHideAnimation() {
-            this.displayObject.stage.off(Laya.Event.RESIZE, this, this.updateSizePoint);
-            if (this.isAction) {
-                let tempX = this.x;
-                let tempY = this.y;
-                if (this.startPoint) {
-                    tempX = this.startPoint.x - this.contentPane.width / 2;
-                    tempY = this.startPoint.y - this.contentPane.height / 2;
-                }
-                Laya.Tween.to(this, {
-                    scaleX: 0.3,
-                    scaleY: 0.3,
-                    x: tempX,
-                    y: tempY
-                }, 400, Laya.Ease.backIn, Laya.Handler.create(this, this.hideImmediately));
-            }
-            else {
-                this.hideImmediately();
-            }
-        }
-        /*@override*/
-        doShowAnimation() {
-            this.displayObject.stage.off(Laya.Event.RESIZE, this, this.updateSizePoint);
-            this.displayObject.stage.on(Laya.Event.RESIZE, this, this.updateSizePoint);
-            this.touchable = true;
-            if (this.joinRecord)
-                HistoryManager.addHistory(null, this);
-            this.updateSizePoint();
-            if (this.isAction) {
-                this.setScale(.3, .3);
-                let tempX = this.x;
-                let tempY = this.y;
-                if (this.startPoint) {
-                    this.setXY(this.startPoint.x - this.contentPane.width / 2, this.startPoint.y - this.contentPane.height / 2);
-                }
-                Laya.Tween.to(this, { scaleX: 1, scaleY: 1, x: tempX, y: tempY }, 400, Laya.Ease.backOut, Laya.Handler.create(this, this.onShown));
-            }
-            else {
-                this.onShown();
-            }
-        }
-        /*@override*/
-        closeEventHandler() {
-            if (this.parent) {
-                if (this.joinRecord) {
-                    HistoryManager.backHistory();
-                }
-                else {
-                    this.hideRecord();
-                }
-            }
-        }
-        /*@override*/
-        onHide() {
-            HistoryManager.invalidHistory(this);
-        }
-        hideRecord() {
-            this.touchable = false;
-            fgui.GRoot.inst.closeModalWait();
-            this.hide();
-        }
-        showRecord() {
-        }
-        /*@override*/
-        dispose() {
-            var _a, _b;
-            this.parent = null;
-            HistoryManager.invalidHistory(this);
-            Laya.Tween.clearAll(this);
-            (_a = this.displayObject) === null || _a === void 0 ? void 0 : _a.stage.off(Laya.Event.RESIZE, this, this.updateSizePoint);
-            if (!((_b = this.displayObject) === null || _b === void 0 ? void 0 : _b.destroyed))
-                super.dispose();
-        }
-    }
-    tsCore.EWindow = EWindow;
     /**
      * 碰撞类
      */
@@ -2621,6 +1991,684 @@ window.tsCore = {};
         }
     }
     tsCore.DefineConfig = DefineConfig;
+    class EButton extends mixinExt(StringBlock, ViewBlock, ActionEvent, fgui.GButton) {
+        /*@override*/
+        onConstruct() {
+            super.onConstruct();
+            this.onInit();
+        }
+        onInit() { }
+        /**
+         * 获取子组件
+         * @param name 传入子组件多种命名方式
+         */
+        /*@override*/
+        getChild(...name) {
+            let child = null;
+            for (const key of name) {
+                child = super.getChild(key);
+                if (child)
+                    return child;
+            }
+            return child;
+        }
+    }
+    tsCore.EButton = EButton;
+    class EComboBox extends mixinExt(StringBlock, ViewBlock, ActionEvent, fgui.GComboBox) {
+        constructor() {
+            super(...arguments);
+            /**
+             * 是否根据选择数据改变 icon  text
+             * @default true
+             */
+            this.isUpdateValue = true;
+            this._updateValue = true;
+        }
+        /*@override*/
+        onConstruct() {
+            super.onConstruct();
+            this.onInit();
+        }
+        onInit() { }
+        /*@override*/
+        set selectedIndex(val) {
+            this._updateValue = this.isUpdateValue;
+            super.selectedIndex = val;
+            this._updateValue = true;
+        }
+        /*@override*/
+        set icon(value) {
+            if (this._updateValue)
+                super.icon = value;
+        }
+        /*@override*/
+        set text(value) {
+            if (this._updateValue)
+                super.text = value;
+        }
+        /**
+         * 获取子组件
+         * @param name 传入子组件多种命名方式
+         */
+        /*@override*/
+        getChild(...name) {
+            let child = null;
+            for (const key of name) {
+                child = super.getChild(key);
+                if (child)
+                    return child;
+            }
+            return child;
+        }
+    }
+    tsCore.EComboBox = EComboBox;
+    class EDrawTextureCmd extends Laya.DrawTextureCmd {
+        /*@override*/
+        recover() {
+            this.colorFlt = null; // 自己修改的 Laya Bug
+            super.recover();
+        }
+    }
+    tsCore.EDrawTextureCmd = EDrawTextureCmd;
+    class ELabel extends mixinExt(ViewBlock, ActionEvent, fgui.GLabel) {
+        /*@override*/
+        onConstruct() {
+            super.onConstruct();
+            this.onInit();
+        }
+        onInit() { }
+        /**
+         * 获取子组件
+         * @param name 传入子组件多种命名方式
+         */
+        /*@override*/
+        getChild(...name) {
+            let child = null;
+            for (const key of name) {
+                child = super.getChild(key);
+                if (child)
+                    return child;
+            }
+            return child;
+        }
+    }
+    tsCore.ELabel = ELabel;
+    class ELoader {
+        constructor() {
+            /** 加载域名备用 */
+            this.baseUrls = [];
+            this._infoPool = [];
+            Laya.URL.customFormat = ELoader.formatUrl;
+        }
+        static formatUrl(url) {
+            let version = Laya.URL.version[url];
+            for (let i = 0; i < ELoader.format.length; i++) {
+                version = ELoader.format[i].call(url, version);
+            }
+            if (ELoader.isWebp && StringUtil.endsWithAny(url, "png", "jpg"))
+                url += ".webp";
+            if (!Laya.Browser.onLayaRuntime && version)
+                url += "?v=" + version;
+            return url;
+        }
+        /**
+         * <p>加载资源。资源加载错误时，本对象会派发 Event.ERROR 事件，事件回调参数值为加载出错的资源地址。</p>
+         * <p>因为返回值为 LoaderManager 对象本身，所以可以使用如下语法：loaderManager.load(...).load(...);</p>
+         * @param    url            要加载的单个资源地址或资源信息数组。比如：简单数组：["a.png","b.png"]；复杂数组[{url:"a.png",type:Laya.Loader.IMAGE,size:100,priority:1},{url:"b.json",type:Laya.Loader.JSON,size:50,priority:1}]。
+         * @param    complete    加载结束回调。根据url类型不同分为2种情况：1. url为String类型，也就是单个资源地址，如果加载成功，则回调参数值为加载完成的资源，否则为null；2. url为数组类型，指定了一组要加载的资源，如果全部加载成功，则回调参数值为true，否则为false。
+         * @param    progress    加载进度回调。回调参数值为当前资源的加载进度信息(0-1)。
+         * @param    type        资源类型。比如：Loader.IMAGE。
+         * @param    priority    (default = 1)加载的优先级，优先级高的优先加载。有0-4共5个优先级，0最高，4最低。
+         * @param    cache        是否缓存加载结果。
+         * @param    group        分组，方便对资源进行管理。
+         * @param    ignoreCache    是否忽略缓存，强制重新加载。
+         * @param    useWorkerLoader (default = false)是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
+         * @return 此 LoaderManager 对象本身。
+         */
+        load(url, complete, progress, type, priority = 1, cache = true, group, ignoreCache = false, useWorkerLoader = false) {
+            if (Array.isArray(url))
+                return this.loadAssets(url, complete, progress, type, priority, cache, group);
+            let content = this.getRes(url);
+            if (!ignoreCache && content) {
+                //增加延迟回掉，防止快速回掉导致执行顺序错误
+                Laya.systemTimer.frameOnce(1, null, function () {
+                    progress && progress.runWith(1);
+                    complete && complete.runWith(Array.isArray(content) ? [content] : content);
+                });
+            }
+            else {
+                let resInfo = this._infoPool.length ? this._infoPool.pop() : new ResInfo();
+                resInfo.url = url;
+                resInfo.complete = complete;
+                resInfo.progress = progress;
+                resInfo.type = type;
+                resInfo.priority = priority;
+                resInfo.cache = cache;
+                resInfo.group = group;
+                resInfo.ignoreCache = ignoreCache;
+                resInfo.useWorkerLoader = useWorkerLoader;
+                resInfo.useIndex = 0;
+                this._load(url, resInfo, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
+            }
+        }
+        loadAssets(arr, complete, progress, type, priority, cache, group) {
+            let itemCount = arr.length;
+            let loadedCount = 0;
+            let totalSize = 0;
+            let items = [];
+            let success = true;
+            for (let i = 0; i < itemCount; i++) {
+                let item = arr[i];
+                if (typeof item === "string")
+                    item = { url: item, type: type, size: 1, priority: priority };
+                if (!item.size)
+                    item.size = 1;
+                item.progress = 0;
+                totalSize += item.size;
+                items.push(item);
+                let progressHandler = progress ? Laya.Handler.create(null, loadProgress, [item], false) : null;
+                let completeHandler = (complete || progress) ? Laya.Handler.create(null, loadComplete, [item]) : null;
+                this.load(item.url, completeHandler, progressHandler, item.type, item.priority || 1, cache, item.group || group, false, item.useWorkerLoader);
+            }
+            function loadComplete(item, content) {
+                loadedCount++;
+                item.progress = 1;
+                if (!content)
+                    success = false;
+                if (loadedCount === itemCount) {
+                    complete === null || complete === void 0 ? void 0 : complete.runWith(success);
+                }
+            }
+            function loadProgress(item, value) {
+                if (progress) {
+                    item.progress = value;
+                    let num = 0;
+                    for (let j = 0; j < items.length; j++) {
+                        let item1 = items[j];
+                        num += item1.size * item1.progress;
+                    }
+                    let v = num / totalSize;
+                    progress.runWith(v);
+                }
+            }
+        }
+        _load(url, resInfo = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = false) {
+            ELoader.loader.formatURL(url, resInfo);
+            url = StringUtil.replace(url, "{host}", window.location.host);
+            Laya.loader.load(url, Laya.Handler.create(this, this.singleCompleteHandler, [resInfo]), progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
+        }
+        singleCompleteHandler(resInfo, content) {
+            var _a;
+            if (!content) {
+                if (this.baseUrls) {
+                    resInfo.useIndex++;
+                    if (resInfo.useIndex < this.baseUrls.length) {
+                        this._load(resInfo.url, resInfo, resInfo.progress, resInfo.type, resInfo.priority, resInfo.cache, resInfo.group, resInfo.ignoreCache, resInfo.useWorkerLoader);
+                        return;
+                    }
+                }
+            }
+            if (!content)
+                Log.debug("load res fail : " + resInfo.url + " " + content);
+            (_a = resInfo.complete) === null || _a === void 0 ? void 0 : _a.runWith(content);
+            this._infoPool.push(resInfo);
+        }
+        /**
+         * 获取指定资源地址的资源。
+         * @param    url 资源地址。
+         * @return    返回资源。
+         */
+        getRes(url) {
+            let content = null;
+            let allBaseUrl = this.baseUrls;
+            if (ELoader.getAllBaseUrl)
+                allBaseUrl = ELoader.getAllBaseUrl();
+            if (url.indexOf(":") == -1 && allBaseUrl && allBaseUrl.length > 0) { // 不是完整路径走这里
+                let tempUrl = null;
+                for (const baseUrl of allBaseUrl) {
+                    if (url.charAt(0) != "/")
+                        tempUrl = baseUrl + Laya.URL.customFormat(url);
+                    content = Laya.Loader.getRes(tempUrl);
+                    if (content) {
+                        return content;
+                    }
+                }
+            }
+            url = StringUtil.replace(url, "{host}", window.location.host);
+            return Laya.Loader.getRes(url);
+        }
+        /**
+         * 获取指定资源地址的资源。
+         * @param    url 资源地址。
+         * @return    返回资源。
+         */
+        clearRes(url) {
+            let allBaseUrl = this.baseUrls;
+            if (ELoader.getAllBaseUrl)
+                allBaseUrl = ELoader.getAllBaseUrl();
+            if (url.indexOf(":") == -1 && allBaseUrl && allBaseUrl.length > 0) { // 不是完整路径走这里
+                let tempUrl = null;
+                for (const baseUrl of allBaseUrl) {
+                    //如果不是全路径，处理url
+                    if (url.charAt(0) != "/")
+                        tempUrl = baseUrl + Laya.URL.customFormat(url);
+                    Laya.Loader.clearRes(tempUrl);
+                }
+            }
+            Laya.Loader.clearRes(url);
+        }
+        /** 清理当前未完成的加载，所有未加载的内容全部停止加载。*/
+        clearUnLoaded() {
+            Laya.loader.clearUnLoaded();
+        }
+        formatURL(url, resInfo) {
+            if (ELoader.checkBaseUrl)
+                this.baseUrls = ELoader.checkBaseUrl(url);
+            if (this.baseUrls) {
+                let index = resInfo.useIndex;
+                if (this.baseUrls.length <= index) {
+                    index = 0;
+                }
+                let basePath = this.baseUrls[index];
+                basePath = StringUtil.replace(basePath, "{host}", window.location.host);
+                Laya.URL.basePath = basePath;
+            }
+        }
+    }
+    ELoader.isWebp = false;
+    ELoader.loader = new ELoader();
+    /** 加载路径格式化 */
+    ELoader.format = [];
+    tsCore.ELoader = ELoader;
+    class ResInfo {
+    }
+    class EProxy extends Proxys {
+        /** 注册游戏数据 */
+        /*@override*/
+        regGameAction(action, caller, method) {
+            super.regAction(action, caller, method, App.GAME_GROUP);
+        }
+        /** 设置扩展 */
+        insertExt(pkgName, resName, clas) {
+            this.insertExtUrl("//" + pkgName + "/" + resName, clas);
+        }
+        /** 设置扩展 */
+        insertExtUrl(url, clas) {
+            fgui.UIObjectFactory.setPackageItemExtension(url, clas);
+        }
+    }
+    /**
+     *  游戏公用组
+     * @deprecated
+     * @see App.GAME_GROUP
+     */
+    EProxy.GAME_GROUP = App.GAME_GROUP;
+    tsCore.EProxy = EProxy;
+    class ESkeleton extends mixinExt(BezierCurves, ActionEvent, fgui.GComponent) {
+        constructor() {
+            super(...arguments);
+            /** 播放动画数组的索引 */
+            this.playGroupIndex = 0;
+            /** 播放结束执行函数 */
+            this.stoppedHandler = [];
+            /**
+             * 动画播放速率 1为标准速率
+             * @default 1
+             */
+            this.playbackRate = 1;
+            /**
+             * 播放循环次数
+             * @private
+             */
+            this._loopCount = 0;
+        }
+        get aniPath() {
+            return this._aniPath;
+        }
+        /**
+         * 播放动画
+         *
+         * @param    nameOrIndex    动画名字或者索引 如果此值是ISkeletonPlay对象，后面设置的全部将失效
+         * @param    [loop=true]        是否循环播放
+         * @param    [force=true]        false,如果要播的动画跟上一个相同就不生效,true,强制生效
+         * @param    [start=0]        起始时间
+         * @param    [end=0]            结束时间
+         * @param    [freshSkin=true]    是否刷新皮肤数据
+         * @param    [playAudio=true]    是否播放音频
+         */
+        play(nameOrIndex, loop = true, force = true, start = 0, end = 0, freshSkin = true, playAudio = true) {
+            if (!this.asSkeleton.templet)
+                return;
+            // 如果不是数组 而是一个 object
+            if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
+                if (nameOrIndex.nameOrIndex && (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0))
+                    return;
+                this.playAni(nameOrIndex, 0);
+                return;
+            }
+            if (typeof nameOrIndex === "number" && nameOrIndex < 0)
+                return;
+            this.playAni({
+                nameOrIndex: nameOrIndex, loop: loop, force: force,
+                start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
+            });
+        }
+        /**
+         * 播放动画
+         * @param skeletonPlay 播放数据
+         * @param [playGroupIndex=-1] 如果是播放数组动画 需要要播放动画的位置
+         */
+        playAni(skeletonPlay, playGroupIndex = -1) {
+            var _a, _b;
+            if (!this.asSkeleton.templet)
+                return;
+            if (!skeletonPlay && !this.skeletonPlay) {
+                Log.warn("not found play data " + skeletonPlay);
+                return;
+            }
+            this.playGroupIndex = playGroupIndex;
+            if (skeletonPlay) {
+                (_a = skeletonPlay.loop) !== null && _a !== void 0 ? _a : (skeletonPlay.loop = true);
+                this.skeletonPlay = skeletonPlay;
+            }
+            let delayPlay = this.skeletonPlay.delayPlay;
+            if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
+                playGroupIndex = playGroupIndex < 0 ? 0 : playGroupIndex;
+                let play = this.skeletonPlay.nameOrIndex[playGroupIndex];
+                if (typeof play === "object") {
+                    if (play.delayPlay)
+                        delayPlay = play.delayPlay;
+                    play = play.nameOrIndex;
+                }
+                this.nameOrIndex = play;
+            }
+            else {
+                this.nameOrIndex = (_b = this.skeletonPlay.nameOrIndex) !== null && _b !== void 0 ? _b : 0;
+            }
+            if (delayPlay && delayPlay > 0) {
+                Laya.timer.once(delayPlay, this, this._play);
+            }
+            else {
+                this._play();
+            }
+        }
+        _play() {
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+            if (this.skeletonPlay.progress) {
+                if ("before" in this.skeletonPlay.progress) {
+                    runFun(this.skeletonPlay.progress.before, this.nameOrIndex);
+                }
+            }
+            let force = (_a = this.skeletonPlay.force) !== null && _a !== void 0 ? _a : true;
+            let start = (_b = this.skeletonPlay.start) !== null && _b !== void 0 ? _b : 0;
+            let end = (_c = this.skeletonPlay.end) !== null && _c !== void 0 ? _c : 0;
+            let freshSkin = (_d = this.skeletonPlay.freshSkin) !== null && _d !== void 0 ? _d : true;
+            let playAudio = (_e = this.skeletonPlay.playAudio) !== null && _e !== void 0 ? _e : true;
+            let playbackRate = (_f = this.skeletonPlay.playbackRate) !== null && _f !== void 0 ? _f : this.playbackRate;
+            if (Array.isArray(this.skeletonPlay.nameOrIndex)) {
+                let play = this.skeletonPlay.nameOrIndex[this.playGroupIndex];
+                if (typeof play === "object") {
+                    force = (_g = play.force) !== null && _g !== void 0 ? _g : force;
+                    start = (_h = play.start) !== null && _h !== void 0 ? _h : start;
+                    end = (_j = play.end) !== null && _j !== void 0 ? _j : end;
+                    freshSkin = (_k = play.freshSkin) !== null && _k !== void 0 ? _k : freshSkin;
+                    playAudio = (_l = play.playAudio) !== null && _l !== void 0 ? _l : playAudio;
+                    playbackRate = (_m = play.playbackRate) !== null && _m !== void 0 ? _m : playbackRate;
+                }
+            }
+            this.asSkeleton.playbackRate(playbackRate);
+            this.asSkeleton.play(this.nameOrIndex, false, force, start, end, freshSkin, playAudio);
+        }
+        onPlayStopped() {
+            if (this.skeletonPlay.progress) {
+                if ("after" in this.skeletonPlay.progress) {
+                    runFun(this.skeletonPlay.progress.after, this.nameOrIndex);
+                }
+                else {
+                    runFun(this.skeletonPlay.progress, this.nameOrIndex);
+                }
+            }
+            if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
+                const playData = this.skeletonPlay.nameOrIndex[this.playGroupIndex];
+                // 当前动画播放完成后需要循环播放的次数
+                let loopCount = 0;
+                if (typeof playData === "object") {
+                    loopCount = playData.loopCount || loopCount;
+                    runFun(playData.playComplete);
+                }
+                // 在播放动画数组
+                if (loopCount > 0 && loopCount != this._loopCount) {
+                    this._loopCount++;
+                }
+                else {
+                    this.playGroupIndex++;
+                    this._loopCount = 0;
+                }
+                let isNewPro = false;
+                if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex
+                    || (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
+                    if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                        // 循环播放有延迟的时候  单独处理
+                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
+                    }
+                    else {
+                        this.playAni(this.skeletonPlay, this.playGroupIndex);
+                    }
+                    return;
+                }
+                // 当全局数组动画loop是false loopPlayIndex > -1
+                if (this.skeletonPlay.loopPlayIndex > -1 && this.skeletonPlay.loopPlayIndex < this.skeletonPlay.nameOrIndex.length) {
+                    this.playGroupIndex = this.skeletonPlay.loopPlayIndex;
+                    this.playAni(this.skeletonPlay, this.playGroupIndex);
+                    return;
+                }
+            }
+            else {
+                if (this.skeletonPlay.loop && this.getAnimDuration(0) > 0 && this.getAnimFrame(0) > 1) {
+                    if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
+                    }
+                    else {
+                        this.playAni(this.skeletonPlay, this.playGroupIndex);
+                    }
+                    return;
+                }
+            }
+            runFun(this.skeletonPlay.playComplete);
+            for (let i = 0; i < this.stoppedHandler.length; i++) {
+                this.stoppedHandler[i].run();
+            }
+        }
+        paused() {
+            this.asSkeleton.paused();
+        }
+        resume() {
+            this.asSkeleton.resume();
+        }
+        stop() {
+            this.asSkeleton.stop();
+        }
+        getAniNameByIndex(index) {
+            var _a;
+            return (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.getAniNameByIndex(index);
+        }
+        getSkeletonPlay() {
+            return this.skeletonPlay;
+        }
+    }
+    tsCore.ESkeleton = ESkeleton;
+    class ESocket {
+        constructor() {
+            /** 是否已经连接 */
+            this.isConnect = false;
+            /** socket类型注册监听 */
+            this.eventManager = {};
+        }
+        /** 关闭链接 */
+        close() {
+            this.isConnect = false;
+            this.eventManager = {};
+        }
+        /**
+         * 删除socket 事件
+         * @param type
+         */
+        removeSocketEvent(type) {
+            delete this.eventManager["event_" + type];
+        }
+        /**
+         * 注册socket 事件
+         * @param type
+         * @param handler
+         */
+        addSocketEvent(type, handler) {
+            this.eventManager["event_" + type] = handler;
+        }
+        /**
+         * 发送socket type事件
+         * @param type
+         * @param obj
+         */
+        sendEventManager(type, ...obj) {
+            let fun = this.eventManager["event_" + type];
+            if (fun) {
+                obj.unshift(fun);
+                runFun.apply(null, obj);
+            }
+        }
+    }
+    tsCore.ESocket = ESocket;
+    class EWindow extends mixinExt(StringBlock, ViewProxy, ActionEvent, fgui.Window) {
+        constructor() {
+            super(...arguments);
+            /** 动画显示或关闭 */
+            this.isAction = true;
+            /** 是否加入后退记录 */
+            this.joinRecord = true;
+        }
+        /*@override*/
+        onInit() {
+            let scale = App.inst.getEqualRatioScale();
+            this.contentPane.setSize(this.width * scale, this.height * scale);
+            this.setSize(this.contentPane.width, this.contentPane.height);
+            if (this.isAction) {
+                this.setPivot(0.5, 0.5);
+            }
+        }
+        /**
+         * 获取子组件
+         * @param name 传入子组件多种命名方式
+         */
+        /*@override*/
+        getChild(...name) {
+            var _a;
+            let child = null;
+            for (const key of name) {
+                child = ((_a = this.contentPane) === null || _a === void 0 ? void 0 : _a.getChild(key)) || super.getChild(key);
+                if (child)
+                    return child;
+            }
+            return child;
+        }
+        /*@override*/
+        getTransition(transName) {
+            var _a;
+            return ((_a = this.contentPane) === null || _a === void 0 ? void 0 : _a.getTransition(transName)) || super.getTransition(transName);
+        }
+        /*@override*/
+        getTransitionAt(index) {
+            var _a;
+            return ((_a = this.contentPane) === null || _a === void 0 ? void 0 : _a.getTransitionAt(index)) || super.getTransitionAt(index);
+        }
+        /*@override*/
+        getController(name) {
+            var _a;
+            return ((_a = this.contentPane) === null || _a === void 0 ? void 0 : _a.getController(name)) || super.getController(name);
+        }
+        /*@override*/
+        getControllerAt(index) {
+            var _a;
+            return ((_a = this.contentPane) === null || _a === void 0 ? void 0 : _a.getControllerAt(index)) || super.getControllerAt(index);
+        }
+        updateSizePoint() {
+            this.center();
+        }
+        /*@override*/
+        doHideAnimation() {
+            this.displayObject.stage.off(Laya.Event.RESIZE, this, this.updateSizePoint);
+            if (this.isAction) {
+                let tempX = this.x;
+                let tempY = this.y;
+                if (this.startPoint) {
+                    tempX = this.startPoint.x - this.contentPane.width / 2;
+                    tempY = this.startPoint.y - this.contentPane.height / 2;
+                }
+                Laya.Tween.to(this, {
+                    scaleX: 0.3,
+                    scaleY: 0.3,
+                    x: tempX,
+                    y: tempY
+                }, 400, Laya.Ease.backIn, Laya.Handler.create(this, this.hideImmediately));
+            }
+            else {
+                this.hideImmediately();
+            }
+        }
+        /*@override*/
+        doShowAnimation() {
+            this.displayObject.stage.off(Laya.Event.RESIZE, this, this.updateSizePoint);
+            this.displayObject.stage.on(Laya.Event.RESIZE, this, this.updateSizePoint);
+            this.touchable = true;
+            if (this.joinRecord)
+                HistoryManager.addHistory(null, this);
+            this.updateSizePoint();
+            if (this.isAction) {
+                this.setScale(.3, .3);
+                let tempX = this.x;
+                let tempY = this.y;
+                if (this.startPoint) {
+                    this.setXY(this.startPoint.x - this.contentPane.width / 2, this.startPoint.y - this.contentPane.height / 2);
+                }
+                Laya.Tween.to(this, { scaleX: 1, scaleY: 1, x: tempX, y: tempY }, 400, Laya.Ease.backOut, Laya.Handler.create(this, this.onShown));
+            }
+            else {
+                this.onShown();
+            }
+        }
+        /*@override*/
+        closeEventHandler() {
+            if (this.parent) {
+                if (this.joinRecord) {
+                    HistoryManager.backHistory();
+                }
+                else {
+                    this.hideRecord();
+                }
+            }
+        }
+        /*@override*/
+        onHide() {
+            HistoryManager.invalidHistory(this);
+        }
+        hideRecord() {
+            this.touchable = false;
+            fgui.GRoot.inst.closeModalWait();
+            this.hide();
+        }
+        showRecord() {
+        }
+        /*@override*/
+        dispose() {
+            var _a, _b;
+            this.parent = null;
+            HistoryManager.invalidHistory(this);
+            Laya.Tween.clearAll(this);
+            (_a = this.displayObject) === null || _a === void 0 ? void 0 : _a.stage.off(Laya.Event.RESIZE, this, this.updateSizePoint);
+            if (!((_b = this.displayObject) === null || _b === void 0 ? void 0 : _b.destroyed))
+                super.dispose();
+        }
+    }
+    tsCore.EWindow = EWindow;
     let Method;
     (function (Method) {
         Method["GET"] = "get";
@@ -3256,7 +3304,7 @@ window.tsCore = {};
          * @param newPage 添加的新面板
          */
         static addHistory(currentPage, newPage) {
-            // Log.debug("addHistory")
+            Log.debug(`history add currentPage=${currentPage} newPage=${newPage}`);
             HistoryManager.history.push({ current: currentPage, newPage: newPage });
         }
         /**
@@ -3266,7 +3314,7 @@ window.tsCore = {};
          */
         static invalidHistory(value) {
             var _a;
-            // Log.debug("invalidHistory")
+            Log.debug(`history invalidHistory value=${value}`);
             if (HistoryManager.history.length > 0) {
                 for (let i = 0; i < HistoryManager.history.length; i++) {
                     if (((_a = HistoryManager.history[i]) === null || _a === void 0 ? void 0 : _a.newPage) == value) {
@@ -3282,11 +3330,13 @@ window.tsCore = {};
          *
          */
         static backHistory(isBack = false) {
+            Log.debug(`history backHistory isBack=${isBack}`);
             HistoryManager.back(isBack);
         }
         /** 执行非大厅后退 */
         static back(isBack = false) {
             var _a, _b;
+            Log.debug(`history back isBack=${isBack}`);
             // 取出最后一个页面关闭
             let array = HistoryManager.history.pop();
             // 新页面隐藏
@@ -3320,6 +3370,7 @@ window.tsCore = {};
         static init() {
             if (!Laya.Browser.onLayaRuntime) {
                 HistoryManager.addNewHistory();
+                Log.debug("history add event Listener");
                 window.addEventListener("popstate", function (e) {
                     HistoryManager.backHistory(true);
                 }, false);
@@ -3331,6 +3382,7 @@ window.tsCore = {};
         }
         /** 添加历史记录 */
         static pushHistory(title, url) {
+            Log.debug(`history push state title=${title} url=${url}`);
             const state = { title: title, url: url };
             window.history.pushState(state, title, url);
         }
@@ -4158,12 +4210,22 @@ window.tsCore = {};
     NumberTween._gid = 0;
     tsCore.NumberTween = NumberTween;
     class SoundUtils {
+        /**
+         * 添加需要使用 SoundUtils.load() 加载的资源文件
+         * @param res
+         * @see SoundUtils.load
+         */
         static addRes(res) {
             Laya.SoundManager.autoReleaseSound = false;
-            SoundUtils.loadAsset = res;
+            SoundUtils.loadAsset = Array.isArray(res) ? res : [res];
         }
+        /**
+         * 执行加载音频文件
+         * @param url 加载文件地址  默认使用 SoundUtils.loadAsset
+         * @see SoundUtils.loadAsset
+         */
         static load(url) {
-            Laya.loader.load(!url ? SoundUtils.loadAsset : url, Laya.Handler.create(null, SoundUtils.onLoader));
+            Laya.loader.load(url !== null && url !== void 0 ? url : SoundUtils.loadAsset, Laya.Handler.create(null, SoundUtils.onLoader));
         }
         static onLoader() {
             for (let i = 0; i < SoundUtils.autoPlay.length; i++) {
@@ -4283,7 +4345,7 @@ window.tsCore = {};
     }
     /** 需要立即播放的 */
     SoundUtils.autoPlay = [];
-    /** 加载资源 */
+    /** 需要使用load加载的资源 */
     SoundUtils.loadAsset = [];
     SoundUtils.bgMusicLoop = 0;
     SoundUtils.bgVolume = 1;
@@ -6565,6 +6627,13 @@ function getString(id, ...args) {
         return content;
     // @ts-ignore
     return tsCore.StringUtil.format(content, ...args);
+}
+/**
+ * 获取设备刘海屏的高度
+ * @param [offsetH=5] 便宜高度
+ */
+function notchHeight(offsetH = 5) {
+    return (window.innerHeight - document.documentElement.clientHeight) / Laya.Browser.pixelRatio + offsetH;
 }
 /**
  * 修改 mixin 函数
