@@ -141,7 +141,7 @@ class GenerateModule {
                         // 将其它库文件 放到属性前面
                         for (let i = 0; i < arr.length; i++) {
                             let tar = arr[i].substring(arr[i].indexOf("import ") + 6, arr[i].indexOf("=")).trim()
-                            let reg = new RegExp("(?<=^|\\s|:|\\(|!|<|\\[|>)" + tar + "(?=\\s+?|\\.|\\[|,|\"|\\(|\\)|;|,|<|>|$)", "g")
+                            let reg = new RegExp("(?<=^|\\s|:|\\(|!|<|\\[|>|\\{)" + tar + "(?=\\s+?|\\.|\\[|,|\"|\\(|\\)|;|,|<|>|$)", "g")
                             if (reg.test(line)) {
                                 let endIndex = arr[i].lastIndexOf(".")
                                 let newC = arr[i].substring(arr[i].lastIndexOf("=") + 1, endIndex).trim()
