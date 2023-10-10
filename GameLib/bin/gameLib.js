@@ -134,7 +134,11 @@ window.gameLib = {};
          *  callback:ParamHandler 取消回调方法
          *  continueFun:ParamHandler 确定回调方法
          *  isAction = true 动画显示或关闭
+         *
+         *  或者只传递一个参数 PromptData
+         * ```
          *  @see PromptWindow._showWindow
+         *  @see PromptData
          */
         ActionLib["GAME_SHOW_PROMPT_NORMAL_WINDOW"] = "game_show_prompt_normal_window";
         /** 游戏新的回合开始 */
@@ -235,6 +239,11 @@ window.gameLib = {};
             this.noticeData = [];
             /** 默认bet位置 */
             this.defaultBetIndex = 0;
+            /**
+             * 当前是否在特殊模式
+             * @default false
+             */
+            this.specialMode = false;
             /**
              * 重置默认bet值
              * @default false
@@ -703,9 +712,7 @@ window.gameLib = {};
             // let value: string = Laya.LocalStorage.getItem(Player.inst.gameId + "_demo")
             // if (Player.inst.isGuest && !value) {
             if (Player.inst.isGuest) {
-                this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1013 /* LibStr.PROMPT_GUEST */, null, () => {
-                    this.runEvent();
-                });
+                this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, { msg: 1013 /* LibStr.PROMPT_GUEST */, obj: { cancelName: getString(1066 /* LibStr.OK */) }, callback: this.runEvent.bind(this) });
                 // Laya.LocalStorage.setItem(Player.inst.gameId + "_demo", "1")
             }
             else {
@@ -3016,7 +3023,7 @@ window.gameLib = {};
         /**
          * 获取游戏名字的标准样式
          * @param [code=null] 游戏id 不填将使用当前已在用得到游戏id
-         * @param [format=null] 格式化样式，不设置将用驼峰命名
+         * @param [format=null] 格式化样式，将空白替换成指定的值 不设置将用驼峰命名
          */
         static gameNameCanonical(code = null, format = null) {
             let name = GameConfigKit.gameName(code);
@@ -3211,15 +3218,15 @@ window.gameLib = {};
         callback(json) {
             if (!json)
                 return;
-            if (typeof json === "string") {
+            tsCore.Log.debug(`callback() json=${json}`);
+            if (typeof json === "string")
                 json = JSON.parse(json);
-            }
             if (AppRecordManager.customJavaSendOpen && AppRecordManager.customJavaSendOpen(json))
                 return;
             Player.inst.urlParam.parseData(json);
-            tsCore.Log.debug("JavaSendOpen() type = " + json.type);
-            tsCore.Log.debug("JavaSendOpen() openGame = " + json.openGame);
-            tsCore.Log.debug("JavaSendOpen() gameName = " + json.gameName);
+            tsCore.Log.debug("callback() type = " + json.type);
+            tsCore.Log.debug("callback() openGame = " + json.openGame);
+            tsCore.Log.debug("callback() gameName = " + json.gameName);
             if (!Player.inst.isGuest && json.token) {
                 Player.inst.login.loginToken((data) => {
                     this.open(json);
@@ -3260,7 +3267,8 @@ window.gameLib = {};
             if (AppManager.callIOS("runJs", { js: "appKeyBack()" }))
                 return;
             // @ts-ignore
-            (_a = window.conch) === null || _a === void 0 ? void 0 : _a.setOnBackPressedFunction(function () { });
+            (_a = window.conch) === null || _a === void 0 ? void 0 : _a.setOnBackPressedFunction(function () {
+            });
         }
         /** 进入游戏 */
         static sendAppData() {
@@ -3596,12 +3604,25 @@ window.gameLib = {};
             // @ts-ignore
             return (typeof window.webkit !== 'undefined' && typeof window.webkit.messageHandlers !== 'undefined') ? window.webkit.messageHandlers : null;
         }
-        static callIOS(method, data) {
+        /**
+         * 执行调用ios方法
+         * @param method 调用方法名
+         * @param data 传递数据
+         * @param [printDebug=true] 打印调用命令是否执行
+         */
+        static callIOS(method, data, printDebug = true) {
             var _a, _b;
             const webkit = AppManager.isIOS;
             if (webkit) {
                 data !== null && data !== void 0 ? data : (data = {});
-                (_b = (_a = webkit === null || webkit === void 0 ? void 0 : webkit[method]) === null || _a === void 0 ? void 0 : _a.postMessage) === null || _b === void 0 ? void 0 : _b.call(_a, JSON.stringify(data));
+                tsCore.Log.debug(`execute ios ${method} ${JSON.stringify(data)}`);
+                const promise = (_b = (_a = webkit === null || webkit === void 0 ? void 0 : webkit[method]) === null || _a === void 0 ? void 0 : _a.postMessage) === null || _b === void 0 ? void 0 : _b.call(_a, JSON.stringify(data));
+                if (printDebug)
+                    promise === null || promise === void 0 ? void 0 : promise.then((r, c) => {
+                        tsCore.Log.debug(`call ios success -> ${method} ${data}  ${promise.status} ${r} ${c}`);
+                    }).catch((e) => {
+                        tsCore.Log.debug(`call ios error -> ${method} ${data} ${promise.status} ${e} `);
+                    });
                 return true;
             }
             return false;
@@ -3619,6 +3640,7 @@ window.gameLib = {};
          *
          */
         static backGame(isBack = false) {
+            tsCore.Log.debug(`backGame isBack=${isBack}`);
             if (AppRecordManager.pauseHistory) {
                 if (isBack) { // 键盘返回
                     if (!Laya.Browser.onLayaRuntime)
@@ -3649,6 +3671,7 @@ window.gameLib = {};
          * @internal
          */
         static _backHistory(isBack = false) {
+            tsCore.Log.debug(`_backHistory isBack=${isBack}`);
             const history = AppRecordManager.history;
             if (history.length > 0 && (history[history.length - 1].newPage instanceof fgui.Window || !AppRecordManager.pauseHistory)) {
                 let array = history[history.length - 1];
@@ -3682,6 +3705,7 @@ window.gameLib = {};
          *
          */
         static appRunJs(action, ...value) {
+            tsCore.Log.debug(`appRunJs action=${action} values=${value.join(',')}`);
             switch (action) {
                 case 1: // 返回
                     if (Player.inst.gameId == CommonCmd.GAME_SPORTS && value[0] != "close") {
@@ -3751,9 +3775,9 @@ window.gameLib = {};
                 return;
             }
             Player.inst.urlParam.parseData(json);
-            tsCore.Log.debug("JavaSendOpen() type = " + json.type);
-            tsCore.Log.debug("JavaSendOpen() openGame = " + json.openGame);
-            tsCore.Log.debug("JavaSendOpen() gameName = " + json.gameName);
+            tsCore.Log.debug(`JavaSendOpen() type=${json.type}`);
+            tsCore.Log.debug(`JavaSendOpen() openGame=${json.openGame}`);
+            tsCore.Log.debug(`JavaSendOpen() gameName=${json.gameName}`);
             if (!Player.inst.isGuest && json.token) {
                 Player.inst.login.loginToken(Laya.Handler.create(null, function (data) {
                     AppRecordManager.open(json);
@@ -3764,6 +3788,7 @@ window.gameLib = {};
             }
         }
         static open(json) {
+            tsCore.Log.debug(`open() json=${json}`);
             switch (json.type) {
                 case 1: // 打开网页
                     HtmlWindow.inst.showTip(json.data);
@@ -3783,7 +3808,7 @@ window.gameLib = {};
     /** 退出点击上一次时间 */
     AppRecordManager.exitTimer = 0;
     gameLib.AppRecordManager = AppRecordManager;
-    Object.defineProperty(tsCore.HistoryManager, "backHistory", AppRecordManager._backHistory);
+    Object.defineProperty(tsCore.HistoryManager, "backHistory", { value: AppRecordManager._backHistory });
     /**
      * 资源管理类
      */
@@ -4029,19 +4054,27 @@ window.gameLib = {};
             let soundLoads = [];
             for (let i = 0; i < loadArray.length; i++) {
                 let obj = loadArray[i];
-                if (obj.type == Laya.Loader.SOUND && !obj.forceLoad) {
-                    loadArray.splice(i, 1);
-                    i--;
+                if (obj.type == Laya.Loader.SOUND) {
                     let chromeBrowser = Laya.Browser.userAgent.indexOf("Chrome") != -1;
                     // 清理苹果移动设备中 ogg 音频文件
                     if (!chromeBrowser && (Laya.Browser.onMac || Laya.Browser.onIOS || Laya.Browser.onIPhone || Laya.Browser.onIPad)) {
-                        if (!tsCore.StringUtil.contains(obj.url, ".ogg")) {
+                        // 不是ogg格式的文件 或 ios app应用
+                        if (!obj.url.contains(".ogg")) {
                             soundLoads.push(obj);
                         }
+                        else
+                            tsCore.Log.debug(`clean ogg audio files from apple mobile devices. ${obj.url}`);
                     }
                     else {
                         soundLoads.push(obj);
                     }
+                    // 此文件是要强制加载的音频文件 并且在预加载中
+                    if (obj.forceLoad && soundLoads.includes(obj)) {
+                        continue;
+                    }
+                    // 默认 剔除音频
+                    loadArray.splice(i, 1);
+                    i--;
                 }
             }
             tsCore.SoundUtils.addRes(soundLoads);
@@ -4056,16 +4089,6 @@ window.gameLib = {};
                     this.runLoads.push(obj);
                 }
             }
-            // // 清理苹果移动设备中 ogg 音频文件
-            // if (Laya.Browser.onIOS || Laya.Browser.onIPhone || Laya.Browser.onIPad) {
-            //     for (let i = 0; i < loadArray.length; i++) {
-            //         let obj = loadArray[i]
-            //         if (tsCore.StringUtil.contains(obj.url, ".ogg")) {
-            //             loadArray.splice(i, 1)
-            //             i--
-            //         }
-            //     }
-            // }
             // 开始load
             tsCore.ELoader.loader.load(loadArray, Laya.Handler.create(this, this.loadComplete), new Laya.Handler(this, this.progressComplete));
         }
@@ -5092,7 +5115,7 @@ window.gameLib = {};
             this.debug = !!(defaults === null || defaults === void 0 ? void 0 : defaults.debug);
             this.parseData(null);
             if (Player.inst.isWeb) {
-                let url = Laya.Browser.window.location.href;
+                let url = window.location.href;
                 let newUrl = url.split("?")[0];
                 let clearCache = Laya.Utils.getQueryString("clearCache");
                 if (clearCache) {
@@ -5110,7 +5133,8 @@ window.gameLib = {};
                         }
                         index++;
                     }
-                    Laya.Browser.window.location.href = newUrl + param;
+                    tsCore.Log.debug(`clear cache reload ${newUrl + param}`);
+                    window.location.href = newUrl + param;
                 }
                 //        if (Laya.Browser.window.location.protocol != "http:" && !Laya.Render.isConchApp)
                 //            Laya.Browser.window.history.pushState(null, null, newUrl)
@@ -5455,9 +5479,9 @@ window.gameLib = {};
             this._status = value;
         }
         windowOpen(url) {
-            let window = Laya.Browser.window.open(url);
-            if (!window) {
-                Laya.Browser.window.location.href = url;
+            let wd = window.open(url);
+            if (!wd) {
+                window.location.href = url;
             }
         }
         get guestModel() {
@@ -6261,10 +6285,11 @@ window.gameLib = {};
                 Laya.Browser.window.parent.GameToHall.gameClose(type, data);
             }
             else {
-                if (!Laya.Render.isConchApp && Laya.Browser.window.location.protocol == "https:") {
+                if (!Laya.Render.isConchApp && window.location.protocol == "https:") {
                     // 如果不是加速器 并且不是在非https下  那么直接返回大厅
                     // Laya.Browser.window.location.href = Player.HOME_URL
-                    Laya.Browser.window.location.href = "//" + Laya.Browser.window.location.host;
+                    tsCore.Log.debug(`return home url ${window.location.host}`);
+                    window.location.href = "//" + window.location.host;
                 }
             }
             AppManager.showWeb({ javascript: `window.GameToHall.gameClose(${type}, ${data})` });
@@ -6316,7 +6341,7 @@ window.gameLib = {};
         /** 进入游戏进度条 */
         static progress(value) {
             var _a, _b, _c, _d, _e, _f;
-            if (AppManager.callIOS("progress", { value: value }))
+            if (AppManager.callIOS("progress", { value: value }, false))
                 return;
             (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.progress) === null || _c === void 0 ? void 0 : _c.call(_b, value);
             (_f = (_e = (_d = Laya.Browser.window.parent) === null || _d === void 0 ? void 0 : _d.GameToHall) === null || _e === void 0 ? void 0 : _e.getProgress) === null || _f === void 0 ? void 0 : _f.call(_e, value);
@@ -7887,7 +7912,12 @@ window.gameLib = {};
          */
         showTip(msg, callback, isAction = true) {
             if (!this.isPromptData(msg))
-                msg = { msg: msg, callback: callback, obj: { cancelName: getString(1066 /* LibStr.OK */) }, isAction: isAction };
+                msg = {
+                    msg: msg,
+                    callback: callback,
+                    obj: { cancelName: getString(1066 /* LibStr.OK */) },
+                    isAction: isAction
+                };
             this._show(msg);
         }
         /**
@@ -7905,7 +7935,15 @@ window.gameLib = {};
             this._show({ msg: msg, obj: obj, callback: callback, continue: continueFun, isAction: isAction });
         }
         _showWindow(msg, obj, callback, continueFun, isAction = true) {
-            this._show({ msg: msg, obj: obj, callback: callback, continue: continueFun, isAction: isAction });
+            if (!this.isPromptData(msg))
+                msg = {
+                    msg: msg,
+                    obj: obj,
+                    callback: callback,
+                    continue: continueFun,
+                    isAction: isAction
+                };
+            this._show(msg);
         }
         _show(data) {
             var _a, _b;

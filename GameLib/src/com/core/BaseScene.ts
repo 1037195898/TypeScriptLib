@@ -482,9 +482,9 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
         // let value: string = LocalStorage.getItem(Player.inst.gameId + "_demo")
         // if (Player.inst.isGuest && !value) {
         if (Player.inst.isGuest) {
-            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.PROMPT_GUEST, null, () => {
-                this.runEvent()
-            })
+            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW,
+                {msg: LibStr.PROMPT_GUEST, obj: {cancelName: getString(LibStr.OK)}, callback: this.runEvent.bind(this)}
+            )
             // LocalStorage.setItem(Player.inst.gameId + "_demo", "1")
         } else {
             this.runEvent()
@@ -572,4 +572,3 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
 
 
 }
-

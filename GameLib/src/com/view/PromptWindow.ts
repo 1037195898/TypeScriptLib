@@ -110,7 +110,12 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
      * @see ActionLib.GAME_SHOW_PROMPT_WINDOW
      */
     showTip(msg: string | number | any[] | PromptData, callback?: ParamHandler, isAction = true) {
-        if (!this.isPromptData(msg)) msg = {msg: msg, callback: callback, obj: {cancelName: getString(LibStr.OK)}, isAction: isAction}
+        if (!this.isPromptData(msg)) msg = {
+            msg: msg,
+            callback: callback,
+            obj: {cancelName: getString(LibStr.OK)},
+            isAction: isAction
+        }
         this._show(msg)
     }
 
@@ -129,8 +134,15 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
         this._show({msg: msg, obj: obj, callback: callback, continue: continueFun, isAction: isAction})
     }
 
-    private _showWindow(msg: string | number | any[], obj?: IPromptData, callback?: ParamHandler, continueFun?: ParamHandler, isAction = true) {
-        this._show({msg: msg, obj: obj, callback: callback, continue: continueFun, isAction: isAction})
+    private _showWindow(msg: string | number | any[] | PromptData, obj?: IPromptData, callback?: ParamHandler, continueFun?: ParamHandler, isAction = true) {
+        if (!this.isPromptData(msg)) msg = {
+            msg: msg,
+            obj: obj,
+            callback: callback,
+            continue: continueFun,
+            isAction: isAction
+        }
+        this._show(msg)
     }
 
     private _show(data: PromptData) {
@@ -179,7 +191,7 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
      * 判断是否是接口 用 prototype 是否存在判断
      * @param optional
      */
-    isPromptData(optional): optional is PromptData {
+    isPromptData(optional: any): optional is PromptData {
         return typeof optional === "object" && ("msg" in optional)
     }
 

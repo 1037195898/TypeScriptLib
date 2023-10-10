@@ -132,7 +132,11 @@ export enum ActionLib {
      *  callback:ParamHandler 取消回调方法
      *  continueFun:ParamHandler 确定回调方法
      *  isAction = true 动画显示或关闭
+     *
+     *  或者只传递一个参数 PromptData
+     * ```
      *  @see PromptWindow._showWindow
+     *  @see PromptData
      */
     GAME_SHOW_PROMPT_NORMAL_WINDOW = "game_show_prompt_normal_window",
     /** 游戏新的回合开始 */

@@ -54,6 +54,7 @@ export class APP {
 
     /**
      * 返回键
+     * @param [value=true]
      */
     appKeyBack(value = true) {
         HistoryManager.backHistory(value)
@@ -82,15 +83,15 @@ export class APP {
      */
     callback(json: IExecuteData) {
         if (!json) return
-        if (typeof json === "string") {
-            json = JSON.parse(json)
-        }
+        Log.debug(`callback() json=${json}`)
+        if (typeof json === "string") json = JSON.parse(json)
+
         if (AppRecordManager.customJavaSendOpen && AppRecordManager.customJavaSendOpen(json)) return
 
         Player.inst.urlParam.parseData(json)
-        Log.debug("JavaSendOpen() type = " + json.type)
-        Log.debug("JavaSendOpen() openGame = " + json.openGame)
-        Log.debug("JavaSendOpen() gameName = " + json.gameName)
+        Log.debug("callback() type = " + json.type)
+        Log.debug("callback() openGame = " + json.openGame)
+        Log.debug("callback() gameName = " + json.gameName)
         if (!Player.inst.isGuest && json.token) {
             Player.inst.login.loginToken((data: any) => {
                 this.open(json)

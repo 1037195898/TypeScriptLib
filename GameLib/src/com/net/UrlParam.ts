@@ -9,6 +9,7 @@ import {SceneManager} from "../manager/SceneManager";
 import UtilKit = tsCore.UtilKit;
 import {IExecuteData} from "../Interfaces";
 import StringUtil = tsCore.StringUtil;
+import Log = tsCore.Log;
 
 /**
  * url 参数
@@ -45,7 +46,7 @@ export class UrlParam {
         this.parseData(null)
 
         if (Player.inst.isWeb) {
-            let url = Browser.window.location.href
+            let url = window.location.href
             let newUrl = url.split("?")[0]
             let clearCache = Utils.getQueryString("clearCache")
             if (clearCache) {
@@ -63,7 +64,8 @@ export class UrlParam {
                     }
                     index++
                 }
-                Browser.window.location.href = newUrl + param
+                Log.debug(`clear cache reload ${newUrl + param}` )
+                window.location.href = newUrl + param
             }
 
 //        if (Browser.window.location.protocol != "http:" && !Render.isConchApp)

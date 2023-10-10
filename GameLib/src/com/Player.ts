@@ -275,9 +275,9 @@ export class Player {
 
 
     windowOpen(url: string) {
-        let window = Browser.window.open(url)
-        if (!window) {
-            Browser.window.location.href = url
+        let wd = window.open(url)
+        if (!wd) {
+            window.location.href = url
         }
     }
 

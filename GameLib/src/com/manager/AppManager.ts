@@ -1,4 +1,4 @@
-import Browser = Laya.Browser
+import Browser = Laya.Browser;
 import IPlatform = tsCore.IPlatform;
 import StringUtil = tsCore.StringUtil;
 import Log = tsCore.Log;
@@ -11,9 +11,10 @@ export class AppManager {
 
     /** 关闭app自定义返回 */
     static closeAppBack() {
-        if(AppManager.callIOS("runJs", {js: "appKeyBack()"})) return
+        if (AppManager.callIOS("runJs", {js: "appKeyBack()"})) return
         // @ts-ignore
-        window.conch?.setOnBackPressedFunction(function () {})
+        window.conch?.setOnBackPressedFunction(function () {
+        })
     }
 
     /** 进入游戏 */
@@ -379,11 +380,23 @@ export class AppManager {
         return (typeof window.webkit !== 'undefined' && typeof window.webkit.messageHandlers !== 'undefined') ? window.webkit.messageHandlers : null
     }
 
-    static callIOS(method: string, data?: any) {
+    /**
+     * 执行调用ios方法
+     * @param method 调用方法名
+     * @param data 传递数据
+     * @param [printDebug=true] 打印调用命令是否执行
+     */
+    static callIOS(method: string, data?: any, printDebug = true) {
         const webkit = AppManager.isIOS
         if (webkit) {
             data ??= {}
-            webkit?.[method]?.postMessage?.(JSON.stringify(data))
+            Log.debug(`execute ios ${method} ${JSON.stringify(data)}`)
+            const promise = webkit?.[method]?.postMessage?.(JSON.stringify(data))
+            if (printDebug) promise?.then((r: any, c: any) => {
+                Log.debug(`call ios success -> ${method} ${data}  ${promise.status} ${r} ${c}`)
+            }).catch((e: any) => {
+                Log.debug(`call ios error -> ${method} ${data} ${promise.status} ${e} `)
+            })
             return true
         }
         return false

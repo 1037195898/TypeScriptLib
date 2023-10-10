@@ -34,6 +34,7 @@ export class AppRecordManager extends tsCore.HistoryManager {
      *
      */
     static backGame(isBack = false) {
+        Log.debug(`backGame isBack=${isBack}`)
         if (AppRecordManager.pauseHistory) {
             if (isBack) {// 键盘返回
                 if (!Browser.onLayaRuntime) AppRecordManager.addNewHistory()
@@ -61,6 +62,7 @@ export class AppRecordManager extends tsCore.HistoryManager {
      * @internal
      */
     static _backHistory(isBack = false) {
+        Log.debug(`_backHistory isBack=${isBack}`)
         const history = AppRecordManager.history
         if (history.length > 0 && (history[history.length - 1].newPage instanceof fgui.Window || !AppRecordManager.pauseHistory)) {
             let array = history[history.length - 1]
@@ -92,7 +94,8 @@ export class AppRecordManager extends tsCore.HistoryManager {
      * @param value 执行命令
      *
      */
-    static appRunJs(action: number, ...value) {
+    static appRunJs(action: number, ...value: any[]) {
+        Log.debug(`appRunJs action=${action} values=${value.join(',')}`)
         switch (action) {
             case 1:// 返回
                 if (Player.inst.gameId == CommonCmd.GAME_SPORTS && value[0] != "close") {
@@ -165,9 +168,9 @@ export class AppRecordManager extends tsCore.HistoryManager {
         }
 
         Player.inst.urlParam.parseData(json)
-        Log.debug("JavaSendOpen() type = " + json.type)
-        Log.debug("JavaSendOpen() openGame = " + json.openGame)
-        Log.debug("JavaSendOpen() gameName = " + json.gameName)
+        Log.debug(`JavaSendOpen() type=${json.type}`)
+        Log.debug(`JavaSendOpen() openGame=${json.openGame}`)
+        Log.debug(`JavaSendOpen() gameName=${json.gameName}`)
         if (!Player.inst.isGuest && json.token) {
             Player.inst.login.loginToken(Handler.create(null, function (data: any) {
                 AppRecordManager.open(json)
@@ -178,6 +181,7 @@ export class AppRecordManager extends tsCore.HistoryManager {
     }
 
     private static open(json: any) {
+        Log.debug(`open() json=${json}`)
         switch (json.type) {
             case 1:// 打开网页
                 HtmlWindow.inst.showTip(json.data)
@@ -197,4 +201,4 @@ export class AppRecordManager extends tsCore.HistoryManager {
 
 }
 
-Object.defineProperty(tsCore.HistoryManager, "backHistory", AppRecordManager._backHistory)
+Object.defineProperty(tsCore.HistoryManager, "backHistory", {value: AppRecordManager._backHistory})

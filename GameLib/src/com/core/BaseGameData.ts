@@ -42,6 +42,11 @@ export class BaseGameData implements IGameData {
     /** 默认bet位置 */
     defaultBetIndex = 0
     /**
+     * 当前是否在特殊模式
+     * @default false
+     */
+    specialMode = false
+    /**
      * 重置默认bet值
      * @default false
      */

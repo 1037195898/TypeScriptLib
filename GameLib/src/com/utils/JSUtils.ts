@@ -1,8 +1,8 @@
 import Browser = Laya.Browser;
 import Render = Laya.Render;
+import Log = tsCore.Log;
 import {AppManager} from "../manager/AppManager"
 import {SceneManager} from "../manager/SceneManager"
-import Log = tsCore.Log;
 
 export class JSUtils {
 
@@ -53,10 +53,11 @@ export class JSUtils {
         if (Browser.window.parent.GameToHall) {
             Browser.window.parent.GameToHall.gameClose(type, data)
         } else {
-            if (!Render.isConchApp && Browser.window.location.protocol == "https:") {
+            if (!Render.isConchApp && window.location.protocol == "https:") {
                 // 如果不是加速器 并且不是在非https下  那么直接返回大厅
                 // Browser.window.location.href = Player.HOME_URL
-                Browser.window.location.href = "//" + Browser.window.location.host
+                Log.debug(`return home url ${window.location.host}`)
+                window.location.href = "//" + window.location.host
             }
         }
         AppManager.showWeb({javascript: `window.GameToHall.gameClose(${type}, ${data})`})
@@ -105,7 +106,7 @@ export class JSUtils {
 
     /** 进入游戏进度条 */
     static progress(value: number) {
-        if (AppManager.callIOS("progress", {value: value})) return
+        if (AppManager.callIOS("progress", {value: value}, false)) return
         Browser.window.parent?.GameToHall?.progress?.(value)
         Browser.window.parent?.GameToHall?.getProgress?.(value)
         AppManager.executionJavascript("window.GameToHall.progress && window.GameToHall.progress", value)

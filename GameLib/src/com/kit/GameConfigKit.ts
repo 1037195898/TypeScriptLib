@@ -31,7 +31,7 @@ export class GameConfigKit {
     /**
      * 获取游戏名字的标准样式
      * @param [code=null] 游戏id 不填将使用当前已在用得到游戏id
-     * @param [format=null] 格式化样式，不设置将用驼峰命名
+     * @param [format=null] 格式化样式，将空白替换成指定的值 不设置将用驼峰命名
      */
     static gameNameCanonical(code: number = null, format: string = null) {
         let name = GameConfigKit.gameName(code)

@@ -125,7 +125,11 @@ declare namespace gameLib {
          *  callback:ParamHandler 取消回调方法
          *  continueFun:ParamHandler 确定回调方法
          *  isAction = true 动画显示或关闭
+         *
+         *  或者只传递一个参数 PromptData
+         * ```
          *  @see PromptWindow._showWindow
+         *  @see PromptData
          */
         GAME_SHOW_PROMPT_NORMAL_WINDOW = "game_show_prompt_normal_window",
         /** 游戏新的回合开始 */
@@ -222,6 +226,11 @@ declare namespace gameLib {
         noticeData: any[];
         /** 默认bet位置 */
         defaultBetIndex: number;
+        /**
+         * 当前是否在特殊模式
+         * @default false
+         */
+        specialMode: boolean;
         /**
          * 重置默认bet值
          * @default false
@@ -1666,7 +1675,7 @@ declare namespace gameLib {
         /**
          * 获取游戏名字的标准样式
          * @param [code=null] 游戏id 不填将使用当前已在用得到游戏id
-         * @param [format=null] 格式化样式，不设置将用驼峰命名
+         * @param [format=null] 格式化样式，将空白替换成指定的值 不设置将用驼峰命名
          */
         static gameNameCanonical(code?: number, format?: string): string;
         /**
@@ -2020,7 +2029,13 @@ declare namespace gameLib {
         /** 空方法 */
         static nullFun(data: any): void;
         static get isIOS(): any;
-        static callIOS(method: string, data?: any): boolean;
+        /**
+         * 执行调用ios方法
+         * @param method 调用方法名
+         * @param data 传递数据
+         * @param [printDebug=true] 打印调用命令是否执行
+         */
+        static callIOS(method: string, data?: any, printDebug?: boolean): boolean;
     }
     /**
      * app 访问记录管理
