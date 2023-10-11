@@ -1213,6 +1213,12 @@ declare namespace tsCore {
      * @see MathKit
      */
     export const Cast: typeof MathKit;
+    export class SystemKit {
+        /**
+         * 获取设备刘海屏高度
+         */
+        static get notchHeight(): number;
+    }
     export enum LogLevel {
         ALL = 0,
         /**
@@ -2733,12 +2739,6 @@ declare type InstanceTypeOfConstructor<T> = T extends Constructor<infer R> ? R :
  */
 declare function getString(id: string | number, ...args): string
 
-/**
- * 获取设备刘海屏的高度
- * @param [offsetH=5] 便宜高度
- */
-declare function notchHeight(offsetH?: number): number
-
 declare module Laya {
 
 // @ts-ignore
@@ -2912,6 +2912,9 @@ declare type InitApp = {
     /** 是否让GRoot 自适应大小 默认true */
     resize?: boolean
 }
+
+declare type PointType = { x?: number, y?: number }
+declare type RectangleType = { x?: number, y?: number, width?: number, height?: number }
 
 /**
  * 历史页面导航

@@ -6099,35 +6099,45 @@ window.gameLib = {};
          * @param startObject 开始对象 如果传入null 将用舞台中心做为起点
          * @param endObject 结束对象
          * @param endHandler 结束回调
+         * @deprecated
+         * @see play
          */
         playObject(num, startObject, endObject, endHandler) {
-            if (!startObject || startObject.isDisposed || !startObject.displayObject) {
-                this.startPoint = Laya.Point.create().setTo((this.scene.width >> 1), (this.scene.height >> 1));
-            }
-            else {
-                this.startPoint = startObject.localToGlobal();
-                this.globalToLocal(this.startPoint);
-                this.startPoint.x += startObject.width / 2;
-                this.startPoint.y += startObject.height / 2;
-            }
-            this.endPoint = endObject.localToGlobal();
-            this.globalToLocal(this.endPoint);
-            this.endPoint.x += endObject.width / 2;
-            this.endPoint.y += endObject.height / 2;
-            this.play(num, this.startPoint, this.endPoint, endHandler);
+            this.play(num, startObject, endObject, endHandler);
         }
         /**
          * 播放金币动画
          * @param num 创建数量
-         * @param startPoint 开始位置
-         * @param endPoint 结束位置
-         * @param endHandler 结束回调
+         * @param start 开始位置
+         * @param end 结束位置
+         * @param complete 结束回调
          */
-        play(num, startPoint, endPoint, endHandler) {
-            this.startPoint = startPoint;
-            this.endPoint = endPoint;
-            this.endHandler = endHandler;
+        play(num, start, end, complete) {
+            var _a;
+            if (start instanceof fgui.GObject) {
+                if (!start || start.isDisposed || !start.displayObject) {
+                    this.startPoint = Laya.Point.create().setTo((this.scene.width >> 1), (this.scene.height >> 1));
+                }
+                else {
+                    this.startPoint = start.localToGlobal();
+                    this.globalToLocal(this.startPoint);
+                    this.startPoint.x += start.width / 2;
+                    this.startPoint.y += start.height / 2;
+                }
+            }
+            else
+                this.startPoint = start;
+            if (end instanceof fgui.GObject) {
+                this.endPoint = end.localToGlobal();
+                this.globalToLocal(this.endPoint);
+                this.endPoint.x += end.width / 2;
+                this.endPoint.y += end.height / 2;
+            }
+            else
+                this.endPoint = end;
+            this.completeFun = complete;
             this.specialAward(num);
+            (_a = this.startPoint) === null || _a === void 0 ? void 0 : _a.recover();
             if (this.sound instanceof Laya.Sound) {
                 this.sound.play();
             }
@@ -6162,13 +6172,12 @@ window.gameLib = {};
                     .to({ visible: 0 }, 0)
                     .play();
             }
-            this.startPoint.recover();
         }
         onPlayAwardEnd() {
             this.count++;
             if (this.count == this.loaders.length) {
                 this.clearGoldLoader();
-                runFun(this.endHandler);
+                runFun(this.completeFun);
             }
         }
         /************************************  普通金币掉落动画  ***********************************/
