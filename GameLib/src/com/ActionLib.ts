@@ -156,20 +156,23 @@ export enum ActionLib {
     GAME_ALL_BTN_CHANGE_STATE = "game_all_btn_change_state",
     /** 更新赢钱的值 */
     GAME_UPDATE_WIN_VALUE = "game_update_win_value",
-    /**
-     * 游戏更新自动bet次数
-     */
-    GAME_UPDATE_AUTO_BET_NUMBER = "game_update_auto_bet_number",
+
     /**
      * 游戏更新自动SPIN次数
      */
     GAME_UPDATE_AUTO_SPIN_NUMBER = "game_update_auto_spin_number",
     /**
+     * 游戏更新自动bet次数
+     * @deprecated
+     * @see GAME_UPDATE_AUTO_SPIN_NUMBER
+     */
+    GAME_UPDATE_AUTO_BET_NUMBER = GAME_UPDATE_AUTO_SPIN_NUMBER,
+    /**
      * 游戏更新免费次数
      * @deprecated
-     * @see GAME_UPDATE_AUTO_BET_NUMBER
+     * @see GAME_UPDATE_AUTO_SPIN_NUMBER
      */
-    GAME_UPDATE_FREE_COUNT = GAME_UPDATE_AUTO_BET_NUMBER,
+    GAME_UPDATE_FREE_COUNT = GAME_UPDATE_AUTO_SPIN_NUMBER,
     /** 播放收金币动画 */
     GAME_PLAY_COLLECT_GOLD_COINS_ANI = "game_play_collect_gold_coins_ani",
     /** 显示free窗口 */

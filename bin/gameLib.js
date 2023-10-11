@@ -157,19 +157,21 @@ window.gameLib = {};
         /** 更新赢钱的值 */
         ActionLib["GAME_UPDATE_WIN_VALUE"] = "game_update_win_value";
         /**
-         * 游戏更新自动bet次数
-         */
-        ActionLib["GAME_UPDATE_AUTO_BET_NUMBER"] = "game_update_auto_bet_number";
-        /**
          * 游戏更新自动SPIN次数
          */
         ActionLib["GAME_UPDATE_AUTO_SPIN_NUMBER"] = "game_update_auto_spin_number";
         /**
+         * 游戏更新自动bet次数
+         * @deprecated
+         * @see GAME_UPDATE_AUTO_SPIN_NUMBER
+         */
+        ActionLib["GAME_UPDATE_AUTO_BET_NUMBER"] = "game_update_auto_spin_number";
+        /**
          * 游戏更新免费次数
          * @deprecated
-         * @see GAME_UPDATE_AUTO_BET_NUMBER
+         * @see GAME_UPDATE_AUTO_SPIN_NUMBER
          */
-        ActionLib["GAME_UPDATE_FREE_COUNT"] = "game_update_auto_bet_number";
+        ActionLib["GAME_UPDATE_FREE_COUNT"] = "game_update_auto_spin_number";
         /** 播放收金币动画 */
         ActionLib["GAME_PLAY_COLLECT_GOLD_COINS_ANI"] = "game_play_collect_gold_coins_ani";
         /** 显示free窗口 */
