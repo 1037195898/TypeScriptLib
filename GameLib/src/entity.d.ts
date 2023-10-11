@@ -90,3 +90,7 @@ declare type FreeSpinData = {
     free_spin_data: any
     [key: string]: any
 }
+
+declare type GoldAniData = {
+    x?: number, y?: number, scaleX?: number, scaleY?: number, duration?: number, delay?: number, ease?: Function
+}

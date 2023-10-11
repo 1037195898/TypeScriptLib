@@ -342,7 +342,7 @@ export class SceneManager extends EProxy {
     private checkGameState(data: any) {
         if (data?.code == -1) {
             LoadingWindow.inst.hide()
-            JSUtils.openModal(StateCode.getShowMessage(data))
+            JSUtils.alert(StateCode.getShowMessage(data))
             JSUtils.gameClose()
             return
         }
@@ -408,7 +408,7 @@ export class SceneManager extends EProxy {
         GRoot.inst.closeModalWait()
         if (Player.inst.urlParam.isJumpPage()) {
             if (!Render.isConchApp)
-                JSUtils.openModal(getString(LibStr.NET_ERROR))
+                JSUtils.alert(getString(LibStr.NET_ERROR))
             JSUtils.gameClose()
             AppManager.gameRestart()
             Player.inst.gameId = CommonCmd.GAME_HOME

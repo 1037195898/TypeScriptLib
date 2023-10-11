@@ -333,7 +333,9 @@ declare namespace tsCore {
          * 获取浏览器传入的所有参数
          * @return 所有的参数key=value
          */
-        static getRequest(): any;
+        static getRequest(): {
+            [key: string]: string;
+        };
         /** 绑定输入框和组件  当输入框中都存在值后  组件变成可点击 */
         static bindInputKit(confirmBtn: fgui.GComponent, ...panel: any[]): BindInputKit;
         /** 绑定按钮长按、点击 */
@@ -1211,6 +1213,12 @@ declare namespace tsCore {
      * @see MathKit
      */
     export const Cast: typeof MathKit;
+    export class SystemKit {
+        /**
+         * 获取设备刘海屏高度
+         */
+        static get notchHeight(): number;
+    }
     export enum LogLevel {
         ALL = 0,
         /**
@@ -2731,12 +2739,6 @@ declare type InstanceTypeOfConstructor<T> = T extends Constructor<infer R> ? R :
  */
 declare function getString(id: string | number, ...args): string
 
-/**
- * 获取设备刘海屏的高度
- * @param [offsetH=5] 便宜高度
- */
-declare function notchHeight(offsetH?: number): number
-
 declare module Laya {
 
 // @ts-ignore
@@ -2910,6 +2912,9 @@ declare type InitApp = {
     /** 是否让GRoot 自适应大小 默认true */
     resize?: boolean
 }
+
+declare type PointType = { x?: number, y?: number }
+declare type RectangleType = { x?: number, y?: number, width?: number, height?: number }
 
 /**
  * 历史页面导航

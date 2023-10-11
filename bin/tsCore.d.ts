@@ -333,7 +333,9 @@ declare namespace tsCore {
          * 获取浏览器传入的所有参数
          * @return 所有的参数key=value
          */
-        static getRequest(): any;
+        static getRequest(): {
+            [key: string]: string;
+        };
         /** 绑定输入框和组件  当输入框中都存在值后  组件变成可点击 */
         static bindInputKit(confirmBtn: fgui.GComponent, ...panel: any[]): BindInputKit;
         /** 绑定按钮长按、点击 */

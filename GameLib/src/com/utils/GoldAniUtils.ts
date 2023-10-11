@@ -1,14 +1,13 @@
-import Point = Laya.Point;
 import Tween = Laya.Tween;
 import GObject = fgui.GObject;
 import GRoot = fgui.GRoot;
 import Ease = Laya.Ease;
 import GComponent = fgui.GComponent;
 import Sound = Laya.Sound;
-import {GoldLoader} from "../effect/GoldLoader"
-import {SceneManager} from "../manager/SceneManager";
 import SoundUtils = tsCore.SoundUtils;
 import MathKit = tsCore.MathKit;
+import {GoldLoader} from "../effect/GoldLoader"
+import {SceneManager} from "../manager/SceneManager";
 
 /**
  * 金币动画
@@ -30,9 +29,9 @@ export class GoldAniUtils {
 
     private loaders: GoldLoader[] = []
     private count = 0
-    private startPoint: Point
-    private endPoint: Point
-    private endHandler: ParamHandler
+    private startPoint: Laya.Point
+    private endPoint: Laya.Point
+    private completeFun: ParamHandler
     private goldTween: Tween
     /** 宽 */
     goldW = 70
@@ -56,35 +55,40 @@ export class GoldAniUtils {
      * @param startObject 开始对象 如果传入null 将用舞台中心做为起点
      * @param endObject 结束对象
      * @param endHandler 结束回调
+     * @deprecated
+     * @see play
      */
     playObject(num: number, startObject: GObject, endObject: GObject, endHandler?: ParamHandler) {
-        if (!startObject || startObject.isDisposed || !startObject.displayObject) {
-            this.startPoint = Point.create().setTo((this.scene.width >> 1), (this.scene.height >> 1))
-        } else {
-            this.startPoint = startObject.localToGlobal()
-            this.globalToLocal(this.startPoint)
-            this.startPoint.x += startObject.width / 2
-            this.startPoint.y += startObject.height / 2
-        }
-        this.endPoint = endObject.localToGlobal()
-        this.globalToLocal(this.endPoint)
-        this.endPoint.x += endObject.width / 2
-        this.endPoint.y += endObject.height / 2
-        this.play(num, this.startPoint, this.endPoint, endHandler)
+        this.play(num, startObject, endObject, endHandler)
     }
 
     /**
      * 播放金币动画
      * @param num 创建数量
-     * @param startPoint 开始位置
-     * @param endPoint 结束位置
-     * @param endHandler 结束回调
+     * @param start 开始位置
+     * @param end 结束位置
+     * @param complete 结束回调
      */
-    play(num: number, startPoint: Point, endPoint: Point, endHandler?: ParamHandler) {
-        this.startPoint = startPoint
-        this.endPoint = endPoint
-        this.endHandler = endHandler
+    play(num: number, start: Laya.Point | GObject, end: Laya.Point | GObject, complete?: ParamHandler) {
+        if (start instanceof GObject) {
+            if (!start || start.isDisposed || !start.displayObject) {
+                this.startPoint = Laya.Point.create().setTo((this.scene.width >> 1), (this.scene.height >> 1))
+            } else {
+                this.startPoint = start.localToGlobal()
+                this.globalToLocal(this.startPoint)
+                this.startPoint.x += start.width / 2
+                this.startPoint.y += start.height / 2
+            }
+        } else this.startPoint = start
+        if (end instanceof GObject) {
+            this.endPoint = end.localToGlobal()
+            this.globalToLocal(this.endPoint)
+            this.endPoint.x += end.width / 2
+            this.endPoint.y += end.height / 2
+        } else this.endPoint = end
+        this.completeFun = complete
         this.specialAward(num)
+        this.startPoint?.recover()
         if (this.sound instanceof Sound) {
             this.sound.play()
         } else SoundUtils.playSound(this.sound)
@@ -106,7 +110,7 @@ export class GoldAniUtils {
             let tempX = this.startPoint.x + Math.random() * 250 - 125
             let tempY = this.startPoint.y + Math.random() * 50 + 100
 
-            let endP = Point.create().setTo(this.endPoint.x - loader.width / 2, this.endPoint.y - loader.height / 2)
+            let endP = Laya.Point.create().setTo(this.endPoint.x - loader.width / 2, this.endPoint.y - loader.height / 2)
 
             loader.setStartPoint(tempX, tempY)
             loader.setMiddlePoint(tempX + (endP.x - tempX) / 2 + MathKit.random(200, 300),
@@ -125,16 +129,13 @@ export class GoldAniUtils {
                 .to({visible: 0}, 0)
                 .play()
         }
-
-        this.startPoint.recover()
-
     }
 
     private onPlayAwardEnd() {
         this.count++
         if (this.count == this.loaders.length) {
             this.clearGoldLoader()
-            runFun(this.endHandler)
+            runFun(this.completeFun)
         }
     }
 
@@ -149,7 +150,7 @@ export class GoldAniUtils {
      * @param parent 父对象
      * @param props 附带的属性变化 或参数 duration,delay,ease
      */
-    playGoldAni(targetObject: GObject, endObject: GObject, endHandler?: ParamHandler, parent?: GComponent, props?: any) {
+    playGoldAni(targetObject: GObject, endObject: GObject, endHandler?: ParamHandler, parent?: GComponent, props?: GoldAniData) {
         parent ??= this.scene
         let endGlobal = endObject.localToGlobal()
         parent.globalToLocal(endGlobal.x, endGlobal.y, endGlobal)
@@ -168,7 +169,7 @@ export class GoldAniUtils {
      * @param parent 父对象
      * @param props 附带的属性变化 或参数 duration,delay,ease
      */
-    playGoldPointAni(targetObject: GObject, startPoint: Point, endPoint: Point, endHandler?: ParamHandler, parent?, props?) {
+    playGoldPointAni(targetObject: GObject, startPoint: PointType, endPoint: PointType, endHandler?: ParamHandler, parent?: fgui.GComponent, props?: GoldAniData) {
         parent ??= this.scene
         props ??= {}
         targetObject.setXY(startPoint.x, startPoint.y)
@@ -192,7 +193,7 @@ export class GoldAniUtils {
         return this.scene.addChild(child)
     }
 
-    private globalToLocal(target: Point) {
+    private globalToLocal(target: Laya.Point) {
         this.scene.globalToLocal(target.x, target.y, target)
     }
 

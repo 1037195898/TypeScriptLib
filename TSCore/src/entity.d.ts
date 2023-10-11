@@ -10,6 +10,9 @@ declare type InitApp = {
     resize?: boolean
 }
 
+declare type PointType = { x?: number, y?: number }
+declare type RectangleType = { x?: number, y?: number, width?: number, height?: number }
+
 /**
  * 历史页面导航
  */

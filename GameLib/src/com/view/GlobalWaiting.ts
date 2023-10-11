@@ -3,7 +3,6 @@ import GTextField = fgui.GTextField
 import GRoot = fgui.GRoot
 import RelationType = fgui.RelationType
 import {LibStr} from "../LibStr"
-import LanguageUtils = tsCore.LanguageUtils;
 
 export class GlobalWaiting extends GComponent {
 
@@ -24,7 +23,7 @@ export class GlobalWaiting extends GComponent {
     }
 
     override set text(value: string) {
-        value ??= LanguageUtils.inst.getStr(LibStr.LOADING)
+        value ??= getString(LibStr.LOADING)
         this.messageText.text = value
     }
 

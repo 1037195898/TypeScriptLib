@@ -11,7 +11,6 @@ import {SceneManager} from "../manager/SceneManager"
 import {LibStr} from "../LibStr"
 import {HttpCode} from "../net/Common";
 import {ActionLib} from "../actions/ActionLib";
-import LanguageUtils = tsCore.LanguageUtils;
 import Log = tsCore.Log;
 import App = tsCore.App;
 
@@ -23,7 +22,7 @@ export class StateCode {
      * @param data 一个object对象  如果带有message错误文字  直接使用 否则用code命令获取错误内容
      */
     static getShowMessage(data?: any) {
-        if (!data) return LanguageUtils.inst.getStr(LibStr.NET_ERROR)
+        if (!data) return getString(LibStr.NET_ERROR)
         if (data.message?.length > 0) {
             return data.message
         } else if (data.msg?.length > 0) {
@@ -40,22 +39,22 @@ export class StateCode {
         let content: string
         switch (code) {
             case HttpCode.LOGIN_INVALIDITY: // 未登陆，请先登陆
-                content = LanguageUtils.inst.getStr(LibStr.FIRST_LOG)
+                content = getString(LibStr.FIRST_LOG)
                 break
             case HttpCode.GAME_INSUFFICIENT_BALANCE:// 资金不足
-                content = LanguageUtils.inst.getStr(LibStr.RECHARGE)
+                content = getString(LibStr.RECHARGE)
                 break
             case HttpCode.GAME_CANNOT_BET:// 当前游戏状态不属于投注状态
-                content = LanguageUtils.inst.getStr(LibStr.CANNOT_BET)
+                content = getString(LibStr.CANNOT_BET)
                 break
             case HttpCode.GAME_OFF:// 游戏暂停中
-                content = LanguageUtils.inst.getStr(LibStr.GAME_OFF)
+                content = getString(LibStr.GAME_OFF)
                 break
             case HttpCode.GAME_BET_FAIL:// 投注失败
-                content = LanguageUtils.inst.getStr(LibStr.BET_FAIL)
+                content = getString(LibStr.BET_FAIL)
                 break
             default:
-                content = LanguageUtils.inst.getStr(LibStr.NET_ERROR) + ". code:" + code
+                content = getString(LibStr.NET_ERROR) + ". code:" + code
                 break
         }
         return content
@@ -80,7 +79,7 @@ export class StateCode {
                 LoadingWindow.inst.hide()
                 HtmlWindow.inst.hide()
                 if (typeof msg === "object") msg = this.getShowMessage(msg)
-                msg = msg ? msg : LanguageUtils.inst.getStr(LibStr.FIRST_LOG)
+                msg = msg ? msg : getString(LibStr.FIRST_LOG)
                 if (UIPackage.getByName("gameCommon")) WaitResult.inst.hide()
                 HomePrompt.instance.showTip(0, msg, function () {
                     if (Player.inst.gameId == -1) {
@@ -96,7 +95,7 @@ export class StateCode {
                     } else {
                         SceneManager.inst.logout()
                     }
-                }, null, {cancelName: LanguageUtils.inst.getStr(LibStr.OK)})
+                }, null, {cancelName: getString(LibStr.OK)})
                 return true
             case HttpCode.GAME_PAUSE:// 游戏暂停中
                 Log.debug("StateCode.execute() 8003")
@@ -112,7 +111,7 @@ export class StateCode {
 
     /** 游戏暂停中，返回大厅 */
     static showGameOff() {
-        JSUtils.openModal(LanguageUtils.inst.getStr(LibStr.GAME_OFF))
+        JSUtils.alert(getString(LibStr.GAME_OFF))
         JSUtils.gameClose()
     }
 

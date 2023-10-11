@@ -3191,6 +3191,15 @@ window.tsCore = {};
      * @see MathKit
      */
     tsCore.Cast = MathKit;
+    class SystemKit {
+        /**
+         * 获取设备刘海屏高度
+         */
+        static get notchHeight() {
+            return (window.innerHeight - document.documentElement.clientHeight); /* / Laya.Browser.pixelRatio */
+        }
+    }
+    tsCore.SystemKit = SystemKit;
     let LogLevel;
     (function (LogLevel) {
         LogLevel[LogLevel["ALL"] = 0] = "ALL";
@@ -6627,13 +6636,6 @@ function getString(id, ...args) {
         return content;
     // @ts-ignore
     return tsCore.StringUtil.format(content, ...args);
-}
-/**
- * 获取设备刘海屏的高度
- * @param [offsetH=5] 便宜高度
- */
-function notchHeight(offsetH = 5) {
-    return (window.innerHeight - document.documentElement.clientHeight) / Laya.Browser.pixelRatio + offsetH;
 }
 /**
  * 修改 mixin 函数

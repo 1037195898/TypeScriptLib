@@ -1882,6 +1882,7 @@ declare namespace gameLib {
         guest(value?: boolean): void;
         /**
          * 返回键
+         * @param [value=true]
          */
         appKeyBack(value?: boolean): void;
         /**
@@ -2126,7 +2127,7 @@ declare namespace gameLib {
          */
         customLoaderRes: ParamHandler;
         constructor();
-        call(url: string, version: any): string;
+        call(url: string, version: string): string;
         /**
          * 加载版本控制文件
          * @param complete
@@ -2974,7 +2975,15 @@ declare namespace gameLib {
          * @param parent 父对象
          * @param props 附带的属性变化 或参数 duration,delay,ease
          */
-        playGoldAni(targetObject: fgui.GObject, endObject: fgui.GObject, endHandler?: ParamHandler, parent?: fgui.GComponent, props?: any): void;
+        playGoldAni(targetObject: fgui.GObject, endObject: fgui.GObject, endHandler?: ParamHandler, parent?: fgui.GComponent, props?: {
+            x?: number;
+            y?: number;
+            scaleX?: number;
+            scaleY?: number;
+            duration?: number;
+            delay?: number;
+            ease?: Function;
+        }): void;
         /**
          * 播放移动目标到指定位置
          * @param targetObject 要被移动的对象
@@ -2984,7 +2993,15 @@ declare namespace gameLib {
          * @param parent 父对象
          * @param props 附带的属性变化 或参数 duration,delay,ease
          */
-        playGoldPointAni(targetObject: fgui.GObject, startPoint: Laya.Point, endPoint: Laya.Point, endHandler?: ParamHandler, parent?: any, props?: any): void;
+        playGoldPointAni(targetObject: fgui.GObject, startPoint: Laya.Point, endPoint: Laya.Point, endHandler?: ParamHandler, parent?: fgui.GComponent, props?: {
+            x?: number;
+            y?: number;
+            scaleX?: number;
+            scaleY?: number;
+            duration?: number;
+            delay?: number;
+            ease?: Function;
+        }): void;
         private addChild;
         private globalToLocal;
         private get scene();

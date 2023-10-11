@@ -17,7 +17,6 @@ import {LibStr} from "../LibStr"
 import IFormatVer = tsCore.IFormatVer;
 import ELoader = tsCore.ELoader;
 import StringUtil = tsCore.StringUtil;
-import LanguageUtils = tsCore.LanguageUtils;
 import Log = tsCore.Log;
 import UtilKit = tsCore.UtilKit;
 import SoundUtils = tsCore.SoundUtils;
@@ -91,9 +90,9 @@ export class AssetsLoader implements IFormatVer {
         ELoader.format.push(this)
     }
 
-    call(url: string, version): string {
+    call(url: string, version: string): string {
         if (Render.isConchApp) return version
-        if (StringUtil.contains(url, "configs/newConfig")) {
+        if (url.contains("configs/newConfig")) {
             return URL.version["configs/newConfig.js"]
         }
         return version
@@ -166,8 +165,7 @@ export class AssetsLoader implements IFormatVer {
         let loadErrorHandler = () => {
             ELoader.loader.clearUnLoaded()
             AnalyticsManager.sendGameAnalysis("loader_main_res_error")
-            if (!Render.isConchApp)
-                JSUtils.openModal(LanguageUtils.inst.getStr(LibStr.NET_ERROR))
+            if (!Render.isConchApp) JSUtils.alert(getString(LibStr.NET_ERROR))
             JSUtils.gameClose()
             AppManager.gameRestart()
         }
@@ -209,7 +207,7 @@ export class AssetsLoader implements IFormatVer {
 
         function loadCommonErrorHandler() {
             ELoader.loader.clearUnLoaded()
-            if (!Render.isConchApp) JSUtils.openModal(LanguageUtils.inst.getStr(LibStr.NET_ERROR))
+            if (!Render.isConchApp) JSUtils.alert(getString(LibStr.NET_ERROR))
             JSUtils.gameClose()
             AppManager.gameRestart()
         }

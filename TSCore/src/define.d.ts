@@ -25,12 +25,6 @@ declare type InstanceTypeOfConstructor<T> = T extends Constructor<infer R> ? R :
  */
 declare function getString(id: string | number, ...args): string
 
-/**
- * 获取设备刘海屏的高度
- * @param [offsetH=5] 便宜高度
- */
-declare function notchHeight(offsetH?: number): number
-
 declare module Laya {
 
 // @ts-ignore

@@ -44,7 +44,7 @@ export class UtilKit {
      */
     static getRequest() {
         let url = window.location.search; //获取url中"?"符后的字串
-        let theRequest: any = {}
+        let theRequest: { [key: string]: string } = {}
         if (url.indexOf("?") != -1) {
             let str = url.substring(1)
             let strs = str.split("&")

@@ -201,7 +201,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
         Player.inst.gameId = CommonCmd.GAME_HOME
         GRoot.inst.closeModalWait()
         LoadingWindow.inst.hide()
-        JSUtils.openModal(message ? message : getString(LibStr.GAME_OFF))
+        JSUtils.alert(message ? message : getString(LibStr.GAME_OFF))
         JSUtils.gameClose()
         if (isTip) MessageTip.showTip(message ? message : LibStr.GAME_OFF)
         this.sendAction(ActionLib.GAME_UPDATE_DEFAULT_SCREEN)
@@ -434,7 +434,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
             str = getString(LibStr.NET_ERROR)
         }
         if (closeGame) {
-            JSUtils.openModal(str)
+            JSUtils.alert(str)
             JSUtils.gameClose()
         } else {
             this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, str)

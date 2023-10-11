@@ -13,14 +13,6 @@ function getString(id: string | number, ...args) {
 }
 
 /**
- * 获取设备刘海屏的高度
- * @param [offsetH=5] 便宜高度
- */
-function notchHeight(offsetH = 5) {
-    return (window.innerHeight - document.documentElement.clientHeight) / Laya.Browser.pixelRatio + offsetH
-}
-
-/**
  * 修改 mixin 函数
  * @deprecated
  * @param classes

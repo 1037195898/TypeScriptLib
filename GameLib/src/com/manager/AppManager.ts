@@ -11,7 +11,7 @@ export class AppManager {
 
     /** 关闭app自定义返回 */
     static closeAppBack() {
-        if (AppManager.callIOS("runJs", {js: "appKeyBack()"})) return
+        // if (AppManager.callIOS("runJs", {js: "appKeyBack()"})) return
         // @ts-ignore
         window.conch?.setOnBackPressedFunction(function () {
         })

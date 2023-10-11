@@ -3,7 +3,6 @@ import Browser = Laya.Browser;
 import Render = Laya.Render;
 import Utils = Laya.Utils;
 import Log = tsCore.Log;
-import LanguageUtils = tsCore.LanguageUtils;
 import App = tsCore.App;
 import {IExecuteData} from "../Interfaces";
 import {Player} from "../Player";
@@ -81,7 +80,7 @@ export class AppRecordManager extends tsCore.HistoryManager {
                     return
                 }
                 AppRecordManager.exitTimer = timer
-                AppManager.toast(LanguageUtils.inst.getStr(LibStr.EXIT_APP))
+                AppManager.toast(getString(LibStr.EXIT_APP))
             } else {
 //					__JS__("window.history.back()")
             }

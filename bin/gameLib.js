@@ -1712,7 +1712,7 @@ window.gameLib = {};
             Player.inst.gameId = CommonCmd.GAME_HOME;
             fgui.GRoot.inst.closeModalWait();
             LoadingWindow.inst.hide();
-            JSUtils.openModal(message ? message : getString(1002 /* LibStr.GAME_OFF */));
+            JSUtils.alert(message ? message : getString(1002 /* LibStr.GAME_OFF */));
             JSUtils.gameClose();
             if (isTip)
                 tsCore.MessageTip.showTip(message ? message : 1002 /* LibStr.GAME_OFF */);
@@ -1927,7 +1927,7 @@ window.gameLib = {};
                 str = getString(1005 /* LibStr.NET_ERROR */);
             }
             if (closeGame) {
-                JSUtils.openModal(str);
+                JSUtils.alert(str);
                 JSUtils.gameClose();
             }
             else {
@@ -3191,6 +3191,7 @@ window.gameLib = {};
         }
         /**
          * 返回键
+         * @param [value=true]
          */
         appKeyBack(value = true) {
             tsCore.HistoryManager.backHistory(value);
@@ -3264,8 +3265,7 @@ window.gameLib = {};
         /** 关闭app自定义返回 */
         static closeAppBack() {
             var _a;
-            if (AppManager.callIOS("runJs", { js: "appKeyBack()" }))
-                return;
+            // if (AppManager.callIOS("runJs", {js: "appKeyBack()"})) return
             // @ts-ignore
             (_a = window.conch) === null || _a === void 0 ? void 0 : _a.setOnBackPressedFunction(function () {
             });
@@ -3691,7 +3691,7 @@ window.gameLib = {};
                         return;
                     }
                     AppRecordManager.exitTimer = timer;
-                    AppManager.toast(tsCore.LanguageUtils.inst.getStr(1034 /* LibStr.EXIT_APP */));
+                    AppManager.toast(getString(1034 /* LibStr.EXIT_APP */));
                 }
                 else {
                     //					__JS__("window.history.back()")
@@ -3828,7 +3828,7 @@ window.gameLib = {};
         call(url, version) {
             if (Laya.Render.isConchApp)
                 return version;
-            if (tsCore.StringUtil.contains(url, "configs/newConfig")) {
+            if (url.contains("configs/newConfig")) {
                 return Laya.URL.version["configs/newConfig.js"];
             }
             return version;
@@ -3897,7 +3897,7 @@ window.gameLib = {};
                 tsCore.ELoader.loader.clearUnLoaded();
                 AnalyticsManager.sendGameAnalysis("loader_main_res_error");
                 if (!Laya.Render.isConchApp)
-                    JSUtils.openModal(tsCore.LanguageUtils.inst.getStr(1005 /* LibStr.NET_ERROR */));
+                    JSUtils.alert(getString(1005 /* LibStr.NET_ERROR */));
                 JSUtils.gameClose();
                 AppManager.gameRestart();
             };
@@ -3933,7 +3933,7 @@ window.gameLib = {};
             function loadCommonErrorHandler() {
                 tsCore.ELoader.loader.clearUnLoaded();
                 if (!Laya.Render.isConchApp)
-                    JSUtils.openModal(tsCore.LanguageUtils.inst.getStr(1005 /* LibStr.NET_ERROR */));
+                    JSUtils.alert(getString(1005 /* LibStr.NET_ERROR */));
                 JSUtils.gameClose();
                 AppManager.gameRestart();
             }
@@ -4615,7 +4615,7 @@ window.gameLib = {};
         checkGameState(data) {
             if ((data === null || data === void 0 ? void 0 : data.code) == -1) {
                 LoadingWindow.inst.hide();
-                JSUtils.openModal(StateCode.getShowMessage(data));
+                JSUtils.alert(StateCode.getShowMessage(data));
                 JSUtils.gameClose();
                 return;
             }
@@ -4677,7 +4677,7 @@ window.gameLib = {};
             fgui.GRoot.inst.closeModalWait();
             if (Player.inst.urlParam.isJumpPage()) {
                 if (!Laya.Render.isConchApp)
-                    JSUtils.openModal(getString(1005 /* LibStr.NET_ERROR */));
+                    JSUtils.alert(getString(1005 /* LibStr.NET_ERROR */));
                 JSUtils.gameClose();
                 AppManager.gameRestart();
                 Player.inst.gameId = CommonCmd.GAME_HOME;
@@ -5134,10 +5134,10 @@ window.gameLib = {};
                         index++;
                     }
                     tsCore.Log.debug(`clear cache reload ${newUrl + param}`);
-                    window.location.href = newUrl + param;
+                    window.location.replace(newUrl + param);
                 }
-                //        if (Laya.Browser.window.location.protocol != "http:" && !Laya.Render.isConchApp)
-                //            Laya.Browser.window.history.pushState(null, null, newUrl)
+                //        if (Browser.window.location.protocol != "http:" && !Laya.Render.isConchApp)
+                //            Browser.window.history.pushState(null, null, newUrl)
             }
         }
         parseData(json) {
@@ -6750,7 +6750,7 @@ window.gameLib = {};
         static getShowMessage(data) {
             var _a, _b;
             if (!data)
-                return tsCore.LanguageUtils.inst.getStr(1005 /* LibStr.NET_ERROR */);
+                return getString(1005 /* LibStr.NET_ERROR */);
             if (((_a = data.message) === null || _a === void 0 ? void 0 : _a.length) > 0) {
                 return data.message;
             }
@@ -6767,22 +6767,22 @@ window.gameLib = {};
             let content;
             switch (code) {
                 case HttpCode.LOGIN_INVALIDITY: // 未登陆，请先登陆
-                    content = tsCore.LanguageUtils.inst.getStr(1007 /* LibStr.FIRST_LOG */);
+                    content = getString(1007 /* LibStr.FIRST_LOG */);
                     break;
                 case HttpCode.GAME_INSUFFICIENT_BALANCE: // 资金不足
-                    content = tsCore.LanguageUtils.inst.getStr(1021 /* LibStr.RECHARGE */);
+                    content = getString(1021 /* LibStr.RECHARGE */);
                     break;
                 case HttpCode.GAME_CANNOT_BET: // 当前游戏状态不属于投注状态
-                    content = tsCore.LanguageUtils.inst.getStr(1006 /* LibStr.CANNOT_BET */);
+                    content = getString(1006 /* LibStr.CANNOT_BET */);
                     break;
                 case HttpCode.GAME_OFF: // 游戏暂停中
-                    content = tsCore.LanguageUtils.inst.getStr(1002 /* LibStr.GAME_OFF */);
+                    content = getString(1002 /* LibStr.GAME_OFF */);
                     break;
                 case HttpCode.GAME_BET_FAIL: // 投注失败
-                    content = tsCore.LanguageUtils.inst.getStr(1010 /* LibStr.BET_FAIL */);
+                    content = getString(1010 /* LibStr.BET_FAIL */);
                     break;
                 default:
-                    content = tsCore.LanguageUtils.inst.getStr(1005 /* LibStr.NET_ERROR */) + ". code:" + code;
+                    content = getString(1005 /* LibStr.NET_ERROR */) + ". code:" + code;
                     break;
             }
             return content;
@@ -6807,7 +6807,7 @@ window.gameLib = {};
                     HtmlWindow.inst.hide();
                     if (typeof msg === "object")
                         msg = this.getShowMessage(msg);
-                    msg = msg ? msg : tsCore.LanguageUtils.inst.getStr(1007 /* LibStr.FIRST_LOG */);
+                    msg = msg ? msg : getString(1007 /* LibStr.FIRST_LOG */);
                     if (fgui.UIPackage.getByName("gameCommon"))
                         WaitResult.inst.hide();
                     HomePrompt.instance.showTip(0, msg, function () {
@@ -6825,7 +6825,7 @@ window.gameLib = {};
                         else {
                             SceneManager.inst.logout();
                         }
-                    }, null, { cancelName: tsCore.LanguageUtils.inst.getStr(1066 /* LibStr.OK */) });
+                    }, null, { cancelName: getString(1066 /* LibStr.OK */) });
                     return true;
                 case HttpCode.GAME_PAUSE: // 游戏暂停中
                     tsCore.Log.debug("StateCode.execute() 8003");
@@ -6841,7 +6841,7 @@ window.gameLib = {};
         }
         /** 游戏暂停中，返回大厅 */
         static showGameOff() {
-            JSUtils.openModal(tsCore.LanguageUtils.inst.getStr(1002 /* LibStr.GAME_OFF */));
+            JSUtils.alert(getString(1002 /* LibStr.GAME_OFF */));
             JSUtils.gameClose();
         }
     }
@@ -7202,7 +7202,7 @@ window.gameLib = {};
         }
         /*@override*/
         set text(value) {
-            value !== null && value !== void 0 ? value : (value = tsCore.LanguageUtils.inst.getStr(1001 /* LibStr.LOADING */));
+            value !== null && value !== void 0 ? value : (value = getString(1001 /* LibStr.LOADING */));
             this.messageText.text = value;
         }
     }

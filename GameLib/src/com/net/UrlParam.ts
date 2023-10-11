@@ -1,4 +1,3 @@
-import Browser = Laya.Browser
 import Utils = Laya.Utils
 import LocalStorage = Laya.LocalStorage
 import Render = Laya.Render
@@ -65,7 +64,7 @@ export class UrlParam {
                     index++
                 }
                 Log.debug(`clear cache reload ${newUrl + param}` )
-                window.location.href = newUrl + param
+                window.location.replace(newUrl + param)
             }
 
 //        if (Browser.window.location.protocol != "http:" && !Render.isConchApp)
