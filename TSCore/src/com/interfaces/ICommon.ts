@@ -2,9 +2,23 @@ import {IAction} from "./IAction";
 
 export enum Method {GET = "get", POST = "post"}
 
-
+/**
+ * 初始化引擎接口
+ */
 export interface IInitEngine {
-    run(): void
+    /**
+     * 启动引擎结束
+     */
+    run?(): void
+    /**
+     * 引擎初始化结束
+     * Laya fgui
+     */
+    onEngine?():void
+    /**
+     * 所有初始化完成，包括延迟执行
+     */
+    onEnd?(): void
 }
 
 export interface IFormatVer {

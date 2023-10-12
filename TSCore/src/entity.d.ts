@@ -1,13 +1,27 @@
 declare type InitApp = {
     /** 初始化Laya */
     laya: {
-        /** 是否初始化Laya 默认true */
+        /**
+         * 是否初始化Laya
+         * @default true
+         */
         init: boolean,
-        /** 渲染模式 默认 Laya.WebGL */
+        /**
+         * 渲染模式
+         * @default Laya.WebGL
+         */
         renders: any[]
     },
-    /** 是否让GRoot 自适应大小 默认true */
+    /**
+     * 是否让GRoot 自适应大小
+     * @default true
+     */
     resize?: boolean
+    /**
+     * 是否启用刘海屏模式
+     * @default false
+     */
+    isNotchEnable?:boolean
 }
 
 declare type PointType = { x?: number, y?: number }

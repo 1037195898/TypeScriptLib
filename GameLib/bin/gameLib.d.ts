@@ -2242,24 +2242,24 @@ declare namespace gameLib {
         logout(): void;
         private visibleId;
         private visibles;
-        onVisibleChange(fun: () => void): void;
-        offVisibleChange(fun: () => void): void;
+        /**
+         * 添加应用显示与隐藏调用方法
+         * @param fun
+         */
+        onVisibleChange(fun: (v: boolean) => void): void;
+        offVisibleChange(fun: (v: boolean) => void): void;
         /** 游戏是否进入后台 */
         private visibilityChange;
         /** 得到焦点开始渲染 */
         private focusHandler;
         /** 失去焦点停止渲染 */
         private blurHandler;
+        showLoginTip(): void;
         /**
          * 登录提示框
          * @deprecated
          */
-        showloginTip(): void;
-        showLoginTip(): void;
-        /** 获取当前屏幕等比例缩放系数 */
-        getEqualRatioScale(): number;
-        /** 获取当前屏幕等比例缩放系数 */
-        getEqualRatioRatio(w: number, h: number): Laya.Point;
+        showloginTip: () => void;
         /**
          * 开启游戏 两个参数二选一  如果使用id第一个必须设置null
          * @param config 游戏配置文件名
@@ -2321,8 +2321,6 @@ declare namespace gameLib {
          * @param callback
          */
         unexpectedExitGame(msg?: string, callback?: ParamHandler): void;
-        /** 更新当前游戏中的游戏金币 */
-        updateGlod(): void;
         get starter(): BaseStarter;
         get scene(): BaseScene<BaseGameData>;
         /**
@@ -2702,10 +2700,10 @@ declare namespace gameLib {
         getCoupon(type: number): Coupons[];
         /**
          * 根据游戏ID  获取优惠劵
-         * @param gameId 游戏ID
+         * @param gameId 游戏ID 默认使用 Player.inst.gameId
          * @return
          */
-        getCouponGame(gameId: number): Coupons[];
+        getCouponGame(gameId?: number): Coupons[];
         /** 使用活动劵的次数 */
         useCouponNum(): void;
         /**

@@ -70,8 +70,10 @@ export class GoldAniUtils {
      * @param complete 结束回调
      */
     play(num: number, start: Laya.Point | GObject, end: Laya.Point | GObject, complete?: ParamHandler) {
-        if (start instanceof GObject) {
-            if (!start || start.isDisposed || !start.displayObject) {
+        if (!start) {
+            this.startPoint = Laya.Point.create().setTo((this.scene.width >> 1), (this.scene.height >> 1))
+        } else if (start instanceof GObject) {
+            if (start.isDisposed || !start.displayObject) {
                 this.startPoint = Laya.Point.create().setTo((this.scene.width >> 1), (this.scene.height >> 1))
             } else {
                 this.startPoint = start.localToGlobal()

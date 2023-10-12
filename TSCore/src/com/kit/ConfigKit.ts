@@ -1,8 +1,8 @@
 import {ELoader} from "../extends/ELoader";
-import Utils = Laya.Utils;
-import Render = Laya.Render;
 import {StringUtil} from "../utils/StringUtil";
 import {Log} from "../Log";
+import Utils = Laya.Utils;
+import Render = Laya.Render;
 
 export enum EnvType { PROD, DEV, TEST}
 

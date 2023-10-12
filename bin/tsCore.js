@@ -13,13 +13,18 @@ window.tsCore = {};
          * @param options
          */
         static run(init, w = 720, h = 1280, options) {
+            var _a, _b, _c;
+            var _d;
+            App.initEngine = init;
             App._init();
             App.inst.options = options !== null && options !== void 0 ? options : (options = { laya: { init: true, renders: [Laya.WebGL] }, resize: true });
-            init === null || init === void 0 ? void 0 : init.run();
+            (_a = init === null || init === void 0 ? void 0 : init.run) === null || _a === void 0 ? void 0 : _a.call(init);
             if (options.laya && !options.laya.init)
                 return;
+            (_b = (_d = options.laya).renders) !== null && _b !== void 0 ? _b : (_d.renders = [Laya.WebGL]);
             Laya.init(w, h, ...options.laya.renders);
-            Laya.timer.callLater(this, this.startSize);
+            (_c = init === null || init === void 0 ? void 0 : init.onEngine) === null || _c === void 0 ? void 0 : _c.call(init);
+            Laya.timer.callLater(App.inst, App.inst.lastInit);
         }
         /** 设置默认竖屏布局 */
         static updateDefaultScreen() {
@@ -65,13 +70,32 @@ window.tsCore = {};
                 new args[i]();
             }
         }
+        lastInit() {
+            this.startSize();
+            if (this.options.isNotchEnable) {
+                function notchFun() {
+                    const notch = SystemKit.notchHeight;
+                    SystemKit.cacheNotch = notch;
+                    Log.debug(`notchHeight1=${notch}`);
+                }
+                function getNotchEnd() {
+                    var _a, _b;
+                    const notch = SystemKit.notchHeight;
+                    SystemKit.cacheNotch = notch;
+                    Log.debug(`notchHeight2=${notch}`);
+                    (_b = (_a = App.initEngine) === null || _a === void 0 ? void 0 : _a.onEnd) === null || _b === void 0 ? void 0 : _b.call(_a);
+                }
+                Laya.timer.callLater(this, notchFun);
+                Laya.timer.once(300, this, getNotchEnd);
+            }
+        }
         constructor() {
             this.initController();
         }
-        static startSize() {
-            if (App.inst.options.resize) {
-                Laya.stage.on(Laya.Event.RESIZE, App.inst, App.inst.onResize);
-                App.inst.onResize();
+        startSize() {
+            if (this.options.resize) {
+                Laya.stage.on(Laya.Event.RESIZE, this, this.onResize);
+                this.onResize();
             }
         }
         onResize() {
@@ -3198,7 +3222,19 @@ window.tsCore = {};
         static get notchHeight() {
             return (window.innerHeight - document.documentElement.clientHeight); /* / Laya.Browser.pixelRatio */
         }
+        /**
+         * 在启用刘海屏模式下会调用指定方法并得到刘海屏信息
+         * @param value
+         */
+        static set onNotch(value) {
+            if (App.inst.options.isNotchEnable)
+                value(SystemKit.cacheNotch);
+        }
     }
+    /**
+     * 启动后自动获取的刘海屏高度
+     */
+    SystemKit.cacheNotch = 0;
     tsCore.SystemKit = SystemKit;
     let LogLevel;
     (function (LogLevel) {
@@ -3872,6 +3908,11 @@ window.tsCore = {};
             this.headers = array;
             return this;
         }
+        /**
+         * 请求在自动终止之前可能需要的毫秒数。<br>
+         * 值为 0，表示没有超时。
+         * @default 0
+         */
         setOvertime(value) {
             this.ghr.setOvertime(value);
             return this;

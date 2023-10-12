@@ -1,12 +1,12 @@
-import Browser = Laya.Browser
-import Render = Laya.Render
-import LocalStorage = Laya.LocalStorage
+import Browser = Laya.Browser;
+import Render = Laya.Render;
+import LocalStorage = Laya.LocalStorage;
 import UtilKit = tsCore.UtilKit;
 import MathKit = tsCore.MathKit;
 import StringUtil = tsCore.StringUtil;
 import ConfigKit = tsCore.ConfigKit;
 import {UrlParam} from "./net/UrlParam"
-import {IExecuteData, IGameData, ILogin, IGuestModel, IData} from "./Interfaces";
+import {IData, IExecuteData, IGameData, IGuestModel, ILogin} from "./Interfaces";
 
 /** 用户数据 */
 export class Player {
@@ -168,10 +168,11 @@ export class Player {
 
     /**
      * 根据游戏ID  获取优惠劵
-     * @param gameId 游戏ID
+     * @param gameId 游戏ID 默认使用 Player.inst.gameId
      * @return
      */
-    getCouponGame(gameId: number) {
+    getCouponGame(gameId?: number) {
+        gameId ??= Player.inst.gameId
         let temps: Coupons[] = []
         for (let i = 0; i < this.coupons.length; i++) {
             let arr = this.coupons[i]

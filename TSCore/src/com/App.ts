@@ -6,6 +6,7 @@ import {ConfigKit, EnvType} from "./kit/ConfigKit";
 import {Log} from "./Log";
 import {IController, IInitEngine, IKey, IProxy, IView} from "./interfaces/ICommon";
 import {HistoryManager} from "./manager/HistoryManager";
+import {SystemKit} from "./kit/SystemKit";
 import Handler = Laya.Handler;
 
 export class App implements IAction {
@@ -29,7 +30,8 @@ export class App implements IAction {
      */
     static GAME_GROUP = "game_group"
 
-    private options: InitApp
+    static initEngine?: IInitEngine
+    options: InitApp
     private _controller: IController
 
     /**
@@ -40,12 +42,15 @@ export class App implements IAction {
      * @param options
      */
     static run(init?: IInitEngine, w = 720, h = 1280, options?: InitApp) {
+        App.initEngine = init
         App._init()
         App.inst.options = options ??= {laya: {init: true, renders: [Laya.WebGL]}, resize: true}
-        init?.run()
+        init?.run?.()
         if (options.laya && !options.laya.init) return
+        options.laya.renders ??= [Laya.WebGL]
         Laya.init(w, h, ...options.laya.renders)
-        Laya.timer.callLater(this, this.startSize)
+        init?.onEngine?.()
+        Laya.timer.callLater(App.inst, App.inst.lastInit)
     }
 
     /** 设置默认竖屏布局 */
@@ -95,14 +100,34 @@ export class App implements IAction {
         }
     }
 
+    lastInit() {
+        this.startSize()
+        if (this.options.isNotchEnable) {
+            function notchFun() {
+                const notch = SystemKit.notchHeight
+                SystemKit.cacheNotch = notch
+                Log.debug(`notchHeight1=${notch}`)
+            }
+            function getNotchEnd() {
+                const notch = SystemKit.notchHeight
+                SystemKit.cacheNotch = notch
+                Log.debug(`notchHeight2=${notch}`)
+                App.initEngine?.onEnd?.()
+            }
+            Laya.timer.callLater(this, notchFun)
+            Laya.timer.once(300, this, getNotchEnd)
+        }
+    }
+
+
     constructor() {
         this.initController()
     }
 
-    private static startSize() {
-        if (App.inst.options.resize) {
-            Laya.stage.on(Laya.Event.RESIZE, App.inst, App.inst.onResize)
-            App.inst.onResize()
+    private startSize() {
+        if (this.options.resize) {
+            Laya.stage.on(Laya.Event.RESIZE, this, this.onResize)
+            this.onResize()
         }
     }
 

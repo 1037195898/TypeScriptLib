@@ -2,14 +2,25 @@ import Render = Laya.Render;
 import LocalStorage = Laya.LocalStorage;
 import GRoot = fgui.GRoot;
 import Handler = Laya.Handler;
-import Point = Laya.Point;
 import Browser = Laya.Browser;
 import UIPackage = fgui.UIPackage;
 import SoundManager = Laya.SoundManager;
-import Stage = Laya.Stage;
 import Loader = Laya.Loader;
 import URL = Laya.URL;
 import Templet = Laya.Templet;
+import EProxy = tsCore.EProxy;
+import Log = tsCore.Log;
+import HistoryManager = tsCore.HistoryManager;
+import HTTPUtils = tsCore.HTTPUtils;
+import App = tsCore.App;
+import ELoader = tsCore.ELoader;
+import UtilKit = tsCore.UtilKit;
+import StringUtil = tsCore.StringUtil;
+import MessageTip = tsCore.MessageTip;
+import SoundUtils = tsCore.SoundUtils;
+import MouseManager = Laya.MouseManager;
+import TouchManager = Laya.TouchManager;
+import KeyBoardManager = Laya.KeyBoardManager;
 import {BaseStarter} from "../core/BaseStarter"
 import {Player} from "../Player"
 import {AppManager} from "./AppManager"
@@ -24,22 +35,9 @@ import {AnalyticsManager} from "./AnalyticsManager"
 import {PromptWindow} from "../view/PromptWindow"
 import {WaitResult} from "../view/WaitResult"
 import {Cmd, CommonCmd} from "../net/Common";
-import EProxy = tsCore.EProxy;
-import Log = tsCore.Log;
-import HistoryManager = tsCore.HistoryManager;
-import HTTPUtils = tsCore.HTTPUtils;
-import App = tsCore.App;
 import {GameConfigKit} from "../kit/GameConfigKit";
-import ELoader = tsCore.ELoader;
-import UtilKit = tsCore.UtilKit;
-import StringUtil = tsCore.StringUtil;
-import MessageTip = tsCore.MessageTip;
-import SoundUtils = tsCore.SoundUtils;
 import {AssetsLoader} from "./AssetsLoader";
 import {StateCode} from "../utils/StateCode";
-import MouseManager = Laya.MouseManager;
-import TouchManager = Laya.TouchManager;
-import KeyBoardManager = Laya.KeyBoardManager;
 
 /**
  * 舞台
@@ -85,14 +83,11 @@ export class SceneManager extends EProxy {
         } else {
             LoadingWindow.inst.hide()
         }
-
-//		    GRoot.inst.addChild(GlodSprayScene.inst)
     }
 
     /** 显示登录界面 */
     showLogin() {
-        if (Player.inst.urlParam.isJumpPage())
-            JSUtils.login()
+        if (Player.inst.urlParam.isJumpPage()) JSUtils.login()
     }
 
     /** 退出登录 */
@@ -120,14 +115,18 @@ export class SceneManager extends EProxy {
     }
 
     private visibleId = 0
-    private visibles: (() => void)[] = []
+    private visibles: ((v: boolean) => void)[] = []
 
-    onVisibleChange(fun: () => void) {
+    /**
+     * 添加应用显示与隐藏调用方法
+     * @param fun
+     */
+    onVisibleChange(fun: (v: boolean) => void) {
         fun["$vid"] = this.visibleId++
         this.visibles.push(fun)
     }
 
-    offVisibleChange(fun: () => void) {
+    offVisibleChange(fun: (v: boolean) => void) {
         if (fun["$vid"]) {
             let index = this.visibles.findIndex((value) => fun["$vid"] === value["$vid"])
             this.visibles.splice(index, 1)
@@ -136,13 +135,10 @@ export class SceneManager extends EProxy {
 
     /** 游戏是否进入后台 */
     private visibilityChange() {
-//		Log.debug("visibilityChange="+Laya.stage.isVisibility)
-        if (!this.isCloseGame) this.visibles.forEach((value) => value())
-        if (Laya.stage.isVisibility) {
-            this.focusHandler()
-        } else {
-            this.blurHandler()
-        }
+        let visibility = Laya.stage.isVisibility
+        // Log.debug(`visibilityChange=${visibility}`)
+        if (!this.isCloseGame) this.visibles.forEach((value) => value(visibility))
+        visibility ? this.focusHandler() : this.blurHandler()
     }
 
     /** 得到焦点开始渲染 */
@@ -187,38 +183,15 @@ export class SceneManager extends EProxy {
         }
     }
 
+    showLoginTip() {
+        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.LOGIN, null, () => this.showLogin())
+    }
+
     /**
      * 登录提示框
      * @deprecated
      */
-    showloginTip() {
-        this.showLoginTip()
-
-    }
-
-    showLoginTip() {
-        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.LOGIN, null, Handler.create(this, () => {
-            this.showLogin()
-        }))
-    }
-
-    /** 获取当前屏幕等比例缩放系数 */
-    getEqualRatioScale() {
-        let point: Point = this.getEqualRatioRatio(GRoot.inst.width, GRoot.inst.height)
-        return Math.min(point.x, point.y)
-    }
-
-    /** 获取当前屏幕等比例缩放系数 */
-    getEqualRatioRatio(w: number, h: number) {
-        let s1 = w / this.gameWidth
-        let s2 = h / this.gameHeight
-        if (Laya.stage.screenMode == Stage.SCREEN_HORIZONTAL) {
-            s1 = w / this.gameHeight
-            s2 = h / this.gameWidth
-        }
-        return new Point(s1, s2)
-    }
-
+    showloginTip = this.showLoginTip
 
     /**
      * 开启游戏 两个参数二选一  如果使用id第一个必须设置null
@@ -284,7 +257,7 @@ export class SceneManager extends EProxy {
         let tempStr: string
         for (let i = 0; i < res.length; i++) {
             tempStr = res[i].url
-            if (StringUtil.endsWith(tempStr, fgui.UIConfig.packageFileExtension)) {
+            if (tempStr.endsWith( fgui.UIConfig.packageFileExtension)) {
                 resName = StringUtil.remove(tempStr, "." + fgui.UIConfig.packageFileExtension)
             }
         }
@@ -541,7 +514,7 @@ export class SceneManager extends EProxy {
      * @param callback
      */
     unexpectedExitGame(msg?: string, callback?: ParamHandler) {
-        msg = msg ? msg : getString(LibStr.GAME_ERROR)
+        msg ??= getString(LibStr.GAME_ERROR)
         this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, msg, null, Handler.create(this, function () {
             Laya.timer.callLater(this, function () {
                 if (Player.inst.gameId != CommonCmd.GAME_HOME) {
@@ -550,11 +523,6 @@ export class SceneManager extends EProxy {
                 runFun(callback)
             })
         }))
-    }
-
-    /** 更新当前游戏中的游戏金币 */
-    public updateGlod() {
-        this.sendAction(ActionLib.GAME_UPDATE_MONEY)
     }
 
     get starter() {
@@ -571,15 +539,12 @@ export class SceneManager extends EProxy {
      */
     sendErrorLog(data: any) {
         let postUrl = Player.inst.data.getErrorUrl()
-        if (StringUtil.isEmpty(postUrl) || !StringUtil.beginsWith(postUrl, "http")) {
-            return
-        }
-        HTTPUtils.create()
-            .setMethod("post")
-            .setOvertime(0)
-            .setUrl(postUrl)
-            .setData(data)
-            .call()
+        if (postUrl?.startsWith( "http")) HTTPUtils.create()
+                .setMethod("post")
+                .setUrl(postUrl)
+                .setData(data)
+                .call()
+
     }
 
 

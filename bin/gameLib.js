@@ -4370,6 +4370,11 @@ window.gameLib = {};
             this.isCall = false;
             this.visibleId = 0;
             this.visibles = [];
+            /**
+             * 登录提示框
+             * @deprecated
+             */
+            this.showloginTip = this.showLoginTip;
         }
         static get inst() {
             var _a;
@@ -4390,7 +4395,6 @@ window.gameLib = {};
             else {
                 LoadingWindow.inst.hide();
             }
-            //		    fgui.GRoot.inst.addChild(GlodSprayScene.inst)
         }
         /** 显示登录界面 */
         showLogin() {
@@ -4415,6 +4419,10 @@ window.gameLib = {};
             tsCore.HistoryManager.clearHistory();
             JSUtils.login();
         }
+        /**
+         * 添加应用显示与隐藏调用方法
+         * @param fun
+         */
         onVisibleChange(fun) {
             fun["$vid"] = this.visibleId++;
             this.visibles.push(fun);
@@ -4427,15 +4435,11 @@ window.gameLib = {};
         }
         /** 游戏是否进入后台 */
         visibilityChange() {
-            //		tsCore.Log.debug("visibilityChange="+Laya.stage.isVisibility)
+            let visibility = Laya.stage.isVisibility;
+            // tsCore.Log.debug(`visibilityChange=${visibility}`)
             if (!this.isCloseGame)
-                this.visibles.forEach((value) => value());
-            if (Laya.stage.isVisibility) {
-                this.focusHandler();
-            }
-            else {
-                this.blurHandler();
-            }
+                this.visibles.forEach((value) => value(visibility));
+            visibility ? this.focusHandler() : this.blurHandler();
         }
         /** 得到焦点开始渲染 */
         focusHandler() {
@@ -4483,32 +4487,8 @@ window.gameLib = {};
                 (_b = (_a = SceneManager.inst.starter) === null || _a === void 0 ? void 0 : _a.gameModel) === null || _b === void 0 ? void 0 : _b.blurGame();
             }
         }
-        /**
-         * 登录提示框
-         * @deprecated
-         */
-        showloginTip() {
-            this.showLoginTip();
-        }
         showLoginTip() {
-            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1023 /* LibStr.LOGIN */, null, Laya.Handler.create(this, () => {
-                this.showLogin();
-            }));
-        }
-        /** 获取当前屏幕等比例缩放系数 */
-        getEqualRatioScale() {
-            let point = this.getEqualRatioRatio(fgui.GRoot.inst.width, fgui.GRoot.inst.height);
-            return Math.min(point.x, point.y);
-        }
-        /** 获取当前屏幕等比例缩放系数 */
-        getEqualRatioRatio(w, h) {
-            let s1 = w / this.gameWidth;
-            let s2 = h / this.gameHeight;
-            if (Laya.stage.screenMode == Laya.Stage.SCREEN_HORIZONTAL) {
-                s1 = w / this.gameHeight;
-                s2 = h / this.gameWidth;
-            }
-            return new Laya.Point(s1, s2);
+            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1023 /* LibStr.LOGIN */, null, () => this.showLogin());
         }
         /**
          * 开启游戏 两个参数二选一  如果使用id第一个必须设置null
@@ -4570,7 +4550,7 @@ window.gameLib = {};
             let tempStr;
             for (let i = 0; i < res.length; i++) {
                 tempStr = res[i].url;
-                if (tsCore.StringUtil.endsWith(tempStr, fgui.UIConfig.packageFileExtension)) {
+                if (tempStr.endsWith(fgui.UIConfig.packageFileExtension)) {
                     resName = tsCore.StringUtil.remove(tempStr, "." + fgui.UIConfig.packageFileExtension);
                 }
             }
@@ -4805,7 +4785,7 @@ window.gameLib = {};
          * @param callback
          */
         unexpectedExitGame(msg, callback) {
-            msg = msg ? msg : getString(1009 /* LibStr.GAME_ERROR */);
+            msg !== null && msg !== void 0 ? msg : (msg = getString(1009 /* LibStr.GAME_ERROR */));
             this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, msg, null, Laya.Handler.create(this, function () {
                 Laya.timer.callLater(this, function () {
                     if (Player.inst.gameId != CommonCmd.GAME_HOME) {
@@ -4814,10 +4794,6 @@ window.gameLib = {};
                     runFun(callback);
                 });
             }));
-        }
-        /** 更新当前游戏中的游戏金币 */
-        updateGlod() {
-            this.sendAction(ActionLib.GAME_UPDATE_MONEY);
         }
         get starter() {
             return this._starter;
@@ -4831,15 +4807,12 @@ window.gameLib = {};
          */
         sendErrorLog(data) {
             let postUrl = Player.inst.data.getErrorUrl();
-            if (tsCore.StringUtil.isEmpty(postUrl) || !tsCore.StringUtil.beginsWith(postUrl, "http")) {
-                return;
-            }
-            tsCore.HTTPUtils.create()
-                .setMethod("post")
-                .setOvertime(0)
-                .setUrl(postUrl)
-                .setData(data)
-                .call();
+            if (postUrl === null || postUrl === void 0 ? void 0 : postUrl.startsWith("http"))
+                tsCore.HTTPUtils.create()
+                    .setMethod("post")
+                    .setUrl(postUrl)
+                    .setData(data)
+                    .call();
         }
     }
     gameLib.SceneManager = SceneManager;
@@ -5389,10 +5362,11 @@ window.gameLib = {};
         }
         /**
          * 根据游戏ID  获取优惠劵
-         * @param gameId 游戏ID
+         * @param gameId 游戏ID 默认使用 Player.inst.gameId
          * @return
          */
         getCouponGame(gameId) {
+            gameId !== null && gameId !== void 0 ? gameId : (gameId = Player.inst.gameId);
             let temps = [];
             for (let i = 0; i < this.coupons.length; i++) {
                 let arr = this.coupons[i];
@@ -5755,7 +5729,7 @@ window.gameLib = {};
          */
         static copyLoader(loader, parent) {
             let newObject = new fgui.GLoader();
-            newObject.setPivot(loader.pivotX, loader.pivotY);
+            newObject.setPivot(loader.pivotX, loader.pivotY, loader.pivotAsAnchor);
             newObject.setSize(loader.width, loader.height);
             newObject.setScale(loader.scaleX, loader.scaleY);
             newObject.align = loader.align;
@@ -5800,7 +5774,7 @@ window.gameLib = {};
                 tf.singleLine = textField.singleLine;
                 tf.strokeColor = textField.strokeColor;
                 tf.stroke = textField.stroke;
-                tf.setPivot(textField.pivotX, textField.pivotY);
+                tf.setPivot(textField.pivotX, textField.pivotY, textField.pivotAsAnchor);
                 tf.setSize(textField.width, textField.height);
                 tf.setScale(textField.scaleX, textField.scaleY);
                 tf.text = textField.text;
@@ -6120,8 +6094,11 @@ window.gameLib = {};
          */
         play(num, start, end, complete) {
             var _a;
-            if (start instanceof fgui.GObject) {
-                if (!start || start.isDisposed || !start.displayObject) {
+            if (!start) {
+                this.startPoint = Laya.Point.create().setTo((this.scene.width >> 1), (this.scene.height >> 1));
+            }
+            else if (start instanceof fgui.GObject) {
+                if (start.isDisposed || !start.displayObject) {
                     this.startPoint = Laya.Point.create().setTo((this.scene.width >> 1), (this.scene.height >> 1));
                 }
                 else {

@@ -96,6 +96,11 @@ export class HTTPUtils {
         return this
     }
 
+    /**
+     * 请求在自动终止之前可能需要的毫秒数。<br>
+     * 值为 0，表示没有超时。
+     * @default 0
+     */
     setOvertime(value: number): HTTPUtils {
         this.ghr.setOvertime(value)
         return this

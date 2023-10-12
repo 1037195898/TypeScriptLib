@@ -14,7 +14,8 @@ declare namespace tsCore {
          *  游戏公用组
          */
         static GAME_GROUP: string;
-        private options;
+        static initEngine?: IInitEngine;
+        options: InitApp;
         private _controller;
         /**
          *
@@ -34,8 +35,9 @@ declare namespace tsCore {
         static init(): void;
         private static _init;
         static initClass(...args: (new () => any)[]): void;
+        lastInit(): void;
         constructor();
-        private static startSize;
+        private startSize;
         private onResize;
         protected initController(): void;
         regActionHandler(action: string, handler: Laya.Handler, group?: string): void;
@@ -838,8 +840,23 @@ declare namespace tsCore {
         GET = "get",
         POST = "post"
     }
+    /**
+     * 初始化引擎接口
+     */
     export interface IInitEngine {
-        run(): void;
+        /**
+         * 启动引擎结束
+         */
+        run?(): void;
+        /**
+         * 引擎初始化结束
+         * Laya fgui
+         */
+        onEngine?(): void;
+        /**
+         * 所有初始化完成，包括延迟执行
+         */
+        onEnd?(): void;
     }
     export interface IFormatVer {
         /**
@@ -1215,9 +1232,18 @@ declare namespace tsCore {
     export const Cast: typeof MathKit;
     export class SystemKit {
         /**
+         * 启动后自动获取的刘海屏高度
+         */
+        static cacheNotch: number;
+        /**
          * 获取设备刘海屏高度
          */
         static get notchHeight(): number;
+        /**
+         * 在启用刘海屏模式下会调用指定方法并得到刘海屏信息
+         * @param value
+         */
+        static set onNotch(value: (height: number) => any);
     }
     export enum LogLevel {
         ALL = 0,
@@ -1708,6 +1734,11 @@ declare namespace tsCore {
         setMethod(data: Method | string): HTTPUtils;
         setResponseType(data: string): HTTPUtils;
         setHeaders(array: string[]): HTTPUtils;
+        /**
+         * 请求在自动终止之前可能需要的毫秒数。<br>
+         * 值为 0，表示没有超时。
+         * @default 0
+         */
         setOvertime(value: number): HTTPUtils;
         onComplete(handler: ParamHandler): HTTPUtils;
         onError(handler: ParamHandler): HTTPUtils;
@@ -2904,13 +2935,27 @@ declare interface String {
 declare type InitApp = {
     /** 初始化Laya */
     laya: {
-        /** 是否初始化Laya 默认true */
+        /**
+         * 是否初始化Laya
+         * @default true
+         */
         init: boolean,
-        /** 渲染模式 默认 Laya.WebGL */
+        /**
+         * 渲染模式
+         * @default Laya.WebGL
+         */
         renders: any[]
     },
-    /** 是否让GRoot 自适应大小 默认true */
+    /**
+     * 是否让GRoot 自适应大小
+     * @default true
+     */
     resize?: boolean
+    /**
+     * 是否启用刘海屏模式
+     * @default false
+     */
+    isNotchEnable?:boolean
 }
 
 declare type PointType = { x?: number, y?: number }

@@ -1,8 +1,8 @@
-import GTextField = fgui.GTextField
-import GRichTextField = fgui.GRichTextField
-import GBasicTextField = fgui.GBasicTextField
-import GComponent = fgui.GComponent
-import GLoader = fgui.GLoader
+import GTextField = fgui.GTextField;
+import GRichTextField = fgui.GRichTextField;
+import GBasicTextField = fgui.GBasicTextField;
+import GComponent = fgui.GComponent;
+import GLoader = fgui.GLoader;
 
 /**
  * 拷贝对象
@@ -16,7 +16,7 @@ export class CopyObject {
      */
     static copyLoader(loader: GLoader, parent?: GComponent) {
         let newObject: GLoader = new GLoader()
-        newObject.setPivot(loader.pivotX, loader.pivotY)
+        newObject.setPivot(loader.pivotX, loader.pivotY, loader.pivotAsAnchor)
         newObject.setSize(loader.width, loader.height)
         newObject.setScale(loader.scaleX, loader.scaleY)
         newObject.align = loader.align
@@ -60,7 +60,7 @@ export class CopyObject {
             tf.singleLine = textField.singleLine
             tf.strokeColor = textField.strokeColor
             tf.stroke = textField.stroke
-            tf.setPivot(textField.pivotX, textField.pivotY)
+            tf.setPivot(textField.pivotX, textField.pivotY, textField.pivotAsAnchor)
             tf.setSize(textField.width, textField.height)
             tf.setScale(textField.scaleX, textField.scaleY)
             tf.text = textField.text
