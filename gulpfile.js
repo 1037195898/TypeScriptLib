@@ -270,6 +270,8 @@ gulp.task('build-Temp', () => {
         "./template/spine-core-3.8.js",
         "./template/laya.spine.js",
         "./template/fairygui.js",
+        "./template/worker.js",
+        "./template/workerloader.js",
     ], generate.distPath + "/min", "../map")
         .on('end', function () {
             fs.writeFileSync(libCache, JSON.stringify(nameCaches));

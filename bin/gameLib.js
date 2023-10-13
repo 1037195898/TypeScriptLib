@@ -5100,7 +5100,7 @@ window.gameLib = {};
                 if (clearCache) {
                     let request = tsCore.UtilKit.getRequest();
                     delete request["clearCache"];
-                    Laya.LocalStorage.clear();
+                    localStorage.clear();
                     let param = "?";
                     let index = 0;
                     for (let key in request) {

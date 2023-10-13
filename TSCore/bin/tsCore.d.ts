@@ -1247,10 +1247,6 @@ declare namespace tsCore {
     export const Cast: typeof MathKit;
     export class SystemKit {
         /**
-         * 启动后自动获取的刘海屏高度
-         */
-        static cacheNotch: number;
-        /**
          * 获取设备刘海屏高度
          */
         static get notchHeight(): number;

@@ -14,7 +14,7 @@ export class EdgeFloatKit {
     static moveXY(target: RectangleType, range: { width: number, height: number }) {
         const {width, height} = range
         const enableNotch = App.inst.options.isNotchEnable && Laya.stage.screenMode === Laya.Stage.SCREEN_HORIZONTAL
-        const notchH = SystemKit.cacheNotch
+        const notchH = SystemKit.notchHeight
         let [tempX, tempY] = [target.x, target.y]
         if (target.x > (width >> 1)) {// 大于可视范围宽度一半
             tempX = width - target.x - target.width

@@ -1,11 +1,7 @@
 import {App} from "../App";
+import {Log} from "../Log";
 
 export class SystemKit {
-
-    /**
-     * 启动后自动获取的刘海屏高度
-     */
-    static cacheNotch = 0
 
     /**
      * 获取设备刘海屏高度
@@ -19,7 +15,22 @@ export class SystemKit {
      * @param value
      */
     static set onNotch(value: (height: number) => any) {
-        if (App.inst.options.isNotchEnable) value(SystemKit.cacheNotch)
+        if (App.inst.options.isNotchEnable) {
+            let cacheNotch = 0
+            function notchFun() {
+                const notch = SystemKit.notchHeight
+                cacheNotch = notch
+                Log.debug(`notchHeight1=${notch}`)
+            }
+            function getNotchEnd() {
+                const notch = SystemKit.notchHeight
+                cacheNotch = notch
+                Log.debug(`notchHeight2=${notch}`)
+                value(cacheNotch)
+            }
+            Laya.timer.callLater(this, notchFun)
+            Laya.timer.once(300, this, getNotchEnd)
+        }
     }
 
 }

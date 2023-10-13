@@ -51,7 +51,7 @@ export class UrlParam {
             if (clearCache) {
                 let request = UtilKit.getRequest()
                 delete request["clearCache"]
-                LocalStorage.clear()
+                localStorage.clear()
 
                 let param = "?"
                 let index = 0

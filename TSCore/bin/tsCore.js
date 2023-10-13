@@ -73,23 +73,9 @@ window.tsCore = {};
             }
         }
         lastInit() {
+            var _a, _b;
             this.startSize();
-            if (this.options.isNotchEnable) {
-                function notchFun() {
-                    const notch = SystemKit.notchHeight;
-                    SystemKit.cacheNotch = notch;
-                    Log.debug(`notchHeight1=${notch}`);
-                }
-                function getNotchEnd() {
-                    var _a, _b;
-                    const notch = SystemKit.notchHeight;
-                    SystemKit.cacheNotch = notch;
-                    Log.debug(`notchHeight2=${notch}`);
-                    (_b = (_a = App.initEngine) === null || _a === void 0 ? void 0 : _a.onEnd) === null || _b === void 0 ? void 0 : _b.call(_a);
-                }
-                Laya.timer.callLater(this, notchFun);
-                Laya.timer.once(300, this, getNotchEnd);
-            }
+            (_b = (_a = App.initEngine) === null || _a === void 0 ? void 0 : _a.onEnd) === null || _b === void 0 ? void 0 : _b.call(_a);
         }
         constructor() {
             this.initController();
@@ -2887,7 +2873,7 @@ window.tsCore = {};
         static moveXY(target, range) {
             const { width, height } = range;
             const enableNotch = App.inst.options.isNotchEnable && Laya.stage.screenMode === Laya.Stage.SCREEN_HORIZONTAL;
-            const notchH = SystemKit.cacheNotch;
+            const notchH = SystemKit.notchHeight;
             let [tempX, tempY] = [target.x, target.y];
             if (target.x > (width >> 1)) { // 大于可视范围宽度一半
                 tempX = width - target.x - target.width;
@@ -3302,14 +3288,24 @@ window.tsCore = {};
          * @param value
          */
         static set onNotch(value) {
-            if (App.inst.options.isNotchEnable)
-                value(SystemKit.cacheNotch);
+            if (App.inst.options.isNotchEnable) {
+                let cacheNotch = 0;
+                function notchFun() {
+                    const notch = SystemKit.notchHeight;
+                    cacheNotch = notch;
+                    Log.debug(`notchHeight1=${notch}`);
+                }
+                function getNotchEnd() {
+                    const notch = SystemKit.notchHeight;
+                    cacheNotch = notch;
+                    Log.debug(`notchHeight2=${notch}`);
+                    value(cacheNotch);
+                }
+                Laya.timer.callLater(this, notchFun);
+                Laya.timer.once(300, this, getNotchEnd);
+            }
         }
     }
-    /**
-     * 启动后自动获取的刘海屏高度
-     */
-    SystemKit.cacheNotch = 0;
     tsCore.SystemKit = SystemKit;
     let LogLevel;
     (function (LogLevel) {

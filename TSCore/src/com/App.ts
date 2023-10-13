@@ -105,25 +105,8 @@ export class App implements IAction {
 
     lastInit() {
         this.startSize()
-        if (this.options.isNotchEnable) {
-            function notchFun() {
-                const notch = SystemKit.notchHeight
-                SystemKit.cacheNotch = notch
-                Log.debug(`notchHeight1=${notch}`)
-            }
-
-            function getNotchEnd() {
-                const notch = SystemKit.notchHeight
-                SystemKit.cacheNotch = notch
-                Log.debug(`notchHeight2=${notch}`)
-                App.initEngine?.onEnd?.()
-            }
-
-            Laya.timer.callLater(this, notchFun)
-            Laya.timer.once(300, this, getNotchEnd)
-        }
+        App.initEngine?.onEnd?.()
     }
-
 
     constructor() {
         this.initController()
