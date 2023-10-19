@@ -6299,10 +6299,12 @@ window.gameLib = {};
          * @param [data = null]
          * */
         static gameClose(type = 0, data = null) {
-            if (AppManager.callIOS("gameClose", { type: type, data: data }))
-                return;
             SceneManager.inst.initComplete = false;
             SceneManager.inst.isLoaderResComplete = false;
+            if (AppManager.callIOS("gameClose", { type: type, data: data })) {
+                SceneManager.inst.closeGame();
+                return;
+            }
             if (Laya.Browser.window.parent.GameToHall) {
                 Laya.Browser.window.parent.GameToHall.gameClose(type, data);
             }

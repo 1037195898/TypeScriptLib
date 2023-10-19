@@ -4361,7 +4361,6 @@ window.tsCore = {};
          * @see SoundUtils.loadAsset
          */
         static load(url) {
-            Log.debug(`lazy load`);
             Laya.loader.load(url !== null && url !== void 0 ? url : SoundUtils.loadAsset, Laya.Handler.create(null, SoundUtils.onLoader));
         }
         static onLoader() {
