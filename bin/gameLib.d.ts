@@ -2312,6 +2312,13 @@ declare namespace gameLib {
         /** 关闭当前的游戏 */
         closeGame(): void;
         /**
+         * 跳转到其它游戏  直接修改url地址 切换游戏  从新走加载流程
+         * @param config 游戏名字
+         * @param code 游戏id
+         *
+         */
+        jumpTo(config: string, code: number): void;
+        /**
          * 切换游戏
          * @param config 游戏名字
          * @param code 游戏id
