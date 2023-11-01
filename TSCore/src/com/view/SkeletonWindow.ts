@@ -15,20 +15,22 @@ export class SkeletonWindow extends EWindow {
 
     protected override onInit(data?: ISkeletonData) {
         super.onInit();
-
         if (data) {
-
             this.skeletonData = data
-
             const newData: ISkeletonData = Object.create(data)
             newData.loaderComplete = this._onLoadComplete.bind(this)
-
             this.skeleton = SpineUtils.createSpine(newData)
             this.addChild(this.skeleton)
         } else throw Error("error data null")
     }
 
+    get sk() {
+        return this.skeleton as GSkeleton
+    }
 
+    get spine() {
+        return this.skeleton as GSpineSkeleton
+    }
 
     protected _onLoadComplete() {
         this.loadComplete = true
@@ -50,7 +52,8 @@ export class SkeletonWindow extends EWindow {
     /**
      * 当初始化程序结束  但是加载程序尚未完成 执行
      */
-    protected customLoader() {}
+    protected customLoader() {
+    }
 
     /**
      * @deprecated

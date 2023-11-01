@@ -13,7 +13,6 @@
  * @property {Resource[]} res - 需要加载的资源数组。
  * @property {string[]} couponHelp - 优惠帮助资源路径。
  * @property {string} js - 项目的js名字。
- * @property {string} bonusFormat - 界面上显示bonus动画的格式 sk or json。
  * @property {number[]} odds - 项目中的赔率配置。
  * @property {function} completeFun - 目标启动类。
  * @property {string|string[]} guide - 引导图片资源路径。

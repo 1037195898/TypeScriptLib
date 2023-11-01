@@ -40,18 +40,28 @@ export class App implements IAction {
      */
     static run(init?: IInitEngine, options?: InitApp) {
         App.initEngine = init
-        App._init()
         // 默认配置
         const def: InitApp = {
-            laya: {init: true, renders: [Laya.WebGL], width: 720, height: 1280},
+            laya: {renders: [Laya.WebGL], width: 720, height: 1280},
+            init: {
+                laya: true,
+                fgui: true,
+                coreLib: true
+            },
             resize: true,
             isNotchEnable: false
         }
         App.inst.options = options = options ? defaults(options, def) : def
+
+        options.init?.coreLib && App._init()
         init?.run?.()
-        if (options.laya && !options.laya.init) return
-        Laya.init(options.laya.width, options.laya.height, ...options.laya.renders)
+
+        options.init?.laya && Laya.init(options.laya.width, options.laya.height, ...options.laya.renders)
+
+        options.init?.fgui && Laya.stage.addChild(fgui.GRoot.inst.displayObject)
+
         init?.onEngine?.()
+
         Laya.timer.callLater(App.inst, App.inst.lastInit)
     }
 
@@ -101,7 +111,7 @@ export class App implements IAction {
     }
 
     lastInit() {
-        this.startSize()
+        this.openResize()
         App.initEngine?.onEnd?.()
     }
 
@@ -109,8 +119,11 @@ export class App implements IAction {
         this.initController()
     }
 
-    private startSize() {
-        if (this.options.resize) {
+    /**
+     * 开启屏幕大小自动调整
+     */
+    openResize() {
+        if (this.options.resize && this.options.init?.fgui) {
             Laya.stage.on(Laya.Event.RESIZE, this, this.onResize)
             this.onResize()
         }

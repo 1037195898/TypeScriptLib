@@ -62,7 +62,8 @@ export class GSpineSkeleton extends ESkeleton {
     }
 
     private onComplete(spine: SpineTempletBase) {
-        this.asSkeleton.init(spine ?? this.template)
+        const template = spine ?? this.template
+        this.asSkeleton.init(template)
         // 销毁已有的动画
         // for (let i = this.displayObject.numChildren - 1; i >= 0; i--) {
         //     let temp = this.displayObject.getChildAt(i)

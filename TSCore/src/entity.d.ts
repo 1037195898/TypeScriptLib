@@ -2,11 +2,6 @@ declare type InitApp = {
     /** 初始化Laya */
     laya?: {
         /**
-         * 是否初始化Laya
-         * @default true
-         */
-        init?: boolean,
-        /**
          * 渲染模式
          * @default Laya.WebGL
          */
@@ -21,10 +16,29 @@ declare type InitApp = {
          * @default 1280
          */
         height?:number
-    },
+    }
+    init?:{
+        /**
+         * 是否初始化 Laya
+         * @default true
+         */
+        laya?:boolean,
+        /**
+         * 是否初始化 fgui 如: Laya.stage.addChild(GRoot.inst.displayObject)
+         * @default true
+         */
+        fgui?:boolean,
+        /**
+         * 是否初始化引擎 手动调用 App.init()
+         * @default true
+         * @see App.init
+         */
+        coreLib?:boolean
+    }
     /**
-     * 是否让GRoot 自适应大小
+     * 是否让GRoot 自适应大小 需要初始化fgui保持开启状态 否则需手动调用 App.inst.openResize
      * @default true
+     * @see App.openResize
      */
     resize?: boolean
     /**
