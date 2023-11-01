@@ -11,21 +11,25 @@ window.tsCore = {};
          * @param options
          */
         static run(init, options) {
-            var _a, _b;
+            var _a, _b, _c, _d, _e;
             App.initEngine = init;
-            App._init();
             // 默认配置
             const def = {
-                laya: { init: true, renders: [Laya.WebGL], width: 720, height: 1280 },
+                laya: { renders: [Laya.WebGL], width: 720, height: 1280 },
+                init: {
+                    laya: true,
+                    fgui: true,
+                    coreLib: true
+                },
                 resize: true,
                 isNotchEnable: false
             };
             App.inst.options = options = options ? defaults(options, def) : def;
-            (_a = init === null || init === void 0 ? void 0 : init.run) === null || _a === void 0 ? void 0 : _a.call(init);
-            if (options.laya && !options.laya.init)
-                return;
-            Laya.init(options.laya.width, options.laya.height, ...options.laya.renders);
-            (_b = init === null || init === void 0 ? void 0 : init.onEngine) === null || _b === void 0 ? void 0 : _b.call(init);
+            ((_a = options.init) === null || _a === void 0 ? void 0 : _a.coreLib) && App._init();
+            (_b = init === null || init === void 0 ? void 0 : init.run) === null || _b === void 0 ? void 0 : _b.call(init);
+            ((_c = options.init) === null || _c === void 0 ? void 0 : _c.laya) && Laya.init(options.laya.width, options.laya.height, ...options.laya.renders);
+            ((_d = options.init) === null || _d === void 0 ? void 0 : _d.fgui) && Laya.stage.addChild(fgui.GRoot.inst.displayObject);
+            (_e = init === null || init === void 0 ? void 0 : init.onEngine) === null || _e === void 0 ? void 0 : _e.call(init);
             Laya.timer.callLater(App.inst, App.inst.lastInit);
         }
         /** 设置默认竖屏布局 */
@@ -73,14 +77,18 @@ window.tsCore = {};
         }
         lastInit() {
             var _a, _b;
-            this.startSize();
+            this.openResize();
             (_b = (_a = App.initEngine) === null || _a === void 0 ? void 0 : _a.onEnd) === null || _b === void 0 ? void 0 : _b.call(_a);
         }
         constructor() {
             this.initController();
         }
-        startSize() {
-            if (this.options.resize) {
+        /**
+         * 开启屏幕大小自动调整
+         */
+        openResize() {
+            var _a;
+            if (this.options.resize && ((_a = this.options.init) === null || _a === void 0 ? void 0 : _a.fgui)) {
                 Laya.stage.on(Laya.Event.RESIZE, this, this.onResize);
                 this.onResize();
             }
@@ -6293,7 +6301,8 @@ window.tsCore = {};
         onError() {
         }
         onComplete(spine) {
-            this.asSkeleton.init(spine !== null && spine !== void 0 ? spine : this.template);
+            const template = spine !== null && spine !== void 0 ? spine : this.template;
+            this.asSkeleton.init(template);
             // 销毁已有的动画
             // for (let i = this.displayObject.numChildren - 1; i >= 0; i--) {
             //     let temp = this.displayObject.getChildAt(i)
@@ -6697,6 +6706,12 @@ window.tsCore = {};
             else
                 throw Error("error data null");
         }
+        get sk() {
+            return this.skeleton;
+        }
+        get spine() {
+            return this.skeleton;
+        }
         _onLoadComplete() {
             this.loadComplete = true;
             this.onLoadComplete();
@@ -6715,7 +6730,8 @@ window.tsCore = {};
         /**
          * 当初始化程序结束  但是加载程序尚未完成 执行
          */
-        customLoader() { }
+        customLoader() {
+        }
         /**
          * @deprecated
          * @see onShowAnimation

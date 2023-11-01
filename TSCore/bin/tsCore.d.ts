@@ -35,7 +35,10 @@ declare namespace tsCore {
         static initClass(...args: (new () => any)[]): void;
         lastInit(): void;
         constructor();
-        private startSize;
+        /**
+         * 开启屏幕大小自动调整
+         */
+        openResize(): void;
         private onResize;
         protected initController(): void;
         regActionHandler(action: string, handler: Laya.Handler, group?: string): void;
@@ -2685,6 +2688,8 @@ declare namespace tsCore {
         protected waitShow: boolean;
         protected skeletonData: ISkeletonData;
         protected onInit(data?: ISkeletonData): void;
+        get sk(): GSkeleton;
+        get spine(): GSpineSkeleton;
         protected _onLoadComplete(): void;
         /**
          * 骨骼动画加载完成
@@ -3015,11 +3020,6 @@ declare type InitApp = {
     /** 初始化Laya */
     laya?: {
         /**
-         * 是否初始化Laya
-         * @default true
-         */
-        init?: boolean,
-        /**
          * 渲染模式
          * @default Laya.WebGL
          */
@@ -3034,10 +3034,29 @@ declare type InitApp = {
          * @default 1280
          */
         height?:number
-    },
+    }
+    init?:{
+        /**
+         * 是否初始化 Laya
+         * @default true
+         */
+        laya?:boolean,
+        /**
+         * 是否初始化 fgui 如: Laya.stage.addChild(GRoot.inst.displayObject)
+         * @default true
+         */
+        fgui?:boolean,
+        /**
+         * 是否初始化引擎 手动调用 App.init()
+         * @default true
+         * @see App.init
+         */
+        coreLib?:boolean
+    }
     /**
-     * 是否让GRoot 自适应大小
+     * 是否让GRoot 自适应大小 需要初始化fgui保持开启状态 否则需手动调用 App.inst.openResize
      * @default true
+     * @see App.openResize
      */
     resize?: boolean
     /**
