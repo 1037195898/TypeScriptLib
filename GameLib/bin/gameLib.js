@@ -3975,7 +3975,7 @@ window.gameLib = {};
                 }
                 runFun(handler);
             };
-            if (!AssetsLoader.CONFIG_RES_NAME) {
+            if (AssetsLoader.CONFIG_RES_NAME) {
                 this.loadVersionXML(loadXmlComplete, loadErrorHandler);
             }
             else

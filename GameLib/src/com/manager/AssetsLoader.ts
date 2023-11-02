@@ -208,7 +208,7 @@ export class AssetsLoader implements IFormatPath {
             runFun(handler)
         }
 
-        if (!AssetsLoader.CONFIG_RES_NAME) {
+        if (AssetsLoader.CONFIG_RES_NAME) {
             this.loadVersionXML(loadXmlComplete, loadErrorHandler)
         } else loadXmlComplete()
 
