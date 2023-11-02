@@ -208,7 +208,9 @@ export class AssetsLoader implements IFormatPath {
             runFun(handler)
         }
 
-        this.loadVersionXML(loadXmlComplete, loadErrorHandler)
+        if (!AssetsLoader.CONFIG_RES_NAME) {
+            this.loadVersionXML(loadXmlComplete, loadErrorHandler)
+        } else loadXmlComplete()
 
     }
 
@@ -614,7 +616,7 @@ export class AssetsLoader implements IFormatPath {
         for (let i = 0; i < chills.length; i++) {
             child = chills[i]
             url = child.getAttribute("url")
-            if (StringUtil.endsWith(url, ".js") && !StringUtil.endsWith(url, ".min.js")) {
+            if (url.endsWith(".js") && !url.endsWith(".min.js")) {
                 Laya.URL.version[StringUtil.replace(url, ".js", ".min.js")] = child.getAttribute("crc")
             }
             Laya.URL.version[url] = child.getAttribute("crc")

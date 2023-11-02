@@ -3975,7 +3975,11 @@ window.gameLib = {};
                 }
                 runFun(handler);
             };
-            this.loadVersionXML(loadXmlComplete, loadErrorHandler);
+            if (!AssetsLoader.CONFIG_RES_NAME) {
+                this.loadVersionXML(loadXmlComplete, loadErrorHandler);
+            }
+            else
+                loadXmlComplete();
         }
         /**
          * 加载公共资源
@@ -4355,7 +4359,7 @@ window.gameLib = {};
             for (let i = 0; i < chills.length; i++) {
                 child = chills[i];
                 url = child.getAttribute("url");
-                if (tsCore.StringUtil.endsWith(url, ".js") && !tsCore.StringUtil.endsWith(url, ".min.js")) {
+                if (url.endsWith(".js") && !url.endsWith(".min.js")) {
                     Laya.URL.version[tsCore.StringUtil.replace(url, ".js", ".min.js")] = child.getAttribute("crc");
                 }
                 Laya.URL.version[url] = child.getAttribute("crc");
