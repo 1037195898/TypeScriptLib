@@ -201,6 +201,7 @@ export class SceneManager extends EProxy {
     openGame(config: string, code = -1) {
         Log.info("openGame -> " + config + " " + code)
         Laya.stage.pauseUpdateTimer = false
+        this.visibles.length = 0
         this.removeGroup(App.GAME_GROUP)
         Player.inst.guestModel.clearData()
         HtmlWindow.inst.hide()
