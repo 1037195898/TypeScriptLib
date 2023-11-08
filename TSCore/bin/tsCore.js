@@ -7071,11 +7071,30 @@ function getPropertyNames(obj, containsSuperClasses = false) {
 String.prototype.startsWithAny = function (...search) {
     return search.some((value) => this.startsWith(value));
 };
+String.prototype.startsWithAnyIgnore = function (...search) {
+    const lowerCase = this.toLowerCase();
+    return search.some((value) => lowerCase.startsWith(value.toLowerCase()));
+};
 String.prototype.endsWithAny = function (...search) {
     return search.some((value) => this.endsWith(value));
 };
+String.prototype.endsWithAnyIgnore = function (...search) {
+    const lowerCase = this.toLowerCase();
+    return search.some((value) => lowerCase.endsWith(value.toLowerCase()));
+};
+String.prototype.equalsAny = function (...value) {
+    return value.some((it) => this === it);
+};
+String.prototype.equalsAnyIgnore = function (...value) {
+    const lowerCase = this.toLowerCase();
+    return value.some((it) => lowerCase === it.toLowerCase());
+};
 String.prototype.contains = function (...search) {
     return search.some((value) => this.includes(value));
+};
+String.prototype.containsIgnore = function (...search) {
+    const lowerCase = this.toLowerCase();
+    return search.some((value) => lowerCase.includes(value.toLowerCase()));
 };
 String.prototype.substringAfter = function (separator) {
     if (!this || !separator)

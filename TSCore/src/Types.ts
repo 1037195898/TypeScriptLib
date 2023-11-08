@@ -235,13 +235,35 @@ function getPropertyNames(obj, containsSuperClasses = false) {
 String.prototype.startsWithAny = function (...search: string []) {
     return search.some((value) => this.startsWith(value))
 }
+String.prototype.startsWithAnyIgnore = function (...search: string []) {
+    const lowerCase = this.toLowerCase()
+    return search.some((value) => lowerCase.startsWith(value.toLowerCase()))
+}
 
 String.prototype.endsWithAny = function (...search: string []) {
     return search.some((value) => this.endsWith(value))
 }
+String.prototype.endsWithAnyIgnore = function (...search: string []) {
+    const lowerCase = this.toLowerCase()
+    return search.some((value) => lowerCase.endsWith(value.toLowerCase()))
+}
+
+String.prototype.equalsAny = function (...value: string []) {
+    return value.some((it) => this === it)
+}
+
+String.prototype.equalsAnyIgnore = function (...value: string []) {
+    const lowerCase = this.toLowerCase()
+    return value.some((it) => lowerCase === it.toLowerCase())
+}
 
 String.prototype.contains = function (...search: string []) {
     return search.some((value) => this.includes(value))
+}
+
+String.prototype.containsIgnore = function (...search: string []) {
+    const lowerCase = this.toLowerCase()
+    return search.some((value) => lowerCase.includes(value.toLowerCase()))
 }
 
 String.prototype.substringAfter = function (separator: string) {

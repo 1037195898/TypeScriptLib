@@ -1,14 +1,13 @@
-import Utils = Laya.Utils
-import LocalStorage = Laya.LocalStorage
-import Render = Laya.Render
-import SoundManager = Laya.SoundManager
+import Utils = Laya.Utils;
+import Render = Laya.Render;
+import SoundManager = Laya.SoundManager;
+import UtilKit = tsCore.UtilKit;
+import StringUtil = tsCore.StringUtil;
+import Log = tsCore.Log;
 import {Player} from "../Player"
 import {AppRecordManager} from "../manager/AppRecordManager"
 import {SceneManager} from "../manager/SceneManager";
-import UtilKit = tsCore.UtilKit;
 import {IExecuteData} from "../Interfaces";
-import StringUtil = tsCore.StringUtil;
-import Log = tsCore.Log;
 
 /**
  * url 参数
@@ -63,7 +62,7 @@ export class UrlParam {
                     }
                     index++
                 }
-                Log.debug(`clear cache reload ${newUrl + param}` )
+                Log.debug(`clear cache reload ${newUrl + param}`)
                 window.location.replace(newUrl + param)
             }
 
@@ -80,12 +79,12 @@ export class UrlParam {
         isweb ??= Render.isConchApp ? "false" : "true"
         Player.inst.isWeb = (isweb != "false")
 
-        let isGuest = this.getValue(json, "isGuest", "demo")
+        const isGuest = this.getValue(json, "isGuest", "guest", "demo")
         if (!StringUtil.isEmpty(isGuest)) {
             Player.inst.isGuest = isGuest == "true"
         }
 
-        let debug = this.getValue(json, "debug")
+        const debug = this.getValue(json, "debug")
         if (debug) {
             this.debug = debug == "true"
         }
@@ -104,10 +103,10 @@ export class UrlParam {
         let tempLanguage = this.getValue(json, "language", "lang")
         if (!StringUtil.isEmpty(tempLanguage)) this._language = tempLanguage
 
-        let tempIsGift = this.getValue(json, "isGift")
+        let tempIsGift = this.getValue(json, "isGift", "gift")
         if (!StringUtil.isEmpty(tempIsGift)) this._isGift = Utils.parseInt(tempIsGift)
 
-        let isCall = this.getValue(json, "isCall")
+        let isCall = this.getValue(json, "isCall", "call")
         if (!StringUtil.isEmpty(isCall)) SceneManager.inst.isCall = !(isCall === "false")
 
         let tempPlayWith = this.getValue(json, "playWith")
@@ -141,6 +140,42 @@ export class UrlParam {
 
     }
 
+    getQueryBoolean(json: any, fun: (value: boolean) => {}, ...keys: string[]) {
+        const value = this.getValue(json, ...keys)
+        if (value) {
+            fun(!(!value || value.equalsAnyIgnore("false", "0")))
+        }
+    }
+
+    /**
+     * 执行参数设置 如果存在将调用fun 如果不存在或是空 将不会调用fun
+     * @param json
+     * @param fun
+     * @param keys
+     */
+    getQuery<T>(json: any, fun: (value: T) => void, ...keys: string[]) {
+        const value = this.getValue(json, ...keys)
+        if (value) {
+            // @ts-ignore
+            fun(value)
+        }
+    }
+
+    /**
+     * 获取指定的key的布尔值 空或false、0 都将返回false
+     * @param json
+     * @param keys
+     */
+    getValueBoolean(json: any, ...keys: string[]) {
+        const value = this.getValue(json, ...keys)
+        return !(!value || value.equalsAnyIgnore("false", "0"))
+    }
+
+    /**
+     * 获取url上的参数key=value
+     * @param json
+     * @param keys
+     */
     getValue(json: any, ...keys: string[]) {
         let value: string
         for (const key of keys) {
