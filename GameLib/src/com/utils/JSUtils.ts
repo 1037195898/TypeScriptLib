@@ -78,7 +78,7 @@ export class JSUtils {
      */
     static alert(msg: string, title = "", okText = "", cancelText = "") {
         if (AppManager.callIOS("alert", {msg: msg, title: title, ensureTv: okText, cancelTv: cancelText})) return
-        Browser.window?.alert?.(msg)
+        Browser.window.gameOnload && Browser.window.alert?.(msg)
         Browser.window.parent?.GameToHall?.alert?.(msg)
         Browser.window.parent?.GameToHall?.openModal?.(msg)
         AppManager.showWeb({javascript: `window.GameToHall.alert && window.GameToHall.alert('${msg}')`})

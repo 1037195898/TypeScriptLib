@@ -6432,7 +6432,7 @@ window.gameLib = {};
             var _a, _b, _c, _d, _e, _f, _g, _h;
             if (AppManager.callIOS("alert", { msg: msg, title: title, ensureTv: okText, cancelTv: cancelText }))
                 return;
-            (_b = (_a = Laya.Browser.window) === null || _a === void 0 ? void 0 : _a.alert) === null || _b === void 0 ? void 0 : _b.call(_a, msg);
+            Laya.Browser.window.gameOnload && ((_b = (_a = Laya.Browser.window).alert) === null || _b === void 0 ? void 0 : _b.call(_a, msg));
             (_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.alert) === null || _e === void 0 ? void 0 : _e.call(_d, msg);
             (_h = (_g = (_f = Laya.Browser.window.parent) === null || _f === void 0 ? void 0 : _f.GameToHall) === null || _g === void 0 ? void 0 : _g.openModal) === null || _h === void 0 ? void 0 : _h.call(_g, msg);
             AppManager.showWeb({ javascript: `window.GameToHall.alert && window.GameToHall.alert('${msg}')` });
