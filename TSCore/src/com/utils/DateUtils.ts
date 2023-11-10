@@ -191,7 +191,7 @@ export class DateUtils {
      *
      * @param time ms | Date
      */
-    calculateTimeDifference(time: number | Date) {
+    static calculateTimeDifference(time: number | Date) {
         if (time instanceof Date) time = time.getTime()
         // 计算时间差（毫秒）
         const timeDifference = time - Date.now()

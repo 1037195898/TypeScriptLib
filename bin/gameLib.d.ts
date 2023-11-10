@@ -2599,6 +2599,25 @@ declare namespace gameLib {
             debug?: boolean;
         });
         parseData(json: IExecuteData): void;
+        getQueryBoolean(json: any, fun: (value: boolean) => {}, ...keys: string[]): void;
+        /**
+         * 执行参数设置 如果存在将调用fun 如果不存在或是空 将不会调用fun
+         * @param json
+         * @param fun
+         * @param keys
+         */
+        getQuery<T>(json: any, fun: (value: T) => void, ...keys: string[]): void;
+        /**
+         * 获取指定的key的布尔值 空或false、0 都将返回false
+         * @param json
+         * @param keys
+         */
+        getValueBoolean(json: any, ...keys: string[]): boolean;
+        /**
+         * 获取url上的参数key=value
+         * @param json
+         * @param keys
+         */
         getValue(json: any, ...keys: string[]): string;
         get amount(): string;
         get inviteCode(): string;
@@ -3078,9 +3097,8 @@ declare namespace gameLib {
          * @param page 页面 如： "/giftPage?token=***"
          * login,register,userSetting,webDetail,gameDetail,editNickName,forgetMain,changePwd,home,deposit,promotion,withdraw,profile
          * @param [isCloseGame=true] 是否关闭游戏
-         * @param fromUrl 登录注册等成功后，需打开的界面地址
          */
-        static openPage(page: string, isCloseGame?: boolean, fromUrl?: string): void;
+        static openPage(page: string | OpenPage, isCloseGame?: boolean): void;
         /** 进入游戏进度条 */
         static progress(value: number): void;
         static getProgress: typeof JSUtils.progress;
@@ -3510,6 +3528,7 @@ declare namespace gameLib {
         private continueBtn?;
         /** 提示框的击中类型 */
         private controller;
+        /** 标题显示控制器 */
         private controller2;
         private controller3;
         private continueFun;
@@ -3628,6 +3647,21 @@ declare type ResConfig = {
     guide?: (string | LoadRes)[] | string | LoadRes
     /** 游戏赔率 */
     odds?: number[][] | any[][]
+}
+
+declare type OpenPage = {
+    /** 打开指定界面 */
+    page: string
+    /** 是否关闭当前界面 */
+    isCloseGame?: boolean
+    /** 登录注册等成功后，需打开的界面 */
+    fromUrl?: String
+    /** 登录注册取消前往地圳 */
+    cancelUrl?: String
+    /** 打开界面是否横屏 */
+    isHorizontalScreen?: boolean
+    /** 0.打开web 1.打开游戏 */
+    type?: number
 }
 
 /**

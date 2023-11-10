@@ -1725,7 +1725,7 @@ declare namespace tsCore {
          *
          * @param time ms | Date
          */
-        calculateTimeDifference(time: number | Date): {
+        static calculateTimeDifference(time: number | Date): {
             days: number;
             hours: number;
             minutes: number;

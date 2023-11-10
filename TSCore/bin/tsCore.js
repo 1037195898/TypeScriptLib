@@ -3997,7 +3997,7 @@ window.tsCore = {};
          *
          * @param time ms | Date
          */
-        calculateTimeDifference(time) {
+        static calculateTimeDifference(time) {
             if (time instanceof Date)
                 time = time.getTime();
             // 计算时间差（毫秒）

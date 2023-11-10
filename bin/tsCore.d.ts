@@ -1725,7 +1725,7 @@ declare namespace tsCore {
          *
          * @param time ms | Date
          */
-        calculateTimeDifference(time: number | Date): {
+        static calculateTimeDifference(time: number | Date): {
             days: number;
             hours: number;
             minutes: number;
@@ -2975,16 +2975,45 @@ declare interface String {
     startsWithAny(...search: string []): boolean
 
     /**
+     * 确定是否按指定字符串开始.满足一个返回 true 忽略大小
+     * @param search
+     */
+    startsWithAnyIgnore(...search: string []): boolean
+
+    /**
      * 确定是否按指定字符串结束.满足一个返回 true
      * @param search
      */
     endsWithAny(...search: string []): boolean
 
     /**
+     * 确定是否按指定字符串结束.满足一个返回 true 忽略大小
+     * @param search
+     */
+    endsWithAnyIgnore(...search: string []): boolean
+
+    /**
+     * 确定是否与指定数组中的某个值相等.满足一个返回 true
+     * @param value
+     */
+    equalsAny(...value: string []): boolean
+    /**
+     * 确定是否与指定的值相等,忽略大小.满足一个返回 true
+     * @param value
+     */
+    equalsAnyIgnore(...value: string []): boolean
+
+    /**
      * 判断此字符串中是否包含
      * @param search
      */
     contains(...search: string[]): boolean
+
+    /**
+     * 判断此字符串中是否包含 忽略大小写
+     * @param search
+     */
+    containsIgnore(...search: string[]): boolean
 
     /**
      * 获取指定符号之后的字符串

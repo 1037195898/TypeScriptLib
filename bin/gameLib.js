@@ -4578,6 +4578,7 @@ window.gameLib = {};
         openGame(config, code = -1) {
             tsCore.Log.info("openGame -> " + config + " " + code);
             Laya.stage.pauseUpdateTimer = false;
+            this.visibles.length = 0;
             this.removeGroup(tsCore.App.GAME_GROUP);
             Player.inst.guestModel.clearData();
             HtmlWindow.inst.hide();
@@ -5221,11 +5222,11 @@ window.gameLib = {};
             let isweb = this.getValue(json, "isweb");
             isweb !== null && isweb !== void 0 ? isweb : (isweb = Laya.Render.isConchApp ? "false" : "true");
             Player.inst.isWeb = (isweb != "false");
-            let isGuest = this.getValue(json, "isGuest", "demo");
+            const isGuest = this.getValue(json, "isGuest", "guest", "demo");
             if (!tsCore.StringUtil.isEmpty(isGuest)) {
                 Player.inst.isGuest = isGuest == "true";
             }
-            let debug = this.getValue(json, "debug");
+            const debug = this.getValue(json, "debug");
             if (debug) {
                 this.debug = debug == "true";
             }
@@ -5242,10 +5243,10 @@ window.gameLib = {};
             let tempLanguage = this.getValue(json, "language", "lang");
             if (!tsCore.StringUtil.isEmpty(tempLanguage))
                 this._language = tempLanguage;
-            let tempIsGift = this.getValue(json, "isGift");
+            let tempIsGift = this.getValue(json, "isGift", "gift");
             if (!tsCore.StringUtil.isEmpty(tempIsGift))
                 this._isGift = Laya.Utils.parseInt(tempIsGift);
-            let isCall = this.getValue(json, "isCall");
+            let isCall = this.getValue(json, "isCall", "call");
             if (!tsCore.StringUtil.isEmpty(isCall))
                 SceneManager.inst.isCall = !(isCall === "false");
             let tempPlayWith = this.getValue(json, "playWith");
@@ -5278,6 +5279,39 @@ window.gameLib = {};
                 AppRecordManager.executeJson = { type: 2, data: Laya.Utils.parseInt(this.openGame), gameName: tempGameName };
             }
         }
+        getQueryBoolean(json, fun, ...keys) {
+            const value = this.getValue(json, ...keys);
+            if (value) {
+                fun(!(!value || value.equalsAnyIgnore("false", "0")));
+            }
+        }
+        /**
+         * 执行参数设置 如果存在将调用fun 如果不存在或是空 将不会调用fun
+         * @param json
+         * @param fun
+         * @param keys
+         */
+        getQuery(json, fun, ...keys) {
+            const value = this.getValue(json, ...keys);
+            if (value) {
+                // @ts-ignore
+                fun(value);
+            }
+        }
+        /**
+         * 获取指定的key的布尔值 空或false、0 都将返回false
+         * @param json
+         * @param keys
+         */
+        getValueBoolean(json, ...keys) {
+            const value = this.getValue(json, ...keys);
+            return !(!value || value.equalsAnyIgnore("false", "0"));
+        }
+        /**
+         * 获取url上的参数key=value
+         * @param json
+         * @param keys
+         */
         getValue(json, ...keys) {
             let value;
             for (const key of keys) {
@@ -6365,12 +6399,14 @@ window.gameLib = {};
          * @param [data = null]
          * */
         static gameClose(type = 0, data = null) {
+            var _a, _b;
             SceneManager.inst.initComplete = false;
             SceneManager.inst.isLoaderResComplete = false;
             if (AppManager.callIOS("gameClose", { type: type, data: data })) {
                 SceneManager.inst.closeGame();
                 return;
             }
+            (_b = (_a = Laya.Browser.window).gameClose) === null || _b === void 0 ? void 0 : _b.call(_a, type, data);
             if (Laya.Browser.window.parent.GameToHall) {
                 Laya.Browser.window.parent.GameToHall.gameClose(type, data);
             }
@@ -6393,11 +6429,12 @@ window.gameLib = {};
          * @param cancelText 取消文本
          */
         static alert(msg, title = "", okText = "", cancelText = "") {
-            var _a, _b, _c, _d, _e, _f;
+            var _a, _b, _c, _d, _e, _f, _g, _h;
             if (AppManager.callIOS("alert", { msg: msg, title: title, ensureTv: okText, cancelTv: cancelText }))
                 return;
-            (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.alert) === null || _c === void 0 ? void 0 : _c.call(_b, msg);
-            (_f = (_e = (_d = Laya.Browser.window.parent) === null || _d === void 0 ? void 0 : _d.GameToHall) === null || _e === void 0 ? void 0 : _e.openModal) === null || _f === void 0 ? void 0 : _f.call(_e, msg);
+            (_b = (_a = Laya.Browser.window) === null || _a === void 0 ? void 0 : _a.alert) === null || _b === void 0 ? void 0 : _b.call(_a, msg);
+            (_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.alert) === null || _e === void 0 ? void 0 : _e.call(_d, msg);
+            (_h = (_g = (_f = Laya.Browser.window.parent) === null || _f === void 0 ? void 0 : _f.GameToHall) === null || _g === void 0 ? void 0 : _g.openModal) === null || _h === void 0 ? void 0 : _h.call(_g, msg);
             AppManager.showWeb({ javascript: `window.GameToHall.alert && window.GameToHall.alert('${msg}')` });
             AppManager.showWeb({ javascript: `window.GameToHall.openModal && window.GameToHall.openModal('${msg}')` });
         }
@@ -6406,45 +6443,48 @@ window.gameLib = {};
          * @param page 页面 如： "/giftPage?token=***"
          * login,register,userSetting,webDetail,gameDetail,editNickName,forgetMain,changePwd,home,deposit,promotion,withdraw,profile
          * @param [isCloseGame=true] 是否关闭游戏
-         * @param fromUrl 登录注册等成功后，需打开的界面地址
          */
-        static openPage(page, isCloseGame = true, fromUrl) {
-            var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        static openPage(page, isCloseGame = true) {
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
             tsCore.Log.debug(`openPage-> page:${page}, isCloseGame=${isCloseGame}`);
-            if (AppManager.callIOS("openPage", {
-                page: page.startsWith("/") ? page.substring(1) : page,
-                isCloseGame: isCloseGame
-            }))
+            if (typeof page === "string") {
+                page = { page: page, isCloseGame: isCloseGame };
+            }
+            page.page = page.page.startsWith("/") ? page.page.substring(1) : page.page;
+            if (AppManager.callIOS("openPage", page))
                 return;
+            (_b = (_a = Laya.Browser.window).openPage) === null || _b === void 0 ? void 0 : _b.call(_a, page);
             if (isCloseGame) {
-                (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.comeWebPage) === null || _c === void 0 ? void 0 : _c.call(_b, page);
-                AppManager.showWeb({ javascript: `window.GameToHall.comeWebPage && window.GameToHall.comeWebPage('${page}')` });
+                (_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.openPage) === null || _e === void 0 ? void 0 : _e.call(_d, page.page);
+                (_h = (_g = (_f = Laya.Browser.window.parent) === null || _f === void 0 ? void 0 : _f.GameToHall) === null || _g === void 0 ? void 0 : _g.comeWebPage) === null || _h === void 0 ? void 0 : _h.call(_g, page.page);
+                AppManager.showWeb({ javascript: `window.GameToHall.openPage && window.GameToHall.openPage('${page.page}')` });
+                AppManager.showWeb({ javascript: `window.GameToHall.comeWebPage && window.GameToHall.comeWebPage('${page.page}')` });
                 SceneManager.inst.closeGame();
             }
             else {
-                (_f = (_e = (_d = Laya.Browser.window.parent) === null || _d === void 0 ? void 0 : _d.GameToHall) === null || _e === void 0 ? void 0 : _e.openWebPageWithoutLeaveGame) === null || _f === void 0 ? void 0 : _f.call(_e, page);
-                AppManager.showWeb({ javascript: `window.GameToHall.openWebPageWithoutLeaveGame('${page}')` });
+                (_l = (_k = (_j = Laya.Browser.window.parent) === null || _j === void 0 ? void 0 : _j.GameToHall) === null || _k === void 0 ? void 0 : _k.openWebPageWithoutLeaveGame) === null || _l === void 0 ? void 0 : _l.call(_k, page.page);
+                AppManager.showWeb({ javascript: `window.GameToHall.openWebPageWithoutLeaveGame('${page.page}')` });
             }
-            (_j = (_h = (_g = Laya.Browser.window.parent) === null || _g === void 0 ? void 0 : _g.GameToHall) === null || _h === void 0 ? void 0 : _h.openPage) === null || _j === void 0 ? void 0 : _j.call(_h, page);
-            AppManager.showWeb({ javascript: `window.GameToHall.openPage && window.GameToHall.openPage('${page}', ${isCloseGame})` });
         }
         /** 进入游戏进度条 */
         static progress(value) {
-            var _a, _b, _c, _d, _e, _f;
+            var _a, _b, _c, _d, _e, _f, _g, _h;
             if (AppManager.callIOS("progress", { value: value }, false))
                 return;
-            (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.progress) === null || _c === void 0 ? void 0 : _c.call(_b, value);
-            (_f = (_e = (_d = Laya.Browser.window.parent) === null || _d === void 0 ? void 0 : _d.GameToHall) === null || _e === void 0 ? void 0 : _e.getProgress) === null || _f === void 0 ? void 0 : _f.call(_e, value);
+            (_b = (_a = Laya.Browser.window).progress) === null || _b === void 0 ? void 0 : _b.call(_a, value);
+            (_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.progress) === null || _e === void 0 ? void 0 : _e.call(_d, value);
+            (_h = (_g = (_f = Laya.Browser.window.parent) === null || _f === void 0 ? void 0 : _f.GameToHall) === null || _g === void 0 ? void 0 : _g.getProgress) === null || _h === void 0 ? void 0 : _h.call(_g, value);
             AppManager.executionJavascript("window.GameToHall.progress && window.GameToHall.progress", value);
             AppManager.executionJavascript("window.GameToHall.getProgress && window.GameToHall.getProgress", value);
         }
         /** 通知进入游戏了 */
         static gameOnload() {
-            var _a, _b, _c;
+            var _a, _b, _c, _d, _e;
             tsCore.Log.debug("gameOnload->");
             if (AppManager.callIOS("gameOnload"))
                 return;
-            (_c = (_b = (_a = Laya.Browser.window.parent) === null || _a === void 0 ? void 0 : _a.GameToHall) === null || _b === void 0 ? void 0 : _b.gameOnload) === null || _c === void 0 ? void 0 : _c.call(_b);
+            (_b = (_a = Laya.Browser.window).gameOnload) === null || _b === void 0 ? void 0 : _b.call(_a);
+            (_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.gameOnload) === null || _e === void 0 ? void 0 : _e.call(_d);
             AppManager.executionJavascript("window.GameToHall.gameOnload", null);
         }
         /** 上传头像 */

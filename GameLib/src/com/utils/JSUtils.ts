@@ -54,6 +54,7 @@ export class JSUtils {
             SceneManager.inst.closeGame()
             return
         }
+        Browser.window.gameClose?.(type, data)
         if (Browser.window.parent.GameToHall) {
             Browser.window.parent.GameToHall.gameClose(type, data)
         } else {
@@ -77,6 +78,7 @@ export class JSUtils {
      */
     static alert(msg: string, title = "", okText = "", cancelText = "") {
         if (AppManager.callIOS("alert", {msg: msg, title: title, ensureTv: okText, cancelTv: cancelText})) return
+        Browser.window?.alert?.(msg)
         Browser.window.parent?.GameToHall?.alert?.(msg)
         Browser.window.parent?.GameToHall?.openModal?.(msg)
         AppManager.showWeb({javascript: `window.GameToHall.alert && window.GameToHall.alert('${msg}')`})
@@ -88,29 +90,31 @@ export class JSUtils {
      * @param page 页面 如： "/giftPage?token=***"
      * login,register,userSetting,webDetail,gameDetail,editNickName,forgetMain,changePwd,home,deposit,promotion,withdraw,profile
      * @param [isCloseGame=true] 是否关闭游戏
-     * @param fromUrl 登录注册等成功后，需打开的界面地址
      */
-    static openPage(page: string, isCloseGame = true, fromUrl?:string) {
+    static openPage(page: string | OpenPage, isCloseGame = true) {
         Log.debug(`openPage-> page:${page}, isCloseGame=${isCloseGame}`)
-        if (AppManager.callIOS("openPage", {
-            page: page.startsWith("/") ? page.substring(1) : page,
-            isCloseGame: isCloseGame
-        })) return
+        if (typeof page === "string") {
+            page = {page: page, isCloseGame: isCloseGame}
+        }
+        page.page = page.page.startsWith("/") ? page.page.substring(1) : page.page
+        if (AppManager.callIOS("openPage", page)) return
+        Browser.window.openPage?.(page)
         if (isCloseGame) {
-            Browser.window.parent?.GameToHall?.comeWebPage?.(page)
-            AppManager.showWeb({javascript: `window.GameToHall.comeWebPage && window.GameToHall.comeWebPage('${page}')`})
+            Browser.window.parent?.GameToHall?.openPage?.(page.page)
+            Browser.window.parent?.GameToHall?.comeWebPage?.(page.page)
+            AppManager.showWeb({javascript: `window.GameToHall.openPage && window.GameToHall.openPage('${page.page}')`})
+            AppManager.showWeb({javascript: `window.GameToHall.comeWebPage && window.GameToHall.comeWebPage('${page.page}')`})
             SceneManager.inst.closeGame()
         } else {
-            Browser.window.parent?.GameToHall?.openWebPageWithoutLeaveGame?.(page)
-            AppManager.showWeb({javascript: `window.GameToHall.openWebPageWithoutLeaveGame('${page}')`})
+            Browser.window.parent?.GameToHall?.openWebPageWithoutLeaveGame?.(page.page)
+            AppManager.showWeb({javascript: `window.GameToHall.openWebPageWithoutLeaveGame('${page.page}')`})
         }
-        Browser.window.parent?.GameToHall?.openPage?.(page)
-        AppManager.showWeb({javascript: `window.GameToHall.openPage && window.GameToHall.openPage('${page}', ${isCloseGame})`})
     }
 
     /** 进入游戏进度条 */
     static progress(value: number) {
         if (AppManager.callIOS("progress", {value: value}, false)) return
+        Browser.window.progress?.(value)
         Browser.window.parent?.GameToHall?.progress?.(value)
         Browser.window.parent?.GameToHall?.getProgress?.(value)
         AppManager.executionJavascript("window.GameToHall.progress && window.GameToHall.progress", value)
@@ -123,6 +127,7 @@ export class JSUtils {
     static gameOnload() {
         Log.debug("gameOnload->")
         if (AppManager.callIOS("gameOnload")) return
+        Browser.window.gameOnload?.()
         Browser.window.parent?.GameToHall?.gameOnload?.()
         AppManager.executionJavascript("window.GameToHall.gameOnload", null)
     }

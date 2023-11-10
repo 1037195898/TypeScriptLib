@@ -1,7 +1,17 @@
 /**
  * @type {(number)=>void}
  */
-let progress
+let onProgress
+
+/**
+ * @type {()=>void}
+ */
+let onError
+
+/**
+ * @type {string}
+ */
+let crashUrl
 
 /**
  * 批量加载资源
@@ -29,7 +39,7 @@ function loadBatch(url, parallel = true, onComplete = null) {
     function complete() {
         completeLoaderNum++
         let pro = parseFloat((completeLoaderNum / loaderTotalNum * 100).toFixed(2))
-        progress && progress(pro)
+        onProgress && onProgress(pro)
         completeIndex++
         if (onComplete && completeIndex === len) onComplete()
     }
@@ -73,6 +83,7 @@ function loadScript(url, parallel = true, callback = null) {
  * @param v {number}
  */
 function getLoadUrl(key, v) {
+    key = key.replace("{host}", window.location.host)
     if (!window.conch && !window.conchMarket) {
         return `${key}?v=${version(key) || v}`
     } else {
@@ -163,14 +174,7 @@ function loadContent(url, complete, args = []) {
 
 function loadError(e) {
     isLoadError = true
-    let errorText = "init: Failed to load resource!";
-    if (window.loadingView && window.loadingView.executionJavascript) {
-        window.loadingView.executionJavascript("window.GameToHall.openModal('" + errorText + "')");
-        window.loadingView.executionJavascript("window.GameToHall.gameClose(" + 0 + ", " + 0 + ")");
-    } else if (window.parent.GameToHall) {
-        window.parent.GameToHall.openModal(errorText);
-        window.parent.GameToHall.gameClose(0, 0);
-    }
+    onError && onError()
 }
 
 /**
@@ -209,7 +213,7 @@ function sendError(data) {
             }
             data = formData
         }
-        let url = window.gameCrash + (window["conch"] ? "app-crash" : "wap-crash")
+        let url = crashUrl
         let http = new XMLHttpRequest();
         http.open("post", url, true)
         http.send(data)

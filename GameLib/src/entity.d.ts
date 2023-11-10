@@ -16,6 +16,21 @@ declare type ResConfig = {
     odds?: number[][] | any[][]
 }
 
+declare type OpenPage = {
+    /** 打开指定界面 */
+    page: string
+    /** 是否关闭当前界面 */
+    isCloseGame?: boolean
+    /** 登录注册等成功后，需打开的界面 */
+    fromUrl?: String
+    /** 登录注册取消前往地圳 */
+    cancelUrl?: String
+    /** 打开界面是否横屏 */
+    isHorizontalScreen?: boolean
+    /** 0.打开web 1.打开游戏 */
+    type?: number
+}
+
 /**
  * 优惠券
  */

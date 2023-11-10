@@ -27,6 +27,7 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
     private continueBtn?: GButton
     /** 提示框的击中类型 */
     private controller: Controller
+    /** 标题显示控制器 */
     private controller2: fgui.Controller
     private controller3: fgui.Controller
     private continueFun: ParamHandler
