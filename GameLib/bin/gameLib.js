@@ -6406,7 +6406,7 @@ window.gameLib = {};
                 SceneManager.inst.closeGame();
                 return;
             }
-            (_b = (_a = Laya.Browser.window).gameClose) === null || _b === void 0 ? void 0 : _b.call(_a, type, data);
+            (_b = (_a = Laya.Browser.window.APP) === null || _a === void 0 ? void 0 : _a.gameClose) === null || _b === void 0 ? void 0 : _b.call(_a, type, data);
             if (Laya.Browser.window.parent.GameToHall) {
                 Laya.Browser.window.parent.GameToHall.gameClose(type, data);
             }
@@ -6432,7 +6432,7 @@ window.gameLib = {};
             var _a, _b, _c, _d, _e, _f, _g, _h;
             if (AppManager.callIOS("alert", { msg: msg, title: title, ensureTv: okText, cancelTv: cancelText }))
                 return;
-            Laya.Browser.window.gameOnload && ((_b = (_a = Laya.Browser.window).alert) === null || _b === void 0 ? void 0 : _b.call(_a, msg));
+            (_b = (_a = Laya.Browser.window.APP) === null || _a === void 0 ? void 0 : _a.alert) === null || _b === void 0 ? void 0 : _b.call(_a, msg);
             (_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.alert) === null || _e === void 0 ? void 0 : _e.call(_d, msg);
             (_h = (_g = (_f = Laya.Browser.window.parent) === null || _f === void 0 ? void 0 : _f.GameToHall) === null || _g === void 0 ? void 0 : _g.openModal) === null || _h === void 0 ? void 0 : _h.call(_g, msg);
             AppManager.showWeb({ javascript: `window.GameToHall.alert && window.GameToHall.alert('${msg}')` });
@@ -6453,7 +6453,7 @@ window.gameLib = {};
             page.page = page.page.startsWith("/") ? page.page.substring(1) : page.page;
             if (AppManager.callIOS("openPage", page))
                 return;
-            (_b = (_a = Laya.Browser.window).openPage) === null || _b === void 0 ? void 0 : _b.call(_a, page);
+            (_b = (_a = Laya.Browser.window.APP).openPage) === null || _b === void 0 ? void 0 : _b.call(_a, page);
             if (isCloseGame) {
                 (_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.openPage) === null || _e === void 0 ? void 0 : _e.call(_d, page.page);
                 (_h = (_g = (_f = Laya.Browser.window.parent) === null || _f === void 0 ? void 0 : _f.GameToHall) === null || _g === void 0 ? void 0 : _g.comeWebPage) === null || _h === void 0 ? void 0 : _h.call(_g, page.page);
@@ -6468,23 +6468,26 @@ window.gameLib = {};
         }
         /** 进入游戏进度条 */
         static progress(value) {
-            var _a, _b, _c, _d, _e, _f, _g, _h;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
             if (AppManager.callIOS("progress", { value: value }, false))
                 return;
-            (_b = (_a = Laya.Browser.window).progress) === null || _b === void 0 ? void 0 : _b.call(_a, value);
-            (_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.progress) === null || _e === void 0 ? void 0 : _e.call(_d, value);
-            (_h = (_g = (_f = Laya.Browser.window.parent) === null || _f === void 0 ? void 0 : _f.GameToHall) === null || _g === void 0 ? void 0 : _g.getProgress) === null || _h === void 0 ? void 0 : _h.call(_g, value);
+            (_b = (_a = Laya.Browser.window.APP) === null || _a === void 0 ? void 0 : _a.progress) === null || _b === void 0 ? void 0 : _b.call(_a, value);
+            (_d = (_c = Laya.Browser.window.loadingView) === null || _c === void 0 ? void 0 : _c.executionJavascript) === null || _d === void 0 ? void 0 : _d.call(_c, "window.GameToHall.getProgress(" + value + ")");
+            (_f = (_e = Laya.Browser.window.loadingView) === null || _e === void 0 ? void 0 : _e.loading) === null || _f === void 0 ? void 0 : _f.call(_e, value);
+            (_j = (_h = (_g = Laya.Browser.window.parent) === null || _g === void 0 ? void 0 : _g.GameToHall) === null || _h === void 0 ? void 0 : _h.progress) === null || _j === void 0 ? void 0 : _j.call(_h, value);
+            (_m = (_l = (_k = Laya.Browser.window.parent) === null || _k === void 0 ? void 0 : _k.GameToHall) === null || _l === void 0 ? void 0 : _l.getProgress) === null || _m === void 0 ? void 0 : _m.call(_l, value);
             AppManager.executionJavascript("window.GameToHall.progress && window.GameToHall.progress", value);
             AppManager.executionJavascript("window.GameToHall.getProgress && window.GameToHall.getProgress", value);
         }
         /** 通知进入游戏了 */
         static gameOnload() {
-            var _a, _b, _c, _d, _e;
+            var _a, _b, _c, _d, _e, _f, _g;
             tsCore.Log.debug("gameOnload->");
             if (AppManager.callIOS("gameOnload"))
                 return;
-            (_b = (_a = Laya.Browser.window).gameOnload) === null || _b === void 0 ? void 0 : _b.call(_a);
-            (_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.gameOnload) === null || _e === void 0 ? void 0 : _e.call(_d);
+            (_b = (_a = Laya.Browser.window.APP) === null || _a === void 0 ? void 0 : _a.gameOnload) === null || _b === void 0 ? void 0 : _b.call(_a);
+            (_d = (_c = Laya.Browser.window.conchMarket) === null || _c === void 0 ? void 0 : _c.gameOnload) === null || _d === void 0 ? void 0 : _d.call(_c);
+            (_g = (_f = (_e = Laya.Browser.window.parent) === null || _e === void 0 ? void 0 : _e.GameToHall) === null || _f === void 0 ? void 0 : _f.gameOnload) === null || _g === void 0 ? void 0 : _g.call(_f);
             AppManager.executionJavascript("window.GameToHall.gameOnload", null);
         }
         /** 上传头像 */

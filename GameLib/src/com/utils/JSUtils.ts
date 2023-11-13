@@ -4,6 +4,7 @@ import Log = tsCore.Log;
 import {AppManager} from "../manager/AppManager"
 import {SceneManager} from "../manager/SceneManager"
 import SoundManager = Laya.SoundManager;
+import NativeUtils = tsCore.NativeUtils;
 
 export class JSUtils {
 
@@ -54,7 +55,7 @@ export class JSUtils {
             SceneManager.inst.closeGame()
             return
         }
-        Browser.window.gameClose?.(type, data)
+        Browser.window.APP?.gameClose?.(type, data)
         if (Browser.window.parent.GameToHall) {
             Browser.window.parent.GameToHall.gameClose(type, data)
         } else {
@@ -78,7 +79,7 @@ export class JSUtils {
      */
     static alert(msg: string, title = "", okText = "", cancelText = "") {
         if (AppManager.callIOS("alert", {msg: msg, title: title, ensureTv: okText, cancelTv: cancelText})) return
-        Browser.window.gameOnload && Browser.window.alert?.(msg)
+        Browser.window.APP?.alert?.(msg)
         Browser.window.parent?.GameToHall?.alert?.(msg)
         Browser.window.parent?.GameToHall?.openModal?.(msg)
         AppManager.showWeb({javascript: `window.GameToHall.alert && window.GameToHall.alert('${msg}')`})
@@ -98,7 +99,7 @@ export class JSUtils {
         }
         page.page = page.page.startsWith("/") ? page.page.substring(1) : page.page
         if (AppManager.callIOS("openPage", page)) return
-        Browser.window.openPage?.(page)
+        Browser.window.APP.openPage?.(page)
         if (isCloseGame) {
             Browser.window.parent?.GameToHall?.openPage?.(page.page)
             Browser.window.parent?.GameToHall?.comeWebPage?.(page.page)
@@ -114,7 +115,10 @@ export class JSUtils {
     /** 进入游戏进度条 */
     static progress(value: number) {
         if (AppManager.callIOS("progress", {value: value}, false)) return
-        Browser.window.progress?.(value)
+        Browser.window.APP?.progress?.(value)
+        Laya.Browser.window.loadingView?.executionJavascript?.("window.GameToHall.getProgress(" + value + ")")
+        Laya.Browser.window.loadingView?.loading?.(value)
+
         Browser.window.parent?.GameToHall?.progress?.(value)
         Browser.window.parent?.GameToHall?.getProgress?.(value)
         AppManager.executionJavascript("window.GameToHall.progress && window.GameToHall.progress", value)
@@ -127,9 +131,11 @@ export class JSUtils {
     static gameOnload() {
         Log.debug("gameOnload->")
         if (AppManager.callIOS("gameOnload")) return
-        Browser.window.gameOnload?.()
+        Browser.window.APP?.gameOnload?.()
+        Browser.window.conchMarket?.gameOnload?.()
         Browser.window.parent?.GameToHall?.gameOnload?.()
         AppManager.executionJavascript("window.GameToHall.gameOnload", null)
+
     }
 
     /** 上传头像 */
