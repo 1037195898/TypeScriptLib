@@ -574,6 +574,7 @@ declare namespace gameLib {
         /** 是否是第一次播放完一次完整的中奖结果 */
         protected isFirstPlayComplete: boolean;
         protected onInit(): void;
+        protected onCloseAllAni(): void;
         /**
          * 绘制指定获胜线
          * @param value 线名字 从 1 开始

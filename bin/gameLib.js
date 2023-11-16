@@ -1029,6 +1029,10 @@ window.gameLib = {};
             (_a = this.list) !== null && _a !== void 0 ? _a : (this.list = (_b = this.getChild("list")) === null || _b === void 0 ? void 0 : _b.asList);
             if (this.list)
                 this.list.touchable = false;
+            this.regGameAction(ActionLib.GAME_CLOSE_ALL_ANI, this, this.onCloseAllAni);
+        }
+        onCloseAllAni() {
+            Laya.timer.clear(this, this.nextLine);
         }
         /**
          * 绘制指定获胜线
@@ -6459,7 +6463,7 @@ window.gameLib = {};
                 page = { page: page, isCloseGame: isCloseGame };
             }
             (_a = page.type) !== null && _a !== void 0 ? _a : (page.type = 0);
-            let pageUrl = page.page.startsWith("/") ? page.page.substring(1) : page.page;
+            let pageUrl = page.page.startsWith("/") && !page.page.startsWith("//") ? page.page.substring(1) : page.page;
             pageUrl = pageUrl.replace(/{host}/g, window.location.host).replace(/{lang}/g, Player.inst.urlParam.language);
             page.page = pageUrl;
             if (AppManager.callIOS("openPage", page))

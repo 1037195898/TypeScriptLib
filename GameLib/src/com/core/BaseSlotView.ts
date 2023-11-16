@@ -11,6 +11,7 @@ import {BaseSlotGameData} from "./BaseSlotGameData"
 import {SlotModel} from "./SlotModel"
 import {BaseView} from "./BaseView";
 import Log = tsCore.Log;
+import {ActionLib} from "../ActionLib";
 
 export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends BaseView {
 
@@ -42,6 +43,11 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
         super.onInit()
         this.list ??= this.getChild("list")?.asList
         if(this.list) this.list.touchable = false
+        this.regGameAction(ActionLib.GAME_CLOSE_ALL_ANI, this, this.onCloseAllAni)
+    }
+
+    protected onCloseAllAni() {
+        Laya.timer.clear(this, this.nextLine)
     }
 
     /**

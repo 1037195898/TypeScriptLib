@@ -105,7 +105,7 @@ export class JSUtils {
             page = {page: page, isCloseGame: isCloseGame}
         }
         page.type ??= 0
-        let pageUrl = page.page.startsWith("/") ? page.page.substring(1) : page.page
+        let pageUrl = page.page.startsWith("/") && !page.page.startsWith("//") ? page.page.substring(1) : page.page
         pageUrl = pageUrl.replace(/{host}/g, window.location.host).replace(/{lang}/g, Player.inst.urlParam.language)
         page.page = pageUrl
 
