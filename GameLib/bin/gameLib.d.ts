@@ -573,6 +573,8 @@ declare namespace gameLib {
         protected lineColor: string;
         /** 是否是第一次播放完一次完整的中奖结果 */
         protected isFirstPlayComplete: boolean;
+        /** 播放胜利线状态 */
+        protected isPlayWinLine: boolean;
         protected onInit(): void;
         protected onCloseAllAni(): void;
         /**

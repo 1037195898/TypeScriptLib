@@ -38,6 +38,8 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
     protected lineColor = "#ff0000"
     /** 是否是第一次播放完一次完整的中奖结果 */
     protected isFirstPlayComplete = false
+    /** 播放胜利线状态 */
+    protected isPlayWinLine = false
 
     protected override onInit() {
         super.onInit()
@@ -47,6 +49,7 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
     }
 
     protected onCloseAllAni() {
+        this.isPlayWinLine = false
         Laya.timer.clear(this, this.nextLine)
     }
 
@@ -126,6 +129,8 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
      * @protected
      */
     protected showWinning(isChangeFirst = true) {
+        if (!this.isPlayWinLine && !isChangeFirst) return  // 已停止播放并且不是第一次播放
+        this.isPlayWinLine = true
         if (isChangeFirst) this.isFirstPlayComplete = false
         let gameData = Player.inst.gameData as BaseSlotGameData
         let wins = gameData.userWinArray
