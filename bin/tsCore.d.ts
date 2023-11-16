@@ -404,7 +404,8 @@ declare namespace tsCore {
         /**
          * 打乱数组
          * @param array 要被打乱的数组
-         *
+         * @deprecated
+         * @see Array.shuffle()
          */
         static shuffle(array: any[]): void;
         /**
@@ -3062,9 +3063,8 @@ declare interface Array<T> {
     /**
      * 返回一个新数组，该数组仅包含给定数组中的元素，这些元素具有不同的键，由给定 selector 函数返回。
      * 在具有相等键的给定数组的元素中，结果数组中仅存在第一个元素。结果数组中的元素的顺序与源数组中的顺序相同。
-     * @param selector {(T) => K}
      */
-    distinctBy<T, K>(selector: (T) => K): Array<T>
+    distinctBy<R>(selector: (value: T) => R): Array<T>
 
     /**
      * 返回一个新数组，该数组仅包含给定数组中的不同元素。

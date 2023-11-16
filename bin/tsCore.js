@@ -921,7 +921,8 @@ window.tsCore = {};
         /**
          * 打乱数组
          * @param array 要被打乱的数组
-         *
+         * @deprecated
+         * @see Array.shuffle()
          */
         static shuffle(array) {
             let rnd;
@@ -7174,7 +7175,7 @@ Object.defineProperty(Array.prototype, "distinctBy", {
     value: function (selector) {
         const set = new Set();
         const list = [];
-        for (let e in this) {
+        for (let e of this) {
             const key = selector(e);
             if (set.add(key))
                 list.push(e);

@@ -121,7 +121,10 @@ function version(url) {
         }
     }
     if (!version) return
-    return version[url] || version[url.replace(baseUrls, "")]
+
+    const host = (Array.isArray(baseUrls) ? baseUrls[0] : baseUrls).replace("{host}", window.location.host)
+
+    return version[url] || version[url.replace(host, "").replace(/_\w+\.min/, "")]
 }
 
 /**

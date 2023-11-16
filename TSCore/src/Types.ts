@@ -340,7 +340,7 @@ Object.defineProperty(Array.prototype, "distinctBy", {
     value: function (selector: (...args: any[]) => any) {
         const set = new Set()
         const list = []
-        for (let e in this) {
+        for (let e of this) {
             const key = selector(e)
             if (set.add(key))
                 list.push(e)

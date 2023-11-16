@@ -209,7 +209,8 @@ export class UtilKit {
     /**
      * 打乱数组
      * @param array 要被打乱的数组
-     *
+     * @deprecated
+     * @see Array.shuffle()
      */
     static shuffle(array: any[]) {
         let rnd: number
