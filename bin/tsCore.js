@@ -7084,11 +7084,12 @@ String.prototype.endsWithAnyIgnore = function (...search) {
     return search.some((value) => lowerCase.endsWith(value.toLowerCase()));
 };
 String.prototype.equalsAny = function (...value) {
-    return value.some((it) => this === it);
+    const that = this.valueOf();
+    return value.some((it) => that === it);
 };
 String.prototype.equalsAnyIgnore = function (...value) {
     const lowerCase = this.toLowerCase();
-    return value.some((it) => lowerCase === it.toLowerCase());
+    return value.some((it) => lowerCase == it.toLowerCase());
 };
 String.prototype.contains = function (...search) {
     return search.some((value) => this.includes(value));

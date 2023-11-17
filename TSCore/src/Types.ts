@@ -249,12 +249,13 @@ String.prototype.endsWithAnyIgnore = function (...search: string []) {
 }
 
 String.prototype.equalsAny = function (...value: string []) {
-    return value.some((it) => this === it)
+    const that = this.valueOf()
+    return value.some((it) => that === it)
 }
 
 String.prototype.equalsAnyIgnore = function (...value: string []) {
     const lowerCase = this.toLowerCase()
-    return value.some((it) => lowerCase === it.toLowerCase())
+    return value.some((it) => lowerCase == it.toLowerCase())
 }
 
 String.prototype.contains = function (...search: string []) {

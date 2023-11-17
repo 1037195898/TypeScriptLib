@@ -1021,6 +1021,8 @@ window.gameLib = {};
             this.lineColor = "#ff0000";
             /** 是否是第一次播放完一次完整的中奖结果 */
             this.isFirstPlayComplete = false;
+            /** 播放胜利线状态 */
+            this.isPlayWinLine = false;
         }
         /*@override*/
         onInit() {
@@ -1032,6 +1034,7 @@ window.gameLib = {};
             this.regGameAction(ActionLib.GAME_CLOSE_ALL_ANI, this, this.onCloseAllAni);
         }
         onCloseAllAni() {
+            this.isPlayWinLine = false;
             Laya.timer.clear(this, this.nextLine);
         }
         /**
@@ -1109,6 +1112,9 @@ window.gameLib = {};
          * @protected
          */
         showWinning(isChangeFirst = true) {
+            if (!this.isPlayWinLine && !isChangeFirst)
+                return; // 已停止播放并且不是第一次播放
+            this.isPlayWinLine = true;
             if (isChangeFirst)
                 this.isFirstPlayComplete = false;
             let gameData = Player.inst.gameData;
