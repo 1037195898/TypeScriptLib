@@ -1,5 +1,4 @@
 import Browser = Laya.Browser;
-import Render = Laya.Render;
 import Log = tsCore.Log;
 import {AppManager} from "../manager/AppManager"
 import {SceneManager} from "../manager/SceneManager"
@@ -56,21 +55,13 @@ export class JSUtils {
         Log.debug(`gameClose->${type} ${data}`)
         SceneManager.inst.initComplete = false
         SceneManager.inst.isLoaderResComplete = false
-        if (AppManager.callIOS("gameClose", {type: type, data: data})) {
-            SceneManager.inst.closeGame()
-            return
-        }
-        Browser.window.APP?.gameClose?.(type, data)
-        if (Browser.window.parent.GameToHall) {
-            Browser.window.parent.GameToHall.gameClose(type, data)
-        } else {
-            if (!Render.isConchApp && window.location.protocol == "https:") {
-                // 如果不是加速器 并且不是在非https下  那么直接返回大厅
-                // Browser.window.location.href = Player.HOME_URL
-                Log.debug(`return home url ${window.location.host}`)
-                window.location.href = `//${window.location.host}`
-            }
-        }
+        AppManager.callIOS("gameClose", {
+            type: type,
+            data: data
+        }) ? SceneManager.inst.closeGame() : Browser.window.APP?.gameClose?.(type, data)
+            || Browser.window.parent?.GameToHall?.gameClose?.(type, data)
+            // 如果不是加速器 并且不是在非https下  那么直接返回大厅
+            || (!Browser.onLayaRuntime && window.location.protocol == "https:") && (window.location.href = `//${window.location.host}`)
         AppManager.showWeb({javascript: `window.GameToHall.gameClose(${type}, ${data})`})
         SceneManager.inst.closeGame()
     }
@@ -85,9 +76,9 @@ export class JSUtils {
     static alert(msg: string, title = "", okText = "", cancelText = "") {
         Log.debug(`alert-> msg:${msg}, title=${title}, okText=${okText}, cancelText=${cancelText}`)
         if (AppManager.callIOS("alert", {msg: msg, title: title, ensureTv: okText, cancelTv: cancelText})) return
-        Browser.window.parent?.GameToHall?.alert?.(msg)
+        Browser.window.APP?.alert?.(msg) ||
+        Browser.window.parent?.GameToHall?.alert?.(msg) ||
         Browser.window.parent?.GameToHall?.openModal?.(msg)
-        Browser.window.APP?.alert?.(msg)
         AppManager.showWeb({javascript: `window.GameToHall.alert && window.GameToHall.alert('${msg}')`})
         AppManager.showWeb({javascript: `window.GameToHall.openModal && window.GameToHall.openModal('${msg}')`})
     }
