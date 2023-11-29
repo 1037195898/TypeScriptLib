@@ -100,7 +100,7 @@ export class JSUtils {
      *
      * @example
      *
-     * openPage("//{host}/{lang}/page")   url= //www.google.com/en/page
+     * openPage("//{host}/{lang}/page") = url= //www.google.com/en/page
      *
      *
      */
@@ -110,9 +110,11 @@ export class JSUtils {
             page = {page: page, isCloseGame: isCloseGame}
         }
         page.type ??= 0
-        let pageUrl = page.page.startsWith("/") && !page.page.startsWith("//") ? page.page.substring(1) : page.page
-        pageUrl = pageUrl.replace(/{host}/g, window.location.host).replace(/{lang}/g, Player.inst.urlParam.language)
-        page.page = pageUrl
+        // 双斜杠开头  默认添加协议头
+        if (page.page.startsWith("//")) page.page = window.location.protocol + page.page
+        // 替换域名和 语言
+        page.page = page.page.replace(/{host}/g, window.location.host)
+            .replace(/{lang}/g, Player.inst.urlParam.language)
 
         if (AppManager.callIOS("openPage", page)) return
         Browser.window.APP?.openPage?.(page, isCloseGame)

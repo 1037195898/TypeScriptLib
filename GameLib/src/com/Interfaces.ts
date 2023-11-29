@@ -22,6 +22,13 @@ export interface IGameData {
 
 export interface IData {
 
+    /** 国家 'ke'肯尼亚；'ug'乌干达, 'ng'尼日尼亚 */
+    country: string
+    /** 语言 en zh-CN */
+    language: string
+    /** 渠道平台 */
+    channel: string
+
     /** 用户昵称是否是第一次改名，0 是，1 不是  */
     isFirstNick: boolean
     /** 该账号是否是第一次登录，0 是，1 不是  */
