@@ -32,6 +32,10 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     protected gameStatus: number
     /** 网络通信名字 */
     networkName: string
+    /**
+     * 外部定义的初始化 在执行onUserData()前执行 返回false表示 出现错误
+     */
+    customInit: () => boolean
 
     protected constructor() {
         super()
@@ -261,11 +265,20 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
             Player.inst.data.jackpot = data.jackpot
         }
         Player.inst.data.period = period
-        if (this.gameStatus == 1 && period > 0) {
-            this.getCoupon()
+        if (this.gameStatus == 1) {
+            let result = true
+            if (this.customInit) result = this.customInit()
+            result && this.onUserData() ? this.getCoupon() : this.enterFail()
         } else {
             this.enterFail()
         }
+    }
+
+    /**
+     * 用户信息初始化完成 返回false表示 出现错误
+     */
+    onUserData() {
+        return true
     }
 
     /**
