@@ -1504,8 +1504,8 @@ window.tsCore = {};
                         }
                     }
                     let restype = responseType !== "arraybuffer" ? "text" : "arraybuffer";
-                    !this.async && (http.responseType = restype);
-                    if (!this.async && http.dataType) { //for Ali
+                    this.async && (http.responseType = restype);
+                    if (this.async && http.dataType) { //for Ali
                         http.dataType = restype;
                     }
                     http.onerror = function (e) {
