@@ -1468,6 +1468,67 @@ window.tsCore = {};
                     return this.tempSaveToCmd.call(this, fun, args);
                 }
             });
+            Object.defineProperties(Laya.HttpRequest.prototype, {
+                async: {
+                    value: true,
+                    writable: true
+                }
+            });
+            Object.defineProperty(Laya.HttpRequest.prototype, "send", {
+                value: function (url, data = null, method = "get", responseType = "text", headers = null) {
+                    this._responseType = responseType;
+                    this._data = null;
+                    if (Laya.Browser.onVVMiniGame || Laya.Browser.onQGMiniGame || Laya.Browser.onQQMiniGame || Laya.Browser.onAlipayMiniGame || Laya.Browser.onBLMiniGame || Laya.Browser.onHWMiniGame || Laya.Browser.onTTMiniGame || Laya.Browser.onTBMiniGame) {
+                        // @ts-ignore
+                        url = Laya.HttpRequest._urlEncode(url);
+                    }
+                    this._url = url;
+                    var _this = this;
+                    var http = this._http;
+                    //临时，因为微信不支持以下文件格式
+                    http.open(method, url, this.async);
+                    let isJson = false;
+                    if (headers) {
+                        for (var i = 0; i < headers.length; i++) {
+                            http.setRequestHeader(headers[i++], headers[i]);
+                        }
+                    }
+                    else if (!(window.conch)) {
+                        if (!data || typeof (data) == 'string')
+                            http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                        else {
+                            http.setRequestHeader("Content-Type", "application/json");
+                            if (!(data instanceof ArrayBuffer) && typeof data !== "string") {
+                                isJson = true;
+                            }
+                        }
+                    }
+                    let restype = responseType !== "arraybuffer" ? "text" : "arraybuffer";
+                    http.responseType = restype;
+                    if (http.dataType) { //for Ali
+                        http.dataType = restype;
+                    }
+                    http.onerror = function (e) {
+                        // @ts-ignore
+                        _this._onError(e);
+                    };
+                    http.onabort = function (e) {
+                        // @ts-ignore
+                        _this._onAbort(e);
+                    };
+                    http.onprogress = function (e) {
+                        // @ts-ignore
+                        _this._onProgress(e);
+                    };
+                    http.onload = function (e) {
+                        // @ts-ignore
+                        _this._onLoad(e);
+                    };
+                    if (Laya.Browser.onBLMiniGame && Laya.Browser.onAndroid && !data)
+                        data = {};
+                    http.send(isJson ? JSON.stringify(data) : data);
+                }
+            });
             DefineConfig.defineSpineSkeleton();
             DefineConfig.defineSkeleton();
             DefineConfig.defineText();

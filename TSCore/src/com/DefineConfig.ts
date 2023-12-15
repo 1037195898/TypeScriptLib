@@ -71,6 +71,7 @@ export class DefineConfig {
                 }
             }
         })
+
         function _stageOnFocus() {
             // @ts-ignore
             Laya.SoundManager._stageOnFocus()
@@ -95,6 +96,7 @@ export class DefineConfig {
                 SoundUtils.playMusic(bgMusic)
             }
         }
+
         function _visibilityChange() {
             if (Laya.stage.isVisibility) {
                 _stageOnFocus()
@@ -174,6 +176,66 @@ export class DefineConfig {
                     args.name = this.boneSlotName || ""
                 }
                 return this.tempSaveToCmd.call(this, fun, args)
+            }
+        })
+
+        Object.defineProperties(Laya.HttpRequest.prototype, {
+            async: {
+                value: true,
+                writable: true
+            }
+        })
+        Object.defineProperty(Laya.HttpRequest.prototype, "send", {
+            value: function (url: string, data: any = null, method: string = "get", responseType: string = "text", headers: any[] | null = null) {
+                this._responseType = responseType
+                this._data = null
+
+                if (Laya.Browser.onVVMiniGame || Laya.Browser.onQGMiniGame || Laya.Browser.onQQMiniGame || Laya.Browser.onAlipayMiniGame || Laya.Browser.onBLMiniGame || Laya.Browser.onHWMiniGame || Laya.Browser.onTTMiniGame || Laya.Browser.onTBMiniGame) {
+                    // @ts-ignore
+                    url = Laya.HttpRequest._urlEncode(url);
+                }
+                this._url = url;
+                var _this: Laya.HttpRequest = this
+                var http = this._http;
+                //临时，因为微信不支持以下文件格式
+                http.open(method, url, this.async)
+                let isJson = false;
+                if (headers) {
+                    for (var i: number = 0; i < headers.length; i++) {
+                        http.setRequestHeader(headers[i++], headers[i]);
+                    }
+                } else if (!(((<any>window)).conch)) {
+                    if (!data || typeof (data) == 'string') http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    else {
+                        http.setRequestHeader("Content-Type", "application/json");
+                        if (!(data instanceof ArrayBuffer) && typeof data !== "string") {
+                            isJson = true;
+                        }
+                    }
+                }
+                let restype: XMLHttpRequestResponseType = responseType !== "arraybuffer" ? "text" : "arraybuffer";
+                http.responseType = restype;
+                if ((http as any).dataType) {//for Ali
+                    (http as any).dataType = restype;
+                }
+                http.onerror = function (e: any): void {
+                    // @ts-ignore
+                    _this._onError(e);
+                }
+                http.onabort = function (e: any): void {
+                    // @ts-ignore
+                    _this._onAbort(e);
+                }
+                http.onprogress = function (e: any): void {
+                    // @ts-ignore
+                    _this._onProgress(e);
+                }
+                http.onload = function (e: any): void {
+                    // @ts-ignore
+                    _this._onLoad(e);
+                }
+                if (Laya.Browser.onBLMiniGame && Laya.Browser.onAndroid && !data) data = {};
+                http.send(isJson ? JSON.stringify(data) : data);
             }
         })
 
@@ -678,28 +740,28 @@ export class DefineConfig {
             value: function (templet: Laya.SpineTempletBase) {
                 let that = this
                 this.temp_init(templet)
-                this.state.listeners[0].event = function(entry: spine.TrackEntry, event: spine.Event) {
-                        let eventData = {
-                            audioValue: event.data.audioPath,
-                            audioPath: event.data.audioPath,
-                            floatValue: event.floatValue,
-                            intValue: event.intValue,
-                            name: event.data.name,
-                            stringValue: event.stringValue,
-                            time: event.time * 1000,
-                            balance: event.balance,
-                            volume: event.volume
-                        };
-                        // console.log("event:", entry, event);
-                        that.event(Laya.Event.LABEL, eventData);
-                        if (that._playAudio && eventData.audioValue) {
-                            let time = (that.currentPlayTime * 1000 - eventData.time) / 1000
-                            if (time < 0) time = 0
-                            SoundUtils.playSound(templet["_textureDic"].root + eventData.audioValue, 1,
-                                null, 1, time)
-                            Laya.SoundManager.playbackRate = that._playbackRate
-                        }
+                this.state.listeners[0].event = function (entry: spine.TrackEntry, event: spine.Event) {
+                    let eventData = {
+                        audioValue: event.data.audioPath,
+                        audioPath: event.data.audioPath,
+                        floatValue: event.floatValue,
+                        intValue: event.intValue,
+                        name: event.data.name,
+                        stringValue: event.stringValue,
+                        time: event.time * 1000,
+                        balance: event.balance,
+                        volume: event.volume
+                    };
+                    // console.log("event:", entry, event);
+                    that.event(Laya.Event.LABEL, eventData);
+                    if (that._playAudio && eventData.audioValue) {
+                        let time = (that.currentPlayTime * 1000 - eventData.time) / 1000
+                        if (time < 0) time = 0
+                        SoundUtils.playSound(templet["_textureDic"].root + eventData.audioValue, 1,
+                            null, 1, time)
+                        Laya.SoundManager.playbackRate = that._playbackRate
                     }
+                }
 
 
             }
@@ -714,7 +776,8 @@ export class DefineConfig {
                         !_channel.isStopped && _channel.stop();
                         this._soundChannelArr.splice(i, 1);
                         // SoundManager.removeChannel(_channel); //  是否需要? 去掉有什么好处? 是否还需要其他操作?
-                        len--; i--;
+                        len--;
+                        i--;
                     }
                 }
             }

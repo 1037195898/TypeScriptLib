@@ -75,6 +75,12 @@ declare module Laya {
 
     }
 
+
+    interface HttpRequest {
+        /** 设置是否异步请求 默认true */
+        async: boolean
+    }
+
     interface Stage {
         /**
          * 是否暂停更新所有的Laya.timer._update()
