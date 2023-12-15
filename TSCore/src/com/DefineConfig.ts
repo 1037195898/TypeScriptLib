@@ -214,8 +214,8 @@ export class DefineConfig {
                     }
                 }
                 let restype: XMLHttpRequestResponseType = responseType !== "arraybuffer" ? "text" : "arraybuffer";
-                http.responseType = restype;
-                if ((http as any).dataType) {//for Ali
+                !this.async && (http.responseType = restype);
+                if (!this.async && (http as any).dataType) {//for Ali
                     (http as any).dataType = restype;
                 }
                 http.onerror = function (e: any): void {
