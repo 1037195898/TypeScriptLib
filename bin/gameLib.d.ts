@@ -755,9 +755,19 @@ declare namespace gameLib {
         /** 网络通信名字 */
         networkName: string;
         /**
-         * 外部定义的初始化 在执行onUserData()前执行 返回false表示 出现错误
+         * 全局外部定义的初始化
+         *
+         * 在执行onUserData()前 gameStatus检查状态后执行
+         *
+         * 返回false表示 出现错误
          */
-        customInit: () => boolean;
+        static customInit: () => boolean;
+        /**
+         * 全局自定义解析用户返回信息的data属性
+         *
+         * 在 parseInitData 方法前执行
+         */
+        static customParseUser: (data: any) => void;
         protected constructor();
         protected get gameData(): T;
         /**

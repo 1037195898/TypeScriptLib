@@ -1713,31 +1713,7 @@ window.gameLib = {};
          * @param handler
          */
         checkState(handler) {
-            // if (Player.inst.isGuest) {
             runFun(handler);
-            // return
-            // // }
-            // let obj: any = {}
-            // obj.token = Player.inst.token
-            // obj.roomId = Player.inst.gameId
-            // this.post("/game/status", obj, (data: any) => {
-            //     if (data.code != HttpCode.OK) {
-            //         this.enterFail(true, StateCode.getShowMessage(data))
-            //         return
-            //     }
-            //     data = data.data
-            //     this.gameStatus = data.game_status
-            //     this.modifyCheckState(data)
-            //     let period: number = data.period;//当前期数
-            //     if (SceneManager.inst.isAloneGame() || Player.inst.gameId == CommonCmd.GAME_SCRATCHER) {
-            //         period = 1
-            //     }
-            //     if (this.gameStatus == 1 && period > 0) {
-            //         runFun(handler)
-            //     } else {
-            //         this.enterFail()
-            //     }
-            // }, Handler.create(this, this.userDataErrorHandler))
         }
         /**
          * 进入游戏失败
@@ -1778,6 +1754,7 @@ window.gameLib = {};
         }
         /** 用户数据 */
         userDataHandler(data) {
+            var _a, _b, _c;
             //			trace("MainPanel.userDataHandlerr(data) 服务器拿到游戏房间数据")
             if (data.code != HttpCode.OK) {
                 this.enterFail(true, StateCode.getShowMessage(data));
@@ -1785,6 +1762,8 @@ window.gameLib = {};
             }
             data = data.data;
             this.gameStatus = data.game_status;
+            // 处理自定义解析
+            (_a = GameServlet.customParseUser) === null || _a === void 0 ? void 0 : _a.call(GameServlet, data);
             this.parseInitData(data);
             Player.inst.status = data.status ? data.status : 1; //1=>投注中，2=>计算中，3=>开奖
             Player.inst.data.lotteryTime = data.lottery_time; //开奖时间戳(s)
@@ -1803,9 +1782,7 @@ window.gameLib = {};
             }
             Player.inst.data.period = period;
             if (this.gameStatus == 1) {
-                let result = true;
-                if (this.customInit)
-                    result = this.customInit();
+                let result = (_c = (_b = GameServlet.customInit) === null || _b === void 0 ? void 0 : _b.call(GameServlet)) !== null && _c !== void 0 ? _c : true;
                 result && this.onUserData() ? this.getCoupon() : this.enterFail();
             }
             else {

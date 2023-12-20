@@ -33,9 +33,19 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     /** 网络通信名字 */
     networkName: string
     /**
-     * 外部定义的初始化 在执行onUserData()前执行 返回false表示 出现错误
+     * 全局外部定义的初始化
+     *
+     * 在执行onUserData()前 gameStatus检查状态后执行
+     *
+     * 返回false表示 出现错误
      */
-    customInit: () => boolean
+    static customInit: () => boolean
+    /**
+     * 全局自定义解析用户返回信息的data属性
+     *
+     * 在 parseInitData 方法前执行
+     */
+    static customParseUser: (data:any) => void
 
     protected constructor() {
         super()
@@ -169,31 +179,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
      * @param handler
      */
     checkState(handler: ParamHandler) {
-        // if (Player.inst.isGuest) {
         runFun(handler)
-        // return
-        // // }
-        // let obj: any = {}
-        // obj.token = Player.inst.token
-        // obj.roomId = Player.inst.gameId
-        // this.post("/game/status", obj, (data: any) => {
-        //     if (data.code != HttpCode.OK) {
-        //         this.enterFail(true, StateCode.getShowMessage(data))
-        //         return
-        //     }
-        //     data = data.data
-        //     this.gameStatus = data.game_status
-        //     this.modifyCheckState(data)
-        //     let period: number = data.period;//当前期数
-        //     if (SceneManager.inst.isAloneGame() || Player.inst.gameId == CommonCmd.GAME_SCRATCHER) {
-        //         period = 1
-        //     }
-        //     if (this.gameStatus == 1 && period > 0) {
-        //         runFun(handler)
-        //     } else {
-        //         this.enterFail()
-        //     }
-        // }, Handler.create(this, this.userDataErrorHandler))
     }
 
     /**
@@ -246,6 +232,8 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
         }
         data = data.data
         this.gameStatus = data.game_status
+        // 处理自定义解析
+        GameServlet.customParseUser?.(data)
 
         this.parseInitData(data)
         Player.inst.status = data.status ? data.status : 1;//1=>投注中，2=>计算中，3=>开奖
@@ -266,8 +254,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
         }
         Player.inst.data.period = period
         if (this.gameStatus == 1) {
-            let result = true
-            if (this.customInit) result = this.customInit()
+            let result = GameServlet.customInit?.() ?? true
             result && this.onUserData() ? this.getCoupon() : this.enterFail()
         } else {
             this.enterFail()
