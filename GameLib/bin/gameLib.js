@@ -5485,14 +5485,7 @@ window.gameLib = {};
          * @return
          */
         getCoupon(type) {
-            let temps = [];
-            for (let i = 0; i < this.coupons.length; i++) {
-                let arr = this.coupons[i];
-                if (arr.type == type && arr.num > 0) {
-                    temps.push(arr);
-                }
-            }
-            return temps;
+            return this.coupons.filter(value => value.type == type && value.num > 0);
         }
         /**
          * 根据游戏ID  获取优惠劵
@@ -5500,15 +5493,23 @@ window.gameLib = {};
          * @return
          */
         getCouponGame(gameId) {
-            gameId !== null && gameId !== void 0 ? gameId : (gameId = Player.inst.gameId);
-            let temps = [];
-            for (let i = 0; i < this.coupons.length; i++) {
-                let arr = this.coupons[i];
-                if (arr.games.indexOf(gameId) != -1 && arr.num > 0) {
-                    temps.push(arr);
+            return this.coupons.filter(value => value.games.includes(gameId !== null && gameId !== void 0 ? gameId : Player.inst.gameId) && value.num > 0);
+        }
+        /**
+         * 使用一个优惠卷 并更改他的使用状态
+         * @param coupon
+         */
+        useCouponStatus(coupon) {
+            const findCoupon = this.coupons.find(value => {
+                if (typeof coupon !== "number") {
+                    if (value.id == coupon.id) {
+                        value.isUse = true;
+                        return value;
+                    }
                 }
-            }
-            return temps;
+            });
+            if (!findCoupon)
+                tsCore.Log.debug(`not find Coupon ${coupon}`);
         }
         /** 使用活动劵的次数 */
         useCouponNum() {
@@ -5522,14 +5523,7 @@ window.gameLib = {};
          * @return
          */
         getUseCoupon() {
-            let useObj = null;
-            for (let i = 0; i < this.coupons.length; i++) {
-                let arr = this.coupons[i];
-                if (arr.isUse) {
-                    useObj = arr;
-                }
-            }
-            return useObj;
+            return this.coupons.find(value => value.isUse);
         }
         /**
          * 获取正在使用的优惠劵
@@ -5544,11 +5538,11 @@ window.gameLib = {};
             }
         }
         /**
-         * 判断当前游戏可有使用的优惠券
+         * 判断当前游戏可以使用的优惠券
          */
         getCanUseCoupon() {
             let betValue = Player.inst.gameData.getTotalBetMoney();
-            let arr = Player.inst.getCouponGame(Player.inst.gameId);
+            let arr = Player.inst.getCouponGame();
             for (let i = 0; i < arr.length; i++) {
                 const useObj = arr[i];
                 if (useObj.type == 1) { // 判断是否有可以使用的抵用券
@@ -5564,10 +5558,7 @@ window.gameLib = {};
         }
         /** 停止所有的优惠价使用 */
         stopAllCoupon() {
-            for (let i = 0; i < this.coupons.length; i++) {
-                let obj = this.coupons[i];
-                obj.isUse = false;
-            }
+            this.coupons.forEach(value => value.isUse = false);
         }
         /** 获取请求发送的  token */
         getRequestToken() {
@@ -6462,6 +6453,8 @@ window.gameLib = {};
             // 双斜杠开头  默认添加协议头
             if (page.page.startsWith("//"))
                 page.page = window.location.protocol + page.page;
+            else if (page.page.startsWith("/"))
+                page.page = `${window.location.protocol}//{host}/{lang}` + page.page;
             // 替换域名和 语言
             page.page = page.page.replace(/{host}/g, window.location.host)
                 .replace(/{lang}/g, Player.inst.urlParam.language);

@@ -2805,6 +2805,11 @@ declare namespace gameLib {
          * @return
          */
         getCouponGame(gameId?: number): Coupons[];
+        /**
+         * 使用一个优惠卷 并更改他的使用状态
+         * @param coupon
+         */
+        useCouponStatus(coupon: Coupons | number): void;
         /** 使用活动劵的次数 */
         useCouponNum(): void;
         /**
@@ -2817,7 +2822,7 @@ declare namespace gameLib {
          */
         removeCoupon(obj: Coupons): void;
         /**
-         * 判断当前游戏可有使用的优惠券
+         * 判断当前游戏可以使用的优惠券
          */
         getCanUseCoupon(): boolean;
         /** 停止所有的优惠价使用 */

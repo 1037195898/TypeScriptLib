@@ -7,6 +7,7 @@ import StringUtil = tsCore.StringUtil;
 import ConfigKit = tsCore.ConfigKit;
 import {UrlParam} from "./net/UrlParam"
 import {IData, IExecuteData, IGameData, IGuestModel, ILogin} from "./Interfaces";
+import Log = tsCore.Log;
 
 /** 用户数据 */
 export class Player {
@@ -156,14 +157,7 @@ export class Player {
      * @return
      */
     getCoupon(type: number) {
-        let temps: Coupons[] = []
-        for (let i = 0; i < this.coupons.length; i++) {
-            let arr = this.coupons[i]
-            if (arr.type == type && arr.num > 0) {
-                temps.push(arr)
-            }
-        }
-        return temps
+        return this.coupons.filter(value => value.type == type && value.num > 0)
     }
 
     /**
@@ -172,15 +166,23 @@ export class Player {
      * @return
      */
     getCouponGame(gameId?: number) {
-        gameId ??= Player.inst.gameId
-        let temps: Coupons[] = []
-        for (let i = 0; i < this.coupons.length; i++) {
-            let arr = this.coupons[i]
-            if (arr.games.indexOf(gameId) != -1 && arr.num > 0) {
-                temps.push(arr)
+        return this.coupons.filter(value => value.games.includes(gameId ?? Player.inst.gameId) && value.num > 0)
+    }
+
+    /**
+     * 使用一个优惠卷 并更改他的使用状态
+     * @param coupon
+     */
+    useCouponStatus(coupon: Coupons | number) {
+        const findCoupon = this.coupons.find(value => {
+            if (typeof coupon !== "number") {
+                if (value.id == coupon.id) {
+                    value.isUse = true
+                    return value
+                }
             }
-        }
-        return temps
+        })
+        if (!findCoupon) Log.debug(`not find Coupon ${coupon}`)
     }
 
     /** 使用活动劵的次数 */
@@ -196,14 +198,7 @@ export class Player {
      * @return
      */
     getUseCoupon() {
-        let useObj: Coupons = null
-        for (let i = 0; i < this.coupons.length; i++) {
-            let arr = this.coupons[i]
-            if (arr.isUse) {
-                useObj = arr
-            }
-        }
-        return useObj
+        return this.coupons.find(value => value.isUse)
     }
 
     /**
@@ -220,11 +215,11 @@ export class Player {
     }
 
     /**
-     * 判断当前游戏可有使用的优惠券
+     * 判断当前游戏可以使用的优惠券
      */
     getCanUseCoupon() {
         let betValue = Player.inst.gameData.getTotalBetMoney()
-        let arr = Player.inst.getCouponGame(Player.inst.gameId)
+        let arr = Player.inst.getCouponGame()
         for (let i = 0; i < arr.length; i++) {
             const useObj = arr[i]
             if (useObj.type == 1) {// 判断是否有可以使用的抵用券
@@ -240,11 +235,10 @@ export class Player {
 
     /** 停止所有的优惠价使用 */
     stopAllCoupon() {
-        for (let i = 0; i < this.coupons.length; i++) {
-            let obj = this.coupons[i]
-            obj.isUse = false
-        }
+        this.coupons.forEach(value => value.isUse = false)
     }
+
+
 
     /** 获取请求发送的  token */
     getRequestToken() {

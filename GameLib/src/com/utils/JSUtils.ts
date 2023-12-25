@@ -102,7 +102,10 @@ export class JSUtils {
         }
         page.type ??= 0
         // 双斜杠开头  默认添加协议头
-        if (page.page.startsWith("//")) page.page = window.location.protocol + page.page
+        if (page.page.startsWith("//"))
+            page.page = window.location.protocol + page.page
+        else if (page.page.startsWith("/")) page.page = `${window.location.protocol}//{host}/{lang}` + page.page
+
         // 替换域名和 语言
         page.page = page.page.replace(/{host}/g, window.location.host)
             .replace(/{lang}/g, Player.inst.urlParam.language)
