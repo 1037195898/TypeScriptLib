@@ -172,12 +172,13 @@ export class Player {
     /**
      * 使用一个优惠卷 并更改他的使用状态
      * @param coupon
+     * @param [isUse=true] 使用状态
      */
-    useCouponStatus(coupon: Coupons | number) {
+    updateCouponStatus(coupon: Coupons | number, isUse = true) {
         const findCoupon = this.coupons.find(value => {
             if (typeof coupon !== "number") {
                 if (value.id == coupon.id) {
-                    value.isUse = true
+                    value.isUse = isUse
                     return value
                 }
             }

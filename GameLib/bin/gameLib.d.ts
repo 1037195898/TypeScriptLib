@@ -2808,8 +2808,9 @@ declare namespace gameLib {
         /**
          * 使用一个优惠卷 并更改他的使用状态
          * @param coupon
+         * @param [isUse=true] 使用状态
          */
-        useCouponStatus(coupon: Coupons | number): void;
+        updateCouponStatus(coupon: Coupons | number, isUse?: boolean): void;
         /** 使用活动劵的次数 */
         useCouponNum(): void;
         /**
