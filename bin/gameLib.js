@@ -546,12 +546,26 @@ window.gameLib = {};
             this.startupEvent.splice(index, 0, { handler: handler, weight: weight, name: name });
         }
         /**
-         * 根据事件名字 更新执行函数
+         * 注册或更新执行函数
+         * @param name 事件名字
+         * @param handler
+         */
+        regOrUpdateStartupEvent(name, handler) {
+            const h = this.startupEvent.find(value => value.name == name);
+            if (h == null)
+                this.regStartupEvent(handler, 0, name);
+            else
+                h.handler = handler;
+        }
+        /**
+         * 更新执行函数
          * @param name 事件名字
          * @param handler
          */
         updateStartupEvent(name, handler) {
-            this.startupEvent.find(value => value.name == name).handler = handler;
+            const h = this.startupEvent.find(value => value.name == name);
+            if (h != null)
+                h.handler = handler;
         }
         /**
          * 根据事件名字 获取事件的执行位置

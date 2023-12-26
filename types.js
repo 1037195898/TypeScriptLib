@@ -2,7 +2,7 @@
  * @typedef {Object} Resource 加载资源配置
  * @property {string} url - 资源的 URL。
  * @property {string|"image"|"arraybuffer"|"spine"|"sound"} type - 资源的类型。
- * @property {string} ignoreSuffix - 忽略的后缀名。
+ * @property {string|"png"|"atlas"} ignoreSuffix - 忽略的后缀名。
  * @property {boolean} forceLoad - 是否强制加载资源。
  * @property {boolean} runLoad - 运行时加载。
  * @property {string[]} branch - 渠道资源解析。

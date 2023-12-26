@@ -3102,9 +3102,9 @@ declare interface Array<T> {
      */
     shuffle(): void
 
-    minBy<R>(selector: (item: T) => R): T | undefined
+    minBy<R>(selector: (value: T) => R): T | undefined
 
-    maxBy<R>(selector: (item: T) => R): T | undefined
+    maxBy<R>(selector: (value: T) => R): T | undefined
 
 }
 declare type InitApp = {
@@ -3119,30 +3119,30 @@ declare type InitApp = {
          * 初始化引擎的宽
          * @default 720
          */
-        width?:number,
+        width?: number,
         /**
          * 初始化引擎的高
          * @default 1280
          */
-        height?:number
+        height?: number
     }
-    init?:{
+    init?: {
         /**
          * 是否初始化 Laya
          * @default true
          */
-        laya?:boolean,
+        laya?: boolean,
         /**
          * 是否初始化 fgui 如: Laya.stage.addChild(GRoot.inst.displayObject)
          * @default true
          */
-        fgui?:boolean,
+        fgui?: boolean,
         /**
          * 是否初始化引擎 手动调用 App.init()
          * @default true
          * @see App.init
          */
-        coreLib?:boolean
+        coreLib?: boolean
     }
     /**
      * 是否让GRoot 自适应大小 需要初始化fgui保持开启状态 否则需手动调用 App.inst.openResize
@@ -3154,7 +3154,7 @@ declare type InitApp = {
      * 是否启用刘海屏模式
      * @default false
      */
-    isNotchEnable?:boolean
+    isNotchEnable?: boolean
 }
 
 declare type PointType = { x?: number, y?: number }
@@ -3448,7 +3448,7 @@ declare type LoadRes = {
      * @example
      * png   jpg
      */
-    ignoreSuffix?: string
+    ignoreSuffix?: string | "png" | "atlas"
     /** 强制加载 */
     forceLoad?: boolean
     /** 分支 */

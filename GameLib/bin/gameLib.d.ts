@@ -378,7 +378,13 @@ declare namespace gameLib {
          */
         regStartupEventIndex(index: number, handler: ParamHandler, weight?: number, name?: any): void;
         /**
-         * 根据事件名字 更新执行函数
+         * 注册或更新执行函数
+         * @param name 事件名字
+         * @param handler
+         */
+        regOrUpdateStartupEvent(name: string, handler: ParamHandler): void;
+        /**
+         * 更新执行函数
          * @param name 事件名字
          * @param handler
          */

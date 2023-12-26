@@ -270,8 +270,8 @@ declare interface Array<T> {
      */
     shuffle(): void
 
-    minBy<R>(selector: (item: T) => R): T | undefined
+    minBy<R>(selector: (value: T) => R): T | undefined
 
-    maxBy<R>(selector: (item: T) => R): T | undefined
+    maxBy<R>(selector: (value: T) => R): T | undefined
 
 }

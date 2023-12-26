@@ -363,7 +363,7 @@ Object.defineProperty(Array.prototype, "shuffle", {
 })
 
 Object.defineProperty(Array.prototype, "minBy", {
-    value: function <T, R> (selector: (item: T) => R) {
+    value: function <T, R> (selector: (value: T) => R) {
         if (this.length == 0) return null
         let minElem = this[0]
         if (this.length == 1) return minElem
@@ -381,7 +381,7 @@ Object.defineProperty(Array.prototype, "minBy", {
 })
 
 Object.defineProperty(Array.prototype, "maxBy", {
-    value: function <T, R> (selector: (item: T) => R) {
+    value: function <T, R> (selector: (value: T) => R) {
         if (this.length == 0) return null
         let minElem = this[0]
         if (this.length == 1) return minElem

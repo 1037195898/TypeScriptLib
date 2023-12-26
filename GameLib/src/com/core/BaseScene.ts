@@ -258,12 +258,24 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
     }
 
     /**
-     * 根据事件名字 更新执行函数
+     * 注册或更新执行函数
+     * @param name 事件名字
+     * @param handler
+     */
+    regOrUpdateStartupEvent(name: string, handler: ParamHandler) {
+        const h = this.startupEvent.find(value => value.name == name)
+        if (h == null) this.regStartupEvent(handler, 0, name)
+        else h.handler = handler
+    }
+
+    /**
+     * 更新执行函数
      * @param name 事件名字
      * @param handler
      */
     updateStartupEvent(name: string, handler: ParamHandler) {
-        this.startupEvent.find(value => value.name == name).handler = handler
+        const h = this.startupEvent.find(value => value.name == name)
+        if (h != null) h.handler = handler
     }
 
     /**
