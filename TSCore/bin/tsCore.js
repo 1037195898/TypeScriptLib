@@ -70,7 +70,6 @@ window.tsCore = {};
             Log.debug("env", EnvType[envType]);
             // 使用自定义加载器加载资源
             fgui.AssetProxy.inst.setAsset(ELoader.loader);
-            HistoryManager.init();
         }
         static initClass(...args) {
             for (let i = 0; i < args.length; i++) {
@@ -3231,7 +3230,7 @@ window.tsCore = {};
          * 从 nums数组中查找 大于value并且最接近value的数据信息
          * @param nums
          * @param value
-         * @param equal
+         * @param [equal=true] 包括等于 相当于 >=
          */
         static getGreater(nums, value, equal = true) {
             let index = -1;
@@ -3251,7 +3250,7 @@ window.tsCore = {};
          * 从 nums数组中查找 小于value并且最接近value的数据信息
          * @param nums
          * @param value
-         * @param equal
+         * @param [equal=true] 包括等于 相当于 <=
          */
         static getLess(nums, value, equal = true) {
             let index = -1;
@@ -3638,7 +3637,7 @@ window.tsCore = {};
         }
         static init() {
             if (!Laya.Browser.onLayaRuntime) {
-                HistoryManager.addNewHistory();
+                HistoryManager.initCreateHistory && HistoryManager.addNewHistory();
                 Log.debug("history add event Listener");
                 window.addEventListener("popstate", function (e) {
                     HistoryManager.backHistory(true);
@@ -3662,6 +3661,8 @@ window.tsCore = {};
     HistoryManager.history = [];
     /** 暂停返回上一页 */
     HistoryManager.pauseHistory = false;
+    /** 初始化是否创建一个历史页 默认 true */
+    HistoryManager.initCreateHistory = true;
     tsCore.HistoryManager = HistoryManager;
     /**
      * 网络请求

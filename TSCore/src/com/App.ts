@@ -5,7 +5,6 @@ import {ELoader} from "./extends/ELoader";
 import {ConfigKit, EnvType} from "./kit/ConfigKit";
 import {Log} from "./Log";
 import {IController, IInitEngine, IKey, IProxy, IView} from "./interfaces/ICommon";
-import {HistoryManager} from "./manager/HistoryManager";
 import Handler = Laya.Handler;
 
 export class App implements IAction {
@@ -102,7 +101,6 @@ export class App implements IAction {
         Log.debug("env", EnvType[envType])
         // 使用自定义加载器加载资源
         fgui.AssetProxy.inst.setAsset(ELoader.loader)
-        HistoryManager.init()
     }
 
     static initClass(...args: (new () => any)[]) {

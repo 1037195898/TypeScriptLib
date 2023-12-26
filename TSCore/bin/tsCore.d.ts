@@ -1219,7 +1219,7 @@ declare namespace tsCore {
          * 从 nums数组中查找 大于value并且最接近value的数据信息
          * @param nums
          * @param value
-         * @param equal
+         * @param [equal=true] 包括等于 相当于 >=
          */
         static getGreater(nums: number[], value: number, equal?: boolean): {
             index: number;
@@ -1229,7 +1229,7 @@ declare namespace tsCore {
          * 从 nums数组中查找 小于value并且最接近value的数据信息
          * @param nums
          * @param value
-         * @param equal
+         * @param [equal=true] 包括等于 相当于 <=
          */
         static getLess(nums: number[], value: number, equal?: boolean): {
             index: number;
@@ -1382,6 +1382,8 @@ declare namespace tsCore {
         static len(): number;
         /** 清理所有页面缓存 */
         static clearHistory(): void;
+        /** 初始化是否创建一个历史页 默认 true */
+        static initCreateHistory: boolean;
         static init(): void;
         /** 添加新的记录 */
         static addNewHistory(): void;

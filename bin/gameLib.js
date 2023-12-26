@@ -4761,6 +4761,8 @@ window.gameLib = {};
                     LoadingWindow.inst.hide();
                     JSUtils.gameOnload();
                     Player.inst.guestModel.guestPlayCount = 0;
+                    // 初始化 历史管理
+                    AppRecordManager.init();
                 });
             }));
         }

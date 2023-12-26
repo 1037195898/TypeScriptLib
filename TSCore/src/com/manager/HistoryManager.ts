@@ -87,9 +87,12 @@ export class HistoryManager {
         HistoryManager.history.splice(0, HistoryManager.history.length)
     }
 
+    /** 初始化是否创建一个历史页 默认 true */
+    static initCreateHistory = true
+
     static init() {
         if (!Laya.Browser.onLayaRuntime) {
-            HistoryManager.addNewHistory()
+            HistoryManager.initCreateHistory && HistoryManager.addNewHistory()
             Log.debug("history add event Listener")
             window.addEventListener("popstate", function (e) {
                 HistoryManager.backHistory(true)

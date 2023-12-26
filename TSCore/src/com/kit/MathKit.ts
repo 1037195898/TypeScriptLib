@@ -181,7 +181,7 @@ export class MathKit {
      * 从 nums数组中查找 大于value并且最接近value的数据信息
      * @param nums
      * @param value
-     * @param equal
+     * @param [equal=true] 包括等于 相当于 >=
      */
     static getGreater(nums: number[], value: number, equal = true) {
         let index = -1
@@ -200,7 +200,7 @@ export class MathKit {
      * 从 nums数组中查找 小于value并且最接近value的数据信息
      * @param nums
      * @param value
-     * @param equal
+     * @param [equal=true] 包括等于 相当于 <=
      */
     static getLess(nums: number[], value: number, equal = true) {
         let index = -1
