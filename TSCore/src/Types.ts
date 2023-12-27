@@ -232,6 +232,12 @@ function getPropertyNames(obj, containsSuperClasses = false) {
     return Array.from(allPropertyNames)
 }
 
+/**
+ * 包装一个 windowMy
+ */
+const windowMy = window.self !== window.top ? window.top : window
+
+
 String.prototype.startsWithAny = function (...search: string []) {
     return search.some((value) => this.startsWith(value))
 }

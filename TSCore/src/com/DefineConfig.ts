@@ -44,7 +44,7 @@ export class DefineConfig {
 
         Object.defineProperty(Laya.KeyBoardManager, "_addEvent", {
             value: function (type) {
-                (window.parent || window).addEventListener(type, function (e: any) {
+                windowMy.addEventListener(type, function (e: any) {
                     Laya.KeyBoardManager["_dispatch"](e, type)
                 })
             }

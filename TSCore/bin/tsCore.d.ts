@@ -736,6 +736,10 @@ declare namespace tsCore {
         sendEventManager(type: number, ...obj: any[]): void;
     }
     const EWindow_base: Constructor<StringBlock & ActionEvent & ViewProxy & fairygui.Window>;
+    /**
+     * 实现了 fgui.Window 的窗口
+     * 默认会添加新的路由到历史中，可通过 joinRecord 处理
+     */
     export class EWindow extends EWindow_base implements IRecord {
         /** 动画显示或关闭 */
         protected isAction: boolean;
@@ -2831,6 +2835,10 @@ declare function getPropertyDescriptor(source: any, key: string | symbol, contai
  * @param [containsSuperClasses=false] 是否要包含父类
  */
 declare function getPropertyNames(obj: any, containsSuperClasses?: boolean): (string | symbol)[];
+/**
+ * 包装一个 windowMy
+ */
+declare const windowMy: Window;
 
 /**
  * 动态参数 function 或 Laya.Handler

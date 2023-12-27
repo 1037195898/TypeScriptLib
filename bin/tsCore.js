@@ -1334,7 +1334,7 @@ window.tsCore = {};
             });
             Object.defineProperty(Laya.KeyBoardManager, "_addEvent", {
                 value: function (type) {
-                    (window.parent || window).addEventListener(type, function (e) {
+                    windowMy.addEventListener(type, function (e) {
                         Laya.KeyBoardManager["_dispatch"](e, type);
                     });
                 }
@@ -2605,6 +2605,10 @@ window.tsCore = {};
         }
     }
     tsCore.ESocket = ESocket;
+    /**
+     * 实现了 fgui.Window 的窗口
+     * 默认会添加新的路由到历史中，可通过 joinRecord 处理
+     */
     class EWindow extends mixinExt(StringBlock, ViewProxy, ActionEvent, fgui.Window) {
         constructor() {
             super(...arguments);
@@ -3639,7 +3643,7 @@ window.tsCore = {};
             if (!Laya.Browser.onLayaRuntime) {
                 HistoryManager.initCreateHistory && HistoryManager.addNewHistory();
                 Log.debug("history add event Listener");
-                window.addEventListener("popstate", function (e) {
+                windowMy.addEventListener("popstate", function (e) {
                     HistoryManager.backHistory(true);
                 }, false);
             }
@@ -3652,7 +3656,7 @@ window.tsCore = {};
         static pushHistory(title, url) {
             Log.debug(`history push state title=${title} url=${url}`);
             const state = { title: title, url: url };
-            window.history.pushState(state, title, url);
+            windowMy.history.pushState(state, title, url);
         }
     }
     /**
@@ -7178,6 +7182,10 @@ function getPropertyNames(obj, containsSuperClasses = false) {
     }
     return Array.from(allPropertyNames);
 }
+/**
+ * 包装一个 windowMy
+ */
+const windowMy = window.self !== window.top ? window.top : window;
 String.prototype.startsWithAny = function (...search) {
     return search.some((value) => this.startsWith(value));
 };
