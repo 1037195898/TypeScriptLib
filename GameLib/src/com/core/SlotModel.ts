@@ -14,11 +14,20 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
     protected tweenList: Tween[]
     /** 完成动画数量 */
     protected completeCount: number
-    /** 是否是向上滚动的 一般开始的位置都是顶部 */
+    /**
+     * 是否是向上滚动的 一般开始的位置都是顶部
+     * @default false
+     */
     protected isScrollUp = false
-    /** 特殊玩法  */
+    /**
+     * 特殊玩法
+     * @default 13
+     */
     SPECIAL_PLAY = 13
-    /** 可以替换任何东西的 */
+    /**
+     * 可以替换任何东西的
+     * @default 12
+     */
     WILD = 12
     /** 满足2个就可以连上的线否则至少3个才可以连线,存放图片id */
     protected smallPrize = []
@@ -28,7 +37,7 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
     colNum = 5
     /**
      * 全部滚动结束延迟时间
-     * @protected
+     * @default 500
      */
     protected allEndDelay = 500
 

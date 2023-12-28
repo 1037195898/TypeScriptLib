@@ -1,6 +1,4 @@
 import {BaseGameData, GameType} from "./BaseGameData"
-import {Player} from "../Player"
-import LocalStorage = Laya.LocalStorage;
 import MathKit = tsCore.MathKit;
 
 

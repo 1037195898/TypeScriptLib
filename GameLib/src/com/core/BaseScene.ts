@@ -72,7 +72,8 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
         Log.debug(value)
     }
 
-    protected override onConstruct() {
+    protected override onInit() {
+        super.onInit();
         this.jackpotBtn = this.getChild("jackpot")
 
         this.regGameAction(ActionLib.GAME_RECONNECTION_NET, this, this.reconnectionNet)
@@ -86,7 +87,6 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
         this.regGameAction(ActionLib.GAME_BET_CHANGE, this, this.betChangeHandler)
         this.regGameAction(ActionLib.GAME_UPDATE_ROOM_ID_CHANGE, this, this.updateRoomIdChange)
         this.regGameAction(ActionLib.GAME_RUN_SCENE_EVENT, this, this.runEvent)
-        super.onConstruct()
     }
 
     /**
