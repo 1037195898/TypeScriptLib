@@ -779,7 +779,7 @@ declare namespace gameLib {
          *
          * 有返回表示 出现错误
          */
-        static customInit: () => CustomResult;
+        static customInit: (fun: (result: CustomResult) => void) => void;
         /**
          * 全局自定义解析用户返回信息的data属性
          *
@@ -864,10 +864,11 @@ declare namespace gameLib {
         protected userDataErrorHandler(data: any): void;
         /** 用户数据 */
         protected userDataHandler(data: any): void;
+        nextInit(): void;
         /**
          * 用户信息初始化完成 返回false表示 出现错误
          */
-        onUserData(): boolean;
+        onUserData(value: (result: CustomResult) => void): void;
         /**
          * 读取奖金池数据
          * @param data

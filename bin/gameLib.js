@@ -1803,18 +1803,28 @@ window.gameLib = {};
             }
             Player.inst.data.period = period;
             if (this.gameStatus == 1) {
-                let result = (_b = GameServlet.customInit) === null || _b === void 0 ? void 0 : _b.call(this);
-                result.succeed && this.onUserData() ? this.getCoupon() : this.enterFail(true, result.msg);
+                ((_b = GameServlet.customInit) === null || _b === void 0 ? void 0 : _b.call(this, (result) => {
+                    if (result.succeed) {
+                        this.nextInit();
+                    }
+                    else
+                        this.enterFail(true, result.msg);
+                })) || this.nextInit();
             }
             else {
                 this.enterFail();
             }
         }
+        nextInit() {
+            this.onUserData.call(this, (result) => {
+                result.succeed ? this.getCoupon() : this.enterFail(true, result.msg);
+            });
+        }
         /**
          * 用户信息初始化完成 返回false表示 出现错误
          */
-        onUserData() {
-            return true;
+        onUserData(value) {
+            value({ succeed: true });
         }
         /**
          * 读取奖金池数据
