@@ -1775,7 +1775,7 @@ window.gameLib = {};
         }
         /** 用户数据 */
         userDataHandler(data) {
-            var _a, _b;
+            var _a, _b, _c;
             //			trace("MainPanel.userDataHandlerr(data) 服务器拿到游戏房间数据")
             if (data.code != HttpCode.OK) {
                 this.enterFail(true, StateCode.getShowMessage(data));
@@ -1803,8 +1803,9 @@ window.gameLib = {};
             }
             Player.inst.data.period = period;
             if (this.gameStatus == 1) {
-                let result = (_b = GameServlet.customInit) === null || _b === void 0 ? void 0 : _b.call(this);
-                result.succeed && this.onUserData() ? this.getCoupon() : this.enterFail(true, result.msg);
+                const runUserData = () => this.onUserData().then(this.getCoupon, error);
+                const error = (err) => this.enterFail(true, err);
+                ((_c = (_b = GameServlet.customInit) === null || _b === void 0 ? void 0 : _b.call(this)) === null || _c === void 0 ? void 0 : _c.then(runUserData, error)) || runUserData();
             }
             else {
                 this.enterFail();
@@ -1814,7 +1815,9 @@ window.gameLib = {};
          * 用户信息初始化完成 返回false表示 出现错误
          */
         onUserData() {
-            return true;
+            return __awaiter(this, void 0, void 0, function* () {
+                return Promise.resolve();
+            });
         }
         /**
          * 读取奖金池数据

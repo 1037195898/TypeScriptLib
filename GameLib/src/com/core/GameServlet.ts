@@ -39,7 +39,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
      *
      * 有返回表示 出现错误
      */
-    static customInit: () => CustomResult
+    static customInit: () => Promise<any>
     /**
      * 全局自定义解析用户返回信息的data属性
      *
@@ -254,18 +254,22 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
         }
         Player.inst.data.period = period
         if (this.gameStatus == 1) {
-            let result: CustomResult = GameServlet.customInit?.call(this)
-            result.succeed && this.onUserData() ? this.getCoupon() : this.enterFail(true, result.msg)
+            const runUserData = () => this.onUserData().then(this.getCoupon, error)
+            const error = (err: string) => this.enterFail(true, err )
+
+            GameServlet.customInit?.call(this)?.then(runUserData, error) || runUserData()
         } else {
             this.enterFail()
         }
+
+
     }
 
     /**
      * 用户信息初始化完成 返回false表示 出现错误
      */
-    onUserData() {
-        return true
+    async onUserData() {
+        return Promise.resolve()
     }
 
     /**

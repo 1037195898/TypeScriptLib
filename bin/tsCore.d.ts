@@ -1782,7 +1782,6 @@ declare namespace tsCore {
         /** 超时 */
         private timeout;
         private static https;
-        private async;
         /** 不管结果如何  执行完成后最后都会执行的方法 */
         private finally;
         constructor();
@@ -1797,7 +1796,6 @@ declare namespace tsCore {
         setUrl(url: string): HTTPUtils;
         setData(data: any): HTTPUtils;
         setMethod(data: Method | string): HTTPUtils;
-        setAsync(async: boolean): HTTPUtils;
         setResponseType(data: string): HTTPUtils;
         setHeaders(array: string[]): HTTPUtils;
         /**
@@ -2917,12 +2915,6 @@ declare module Laya {
 
     }
 
-
-    interface HttpRequest {
-        /** 设置是否异步请求 默认true */
-        async: boolean
-    }
-
     interface Stage {
         /**
          * 是否暂停更新所有的Laya.timer._update()
@@ -3487,16 +3479,4 @@ declare type HttpResponse = {
     data: any,
     message: string,
     [key: string]: any
-}
-
-/**
- * 自定义返回数据格式
- */
-declare type CustomResult = {
-    /** 执行成功 */
-    succeed?: boolean,
-    /** 描述文案 */
-    msg?: string,
-    /** 附带属性 */
-    data?: any
 }
