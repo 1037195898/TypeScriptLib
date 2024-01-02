@@ -294,13 +294,8 @@ declare interface Array<T> {
      */
     sumOf(selector: (value: T) => number): number
 
-}
-
-declare interface Array<T extends number> {
-
     /**
      * 返回集合中所有元素的总和
      */
     sum(): number
-
 }
