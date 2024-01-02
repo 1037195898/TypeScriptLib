@@ -3112,9 +3112,38 @@ declare interface Array<T> {
      */
     shuffle(): void
 
+    /**
+     * 返回产生给定函数的最小值的第一个元素。
+     * @param selector
+     */
     minBy<R>(selector: (value: T) => R): T | undefined
 
+    /**
+     * 返回产生给定函数的最大值的第一个元素。
+     * @param selector
+     */
     maxBy<R>(selector: (value: T) => R): T | undefined
+
+    /**
+     * 返回与给定 predicate 匹配的元素数
+     * @param predicate
+     */
+    count(predicate: (value: T) => boolean): number
+
+    /**
+     * 返回数组中每个元素的函数生成 selector 的所有值的总和。
+     * @param selector
+     */
+    sumOf(selector: (value: T) => number): number
+
+}
+
+declare interface Array<T extends number> {
+
+    /**
+     * 返回集合中所有元素的总和
+     */
+    sum(): number
 
 }
 declare type InitApp = {

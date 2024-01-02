@@ -7351,6 +7351,35 @@ Object.defineProperty(Array.prototype, "maxBy", {
         return minElem;
     }
 });
+Object.defineProperty(Array.prototype, "count", {
+    value: function (predicate) {
+        if (this.length == 0)
+            return 0;
+        let count = 0;
+        for (let element of this)
+            if (predicate(element))
+                ++count;
+        return count;
+    }
+});
+Object.defineProperty(Array.prototype, "sum", {
+    value: function () {
+        let sum = 0;
+        for (let element of this) {
+            sum += element;
+        }
+        return sum;
+    }
+});
+Object.defineProperty(Array.prototype, "sumOf", {
+    value: function (selector) {
+        let sum = 0;
+        for (let element of this) {
+            sum += selector(element);
+        }
+        return sum;
+    }
+});
 function gaSend(hitType, data) {
     ga("send", hitType, data);
 }
