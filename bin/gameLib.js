@@ -1821,7 +1821,7 @@ window.gameLib = {};
         }
         nextInit() {
             this.onUserData.call(this, (result) => {
-                result.succeed ? this.getCoupon() : this.enterFail(true, result.msg);
+                result.succeed ? this.getCoupon(this.initComplete.bind(this)) : this.enterFail(true, result.msg);
             });
         }
         /**
@@ -1846,17 +1846,17 @@ window.gameLib = {};
             this.sendAction(ActionLib.GAME_UPDATE_JACKPOT_POOL);
         }
         /** 获取投注劵 */
-        getCoupon() {
-            this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(), null, this.couponHandler.bind(this), this.userDataErrorHandler.bind(this));
+        getCoupon(onComplete = null) {
+            this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(), null, Laya.Handler.create(this, this.couponHandler, [onComplete]), this.userDataErrorHandler.bind(this));
         }
         /** 收到投注劵数据 */
-        couponHandler(data) {
+        couponHandler(handler, data) {
             if (data.code != HttpCode.OK) {
                 this.enterFail(true, StateCode.getShowMessage(data));
                 return;
             }
             Player.inst.addCoupons(data.data);
-            this.initComplete();
+            runFun(handler);
         }
         initComplete() {
             runFun(this.initHandler);

@@ -875,9 +875,9 @@ declare namespace gameLib {
          */
         readJackpotData(data: HttpData): void;
         /** 获取投注劵 */
-        getCoupon(): void;
+        getCoupon(onComplete?: ParamHandler): void;
         /** 收到投注劵数据 */
-        protected couponHandler(data: HttpResponse): void;
+        protected couponHandler(handler: ParamHandler, data: HttpResponse): void;
         initComplete(): void;
         /**
          * 解析初始化数据

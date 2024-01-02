@@ -19,6 +19,7 @@ import {WaitResult} from "../view/WaitResult"
 import {CommonCmd, HttpCode, Urls} from "../net/Common";
 import {BaseGameData} from "./BaseGameData";
 import {StateCode} from "../utils/StateCode";
+import Handler = Laya.Handler;
 
 /**
  * 游戏基础类
@@ -268,7 +269,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
 
     nextInit() {
         this.onUserData.call(this, (result: CustomResult) => {
-            result.succeed ? this.getCoupon() : this.enterFail(true, result.msg)
+            result.succeed ? this.getCoupon(this.initComplete.bind(this)) : this.enterFail(true, result.msg)
         })
     }
 
@@ -293,19 +294,19 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     }
 
     /** 获取投注劵 */
-    getCoupon() {
+    getCoupon(onComplete: ParamHandler = null) {
         this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(),
-            null, this.couponHandler.bind(this), this.userDataErrorHandler.bind(this))
+            null, Handler.create(this, this.couponHandler, [onComplete]), this.userDataErrorHandler.bind(this))
     }
 
     /** 收到投注劵数据 */
-    protected couponHandler(data: HttpResponse) {
+    protected couponHandler(handler: ParamHandler, data: HttpResponse) {
         if (data.code != HttpCode.OK) {
             this.enterFail(true, StateCode.getShowMessage(data))
             return
         }
         Player.inst.addCoupons(data.data)
-        this.initComplete()
+        runFun(handler)
     }
 
     initComplete(): void {
