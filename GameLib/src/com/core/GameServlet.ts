@@ -291,7 +291,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     }
 
     /** 获取投注劵 */
-    protected getCoupon() {
+    getCoupon() {
         this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(),
             null, this.couponHandler.bind(this), this.userDataErrorHandler.bind(this))
     }

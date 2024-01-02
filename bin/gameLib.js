@@ -4942,11 +4942,17 @@ window.gameLib = {};
             return this._starter;
         }
         get scene() {
-            return this._starter.baseScene;
+            var _a;
+            return (_a = this._starter) === null || _a === void 0 ? void 0 : _a.baseScene;
+        }
+        get servlet() {
+            var _a;
+            return (_a = this._starter) === null || _a === void 0 ? void 0 : _a.gameServlet;
         }
         /**
          * 上传错误日志
          * @param data json格式的错误数据
+         * @deprecated
          */
         sendErrorLog(data) {
             let postUrl = Player.inst.data.getErrorUrl();

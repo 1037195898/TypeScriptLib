@@ -38,6 +38,8 @@ import {Cmd, CommonCmd} from "../net/Common";
 import {GameConfigKit} from "../kit/GameConfigKit";
 import {AssetsLoader} from "./AssetsLoader";
 import {StateCode} from "../utils/StateCode";
+import {GameServlet} from "../core/GameServlet";
+import {BaseGameData} from "../core/BaseGameData";
 
 /**
  * 舞台
@@ -266,7 +268,7 @@ export class SceneManager extends EProxy {
         let tempStr: string
         for (let i = 0; i < res.length; i++) {
             tempStr = res[i].url
-            if (tempStr.endsWith( fgui.UIConfig.packageFileExtension)) {
+            if (tempStr.endsWith(fgui.UIConfig.packageFileExtension)) {
                 resName = StringUtil.remove(tempStr, "." + fgui.UIConfig.packageFileExtension)
             }
         }
@@ -467,7 +469,7 @@ export class SceneManager extends EProxy {
         if (config || code) {
             let href = location.href
             if (config) href = href.replace(/(?<=gameName=)\d+/, config)
-            if (code) href = href.replace(/(?<=openG3ame=)\d+/, code+"")
+            if (code) href = href.replace(/(?<=openG3ame=)\d+/, code + "")
             location.replace(href)
         }
     }
@@ -556,20 +558,25 @@ export class SceneManager extends EProxy {
     }
 
     get scene() {
-        return this._starter.baseScene
+        return this._starter?.baseScene
+    }
+
+    get servlet() {
+        return this._starter?.gameServlet
     }
 
     /**
      * 上传错误日志
      * @param data json格式的错误数据
+     * @deprecated
      */
     sendErrorLog(data: any) {
         let postUrl = Player.inst.data.getErrorUrl()
-        if (postUrl?.startsWith( "http")) HTTPUtils.create()
-                .setMethod("post")
-                .setUrl(postUrl)
-                .setData(data)
-                .call()
+        if (postUrl?.startsWith("http")) HTTPUtils.create()
+            .setMethod("post")
+            .setUrl(postUrl)
+            .setData(data)
+            .call()
 
     }
 

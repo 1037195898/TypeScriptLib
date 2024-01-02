@@ -875,7 +875,7 @@ declare namespace gameLib {
          */
         readJackpotData(data: HttpData): void;
         /** 获取投注劵 */
-        protected getCoupon(): void;
+        getCoupon(): void;
         /** 收到投注劵数据 */
         protected couponHandler(data: HttpResponse): void;
         initComplete(): void;
@@ -2433,9 +2433,11 @@ declare namespace gameLib {
         unexpectedExitGame(msg?: string, callback?: ParamHandler): void;
         get starter(): BaseStarter;
         get scene(): BaseScene<BaseGameData>;
+        get servlet(): GameServlet<BaseGameData>;
         /**
          * 上传错误日志
          * @param data json格式的错误数据
+         * @deprecated
          */
         sendErrorLog(data: any): void;
     }
