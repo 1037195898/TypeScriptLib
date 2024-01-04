@@ -193,7 +193,7 @@ export class SceneManager extends EProxy {
      * 显示登录提示窗口
      */
     showLoginTip() {
-        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.LOGIN, null, null, () => this.showLogin())
+        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.LOGIN, null, null, () => JSUtils.login())
     }
 
     /**

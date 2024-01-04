@@ -1846,7 +1846,7 @@ window.gameLib = {};
             this.sendAction(ActionLib.GAME_UPDATE_JACKPOT_POOL);
         }
         /** 获取投注劵 */
-        getCoupon(onComplete = null) {
+        getCoupon(onComplete) {
             this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(), null, Laya.Handler.create(this, this.couponHandler, [onComplete]), this.userDataErrorHandler.bind(this));
         }
         /** 收到投注劵数据 */
@@ -4616,7 +4616,7 @@ window.gameLib = {};
          * 显示登录提示窗口
          */
         showLoginTip() {
-            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1023 /* LibStr.LOGIN */, null, null, () => this.showLogin());
+            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1023 /* LibStr.LOGIN */, null, null, () => JSUtils.login());
         }
         /**
          * 开启游戏 两个参数二选一  如果使用id第一个必须设置null
