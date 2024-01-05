@@ -198,7 +198,7 @@ export class DefineConfig {
                 var _this: Laya.HttpRequest = this
                 var http = this._http;
                 //临时，因为微信不支持以下文件格式
-                this.async ? console.log(`httpAsync_${method}: ${url}`) : console.log(`httpSync_${method}: ${url}`)
+                // this.async ? console.log(`httpAsync_${method}: ${url}`) : console.log(`httpSync_${method}: ${url}`)
                 http.open(method, url, this.async)
                 let isJson = false;
                 if (headers) {
