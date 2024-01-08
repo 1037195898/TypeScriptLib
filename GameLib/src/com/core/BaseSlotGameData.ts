@@ -100,12 +100,11 @@ export class BaseSlotGameData extends BaseGameData {
     }
 
     /**
-     * 获取每列 list 的值
+     * 获取每列 list 的值 如果没有则自动创建一个
      * @param index 列
-     * @return 返回所拥有的值
      */
     getSlotListArr(index: number): number[] {
-        return null
+        return this[`slotItem${index}`] ?? ( this[`slotItem${index}`] = [] && this.getSlotListArr(index) )
     }
 
     /**
@@ -114,6 +113,7 @@ export class BaseSlotGameData extends BaseGameData {
      * @param ar 新的值
      */
     setSlotListArr(index: number, ar: number[]) {
+        this[`slotItem${index}`] = ar
     }
 
     /**

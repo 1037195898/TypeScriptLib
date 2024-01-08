@@ -942,12 +942,12 @@ window.gameLib = {};
             return this.lottery[index];
         }
         /**
-         * 获取每列 list 的值
+         * 获取每列 list 的值 如果没有则自动创建一个
          * @param index 列
-         * @return 返回所拥有的值
          */
         getSlotListArr(index) {
-            return null;
+            var _a;
+            return (_a = this[`slotItem${index}`]) !== null && _a !== void 0 ? _a : (this[`slotItem${index}`] = [] && this.getSlotListArr(index));
         }
         /**
          * 为每列 list 赋新的值
@@ -955,6 +955,7 @@ window.gameLib = {};
          * @param ar 新的值
          */
         setSlotListArr(index, ar) {
+            this[`slotItem${index}`] = ar;
         }
         /**
          * 数组长度不够需要 那么添加几个随机值

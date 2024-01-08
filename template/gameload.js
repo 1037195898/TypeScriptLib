@@ -9,7 +9,7 @@ let onProgress
 let onError
 
 /**
- * @type {string}
+ * @type {string|(()=>string)}
  */
 let crashUrl
 
@@ -214,6 +214,9 @@ function sendError(data) {
                 formData.append(key, data[key]);
             }
             data = formData
+        }
+        if (typeof crashUrl === "function") {
+            crashUrl = crashUrl()
         }
         let url = crashUrl
         let http = new XMLHttpRequest();

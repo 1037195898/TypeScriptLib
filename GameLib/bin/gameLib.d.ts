@@ -510,9 +510,8 @@ declare namespace gameLib {
          */
         getLottery(index: number): number[];
         /**
-         * 获取每列 list 的值
+         * 获取每列 list 的值 如果没有则自动创建一个
          * @param index 列
-         * @return 返回所拥有的值
          */
         getSlotListArr(index: number): number[];
         /**
