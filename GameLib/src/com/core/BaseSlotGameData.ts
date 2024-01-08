@@ -67,7 +67,7 @@ export class BaseSlotGameData extends BaseGameData {
 
     /** 第一列是否存在 bounds */
     firstExistBounds: boolean
-    /** 当前开出免费游戏的个数 */
+    /** 当前开出免费游戏图标个数 */
     freeBoundsCount = 0
 
     /**

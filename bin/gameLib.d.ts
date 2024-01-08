@@ -493,7 +493,7 @@ declare namespace gameLib {
         freeCount: number;
         /** 第一列是否存在 bounds */
         firstExistBounds: boolean;
-        /** 当前开出免费游戏的个数 */
+        /** 当前开出免费游戏图标个数 */
         freeBoundsCount: number;
         /**
          * 是否有 reSpin
@@ -1312,19 +1312,34 @@ declare namespace gameLib {
         private centreY;
         /** 动画结束回调 */
         private endHandler;
-        /** 宽 */
+        /**
+         * 宽
+         * @default 70
+         */
         goldW: number;
-        /** 高 */
+        /**
+         * 高
+         * @default 70
+         */
         goldH: number;
         /** 重写最后一步方法 */
         readTweenFunction: ParamHandler;
         /** 动画结束数量 */
         private completeCount;
-        /** 回收速度 */
+        /**
+         * 回收速度
+         * @default 500
+         */
         recoveryDuration: number;
-        /** 金币喷出速度 (默认 40) */
+        /**
+         * 金币喷出速度
+         * @default 40
+         */
         goldSpeed: number;
-        /** 重力Y (默认 2)  */
+        /**
+         * 重力Y
+         * @default 2
+         */
         gravityY: number;
         /**
          * 播放金币动画

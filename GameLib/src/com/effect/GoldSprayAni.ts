@@ -15,19 +15,34 @@ export class GoldSprayAni {
     private centreY
     /** 动画结束回调 */
     private endHandler: ParamHandler
-    /** 宽 */
+    /**
+     * 宽
+     * @default 70
+     */
     goldW = 70
-    /** 高 */
+    /**
+     * 高
+     * @default 70
+     */
     goldH = 70
     /** 重写最后一步方法 */
     readTweenFunction: ParamHandler
     /** 动画结束数量 */
     private completeCount = 0
-    /** 回收速度 */
+    /**
+     * 回收速度
+     * @default 500
+     */
     recoveryDuration = 500
-    /** 金币喷出速度 (默认 40) */
+    /**
+     * 金币喷出速度
+     * @default 40
+     */
     goldSpeed = 40
-    /** 重力Y (默认 2)  */
+    /**
+     * 重力Y
+     * @default 2
+     */
     gravityY = 2
 
     /**

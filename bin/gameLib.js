@@ -916,7 +916,7 @@ window.gameLib = {};
             this.hasFreeSpin = 0;
             /** 免费游戏剩余次数 */
             this.freeCount = 0;
-            /** 当前开出免费游戏的个数 */
+            /** 当前开出免费游戏图标个数 */
             this.freeBoundsCount = 0;
             /**
              * 是否有 reSpin
@@ -2937,17 +2937,32 @@ window.gameLib = {};
     class GoldSprayAni {
         constructor() {
             this.goldAniBox = [];
-            /** 宽 */
+            /**
+             * 宽
+             * @default 70
+             */
             this.goldW = 70;
-            /** 高 */
+            /**
+             * 高
+             * @default 70
+             */
             this.goldH = 70;
             /** 动画结束数量 */
             this.completeCount = 0;
-            /** 回收速度 */
+            /**
+             * 回收速度
+             * @default 500
+             */
             this.recoveryDuration = 500;
-            /** 金币喷出速度 (默认 40) */
+            /**
+             * 金币喷出速度
+             * @default 40
+             */
             this.goldSpeed = 40;
-            /** 重力Y (默认 2)  */
+            /**
+             * 重力Y
+             * @default 2
+             */
             this.gravityY = 2;
         }
         /**
