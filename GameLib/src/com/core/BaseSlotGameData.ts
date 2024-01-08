@@ -104,7 +104,7 @@ export class BaseSlotGameData extends BaseGameData {
      * @param index 列
      */
     getSlotListArr(index: number): number[] {
-        return this[`slotItem${index}`] ?? ( this[`slotItem${index}`] = [] && this.getSlotListArr(index) )
+        return this[`slotList${index}`] ?? ( this[`slotList${index}`] = [] && this.getSlotListArr(index) )
     }
 
     /**
@@ -113,7 +113,7 @@ export class BaseSlotGameData extends BaseGameData {
      * @param ar 新的值
      */
     setSlotListArr(index: number, ar: number[]) {
-        this[`slotItem${index}`] = ar
+        this[`slotList${index}`] = ar
     }
 
     /**

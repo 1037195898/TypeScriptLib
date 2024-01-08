@@ -947,7 +947,7 @@ window.gameLib = {};
          */
         getSlotListArr(index) {
             var _a;
-            return (_a = this[`slotItem${index}`]) !== null && _a !== void 0 ? _a : (this[`slotItem${index}`] = [] && this.getSlotListArr(index));
+            return (_a = this[`slotList${index}`]) !== null && _a !== void 0 ? _a : (this[`slotList${index}`] = [] && this.getSlotListArr(index));
         }
         /**
          * 为每列 list 赋新的值
@@ -955,7 +955,7 @@ window.gameLib = {};
          * @param ar 新的值
          */
         setSlotListArr(index, ar) {
-            this[`slotItem${index}`] = ar;
+            this[`slotList${index}`] = ar;
         }
         /**
          * 数组长度不够需要 那么添加几个随机值
