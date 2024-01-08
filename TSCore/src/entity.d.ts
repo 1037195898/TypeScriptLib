@@ -363,9 +363,9 @@ declare type LoadRes = {
 /**
  * http请求数据返回
  */
-declare type HttpResponse = {
+declare type HttpResponse<T = any> = {
     code: number
-    data: any,
+    data: T,
     message: string,
     [key: string]: any
 }
@@ -373,11 +373,11 @@ declare type HttpResponse = {
 /**
  * 自定义返回数据格式
  */
-declare type CustomResult = {
+declare type CustomResult<T = any> = {
     /** 执行成功 */
     succeed?: boolean,
     /** 描述文案 */
     msg?: string,
     /** 附带属性 */
-    data?: any
+    data?: T
 }
