@@ -191,10 +191,6 @@ window.gameLib = {};
          * free 结束通知显示结束  开启结算弹窗
          */
         ActionLib["GAME_FREE_SPIN_END"] = "game_free_spin_end";
-        /**
-         * free spin继续未完成流程
-         */
-        ActionLib["SHOW_FREE_SPIN_GO_ON"] = "show_free_spin_go_on";
         /** 显示获得free奖励窗口 */
         ActionLib["GAME_SHOW_FREE_IN_WINDOW"] = "game_show_free_in_window";
         /** 隐藏获得free奖励窗口 */
