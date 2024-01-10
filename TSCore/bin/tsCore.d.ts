@@ -175,6 +175,13 @@ declare namespace tsCore {
         protected key: string;
         setKey(value: string): void;
         getKey(): string;
+        /**
+         * 已做以下处理
+         * ```
+         * ● 删除 addProxy 添加的缓存
+         * ● 删除本身注册的通知
+         * ```
+         */
         dispose(): void;
     }
     /** 全屏显示基类 */

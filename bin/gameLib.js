@@ -1416,6 +1416,14 @@ window.gameLib = {};
             this.gameScreenType = Laya.Stage.SCREEN_VERTICAL;
             /** 任务 */
             this.tasks = [];
+            /** 延迟发送获得bonus通知
+             * @default 200 ms
+             */
+            this.delayGetBonus = 200;
+            /** 延迟下一轮游戏开始通知
+             * @default 200 ms
+             */
+            this.delayNextRound = 200;
             this.regGameAction(ActionLib.GAME_CLEAR_RES, this, this.clearRes);
             this.regGameAction(ActionLib.GAME_INSERT_EXTENSION, this, this.insertExtension);
             this.regGameAction(ActionLib.GAME_INIT_SOCKET_EVENT, this, this.initSocketEvent);
@@ -1559,17 +1567,58 @@ window.gameLib = {};
         /** 子类实现 */
         insertExtension() {
         }
-        /** 通知开奖结束  进入结束流程 */
+        /**
+         * 通知开奖结束  进入结束流程
+         *
+         * @example
+         *
+         * this.sendAction(ActionLib.GAME_UPDATE_WIN_VALUE)
+         * Player.inst.money = this.gameData.currentBalance
+         * if (this.gameData instanceof BaseSlotGameData) {
+         *     if (this.gameData.hasReSpin) {
+         *         Laya.timer.once(this.delayNextRound, this, function () {
+         *             this.sendAction(ActionLib.GAME_START)
+         *         })
+         *         return
+         *     }
+         *     if (this.gameData.isFreeModel && this.gameData.freeCount > 0) { //如果在特殊场景里面
+         *         Laya.timer.once(this.delayNextRound, this, function () {
+         *             this.sendAction(ActionLib.GAME_START)
+         *         })
+         *         return
+         *     }
+         *     // 开出三个免费游戏启动项目  并且服务端告诉有免费游戏
+         *     if (this.gameData.freeBoundsCount >= 3 && this.gameData.hasFreeSpin != 0) {
+         *         this.gameData.tempServerWinMoney = this.gameData.serverWinMoney
+         *         // 交给scene处理
+         *         Laya.timer.once(this.delayGetBonus, this, () => {
+         *             this.sendAction(ActionLib.GAME_START)
+         *         })
+         *         return
+         *     }
+         *     // 如果是开大奖结束  显示总共赢的钱
+         *     if (this.gameData.hasFreeSpin != 0) {
+         *         this.gameData.hasFreeSpin = 0
+         *         this.sendAction(ActionLib.GAME_SHOW_FREE_OUT_WINDOW)
+         *         return
+         *     }
+         * }
+         * this.sendAction(ActionLib.GAME_ALL_BTN_CHANGE_STATE, false)
+         * this.sendAction(ActionLib.GAME_START)
+         *
+         */
         lotteryComplete() {
             this.sendAction(ActionLib.GAME_UPDATE_WIN_VALUE);
             Player.inst.money = this.gameData.currentBalance;
             if (this.gameData instanceof BaseSlotGameData) {
                 if (this.gameData.hasReSpin) {
-                    this.sendAction(ActionLib.GAME_START);
+                    Laya.timer.once(this.delayNextRound, this, function () {
+                        this.sendAction(ActionLib.GAME_START);
+                    });
                     return;
                 }
                 if (this.gameData.isFreeModel && this.gameData.freeCount > 0) { //如果在特殊场景里面
-                    Laya.timer.callLater(this, function () {
+                    Laya.timer.once(this.delayNextRound, this, function () {
                         this.sendAction(ActionLib.GAME_START);
                     });
                     return;
@@ -1578,7 +1627,9 @@ window.gameLib = {};
                 if (this.gameData.freeBoundsCount >= 3 && this.gameData.hasFreeSpin != 0) {
                     this.gameData.tempServerWinMoney = this.gameData.serverWinMoney;
                     // 交给scene处理
-                    this.sendAction(ActionLib.GAME_START);
+                    Laya.timer.once(this.delayGetBonus, this, () => {
+                        this.sendAction(ActionLib.GAME_START);
+                    });
                     return;
                 }
                 // 如果是开大奖结束  显示总共赢的钱
@@ -1609,8 +1660,17 @@ window.gameLib = {};
             (_a = this._gameServlet) !== null && _a !== void 0 ? _a : (this._gameServlet = SceneManager.inst.starter.gameServlet);
             return this._gameServlet;
         }
+        /**
+         * 已做以下处理
+         * @example
+         * ● 清除该类所有的定时器
+         * ● 还原默认的声音开关配置
+         * ● super.dispose()
+         *
+         */
         /*@override*/
         dispose() {
+            Laya.timer.clearAll(this);
             super.dispose();
             this.resetMusic();
         }
@@ -2695,7 +2755,6 @@ window.gameLib = {};
         }
         /*@override*/
         dispose() {
-            Laya.timer.clearAll(this);
             super.dispose();
         }
     }

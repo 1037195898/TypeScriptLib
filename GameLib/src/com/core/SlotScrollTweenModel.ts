@@ -82,7 +82,6 @@ export class SlotScrollTweenModel<T extends BaseSlotGameData = BaseSlotGameData>
     }
 
     override dispose() {
-        Laya.timer.clearAll(this)
         super.dispose()
     }
 
