@@ -18,6 +18,7 @@ export class BaseGameData implements IGameData {
 
     currentBalance = 0
     totalWinMoney = 0
+    serverWinMoney = 0
     playCount = 0
     isRecommend = false
     specialMode = false
@@ -29,9 +30,6 @@ export class BaseGameData implements IGameData {
     cacheAnte: any
     /** 默认bet位置 */
     defaultBetIndex = 0
-    /** 后端计算   当前盈利 */
-    serverWinMoney = 0
-
     /** 缓存 后端计算 当前盈利 */
     tempServerWinMoney = 0
     /** 当前玩家选择的自动bet次数 */

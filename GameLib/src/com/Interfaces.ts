@@ -16,6 +16,8 @@ export interface IGameData {
     currentBalance: number
     /** 本次总共盈利 */
     totalWinMoney?: number
+    /** 后端计算   当前盈利 */
+    serverWinMoney?:number
     /** 玩的次数 计数 */
     playCount: number
     /** 是否已经弹出过一次推荐正式场的游戏 */

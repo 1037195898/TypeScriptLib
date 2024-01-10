@@ -261,6 +261,8 @@ export class GameModel<T extends IGameData = BaseGameData> extends EProxy implem
     protected lotteryComplete() {
         this.sendAction(ActionLib.GAME_UPDATE_WIN_VALUE)
         Player.inst.money = this.gameData.currentBalance
+        // 保证所有按钮都在禁用状态
+        this.sendAction(ActionLib.GAME_ALL_BTN_CHANGE_STATE, false)
         if (this.gameData instanceof BaseSlotGameData) {
             if (this.gameData.hasReSpin) {
                 Laya.timer.once(this.delayNextRound, this, function () {
@@ -290,7 +292,6 @@ export class GameModel<T extends IGameData = BaseGameData> extends EProxy implem
                 return
             }
         }
-        this.sendAction(ActionLib.GAME_ALL_BTN_CHANGE_STATE, false)
         this.sendAction(ActionLib.GAME_START)
     }
 
