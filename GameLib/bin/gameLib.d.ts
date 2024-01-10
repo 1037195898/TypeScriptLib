@@ -238,6 +238,7 @@ declare namespace gameLib {
     export class BaseGameData implements IGameData {
         currentBalance: number;
         totalWinMoney: number;
+        serverWinMoney: number;
         playCount: number;
         isRecommend: boolean;
         specialMode: boolean;
@@ -248,8 +249,6 @@ declare namespace gameLib {
         cacheAnte: any;
         /** 默认bet位置 */
         defaultBetIndex: number;
-        /** 后端计算   当前盈利 */
-        serverWinMoney: number;
         /** 缓存 后端计算 当前盈利 */
         tempServerWinMoney: number;
         /** 当前玩家选择的自动bet次数 */
@@ -1471,6 +1470,8 @@ declare namespace gameLib {
         currentBalance: number;
         /** 本次总共盈利 */
         totalWinMoney?: number;
+        /** 后端计算   当前盈利 */
+        serverWinMoney?: number;
         /** 玩的次数 计数 */
         playCount: number;
         /** 是否已经弹出过一次推荐正式场的游戏 */
@@ -3812,6 +3813,22 @@ declare namespace gameLib {
     }
     export {};
 }
+
+/**
+ * 给资源绑定一个实现对象
+ * @example
+ *
+ * bindView("ui://package/uiName", MyUIClass)
+ *  可以简写成：
+ * bindView("//package/uiName", MyUIClass)
+ *
+ * //以下这种只能在游戏已经确认的时候使用，会自动根据游戏名字做为包填入
+ * bindView("uiName", MyUIClass)
+ *
+ * @param url
+ * @param type
+ */
+declare function bindView(url: string, type: { new(): fgui.GComponent }): void
 
 /**
  * 游戏资源配置

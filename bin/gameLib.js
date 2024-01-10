@@ -256,6 +256,7 @@ window.gameLib = {};
         constructor() {
             this.currentBalance = 0;
             this.totalWinMoney = 0;
+            this.serverWinMoney = 0;
             this.playCount = 0;
             this.isRecommend = false;
             this.specialMode = false;
@@ -264,8 +265,6 @@ window.gameLib = {};
             this._isTurboMode = false;
             /** 默认bet位置 */
             this.defaultBetIndex = 0;
-            /** 后端计算   当前盈利 */
-            this.serverWinMoney = 0;
             /** 缓存 后端计算 当前盈利 */
             this.tempServerWinMoney = 0;
             /** 当前玩家选择的自动bet次数 */
@@ -1610,6 +1609,8 @@ window.gameLib = {};
         lotteryComplete() {
             this.sendAction(ActionLib.GAME_UPDATE_WIN_VALUE);
             Player.inst.money = this.gameData.currentBalance;
+            // 保证所有按钮都在禁用状态
+            this.sendAction(ActionLib.GAME_ALL_BTN_CHANGE_STATE, false);
             if (this.gameData instanceof BaseSlotGameData) {
                 if (this.gameData.hasReSpin) {
                     Laya.timer.once(this.delayNextRound, this, function () {
@@ -1639,7 +1640,6 @@ window.gameLib = {};
                     return;
                 }
             }
-            this.sendAction(ActionLib.GAME_ALL_BTN_CHANGE_STATE, false);
             this.sendAction(ActionLib.GAME_START);
         }
         /** 游戏进入后台执行 */
@@ -3205,6 +3205,28 @@ window.gameLib = {};
         }
     }
     gameLib.GoldSprayAni = GoldSprayAni;
+    /**
+     * 给资源绑定一个实现对象
+     * @example
+     *
+     * bindView("ui://package/uiName", MyUIClass)
+     *  可以简写成：
+     * bindView("//package/uiName", MyUIClass)
+     *
+     * //以下这种只能在游戏已经确认的时候使用，会自动根据游戏名字做为包填入
+     * bindView("uiName", MyUIClass)
+     *
+     * @param url
+     * @param type
+     */
+    function bindView(url, type) {
+        if (!url.includes("/")) {
+            // @ts-ignore
+            const name = gameLib.GameConfigKit.gameNameCanonical();
+            url = `//${name.charAt(0).toLowerCase()}${name.substring(1)}/${url}`;
+        }
+        fgui.UIObjectFactory.setPackageItemExtension(url, type);
+    }
     class GameConfigKit {
         /**
          * 获取游戏配置表
