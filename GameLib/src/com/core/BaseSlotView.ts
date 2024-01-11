@@ -4,7 +4,6 @@ import Graphics = Laya.Graphics
 import Point = Laya.Point
 import GLabel = fgui.GLabel
 import Handler = Laya.Handler
-import {Player} from "../Player"
 import {BaseSlotItem} from "./BaseSlotItem"
 import {SceneManager} from "../manager/SceneManager"
 import {BaseSlotGameData} from "./BaseSlotGameData"
@@ -12,6 +11,7 @@ import {SlotModel} from "./SlotModel"
 import {BaseView} from "./BaseView";
 import Log = tsCore.Log;
 import {ActionLib} from "../ActionLib";
+import {Player} from "../Player";
 
 export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends BaseView {
 
@@ -26,20 +26,22 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
         [4, 2, 20, 16, 10, 1, 11, 17, 3, 5],
         [14, 12, 9, 18, 6, 7, 19, 8, 13, 15]
     ]
-    /** 当前显示的中奖线 */
+    /** 当前显示的中奖线 默认：0 */
     protected showLineIndex = 0
     /** 左侧线名字列表 */
     protected leftLineList: GList
     /** 右侧线名字列表 */
     protected rightLineList: GList
-    /** 线的大小 */
+    /** 线的大小 默认：3 */
     protected lineSize = 3
-    /** 线颜色 */
+    /** 线颜色 默认：#ff0000 */
     protected lineColor = "#ff0000"
     /** 是否是第一次播放完一次完整的中奖结果 */
     protected isFirstPlayComplete = false
     /** 播放胜利线状态 */
     protected isPlayWinLine = false
+    /** 自动播放中奖线延迟 默认：1500 */
+    protected autoPlayWinLineTime = 1500
 
     protected override onInit() {
         super.onInit()
@@ -50,6 +52,7 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
 
     protected onCloseAllAni() {
         this.isPlayWinLine = false
+        this.lineGraphics?.clear()
         Laya.timer.clear(this, this.nextLine)
     }
 
@@ -60,12 +63,8 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
      * @param lowGrade 是否包含下级 默认 false
      */
     protected showLine(value: number, alone = false, lowGrade = false) {
-        if (!this.lineGraphics) return
-        if (alone) {
-            this.lineGraphics.clear()
-        }
-        let gameData = Player.inst.gameData as BaseSlotGameData
-        let lottery = gameData.getLottery(value - 1)
+        if (alone) this.lineGraphics?.clear()
+        let lottery = this.gameData.getLottery(value - 1)
         let index = 0
         let list: GList
         let items: BaseSlotItem[] = []
@@ -120,24 +119,22 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
                 }
             }
         }
-        this.lineGraphics.drawLines(0, 0, paths, this.lineColor, this.lineSize)
+        this.lineGraphics?.drawLines(0, 0, paths, this.lineColor, this.lineSize)
     }
 
     /**
      * 自动播放中奖的项
-     * @param isChangeFirst 默认true   第一次播放完所有线 调用一次playFirstComplete()
-     * @protected
+     * @param isChangeFirst 默认true 第一次播放完所有线要调用一次 playFirstComplete()
      */
     protected showWinning(isChangeFirst = true) {
         if (!this.isPlayWinLine && !isChangeFirst) return  // 已停止播放并且不是第一次播放
         this.isPlayWinLine = true
         if (isChangeFirst) this.isFirstPlayComplete = false
-        let gameData = Player.inst.gameData as BaseSlotGameData
-        let wins = gameData.userWinArray
+        let wins = this.gameData.userWinArray
         if (wins.length == 0) return
         let currentLine = wins[this.showLineIndex] + 1
         // Log.debug(wins, currentLine)
-        if (gameData.lottery.length < currentLine || this.showLineIndex >= wins.length) {
+        if (this.gameData.lottery.length < currentLine || this.showLineIndex >= wins.length) {
             this.nextLine()
             return
         }
@@ -146,7 +143,7 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
         this.showWinSlotItem(wins[this.showLineIndex])
         // 显示单条线
         this.showLine(wins[this.showLineIndex] + 1, true)
-        Laya.timer.once(1500, this, this.nextLine)
+        Laya.timer.once(this.autoPlayWinLineTime, this, this.nextLine)
     }
 
     /**
@@ -154,9 +151,8 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
      * @param winIndex 赢的线 0开始
      */
     protected showWinSlotItem(winIndex: number) {
-        let gameData = Player.inst.gameData as BaseSlotGameData
         // 指定的线  显示出来
-        let lottery = gameData.getLottery(winIndex)
+        let lottery = this.gameData.getLottery(winIndex)
         let tempItemValue = -1; // 临时值
         let slotItem: BaseSlotItem
         for (let k = 0; k < lottery.length; k++) {
@@ -196,9 +192,8 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
     }
 
     protected nextLine() {
-        let gameData = Player.inst.gameData as BaseSlotGameData
         this.showLineIndex++
-        if (this.showLineIndex >= gameData.userWinArray.length) {
+        if (this.showLineIndex >= this.gameData.userWinArray.length) {
             if (!this.isFirstPlayComplete) { // 如果还没有第一次完成过  调用
                 this.playFirstComplete()
             }

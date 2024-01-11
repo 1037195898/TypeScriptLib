@@ -1058,16 +1058,18 @@ window.gameLib = {};
                 [4, 2, 20, 16, 10, 1, 11, 17, 3, 5],
                 [14, 12, 9, 18, 6, 7, 19, 8, 13, 15]
             ];
-            /** 当前显示的中奖线 */
+            /** 当前显示的中奖线 默认：0 */
             this.showLineIndex = 0;
-            /** 线的大小 */
+            /** 线的大小 默认：3 */
             this.lineSize = 3;
-            /** 线颜色 */
+            /** 线颜色 默认：#ff0000 */
             this.lineColor = "#ff0000";
             /** 是否是第一次播放完一次完整的中奖结果 */
             this.isFirstPlayComplete = false;
             /** 播放胜利线状态 */
             this.isPlayWinLine = false;
+            /** 自动播放中奖线延迟 默认：1500 */
+            this.autoPlayWinLineTime = 1500;
         }
         /*@override*/
         onInit() {
@@ -1079,7 +1081,9 @@ window.gameLib = {};
             this.regGameAction(ActionLib.GAME_CLOSE_ALL_ANI, this, this.onCloseAllAni);
         }
         onCloseAllAni() {
+            var _a;
             this.isPlayWinLine = false;
+            (_a = this.lineGraphics) === null || _a === void 0 ? void 0 : _a.clear();
             Laya.timer.clear(this, this.nextLine);
         }
         /**
@@ -1089,13 +1093,10 @@ window.gameLib = {};
          * @param lowGrade 是否包含下级 默认 false
          */
         showLine(value, alone = false, lowGrade = false) {
-            if (!this.lineGraphics)
-                return;
-            if (alone) {
-                this.lineGraphics.clear();
-            }
-            let gameData = Player.inst.gameData;
-            let lottery = gameData.getLottery(value - 1);
+            var _a, _b;
+            if (alone)
+                (_a = this.lineGraphics) === null || _a === void 0 ? void 0 : _a.clear();
+            let lottery = this.gameData.getLottery(value - 1);
             let index = 0;
             let list;
             let items = [];
@@ -1149,12 +1150,11 @@ window.gameLib = {};
                     }
                 }
             }
-            this.lineGraphics.drawLines(0, 0, paths, this.lineColor, this.lineSize);
+            (_b = this.lineGraphics) === null || _b === void 0 ? void 0 : _b.drawLines(0, 0, paths, this.lineColor, this.lineSize);
         }
         /**
          * 自动播放中奖的项
-         * @param isChangeFirst 默认true   第一次播放完所有线 调用一次playFirstComplete()
-         * @protected
+         * @param isChangeFirst 默认true 第一次播放完所有线要调用一次 playFirstComplete()
          */
         showWinning(isChangeFirst = true) {
             if (!this.isPlayWinLine && !isChangeFirst)
@@ -1162,13 +1162,12 @@ window.gameLib = {};
             this.isPlayWinLine = true;
             if (isChangeFirst)
                 this.isFirstPlayComplete = false;
-            let gameData = Player.inst.gameData;
-            let wins = gameData.userWinArray;
+            let wins = this.gameData.userWinArray;
             if (wins.length == 0)
                 return;
             let currentLine = wins[this.showLineIndex] + 1;
             // tsCore.Log.debug(wins, currentLine)
-            if (gameData.lottery.length < currentLine || this.showLineIndex >= wins.length) {
+            if (this.gameData.lottery.length < currentLine || this.showLineIndex >= wins.length) {
                 this.nextLine();
                 return;
             }
@@ -1177,16 +1176,15 @@ window.gameLib = {};
             this.showWinSlotItem(wins[this.showLineIndex]);
             // 显示单条线
             this.showLine(wins[this.showLineIndex] + 1, true);
-            Laya.timer.once(1500, this, this.nextLine);
+            Laya.timer.once(this.autoPlayWinLineTime, this, this.nextLine);
         }
         /**
          * 显示赢的那条线上所有项
          * @param winIndex 赢的线 0开始
          */
         showWinSlotItem(winIndex) {
-            let gameData = Player.inst.gameData;
             // 指定的线  显示出来
-            let lottery = gameData.getLottery(winIndex);
+            let lottery = this.gameData.getLottery(winIndex);
             let tempItemValue = -1; // 临时值
             let slotItem;
             for (let k = 0; k < lottery.length; k++) {
@@ -1226,9 +1224,8 @@ window.gameLib = {};
             }
         }
         nextLine() {
-            let gameData = Player.inst.gameData;
             this.showLineIndex++;
-            if (this.showLineIndex >= gameData.userWinArray.length) {
+            if (this.showLineIndex >= this.gameData.userWinArray.length) {
                 if (!this.isFirstPlayComplete) { // 如果还没有第一次完成过  调用
                     this.playFirstComplete();
                 }
@@ -2250,10 +2247,8 @@ window.gameLib = {};
                 return;
             }
             // 使用这种方法 可以防止completeHandler 中的判断出错
-            for (let i = 0; i < this.tweenList.length; i++) {
-                this.tweenList[i].complete();
-            }
-            this.tweenList.splice(0, this.tweenList.length);
+            this.tweenList.forEach(value => value.complete());
+            this.tweenList.length = 0;
         }
         /**
          * 当前滚动列数据处理完毕调用

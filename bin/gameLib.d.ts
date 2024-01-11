@@ -600,20 +600,22 @@ declare namespace gameLib {
         protected list: fgui.GList;
         /** 线数字 */
         protected lineNum: number[][];
-        /** 当前显示的中奖线 */
+        /** 当前显示的中奖线 默认：0 */
         protected showLineIndex: number;
         /** 左侧线名字列表 */
         protected leftLineList: fgui.GList;
         /** 右侧线名字列表 */
         protected rightLineList: fgui.GList;
-        /** 线的大小 */
+        /** 线的大小 默认：3 */
         protected lineSize: number;
-        /** 线颜色 */
+        /** 线颜色 默认：#ff0000 */
         protected lineColor: string;
         /** 是否是第一次播放完一次完整的中奖结果 */
         protected isFirstPlayComplete: boolean;
         /** 播放胜利线状态 */
         protected isPlayWinLine: boolean;
+        /** 自动播放中奖线延迟 默认：1500 */
+        protected autoPlayWinLineTime: number;
         protected onInit(): void;
         protected onCloseAllAni(): void;
         /**
@@ -625,8 +627,7 @@ declare namespace gameLib {
         protected showLine(value: number, alone?: boolean, lowGrade?: boolean): void;
         /**
          * 自动播放中奖的项
-         * @param isChangeFirst 默认true   第一次播放完所有线 调用一次playFirstComplete()
-         * @protected
+         * @param isChangeFirst 默认true 第一次播放完所有线要调用一次 playFirstComplete()
          */
         protected showWinning(isChangeFirst?: boolean): void;
         /**
@@ -1122,14 +1123,14 @@ declare namespace gameLib {
          * @param isTurboMode 是否快速播放
          * @return 运行时长
          */
-        protected abstract getDuration(index: number, isTurboMode: boolean): any;
+        protected abstract getDuration(index: number, isTurboMode: boolean): number;
         /**
          * 获取 Laya.Tween 运行延迟
          * @param index list 所在列
          * @param isTurboMode 是否快速播放
          * @return 延迟值
          */
-        protected abstract getDelay(index: number, isTurboMode: boolean): any;
+        protected abstract getDelay(index: number, isTurboMode: boolean): number;
         /**
          * 判断此列表是否需要滚动
          * @param list 列表

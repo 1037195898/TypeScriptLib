@@ -81,10 +81,8 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
             return
         }
         // 使用这种方法 可以防止completeHandler 中的判断出错
-        for (let i = 0; i < this.tweenList.length; i++) {
-            this.tweenList[i].complete()
-        }
-        this.tweenList.splice(0, this.tweenList.length)
+        this.tweenList.forEach(value => value.complete())
+        this.tweenList.length = 0
     }
 
     /**
@@ -135,7 +133,7 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
      * @param isTurboMode 是否快速播放
      * @return 运行时长
      */
-    protected abstract getDuration(index: number, isTurboMode: boolean)
+    protected abstract getDuration(index: number, isTurboMode: boolean): number
 
     /**
      * 获取 Tween 运行延迟
@@ -143,7 +141,7 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
      * @param isTurboMode 是否快速播放
      * @return 延迟值
      */
-    protected abstract getDelay(index: number, isTurboMode: boolean)
+    protected abstract getDelay(index: number, isTurboMode: boolean): number
 
     /**
      * 判断此列表是否需要滚动
