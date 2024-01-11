@@ -264,23 +264,23 @@ export class GameModel<T extends IGameData = BaseGameData> extends EProxy implem
         // 保证所有按钮都在禁用状态
         this.sendAction(ActionLib.GAME_ALL_BTN_CHANGE_STATE, false)
         if (this.gameData instanceof BaseSlotGameData) {
-            if (this.gameData.hasReSpin) {
-                Laya.timer.once(this.delayNextRound, this, function () {
-                    this.sendAction(ActionLib.GAME_START)
-                })
-                return
-            }
             if (this.gameData.isFreeModel && this.gameData.freeCount > 0) { //如果在特殊场景里面
                 Laya.timer.once(this.delayNextRound, this, function () {
                     this.sendAction(ActionLib.GAME_START)
                 })
                 return
             }
-
             // 有reSpin 并且没有激活
-            if (this.gameData.hasReSpin && !this.gameData.isReSpinModel) {
-                this.gameData.isReSpinModel = true
-                this.sendAction(ActionLib.GAME_RE_SPIN_IN_WINDOW)
+            if (this.gameData.hasReSpin) {
+                if (this.gameData.isReSpinModel) {
+                    // 已经在reSpin模式中 表示继续reSpin
+                    Laya.timer.once(this.delayNextRound, this, function () {
+                        this.sendAction(ActionLib.GAME_START)
+                    })
+                } else {
+                    this.gameData.isReSpinModel = true
+                    this.sendAction(ActionLib.GAME_RE_SPIN_IN_WINDOW)
+                }
                 return
             }
             // reSpin 结束
