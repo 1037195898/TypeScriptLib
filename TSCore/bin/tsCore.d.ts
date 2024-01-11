@@ -2545,8 +2545,6 @@ declare namespace tsCore {
          * @param    start        起始时间
          * @param    end            结束时间
          * @param    freshSkin    是否刷新皮肤数据
-         *
-         * @deprecated
          */
         playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
         /**

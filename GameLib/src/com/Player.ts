@@ -68,6 +68,8 @@ export class Player {
     gameId = -1
     /** 游戏名字 */
     gameName: string
+    /** 游戏名字 首字母小写 */
+    simpleName: string
     /**
      *  是否是web端口
      *  @default true

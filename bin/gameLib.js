@@ -4792,6 +4792,7 @@ window.gameLib = {};
                 return;
             }
             Player.inst.gameName = config;
+            Player.inst.simpleName = config.charAt(0).toLowerCase() + config.substring(1);
             this.isCloseGame = false;
             //		// 如果是未登陆状态
             //		if (!Player.inst.isGuest && !Player.inst.token) {
