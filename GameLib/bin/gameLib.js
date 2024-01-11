@@ -187,6 +187,11 @@ window.gameLib = {};
          * @see GAME_UPDATE_AUTO_SPIN_NUMBER
          */
         ActionLib["GAME_UPDATE_FREE_COUNT"] = "game_update_auto_spin_number";
+        //------------------------------- RE SPIN --------------------------------
+        /** reSpin开始提示 */
+        ActionLib["GAME_RE_SPIN_IN_WINDOW"] = "game_re_spin_in_window";
+        /** reSpin 结束提示 */
+        ActionLib["GAME_RE_SPIN_OUT_WINDOW"] = "game_re_spin_out_window";
         //------------------------------- FREE SPIN 都是在scene startGame中启动 以及显示中奖弹窗 --------------------------------
         /**
          * 在 scene.startGame 中修改isFreeModel后的 请求第一次free spin
@@ -1624,6 +1629,18 @@ window.gameLib = {};
                     Laya.timer.once(this.delayNextRound, this, function () {
                         this.sendAction(ActionLib.GAME_START);
                     });
+                    return;
+                }
+                // 有reSpin 并且没有激活
+                if (this.gameData.hasReSpin && !this.gameData.isReSpinModel) {
+                    this.gameData.isReSpinModel = true;
+                    this.sendAction(ActionLib.GAME_RE_SPIN_IN_WINDOW);
+                    return;
+                }
+                // reSpin 结束
+                if (this.gameData.isReSpinModel && this.gameData.hasFreeSpin != 1) {
+                    this.sendAction(ActionLib.GAME_RE_SPIN_OUT_WINDOW);
+                    this.gameData.isReSpinModel = false;
                     return;
                 }
                 // 开出三个免费游戏启动项目  并且服务端告诉有免费游戏

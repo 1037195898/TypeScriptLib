@@ -191,7 +191,11 @@ export enum ActionLib {
 
 
 
-
+    //------------------------------- RE SPIN --------------------------------
+    /** reSpin开始提示 */
+    GAME_RE_SPIN_IN_WINDOW = "game_re_spin_in_window",
+    /** reSpin 结束提示 */
+    GAME_RE_SPIN_OUT_WINDOW = "game_re_spin_out_window",
 
 
     //------------------------------- FREE SPIN 都是在scene startGame中启动 以及显示中奖弹窗 --------------------------------

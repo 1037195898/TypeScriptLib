@@ -74,6 +74,10 @@ export class BaseSlotGameData extends BaseGameData {
      * 是否有 reSpin
      */
     hasReSpin = 0
+    /**
+     * 当前在reSpin模式
+     */
+    isReSpinModel :boolean
 
     constructor() {
         super()

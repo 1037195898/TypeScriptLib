@@ -177,6 +177,10 @@ declare namespace gameLib {
          * @see GAME_UPDATE_AUTO_SPIN_NUMBER
          */
         GAME_UPDATE_FREE_COUNT = "game_update_auto_spin_number",
+        /** reSpin开始提示 */
+        GAME_RE_SPIN_IN_WINDOW = "game_re_spin_in_window",
+        /** reSpin 结束提示 */
+        GAME_RE_SPIN_OUT_WINDOW = "game_re_spin_out_window",
         /**
          * 在 scene.startGame 中修改isFreeModel后的 请求第一次free spin
          */
@@ -526,6 +530,10 @@ declare namespace gameLib {
          * 是否有 reSpin
          */
         hasReSpin: number;
+        /**
+         * 当前在reSpin模式
+         */
+        isReSpinModel: boolean;
         constructor();
         /** 总共要投注的钱 */
         getTotalBetMoney(): number;

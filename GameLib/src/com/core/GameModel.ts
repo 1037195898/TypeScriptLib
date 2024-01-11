@@ -276,6 +276,20 @@ export class GameModel<T extends IGameData = BaseGameData> extends EProxy implem
                 })
                 return
             }
+
+            // 有reSpin 并且没有激活
+            if (this.gameData.hasReSpin && !this.gameData.isReSpinModel) {
+                this.gameData.isReSpinModel = true
+                this.sendAction(ActionLib.GAME_RE_SPIN_IN_WINDOW)
+                return
+            }
+            // reSpin 结束
+            if (this.gameData.isReSpinModel && this.gameData.hasFreeSpin != 1) {
+                this.sendAction(ActionLib.GAME_RE_SPIN_OUT_WINDOW)
+                this.gameData.isReSpinModel = false
+                return
+            }
+
             // 开出三个免费游戏启动项目  并且服务端告诉有免费游戏
             if (this.gameData.freeBoundsCount >= 3 && this.gameData.hasFreeSpin != 0) {
                 this.gameData.tempServerWinMoney = this.gameData.serverWinMoney
