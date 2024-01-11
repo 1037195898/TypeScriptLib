@@ -266,10 +266,10 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
         if (this.list && this.list.numChildren > value) {
             let obj = this.list.getChildAt(value)
             if (obj instanceof GList) return obj as GList
-            obj = obj.asCom.getChild("n0")
-            if (obj instanceof GList) return obj as GList
-            obj = obj.asCom.getChild("list")
-            if (obj instanceof GList) return obj as GList
+            let child = obj.asCom.getChild("n0")
+            if (child instanceof GList) return child as GList
+            child = obj.asCom.getChild("list")
+            if (child instanceof GList) return child as GList
         }
         return null
     }

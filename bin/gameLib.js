@@ -1298,12 +1298,12 @@ window.gameLib = {};
                 let obj = this.list.getChildAt(value);
                 if (obj instanceof fgui.GList)
                     return obj;
-                obj = obj.asCom.getChild("n0");
-                if (obj instanceof fgui.GList)
-                    return obj;
-                obj = obj.asCom.getChild("list");
-                if (obj instanceof fgui.GList)
-                    return obj;
+                let child = obj.asCom.getChild("n0");
+                if (child instanceof fgui.GList)
+                    return child;
+                child = obj.asCom.getChild("list");
+                if (child instanceof fgui.GList)
+                    return child;
             }
             return null;
         }
