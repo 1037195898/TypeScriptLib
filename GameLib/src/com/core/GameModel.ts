@@ -62,7 +62,7 @@ export class GameModel<T extends IGameData = BaseGameData> extends EProxy implem
         this.regGameAction(ActionLib.GAME_CLEAR_RES, this, this.clearRes)
         this.regGameAction(ActionLib.GAME_INSERT_EXTENSION, this, this.insertExtension)
         this.regGameAction(ActionLib.GAME_INIT_SOCKET_EVENT, this, this.initSocketEvent)
-        this.regGameAction(ActionLib.GAME_INIT_MODEL, this, this.initModel)
+        this.regGameAction(ActionLib.GAME_INIT_DATA, this, this.initModel)
         this.regGameAction(ActionLib.GAME_DISPOSE, this, this.dispose)
         this.regGameAction(ActionLib.GAME_LOTTERY_ANI_COMPLETE, this, this.lotteryComplete)
 

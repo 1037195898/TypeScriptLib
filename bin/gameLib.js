@@ -30,7 +30,7 @@ window.gameLib = {};
         ActionLib["GAME_INIT_SOCKET_EVENT"] = "game_init_socket_event";
         /** 创建游戏到舞台上 */
         ActionLib["GAME_CREATE_SCENE_SHOW"] = "game_create_scene_show";
-        /** 即将打开游戏前，最后一次初始化数据 */
+        /** 创建Scene前，初始化数据 */
         ActionLib["GAME_INIT_DATA"] = "game_init_data";
         /** 初始化model
          * @deprecated
@@ -1428,7 +1428,7 @@ window.gameLib = {};
             this.regGameAction(ActionLib.GAME_CLEAR_RES, this, this.clearRes);
             this.regGameAction(ActionLib.GAME_INSERT_EXTENSION, this, this.insertExtension);
             this.regGameAction(ActionLib.GAME_INIT_SOCKET_EVENT, this, this.initSocketEvent);
-            this.regGameAction(ActionLib.GAME_INIT_MODEL, this, this.initModel);
+            this.regGameAction(ActionLib.GAME_INIT_DATA, this, this.initModel);
             this.regGameAction(ActionLib.GAME_DISPOSE, this, this.dispose);
             this.regGameAction(ActionLib.GAME_LOTTERY_ANI_COMPLETE, this, this.lotteryComplete);
         }
@@ -4904,13 +4904,14 @@ window.gameLib = {};
             tsCore.MessageTip.clearAll();
             this.sendAction(ActionLib.GAME_INIT_SOCKET_EVENT);
             tsCore.SoundUtils.stopMusic(); // 关闭进入游戏前的音乐
+            tsCore.Log.debug("init data");
+            this.sendAction(ActionLib.GAME_INIT_DATA);
             tsCore.Log.debug("create scene");
             // 创建游戏到舞台上
             this.sendAction(ActionLib.GAME_CREATE_SCENE_SHOW, Laya.Handler.create(this, function () {
                 fgui.GRoot.inst.closeModalWait();
-                tsCore.Log.debug("init data and load sound");
-                this.sendAction(ActionLib.GAME_INIT_DATA);
                 AppRecordManager.executeJson = null;
+                tsCore.Log.debug("load sound");
                 // 开始加载运行加载的声音
                 tsCore.SoundUtils.load();
                 // 开始加载运行加载的资源

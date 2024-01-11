@@ -21,7 +21,7 @@ declare namespace gameLib {
         GAME_INIT_SOCKET_EVENT = "game_init_socket_event",
         /** 创建游戏到舞台上 */
         GAME_CREATE_SCENE_SHOW = "game_create_scene_show",
-        /** 即将打开游戏前，最后一次初始化数据 */
+        /** 创建Scene前，初始化数据 */
         GAME_INIT_DATA = "game_init_data",
         /** 初始化model
          * @deprecated

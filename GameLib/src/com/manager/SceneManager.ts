@@ -366,13 +366,15 @@ export class SceneManager extends EProxy {
         MessageTip.clearAll()
         this.sendAction(ActionLib.GAME_INIT_SOCKET_EVENT)
         SoundUtils.stopMusic();// 关闭进入游戏前的音乐
+        Log.debug("init data")
+        this.sendAction(ActionLib.GAME_INIT_DATA)
+
         Log.debug("create scene")
         // 创建游戏到舞台上
         this.sendAction(ActionLib.GAME_CREATE_SCENE_SHOW, Handler.create(this, function () {
             GRoot.inst.closeModalWait()
-            Log.debug("init data and load sound")
-            this.sendAction(ActionLib.GAME_INIT_DATA)
             AppRecordManager.executeJson = null
+            Log.debug("load sound")
             // 开始加载运行加载的声音
             SoundUtils.load()
             // 开始加载运行加载的资源
