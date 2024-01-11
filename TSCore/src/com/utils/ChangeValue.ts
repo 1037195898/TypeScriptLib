@@ -11,11 +11,11 @@ import {UtilKit} from "../kit/UtilKit";
 export class ChangeValue {
 
     /** 加号按钮 */
-    private readonly addBtn: GButton
+    readonly addBtn: GButton
     /** 减号按钮 */
-    private readonly minusBtn: GButton
+    readonly minusBtn: GButton
     /** 数据变动显示对象 */
-    private label: GTextField
+    readonly label: GTextField
     /** 变动数据的存储库 */
     private _nums: number[]
     /** 变更值后调用 */

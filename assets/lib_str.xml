@@ -81,7 +81,7 @@
   <!-- 中奖通告 -->
   <string name="WIN_NOTICE" id="1039">Congratulations!&amp;nbsp;[color=#FFF337]{0} WON {unit}.{1}[/color]&amp;nbsp;in {2}.</string>
   <!-- 当前没有可用gift -->
-  <string name="NOT_GIFT" id="1040">Currently no available gifts.</string>
+  <string name="NOT_GIFT" id="1040">no available gifts</string>
   <!-- 正在使用的劵 -->
   <string name="USE_IN_GIFT" id="1041">{unit} {0} Available</string>
   <!-- gift消费提示 -->
