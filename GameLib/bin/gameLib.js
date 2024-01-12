@@ -892,6 +892,19 @@ window.gameLib = {};
     }
     gameLib.BaseScene = BaseScene;
     class BaseSkeletonWindow extends tsCore.SkeletonWindow {
+        /**
+         * 如果传入的 data.url 不带/符号  则自动转成 gameName/url.ends/data.url
+         * @param data
+         */
+        /*@override*/
+        onInit(data) {
+            if (data === null || data === void 0 ? void 0 : data.url) {
+                if (!data.url.includes("/")) {
+                    data.url = `${Player.inst.simpleName}/${data.url.endsWith(".sk") ? "sk" : "spine"}/${data.url}`;
+                }
+            }
+            super.onInit(data);
+        }
         get gameData() {
             return Player.inst.gameData;
         }
@@ -1328,6 +1341,9 @@ window.gameLib = {};
         getSlotModel() {
             return SceneManager.inst.starter.gameModel;
         }
+        /**
+         * Laya.timer.clearAll(this)
+         */
         /*@override*/
         dispose() {
             Laya.timer.clearAll(this);
@@ -8503,8 +8519,7 @@ window.gameLib = {};
 function bindView(url, type) {
     if (!url.includes("/")) {
         // @ts-ignore
-        const name = gameLib.GameConfigKit.gameNameCanonical();
-        url = `//${name.charAt(0).toLowerCase()}${name.substring(1)}/${url}`;
+        url = `//${gameLib.Player.inst.simpleName}/${url}`;
     }
     fgui.UIObjectFactory.setPackageItemExtension(url, type);
 }

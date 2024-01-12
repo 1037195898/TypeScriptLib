@@ -292,6 +292,9 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
         return SceneManager.inst.starter.gameModel as SlotModel
     }
 
+    /**
+     * Laya.timer.clearAll(this)
+     */
     override dispose() {
         Laya.timer.clearAll(this)
         super.dispose()

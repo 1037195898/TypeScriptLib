@@ -487,6 +487,11 @@ declare namespace gameLib {
         protected loadFillImage(value: any): void;
     }
     export class BaseSkeletonWindow<T extends BaseGameData = BaseGameData> extends tsCore.SkeletonWindow {
+        /**
+         * 如果传入的 data.url 不带/符号  则自动转成 gameName/url.ends/data.url
+         * @param data
+         */
+        protected onInit(data?: ISkeletonData): void;
         protected get gameData(): T;
         /**
          * @deprecated
@@ -685,6 +690,9 @@ declare namespace gameLib {
         /** 所有的项变暗 */
         protected allSlotItemDark(): void;
         getSlotModel(): SlotModel<BaseSlotGameData>;
+        /**
+         * Laya.timer.clearAll(this)
+         */
         dispose(): void;
         protected get gameData(): T;
         /**

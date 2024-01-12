@@ -15,8 +15,7 @@
 function bindView(url: string, type: { new(): fgui.GComponent }) {
     if (!url.includes("/")) {
         // @ts-ignore
-        const name = gameLib.GameConfigKit.gameNameCanonical()
-        url = `//${name.charAt(0).toLowerCase()}${name.substring(1)}/${url}`
+        url = `//${gameLib.Player.inst.simpleName}/${url}`
     }
     fgui.UIObjectFactory.setPackageItemExtension(url, type)
 }
