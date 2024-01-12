@@ -95,20 +95,24 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
         }
 
         let paths = []
-        let W: number
-        let H: number
-        let point: Point
-        let btn: GLabel
-        for (let j = 0; j < items.length; j++) {
-            W = items[j].width / 2
-            H = items[j].height / 2
-            point = items[j].localToGlobal()
-            this.linePanel.globalToLocal(point.x, point.y, point)
-            paths.push(point.x + W, point.y + H)
+        if (this.linePanel) {
+            let W: number
+            let H: number
+            let point: Point
+            for (let j = 0; j < items.length; j++) {
+                W = items[j].width / 2
+                H = items[j].height / 2
+                point = items[j].localToGlobal()
+                this.linePanel.globalToLocal(point.x, point.y, point)
+                paths.push(point.x + W, point.y + H)
+            }
         }
 
+
         // 获取按钮位置
-        if (tempBtnArray && this.leftLineList && this.rightLineList) {
+        if (tempBtnArray && this.leftLineList && this.rightLineList && this.linePanel) {
+            let btn: GLabel
+            let point: Point
             index = tempBtnArray.indexOf(value)
             if (index != -1) {
                 if (isLeft) {
