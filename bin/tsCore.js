@@ -6967,12 +6967,21 @@ window.tsCore = {};
     }
     tsCore.Upload = Upload;
 })(tsCore || (tsCore = {}));
+/**
+ * 执行 ParamHandler 方法
+ * @param func ParamHandler 对象
+ * @param args 参数 传入数组会将数组当场一个参数传递
+ */
 function runFun(func, ...args) {
     if (func)
         return func instanceof Laya.Handler ? func.runWith(args) : func.apply(null, args);
     return null;
 }
-/** 根据语言包id获取字符串 */
+/**
+ * 根据语言包id获取字符串
+ * @param id 获取文案的key
+ * @param args 如果包含占位符，这里可传入占位符的替换文案
+ */
 function getString(id, ...args) {
     // @ts-ignore
     let content = tsCore.LanguageUtils.inst.getStr(id);

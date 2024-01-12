@@ -8523,3 +8523,15 @@ function bindView(url, type) {
     }
     fgui.UIObjectFactory.setPackageItemExtension(url, type);
 }
+/**
+ * 根据url 创建一个对象
+ * @param url 如果url不带/符号 则自动转成 gameName/url
+ * @param userClass
+ */
+function createView(url, userClass) {
+    if (!url.includes("/")) {
+        // @ts-ignore
+        url = `//${gameLib.Player.inst.simpleName}/${url}`;
+    }
+    return fgui.UIPackage.createObjectFromURL(url, userClass);
+}

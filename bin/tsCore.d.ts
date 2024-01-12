@@ -2783,6 +2783,42 @@ declare namespace tsCore {
     export {};
 }
 /**
+ * 执行 ParamHandler 方法
+ * @param func ParamHandler 对象
+ * @param args 参数 传入数组会将数组当场一个参数传递
+ */
+declare function runFun(func?: ParamHandler, ...args: any[]): any;
+/**
+ * 根据语言包id获取字符串
+ * @param id 获取文案的key
+ * @param args 如果包含占位符，这里可传入占位符的替换文案
+ */
+declare function getString(id: string | number, ...args: any[]): string;
+/**
+ * 配置定义
+ *
+ * @param args 自定义的配置
+ * @param defs 默认配置
+ * @param [croak=false] 验证配置在默认中存在否 如果原型中不存在将抛出错误
+ * @param [append=false] 如果存在键，如果值是数组是否追加在尾部，排除存在的
+ *
+ *
+ * @example
+ *
+ * const defs = {a: [0], c: {c:"c", a: 0}, s: "s"}
+ * const config = {a: [18], c: {a: 66}, s: "d", e:"e"}
+ *
+ * defaults(config, defs)
+ * result:  {a:[18], c: {c: "c", a: 66}, s: "d", e:"e"}
+ *
+ * defaults(config, defs, true)
+ * result: throw error -> `e` is not a supported option, {a: 0, c: {c:"c", a: 0}, s: "s"}
+ *
+ * defaults(config, defs, false, true)
+ * result: {a:[18, 0], c: {c: "c", a: 66}, s: "d", e:"e"}
+ */
+declare function defaults(args: any, defs: any, croak?: boolean, append?: boolean): any;
+/**
  *
  * @param obj
  * @param prop
@@ -2851,39 +2887,6 @@ declare const windowMy: Window;
  */
 declare type ParamHandler = ((...args) => any) | Laya.Handler
 
-/**
- * 执行 ParamHandler 方法
- * @param func ParamHandler 对象
- * @param args 参数 传入数组会将数组当场一个参数传递
- */
-declare function runFun(func: ParamHandler, ...args): any | null
-
-/**
- * 配置定义
- *
- * @param args 自定义的配置
- * @param defs 默认配置
- * @param [croak=false] 验证配置在默认中存在否 如果原型中不存在将抛出错误
- * @param [append=false] 如果存在键，如果值是数组是否追加在尾部，排除存在的
- *
- *
- * @example
- *
- * const defs = {a: [0], c: {c:"c", a: 0}, s: "s"}
- * const config = {a: [18], c: {a: 66}, s: "d", e:"e"}
- *
- * defaults(config, defs)
- * result:  {a:[18], c: {c: "c", a: 66}, s: "d", e:"e"}
- *
- * defaults(config, defs, true)
- * result: throw error -> `e` is not a supported option, {a: 0, c: {c:"c", a: 0}, s: "s"}
- *
- * defaults(config, defs, false, true)
- * result: {a:[18, 0], c: {c: "c", a: 66}, s: "d", e:"e"}
- */
-declare function defaults(args: any, defs: any, croak ?: boolean, append?: boolean)
-
-
 declare type Constructor<T = {}> = new (...args: any[]) => T
 
 /** 使用交叉类型连接多个类型 */
@@ -2891,13 +2894,6 @@ declare type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) e
 
 /** 获取构造函数的实例类型 */
 declare type InstanceTypeOfConstructor<T> = T extends Constructor<infer R> ? R : never
-
-/**
- * 根据语言包id获取字符串
- * @param id 获取文案的key
- * @param args 如果包含占位符，这里可传入占位符的替换文案
- */
-declare function getString(id: string | number, ...args): string
 
 declare module Laya {
 

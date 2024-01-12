@@ -3837,7 +3837,6 @@ declare namespace gameLib {
     }
     export {};
 }
-
 /**
  * 给资源绑定一个实现对象
  * @example
@@ -3852,7 +3851,17 @@ declare namespace gameLib {
  * @param url
  * @param type
  */
-declare function bindView(url: string, type: { new(): fgui.GComponent }): void
+declare function bindView(url: string, type: {
+    new (): fgui.GComponent;
+}): void;
+/**
+ * 根据url 创建一个对象
+ * @param url 如果url不带/符号 则自动转成 gameName/url
+ * @param userClass
+ */
+declare function createView<T extends fgui.GObject>(url: string, userClass?: {
+    new (): T;
+}): T;
 
 /**
  * 游戏资源配置
