@@ -2348,11 +2348,19 @@ declare namespace gameLib {
          * })
          */
         customLoaderRes: ParamHandler;
-        /** 加载路径格式化 */
+        /**
+         * 加载路径格式化
+         * @deprecated
+         * @see tsCore.Path.formatPath
+         */
         static loadPathFormat: tsCore.IFormatPath[];
         constructor();
-        static formatUrl(url: string): string;
-        call(url: string, version: string): string;
+        /**
+         * @deprecated
+         * @see tsCore.Path.formatPath
+         */
+        static formatUrl: typeof tsCore.Path.formatUrl;
+        version(url: string, version: string | number): string | number;
         /**
          * 加载版本控制文件
          * @param complete

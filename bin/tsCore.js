@@ -68,6 +68,7 @@ window.tsCore = {};
             DefineConfig.init();
             let envType = ConfigKit.env();
             Log.debug("env", EnvType[envType]);
+            Laya.URL.customFormat = Path.formatUrl;
             // 使用自定义加载器加载资源
             fgui.AssetProxy.inst.setAsset(ELoader.loader);
         }
@@ -3897,6 +3898,32 @@ window.tsCore = {};
                     this.path += `/${value}`;
             });
         }
+        /**
+         * 格式化路径
+         * ```
+         * 1.当ELoader.isWebp为true的时候，自动将后缀为png/jpg的路径 添加.webp
+         * 2.在未使用加速器的环境中，将启用version控制 会自动在url后面添加版本号
+         * 3.执行顺序是先执行全路径格式 path()方法，在执行version()版本号方法，最后兼容执行call()方法。
+         * ```
+         * @param url 要格式化的路径
+         * @return 格式化后可直接使用的路径
+         */
+        static formatUrl(url) {
+            var _a, _b, _c, _d, _e, _f;
+            url = url.split("?")[0];
+            let version = Laya.URL.version[url];
+            Path.formatPath.sort((a, b) => a.order - a.order);
+            for (const format of Path.formatPath) {
+                url = (_b = (_a = format.path) === null || _a === void 0 ? void 0 : _a.call(format, url)) !== null && _b !== void 0 ? _b : url;
+                version = (_d = (_c = format.version) === null || _c === void 0 ? void 0 : _c.call(format, url, version)) !== null && _d !== void 0 ? _d : version;
+                version = (_f = (_e = format.call) === null || _e === void 0 ? void 0 : _e.call(format, url, version)) !== null && _f !== void 0 ? _f : version;
+            }
+            if (ELoader.isWebp && url.endsWithAny("png", "jpg"))
+                url += ".webp";
+            if (!Laya.Browser.onLayaRuntime && version)
+                url = `${url}?v=${version}`;
+            return url;
+        }
         static of(base, ...subpaths) {
             return new Path(base, ...subpaths);
         }
@@ -3904,6 +3931,8 @@ window.tsCore = {};
             return this.path;
         }
     }
+    /** 路径格式化 */
+    Path.formatPath = [];
     tsCore.Path = Path;
     class NativeUtils {
     }

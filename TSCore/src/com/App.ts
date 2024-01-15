@@ -6,6 +6,7 @@ import {ConfigKit, EnvType} from "./kit/ConfigKit";
 import {Log} from "./Log";
 import {IController, IInitEngine, IKey, IProxy, IView} from "./interfaces/ICommon";
 import Handler = Laya.Handler;
+import {Path} from "./Path";
 
 export class App implements IAction {
 
@@ -99,6 +100,7 @@ export class App implements IAction {
         DefineConfig.init()
         let envType = ConfigKit.env()
         Log.debug("env", EnvType[envType])
+        Laya.URL.customFormat = Path.formatUrl
         // 使用自定义加载器加载资源
         fgui.AssetProxy.inst.setAsset(ELoader.loader)
     }

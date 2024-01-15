@@ -898,6 +898,8 @@ declare namespace tsCore {
          * @see IFormatPath.version
          */
         call?(url: string, version: string | number): string | number;
+        /** 值越大 越后执行 默认:100 */
+        order?: number;
     }
     export interface IKey {
         /**
@@ -1521,7 +1523,20 @@ declare namespace tsCore {
     }
     export class Path {
         private path;
+        /** 路径格式化 */
+        static formatPath: IFormatPath[];
         constructor(base: string, ...subpaths: string[]);
+        /**
+         * 格式化路径
+         * ```
+         * 1.当ELoader.isWebp为true的时候，自动将后缀为png/jpg的路径 添加.webp
+         * 2.在未使用加速器的环境中，将启用version控制 会自动在url后面添加版本号
+         * 3.执行顺序是先执行全路径格式 path()方法，在执行version()版本号方法，最后兼容执行call()方法。
+         * ```
+         * @param url 要格式化的路径
+         * @return 格式化后可直接使用的路径
+         */
+        static formatUrl(url: string): string;
         static of(base: string, ...subpaths: string[]): Path;
         string(): string;
     }

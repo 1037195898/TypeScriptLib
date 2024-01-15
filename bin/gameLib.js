@@ -4093,27 +4093,13 @@ window.gameLib = {};
             /** 是否是http  */
             this.httpProtocol = Laya.Browser.window.location.protocol == "http:";
             this.runLoads = [];
-            Laya.URL.customFormat = AssetsLoader.formatUrl;
             // 添加加载路径格式化
-            AssetsLoader.loadPathFormat.push(this);
+            tsCore.Path.formatPath.push(this);
         }
-        static formatUrl(url) {
-            var _a, _b, _c, _d, _e, _f;
-            let version = Laya.URL.version[url];
-            for (const format of AssetsLoader.loadPathFormat) {
-                url = (_b = (_a = format.path) === null || _a === void 0 ? void 0 : _a.call(format, url)) !== null && _b !== void 0 ? _b : url;
-                version = (_d = (_c = format.version) === null || _c === void 0 ? void 0 : _c.call(format, url, version)) !== null && _d !== void 0 ? _d : version;
-                version = (_f = (_e = format.call) === null || _e === void 0 ? void 0 : _e.call(format, url, version)) !== null && _f !== void 0 ? _f : version;
-            }
-            if (tsCore.ELoader.isWebp && url.endsWithAny("png", "jpg"))
-                url += ".webp";
-            if (!Laya.Browser.onLayaRuntime && version)
-                url = `${url}?v=${version}`;
-            return url;
-        }
-        call(url, version) {
-            if (Laya.Render.isConchApp)
+        version(url, version) {
+            if (Laya.Browser.onLayaRuntime)
                 return version;
+            // 一个兼容处理
             if (url.contains("configs/newConfig")) {
                 return Laya.URL.version["configs/newConfig.js"];
             }
@@ -4657,8 +4643,17 @@ window.gameLib = {};
      * https://res.game.co/assetsversion.json
      */
     AssetsLoader.VERSION_RES_URL = null;
-    /** 加载路径格式化 */
-    AssetsLoader.loadPathFormat = [];
+    /**
+     * 加载路径格式化
+     * @deprecated
+     * @see tsCore.Path.formatPath
+     */
+    AssetsLoader.loadPathFormat = tsCore.Path.formatPath;
+    /**
+     * @deprecated
+     * @see tsCore.Path.formatPath
+     */
+    AssetsLoader.formatUrl = tsCore.Path.formatUrl;
     gameLib.AssetsLoader = AssetsLoader;
     /**
      * 舞台

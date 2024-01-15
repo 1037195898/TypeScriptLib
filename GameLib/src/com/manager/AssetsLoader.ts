@@ -24,6 +24,7 @@ import {LibStr} from "../LibStr"
 import {GameConfigKit} from "../kit/GameConfigKit";
 import {ILoadSoundFilter} from "../interfaces/IGame";
 import ConfigKit = tsCore.ConfigKit;
+import Path = tsCore.Path;
 
 /**
  * 资源管理类
@@ -93,27 +94,23 @@ export class AssetsLoader implements IFormatPath {
      */
     customLoaderRes: ParamHandler
 
-    /** 加载路径格式化 */
-    static loadPathFormat: IFormatPath[] = []
+    /**
+     * 加载路径格式化
+     * @deprecated
+     * @see Path.formatPath
+     */
+    static loadPathFormat = Path.formatPath
 
     constructor() {
-        URL.customFormat = AssetsLoader.formatUrl
         // 添加加载路径格式化
-        AssetsLoader.loadPathFormat.push(this)
+        Path.formatPath.push(this)
     }
 
-    static formatUrl(url: string) {
-        let version = URL.version[url]
-        AssetsLoader.loadPathFormat.sort((a, b) => a.order - a.order)
-        for (const format of AssetsLoader.loadPathFormat) {
-            url = format.path?.(url) ?? url
-            version = format.version?.(url, version) ?? version
-            version = format.call?.(url, version) ?? version
-        }
-        if (ELoader.isWebp && url.endsWithAny("png", "jpg")) url += ".webp"
-        if (!Browser.onLayaRuntime && version) url = `${url}?v=${version}`
-        return url
-    }
+    /**
+     * @deprecated
+     * @see Path.formatPath
+     */
+    static formatUrl = Path.formatUrl
 
     version(url: string, version: string | number): string | number {
         if (Browser.onLayaRuntime) return version
