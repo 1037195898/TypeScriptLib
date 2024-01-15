@@ -58,6 +58,9 @@ export interface IFormatPath {
      */
     call?(url: string, version: string | number): string | number
 
+    /** 值越大 越后执行 默认:100 */
+    order?: number
+
 }
 
 export interface IKey {

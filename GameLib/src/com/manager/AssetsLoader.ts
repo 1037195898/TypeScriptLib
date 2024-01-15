@@ -96,7 +96,6 @@ export class AssetsLoader implements IFormatPath {
     /** 加载路径格式化 */
     static loadPathFormat: IFormatPath[] = []
 
-
     constructor() {
         URL.customFormat = AssetsLoader.formatUrl
         // 添加加载路径格式化
@@ -105,6 +104,7 @@ export class AssetsLoader implements IFormatPath {
 
     static formatUrl(url: string) {
         let version = URL.version[url]
+        AssetsLoader.loadPathFormat.sort((a, b) => a.order - a.order)
         for (const format of AssetsLoader.loadPathFormat) {
             url = format.path?.(url) ?? url
             version = format.version?.(url, version) ?? version
@@ -115,8 +115,9 @@ export class AssetsLoader implements IFormatPath {
         return url
     }
 
-    call(url: string, version: string): string {
-        if (Render.isConchApp) return version
+    version(url: string, version: string | number): string | number {
+        if (Browser.onLayaRuntime) return version
+        // 一个兼容处理
         if (url.contains("configs/newConfig")) {
             return URL.version["configs/newConfig.js"]
         }
