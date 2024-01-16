@@ -49,12 +49,13 @@ export class ChangeValue {
 
     /** 开通按钮长按 */
     set openLong(value: boolean) {
+        this.addBtn.offClick(this, this.onChangeAnte)
+        this.minusBtn.offClick(this, this.onChangeAnte)
         if (value) {
-            this.addBtn.offClick(this, this.onChangeAnte)
-            this.minusBtn.offClick(this, this.onChangeAnte)
-            this.addLongPressKit = UtilKit.bindLongPressKit(this.addBtn, this.onChangeAnte.bind(this), 1)
-            this.minusLongPressKit = UtilKit.bindLongPressKit(this.minusBtn, this.onChangeAnte.bind(this), 2)
+            if (!this.addLongPressKit) this.addLongPressKit = UtilKit.bindLongPressKit(this.addBtn, this.onChangeAnte.bind(this), 1)
+            if (!this.minusLongPressKit) this.minusLongPressKit = UtilKit.bindLongPressKit(this.minusBtn, this.onChangeAnte.bind(this), 2)
         } else {
+            this.addLongPressKit = this.minusLongPressKit = null
             this.addBtn.onClick(this, this.onChangeAnte, [1])
             this.minusBtn.onClick(this, this.onChangeAnte, [2])
         }

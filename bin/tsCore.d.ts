@@ -1131,6 +1131,7 @@ declare namespace tsCore {
         private onHold;
         private onLoopClick;
         private onClick;
+        clearEvent(): void;
         get isApeHold(): boolean;
         dispose(): void;
     }

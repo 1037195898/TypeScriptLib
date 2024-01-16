@@ -28,7 +28,8 @@ export class LongPressKit {
         this.component = component
         this.args = args
         this.callback = callback
-        component.displayObject.once(Laya.Event.MOUSE_DOWN, this, this.onDown)
+        this.clearEvent()
+        component.displayObject?.once(Laya.Event.MOUSE_DOWN, this, this.onDown)
         component.onClick(this, this.onClick)
     }
 
@@ -41,25 +42,21 @@ export class LongPressKit {
     /** 松开按钮 */
     private onUp() {
         this._isApeHold = false
-        Laya.timer.clear(this, this.onLoopClick)
-        // 如果未触发hold，终止触发hold
-        Laya.timer.clear(this, this.onHold)
-        Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onUp)
-
+        this.clearEvent()
         this.component.displayObject?.once(Laya.Event.MOUSE_DOWN, this, this.onDown)
         this.component.onClick(this, this.onClick)
     }
 
     private onHold() {
         this._isApeHold = true
+        // 先清理单击事件
+        this.component.offClick(this, this.onClick)
         Laya.timer.loop(100, this, this.onLoopClick)
         this.onLoopClick()
     }
 
     private onLoopClick() {
         if (this._isApeHold) {
-            // 先清理单击事件
-            this.component.offClick(this, this.onClick)
             // 执行一次点击
             this.onClick(null)
             // 单次执行  直接执行清理结束操作
@@ -70,8 +67,17 @@ export class LongPressKit {
     }
 
     private onClick(e: Laya.Event) {
-        if (e) e.stopPropagation()
+        e?.stopPropagation()
         runFun.apply(null, [this.callback, ...this.args])
+    }
+
+    clearEvent() {
+        Laya.timer.clear(this, this.onLoopClick)
+        // 如果未触发hold，终止触发hold
+        Laya.timer.clear(this, this.onHold)
+        Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onUp)
+        this.component.displayObject?.off(Laya.Event.MOUSE_DOWN, this, this.onDown)
+        this.component.offClick(this, this.onClick)
     }
 
     get isApeHold() {

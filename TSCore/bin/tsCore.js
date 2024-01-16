@@ -512,13 +512,16 @@ window.tsCore = {};
         }
         /** 开通按钮长按 */
         set openLong(value) {
+            this.addBtn.offClick(this, this.onChangeAnte);
+            this.minusBtn.offClick(this, this.onChangeAnte);
             if (value) {
-                this.addBtn.offClick(this, this.onChangeAnte);
-                this.minusBtn.offClick(this, this.onChangeAnte);
-                this.addLongPressKit = UtilKit.bindLongPressKit(this.addBtn, this.onChangeAnte.bind(this), 1);
-                this.minusLongPressKit = UtilKit.bindLongPressKit(this.minusBtn, this.onChangeAnte.bind(this), 2);
+                if (!this.addLongPressKit)
+                    this.addLongPressKit = UtilKit.bindLongPressKit(this.addBtn, this.onChangeAnte.bind(this), 1);
+                if (!this.minusLongPressKit)
+                    this.minusLongPressKit = UtilKit.bindLongPressKit(this.minusBtn, this.onChangeAnte.bind(this), 2);
             }
             else {
+                this.addLongPressKit = this.minusLongPressKit = null;
                 this.addBtn.onClick(this, this.onChangeAnte, [1]);
                 this.minusBtn.onClick(this, this.onChangeAnte, [2]);
             }
@@ -3019,6 +3022,7 @@ window.tsCore = {};
          *
          */
         constructor(component, callback, ...args) {
+            var _a;
             /** 按下判定长按的间隔时间 */
             this.HOLD_TRIGGER_TIME = 500;
             /** 是否单次调用 */
@@ -3026,7 +3030,8 @@ window.tsCore = {};
             this.component = component;
             this.args = args;
             this.callback = callback;
-            component.displayObject.once(Laya.Event.MOUSE_DOWN, this, this.onDown);
+            this.clearEvent();
+            (_a = component.displayObject) === null || _a === void 0 ? void 0 : _a.once(Laya.Event.MOUSE_DOWN, this, this.onDown);
             component.onClick(this, this.onClick);
         }
         /** 点下按钮 */
@@ -3038,22 +3043,19 @@ window.tsCore = {};
         onUp() {
             var _a;
             this._isApeHold = false;
-            Laya.timer.clear(this, this.onLoopClick);
-            // 如果未触发hold，终止触发hold
-            Laya.timer.clear(this, this.onHold);
-            Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onUp);
+            this.clearEvent();
             (_a = this.component.displayObject) === null || _a === void 0 ? void 0 : _a.once(Laya.Event.MOUSE_DOWN, this, this.onDown);
             this.component.onClick(this, this.onClick);
         }
         onHold() {
             this._isApeHold = true;
+            // 先清理单击事件
+            this.component.offClick(this, this.onClick);
             Laya.timer.loop(100, this, this.onLoopClick);
             this.onLoopClick();
         }
         onLoopClick() {
             if (this._isApeHold) {
-                // 先清理单击事件
-                this.component.offClick(this, this.onClick);
                 // 执行一次点击
                 this.onClick(null);
                 // 单次执行  直接执行清理结束操作
@@ -3065,9 +3067,17 @@ window.tsCore = {};
             }
         }
         onClick(e) {
-            if (e)
-                e.stopPropagation();
+            e === null || e === void 0 ? void 0 : e.stopPropagation();
             runFun.apply(null, [this.callback, ...this.args]);
+        }
+        clearEvent() {
+            var _a;
+            Laya.timer.clear(this, this.onLoopClick);
+            // 如果未触发hold，终止触发hold
+            Laya.timer.clear(this, this.onHold);
+            Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onUp);
+            (_a = this.component.displayObject) === null || _a === void 0 ? void 0 : _a.off(Laya.Event.MOUSE_DOWN, this, this.onDown);
+            this.component.offClick(this, this.onClick);
         }
         get isApeHold() {
             return this._isApeHold;
