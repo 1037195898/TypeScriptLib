@@ -21,7 +21,7 @@ export class StateCode {
      * 获取显示信息
      * @param data 一个object对象  如果带有message错误文字  直接使用 否则用code命令获取错误内容
      */
-    static getShowMessage(data?: any) {
+    static getShowMessage(data?: HttpResponse) {
         if (!data) return getString(LibStr.NET_ERROR)
         if (data.message?.length > 0) {
             return data.message

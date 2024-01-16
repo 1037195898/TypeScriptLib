@@ -2044,7 +2044,7 @@ window.gameLib = {};
             // })
         }
         /**
-         * 发送押注数据
+         * 发送bet数据
          * @param url
          * @param data
          * @param callback
@@ -2052,8 +2052,7 @@ window.gameLib = {};
         sendBet(url, data, callback) {
             this.postData(url, data, (data) => {
                 if (data.code != HttpCode.OK) {
-                    tsCore.MessageTip.showTip(StateCode.getShowMessage(data));
-                    this.sendAction(ActionLib.GAME_RESET_BET);
+                    this.betFail(data);
                 }
                 else {
                     Player.inst.gameData.playCount++;
@@ -2069,6 +2068,14 @@ window.gameLib = {};
                     SceneManager.inst.gameErrorExit();
                 });
             });
+        }
+        /**
+         * 当请求不通过的时候  发出提示信息并重置bet
+         * @param data
+         */
+        betFail(data) {
+            tsCore.MessageTip.showTip(StateCode.getShowMessage(data));
+            this.sendAction(ActionLib.GAME_RESET_BET);
         }
         /**
          * 领取奖金池

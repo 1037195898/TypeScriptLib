@@ -379,7 +379,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     }
 
     /**
-     * 发送押注数据
+     * 发送bet数据
      * @param url
      * @param data
      * @param callback
@@ -387,13 +387,11 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     sendBet(url: string, data: any, callback: ParamHandler) {
         this.postData(url, data, (data: HttpResponse) => {
             if (data.code != HttpCode.OK) {
-                MessageTip.showTip(StateCode.getShowMessage(data))
-                this.sendAction(ActionLib.GAME_RESET_BET)
+                this.betFail(data)
             } else {
                 Player.inst.gameData.playCount++
                 Player.inst.playCount++
                 if (Player.inst.isGuest) Player.inst.guestModel.guestPlayCount++
-
             }
             runFun(callback, data)
         }, () => {
@@ -403,6 +401,15 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
                 SceneManager.inst.gameErrorExit()
             })
         })
+    }
+
+    /**
+     * 当请求不通过的时候  发出提示信息并重置bet
+     * @param data
+     */
+    betFail(data:HttpResponse) {
+        MessageTip.showTip(StateCode.getShowMessage(data))
+        this.sendAction(ActionLib.GAME_RESET_BET)
     }
 
     /**

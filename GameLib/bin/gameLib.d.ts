@@ -1022,12 +1022,17 @@ declare namespace gameLib {
          */
         checkGamePeriod(handler: ParamHandler): void;
         /**
-         * 发送押注数据
+         * 发送bet数据
          * @param url
          * @param data
          * @param callback
          */
         sendBet(url: string, data: any, callback: ParamHandler): void;
+        /**
+         * 当请求不通过的时候  发出提示信息并重置bet
+         * @param data
+         */
+        betFail(data: HttpResponse): void;
         /**
          * 领取奖金池
          * @param id
@@ -3482,7 +3487,7 @@ declare namespace gameLib {
          * 获取显示信息
          * @param data 一个object对象  如果带有message错误文字  直接使用 否则用code命令获取错误内容
          */
-        static getShowMessage(data?: any): any;
+        static getShowMessage(data?: HttpResponse): any;
         /**
          * 显示错误信息
          * @param code 错误代号
