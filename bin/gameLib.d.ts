@@ -547,7 +547,11 @@ declare namespace gameLib {
          */
         isReSpinModel: boolean;
         constructor();
-        /** 总共要投注的钱 */
+        /**
+         * 总共要投注的钱
+         * @example 默认
+         * this.lineValue * this.betValue
+         */
         getTotalBetMoney(): number;
         /** 获取当前的开奖数据 */
         getLotteryId(): any[];

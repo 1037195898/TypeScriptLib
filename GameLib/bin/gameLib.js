@@ -978,7 +978,11 @@ window.gameLib = {};
             this.lineValue = this.lottery.length;
             this.gameType = GameType.SLOT;
         }
-        /** 总共要投注的钱 */
+        /**
+         * 总共要投注的钱
+         * @example 默认
+         * this.lineValue * this.betValue
+         */
         /*@override*/
         getTotalBetMoney() {
             return this.lineValue * this.betValue;
@@ -5016,7 +5020,6 @@ window.gameLib = {};
                 if (Player.inst.isGuest)
                     Player.inst.money = Player.inst.cacheMoney;
                 Player.inst.cacheMoney = 0;
-                Player.inst.gameData = null;
                 Player.inst.isGuest = false;
                 Player.inst.gameId = CommonCmd.GAME_HOME;
             }
