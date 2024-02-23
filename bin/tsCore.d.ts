@@ -1266,7 +1266,11 @@ declare namespace tsCore {
          *
          */
         static compareOn(aPrice: number, bPrice: number): 1 | -1 | 0;
-        /** 随机数  最小值  最大值(不包括)  */
+        /**
+         * 随机数  最小值  最大值(不包括)
+         * @deprecated
+         * @see global.random
+         */
         static random(minNum: number, maxNum: number): number;
         /**
          * 随机数
@@ -1274,6 +1278,8 @@ declare namespace tsCore {
          * @param maxNum 最大值(不包括)
          * @param p 保留尾数  默认NAN 表示全保留
          * @return
+         * @deprecated
+         * @see global.randomFloat
          */
         static randomFloat(minNum: number, maxNum: number, p?: number): number;
     }
@@ -2933,6 +2939,16 @@ declare function getPropertyNames(obj: any, containsSuperClasses?: boolean): (st
  * 包装一个 windowMy
  */
 declare const windowMy: Window;
+/** 随机数  最小值  最大值(不包括)  */
+declare function random(minNum: number, maxNum: number): number;
+/**
+ * 随机数
+ * @param minNum 最小值
+ * @param maxNum 最大值(不包括)
+ * @param p 保留尾数  默认NAN 表示全保留
+ * @return
+ */
+declare function randomFloat(minNum: number, maxNum: number, p?: number): number;
 
 /**
  * 动态参数 function 或 Laya.Handler
@@ -3202,6 +3218,11 @@ declare interface Array<T> {
      * 返回集合中所有元素的总和
      */
     sum(): number
+
+    /**
+     * 从数组中随机获取一个值
+     */
+    random(): T
 }
 declare type InitApp = {
     /** 初始化Laya */

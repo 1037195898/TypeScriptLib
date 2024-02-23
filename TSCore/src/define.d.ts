@@ -266,4 +266,9 @@ declare interface Array<T> {
      * 返回集合中所有元素的总和
      */
     sum(): number
+
+    /**
+     * 从数组中随机获取一个值
+     */
+    random(): T
 }

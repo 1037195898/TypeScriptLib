@@ -3330,7 +3330,11 @@ window.tsCore = {};
                 return 0;
             }
         }
-        /** 随机数  最小值  最大值(不包括)  */
+        /**
+         * 随机数  最小值  最大值(不包括)
+         * @deprecated
+         * @see global.random
+         */
         static random(minNum, maxNum) {
             return (Math.floor(Math.random() * (maxNum - minNum)) + minNum);
         }
@@ -3340,6 +3344,8 @@ window.tsCore = {};
          * @param maxNum 最大值(不包括)
          * @param p 保留尾数  默认NAN 表示全保留
          * @return
+         * @deprecated
+         * @see global.randomFloat
          */
         static randomFloat(minNum, maxNum, p = NaN) {
             let temp = (Math.random() * (maxNum - minNum) + minNum);
@@ -7286,6 +7292,135 @@ function getPropertyNames(obj, containsSuperClasses = false) {
  * 包装一个 windowMy
  */
 const windowMy = window.self !== window.top ? window.top : window;
+/** 随机数  最小值  最大值(不包括)  */
+function random(minNum, maxNum) {
+    return (Math.floor(Math.random() * (maxNum - minNum)) + minNum);
+}
+/**
+ * 随机数
+ * @param minNum 最小值
+ * @param maxNum 最大值(不包括)
+ * @param p 保留尾数  默认NAN 表示全保留
+ * @return
+ */
+function randomFloat(minNum, maxNum, p = NaN) {
+    let temp = (Math.random() * (maxNum - minNum) + minNum);
+    if (!isNaN(p))
+        temp = parseFloat(temp.toFixed(p));
+    return temp;
+}
+function gaSend(hitType, data) {
+    ga("send", hitType, data);
+}
+function gaEvent(data) {
+    gaSend("event", data);
+}
+function gaException(data) {
+    gaSend("exception", data);
+}
+function gaTiming(data) {
+    gaSend("timing", data);
+}
+Object.defineProperty(Array.prototype, "distinct", {
+    value: function () {
+        return [...new Set(this)];
+    }
+});
+Object.defineProperty(Array.prototype, "distinctBy", {
+    value: function (selector) {
+        const map = {};
+        const list = [];
+        for (let e of this) {
+            const key = selector.call(this, e);
+            if (!map[key]) {
+                map[key] = true;
+                list.push(e);
+            }
+        }
+        return list;
+    }
+});
+Object.defineProperty(Array.prototype, "shuffle", {
+    value: function () {
+        let len = this.length;
+        for (let i = len - 1; i > 0; i--) {
+            let rnd = Math.floor(Math.random() * (i + 1));
+            [this[i], this[rnd]] = [this[rnd], this[i]];
+        }
+    }
+});
+Object.defineProperty(Array.prototype, "minBy", {
+    value: function (selector) {
+        if (this.length == 0)
+            return null;
+        let minElem = this[0];
+        if (this.length == 1)
+            return minElem;
+        let minValue = selector(minElem);
+        for (let i = 1; i < this.length; i++) {
+            const e = this[i];
+            const v = selector(e);
+            if (minValue > v) {
+                minElem = e;
+                minValue = v;
+            }
+        }
+        return minElem;
+    }
+});
+Object.defineProperty(Array.prototype, "maxBy", {
+    value: function (selector) {
+        if (this.length == 0)
+            return null;
+        let minElem = this[0];
+        if (this.length == 1)
+            return minElem;
+        let minValue = selector(minElem);
+        for (let i = 1; i < this.length; i++) {
+            const e = this[i];
+            const v = selector(e);
+            if (minValue < v) {
+                minElem = e;
+                minValue = v;
+            }
+        }
+        return minElem;
+    }
+});
+Object.defineProperty(Array.prototype, "count", {
+    value: function (predicate) {
+        if (this.length == 0)
+            return 0;
+        let count = 0;
+        for (let element of this)
+            if (predicate(element))
+                ++count;
+        return count;
+    }
+});
+Object.defineProperty(Array.prototype, "sum", {
+    value: function () {
+        let sum = 0;
+        for (let element of this) {
+            sum += element;
+        }
+        return sum;
+    }
+});
+Object.defineProperty(Array.prototype, "sumOf", {
+    value: function (selector) {
+        let sum = 0;
+        for (let element of this) {
+            sum += selector(element);
+        }
+        return sum;
+    }
+});
+Object.defineProperty(Array.prototype, "random", {
+    value: function () {
+        return this[random(0, this.length)];
+    }
+});
 String.prototype.startsWithAny = function (...search) {
     return search.some((value) => this.startsWith(value));
 };
@@ -7384,110 +7519,3 @@ String.prototype.substringsBetween = function (open, close) {
     }
     return list;
 };
-Object.defineProperty(Array.prototype, "distinct", {
-    value: function () {
-        return [...new Set(this)];
-    }
-});
-Object.defineProperty(Array.prototype, "distinctBy", {
-    value: function (selector) {
-        const map = {};
-        const list = [];
-        for (let e of this) {
-            const key = selector.call(this, e);
-            if (!map[key]) {
-                map[key] = true;
-                list.push(e);
-            }
-        }
-        return list;
-    }
-});
-Object.defineProperty(Array.prototype, "shuffle", {
-    value: function () {
-        let len = this.length;
-        for (let i = len - 1; i > 0; i--) {
-            let rnd = Math.floor(Math.random() * (i + 1));
-            [this[i], this[rnd]] = [this[rnd], this[i]];
-        }
-    }
-});
-Object.defineProperty(Array.prototype, "minBy", {
-    value: function (selector) {
-        if (this.length == 0)
-            return null;
-        let minElem = this[0];
-        if (this.length == 1)
-            return minElem;
-        let minValue = selector(minElem);
-        for (let i = 1; i < this.length; i++) {
-            const e = this[i];
-            const v = selector(e);
-            if (minValue > v) {
-                minElem = e;
-                minValue = v;
-            }
-        }
-        return minElem;
-    }
-});
-Object.defineProperty(Array.prototype, "maxBy", {
-    value: function (selector) {
-        if (this.length == 0)
-            return null;
-        let minElem = this[0];
-        if (this.length == 1)
-            return minElem;
-        let minValue = selector(minElem);
-        for (let i = 1; i < this.length; i++) {
-            const e = this[i];
-            const v = selector(e);
-            if (minValue < v) {
-                minElem = e;
-                minValue = v;
-            }
-        }
-        return minElem;
-    }
-});
-Object.defineProperty(Array.prototype, "count", {
-    value: function (predicate) {
-        if (this.length == 0)
-            return 0;
-        let count = 0;
-        for (let element of this)
-            if (predicate(element))
-                ++count;
-        return count;
-    }
-});
-Object.defineProperty(Array.prototype, "sum", {
-    value: function () {
-        let sum = 0;
-        for (let element of this) {
-            sum += element;
-        }
-        return sum;
-    }
-});
-Object.defineProperty(Array.prototype, "sumOf", {
-    value: function (selector) {
-        let sum = 0;
-        for (let element of this) {
-            sum += selector(element);
-        }
-        return sum;
-    }
-});
-function gaSend(hitType, data) {
-    ga("send", hitType, data);
-}
-function gaEvent(data) {
-    gaSend("event", data);
-}
-function gaException(data) {
-    gaSend("exception", data);
-}
-function gaTiming(data) {
-    gaSend("timing", data);
-}

@@ -251,7 +251,11 @@ export class MathKit {
         }
     }
 
-    /** 随机数  最小值  最大值(不包括)  */
+    /**
+     * 随机数  最小值  最大值(不包括)
+     * @deprecated
+     * @see global.random
+     */
     static random(minNum: number, maxNum: number) {
         return (Math.floor(Math.random() * (maxNum - minNum)) + minNum)
     }
@@ -262,6 +266,8 @@ export class MathKit {
      * @param maxNum 最大值(不包括)
      * @param p 保留尾数  默认NAN 表示全保留
      * @return
+     * @deprecated
+     * @see global.randomFloat
      */
     static randomFloat(minNum: number, maxNum: number, p = NaN) {
         let temp = (Math.random() * (maxNum - minNum) + minNum)

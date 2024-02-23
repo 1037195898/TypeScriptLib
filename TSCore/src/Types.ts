@@ -247,200 +247,23 @@ function getPropertyNames(obj, containsSuperClasses = false) {
 const windowMy = window.self !== window.top ? window.top : window
 
 
-String.prototype.startsWithAny = function (...search: string []) {
-    return search.some((value) => this.startsWith(value))
-}
-String.prototype.startsWithAnyIgnore = function (...search: string []) {
-    const lowerCase = this.toLowerCase()
-    return search.some((value) => lowerCase.startsWith(value.toLowerCase()))
+/** 随机数  最小值  最大值(不包括)  */
+function random(minNum: number, maxNum: number) {
+    return (Math.floor(Math.random() * (maxNum - minNum)) + minNum)
 }
 
-String.prototype.endsWithAny = function (...search: string []) {
-    return search.some((value) => this.endsWith(value))
+/**
+ * 随机数
+ * @param minNum 最小值
+ * @param maxNum 最大值(不包括)
+ * @param p 保留尾数  默认NAN 表示全保留
+ * @return
+ */
+function randomFloat(minNum: number, maxNum: number, p = NaN) {
+    let temp = (Math.random() * (maxNum - minNum) + minNum)
+    if (!isNaN(p)) temp = parseFloat(temp.toFixed(p))
+    return temp
 }
-String.prototype.endsWithAnyIgnore = function (...search: string []) {
-    const lowerCase = this.toLowerCase()
-    return search.some((value) => lowerCase.endsWith(value.toLowerCase()))
-}
-
-String.prototype.equalsAny = function (...value: string []) {
-    const that = this.valueOf()
-    return value.some((it) => that === it)
-}
-
-String.prototype.equalsAnyIgnore = function (...value: string []) {
-    const lowerCase = this.toLowerCase()
-    return value.some((it) => lowerCase == it.toLowerCase())
-}
-
-String.prototype.contains = function (...search: string []) {
-    return search.some((value) => this.includes(value))
-}
-
-String.prototype.containsIgnore = function (...search: string []) {
-    const lowerCase = this.toLowerCase()
-    return search.some((value) => lowerCase.includes(value.toLowerCase()))
-}
-
-String.prototype.substringAfter = function (separator: string) {
-    if (!this || !separator) return this.toString()
-    const pos = this.indexOf(separator)
-    if (pos == -1) return this.toString()
-    return this.substring(pos + separator.length)
-}
-
-String.prototype.substringAfterLast = function (separator: string) {
-    if (!this || !separator) return this.toString()
-    const pos = this.lastIndexOf(separator)
-    if (pos == -1 || pos == this.length - separator.length) return this.toString()
-    return this.substring(pos + separator.length)
-}
-
-String.prototype.substringBefore = function (separator: string) {
-    if (!this || !separator) return this.toString()
-    const pos = this.indexOf(separator)
-    if (pos == -1) return this.toString()
-    return this.substring(0, pos)
-}
-
-String.prototype.substringBeforeLast = function (separator: string) {
-    if (!this || !separator) return this.toString()
-    const pos = this.lastIndexOf(separator)
-    if (pos == -1) return this.toString()
-    return this.substring(0, pos)
-}
-
-String.prototype.substringBetween = function (open: string, close: string) {
-    if (!this || !open || !close) return this.toString()
-    const start = this.indexOf(open)
-    if (start != -1) {
-        const end = this.indexOf(close, start + open.length)
-        if (end != -1) return this.substring(start + open.length, end)
-    }
-    return this.toString()
-}
-
-String.prototype.substringsBetween = function (open: string, close: string) {
-    const list: string[] = []
-    if (!this || !open || !close) return list
-    const strLen = this.length
-    if (strLen == 0) {
-        return list
-    }
-    const closeLen = close.length
-    const openLen = open.length
-    let pos = 0
-    while (pos < strLen - closeLen) {
-        let start = this.indexOf(open, pos)
-        if (start < 0) {
-            break
-        }
-        start += openLen
-        const end = this.indexOf(close, start)
-        if (end < 0) {
-            break
-        }
-        list.push(this.substring(start, end))
-        pos = end + closeLen
-    }
-    return list
-}
-
-Object.defineProperty(Array.prototype, "distinct", {
-    value: function () {
-        return [...new Set(this)]
-    }
-})
-
-Object.defineProperty(Array.prototype, "distinctBy", {
-    value: function (selector: (...args: any[]) => any) {
-        const map = {}
-        const list = []
-        for (let e of this) {
-            const key = selector.call(this, e)
-            if (!map[key]) {
-                map[key] = true
-                list.push(e)
-            }
-        }
-        return list
-    }
-})
-
-Object.defineProperty(Array.prototype, "shuffle", {
-    value: function () {
-        let len = this.length
-        for (let i = len - 1; i > 0; i--) {
-            let rnd = Math.floor(Math.random() * (i + 1));
-            [this[i], this[rnd]] = [this[rnd], this[i]]
-        }
-    }
-})
-
-Object.defineProperty(Array.prototype, "minBy", {
-    value: function <T, R>(selector: (value: T) => R) {
-        if (this.length == 0) return null
-        let minElem = this[0]
-        if (this.length == 1) return minElem
-        let minValue = selector(minElem)
-        for (let i = 1; i < this.length; i++) {
-            const e = this[i]
-            const v = selector(e)
-            if (minValue > v) {
-                minElem = e
-                minValue = v
-            }
-        }
-        return minElem
-    }
-})
-
-Object.defineProperty(Array.prototype, "maxBy", {
-    value: function <T, R>(selector: (value: T) => R) {
-        if (this.length == 0) return null
-        let minElem = this[0]
-        if (this.length == 1) return minElem
-        let minValue = selector(minElem)
-        for (let i = 1; i < this.length; i++) {
-            const e = this[i]
-            const v = selector(e)
-            if (minValue < v) {
-                minElem = e
-                minValue = v
-            }
-        }
-        return minElem
-    }
-})
-
-Object.defineProperty(Array.prototype, "count", {
-    value: function <T>(predicate: (value: T) => boolean) {
-        if (this.length == 0) return 0
-        let count = 0
-        for (let element of this) if (predicate(element)) ++count
-        return count
-    }
-})
-
-Object.defineProperty(Array.prototype, "sum", {
-    value: function <T>() {
-        let sum = 0
-        for (let element of this) {
-            sum += element
-        }
-        return sum
-    }
-})
-
-Object.defineProperty(Array.prototype, "sumOf", {
-    value: function <T>(selector: (value: T) => number) {
-        let sum = 0
-        for (let element of this) {
-            sum += selector(element)
-        }
-        return sum
-    }
-})
 
 
 function gaSend(hitType: HitType, data: EventType | ExceptionType | TimingType) {
