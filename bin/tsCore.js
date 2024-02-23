@@ -3944,6 +3944,33 @@ window.tsCore = {};
     /** 路径格式化 */
     Path.formatPath = [];
     tsCore.Path = Path;
+    class Range {
+        constructor(start, endInclusive) {
+            this.start = start;
+            this.endInclusive = endInclusive;
+        }
+        contains(value) {
+            return this.start <= value && value <= this.endInclusive;
+        }
+        /**
+         * 检查范围是否为空。
+         *
+         * 如果范围的起始值大于结束值，则该范围为空。
+         */
+        isEmpty() {
+            return this.start > this.endInclusive;
+        }
+        toArray() {
+            const arr = [];
+            for (let i = this.start; i <= this.endInclusive; i++) {
+                arr[i] = i;
+            }
+            return arr;
+        }
+    }
+    /** An empty range of values of type Int. */
+    Range.EMPTY = new Range(1, 0);
+    tsCore.Range = Range;
     class NativeUtils {
     }
     /**@private Market对象 只有加速器模式下才有值*/

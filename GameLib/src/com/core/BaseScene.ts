@@ -497,7 +497,7 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
     protected eventGuestTip() {
         // let value: string = LocalStorage.getItem(Player.inst.gameId + "_demo")
         // if (Player.inst.isGuest && !value) {
-        if (Player.inst.isGuest) {
+        if (Player.inst.isGuest && !Player.inst.urlParam.debug) {
             this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW,
                 {msg: LibStr.PROMPT_GUEST, obj: {cancelName: getString(LibStr.OK)}, callback: this.runEvent.bind(this)}
             )

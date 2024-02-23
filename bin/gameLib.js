@@ -809,7 +809,7 @@ window.gameLib = {};
         eventGuestTip() {
             // let value: string = Laya.LocalStorage.getItem(Player.inst.gameId + "_demo")
             // if (Player.inst.isGuest && !value) {
-            if (Player.inst.isGuest) {
+            if (Player.inst.isGuest && !Player.inst.urlParam.debug) {
                 this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, { msg: 1013 /* LibStr.PROMPT_GUEST */, obj: { cancelName: getString(1066 /* LibStr.OK */) }, callback: this.runEvent.bind(this) });
                 // Laya.LocalStorage.setItem(Player.inst.gameId + "_demo", "1")
             }

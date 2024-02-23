@@ -1541,6 +1541,21 @@ declare namespace tsCore {
         static of(base: string, ...subpaths: string[]): Path;
         string(): string;
     }
+    export class Range {
+        /** An empty range of values of type Int. */
+        static EMPTY: Range;
+        readonly start: number;
+        readonly endInclusive: number;
+        constructor(start: number, endInclusive: number);
+        contains(value: number): boolean;
+        /**
+         * 检查范围是否为空。
+         *
+         * 如果范围的起始值大于结束值，则该范围为空。
+         */
+        isEmpty(): boolean;
+        toArray(): number[];
+    }
     export interface IConchRenderObject {
         drawSubmesh(submesh: any, drawType: number, renderMode: number, offset: number, count: number): void;
         matrix(matrix: Float32Array): void;
