@@ -33,6 +33,18 @@ function createView<T extends fgui.GObject>(url: string, userClass?: { new(): T 
     return fgui.UIPackage.createObjectFromURL(url, userClass) as T
 }
 
+Object.defineProperty(tsCore.SoundUtils, "playGameMusic", {
+    value: function (url: string, loops?: number, complete?: Laya.Handler, volume?: number, startTime?: number, coverBefore = false) {
+        // @ts-ignore
+        url = `sounds/${gameLib.Player.inst.simpleName}/${url}`
+        return tsCore.SoundUtils.playMusic(url, loops, complete, volume, startTime, coverBefore)
+    }
+})
 
-
-
+Object.defineProperty(tsCore.SoundUtils, "playGameSound", {
+    value: function (url: string, loops?: number, complete?: Laya.Handler, volume?: number, startTime?: number) {
+        // @ts-ignore
+        url = `sounds/${gameLib.Player.inst.simpleName}/${url}`
+        return tsCore.SoundUtils.playSound(url, loops, complete, volume, startTime)
+    }
+})

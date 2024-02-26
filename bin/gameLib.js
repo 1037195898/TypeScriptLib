@@ -8525,3 +8525,17 @@ function createView(url, userClass) {
     }
     return fgui.UIPackage.createObjectFromURL(url, userClass);
 }
+Object.defineProperty(tsCore.SoundUtils, "playGameMusic", {
+    value: function (url, loops, complete, volume, startTime, coverBefore = false) {
+        // @ts-ignore
+        url = `sounds/${gameLib.Player.inst.simpleName}/${url}`;
+        return tsCore.SoundUtils.playMusic(url, loops, complete, volume, startTime, coverBefore);
+    }
+});
+Object.defineProperty(tsCore.SoundUtils, "playGameSound", {
+    value: function (url, loops, complete, volume, startTime) {
+        // @ts-ignore
+        url = `sounds/${gameLib.Player.inst.simpleName}/${url}`;
+        return tsCore.SoundUtils.playSound(url, loops, complete, volume, startTime);
+    }
+});
