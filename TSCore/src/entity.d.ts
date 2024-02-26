@@ -209,7 +209,7 @@ declare type PlaySkeletonFrame = {
      */
     playAudio?: boolean
     /**
-     * 播放完成回调
+     * 播放完成一次会回调一次
      */
     playComplete?: ParamHandler
 }
@@ -251,7 +251,7 @@ declare type ISkeletonPlay = {
      * */
     readonly loaderComplete?: ParamHandler
     /**
-     * 全波播放结束回调
+     * 全部动画播放结束后回调
      */
     playComplete?: ParamHandler
     /**

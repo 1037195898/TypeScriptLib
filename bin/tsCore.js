@@ -2502,7 +2502,12 @@ window.tsCore = {};
             this.asSkeleton.playbackRate(playbackRate);
             this.asSkeleton.play(this.nameOrIndex, false, force, start, end, freshSkin, playAudio);
         }
+        /**
+         * 当动画停止时的回调函数
+         */
         onPlayStopped() {
+            var _a;
+            // 检查播放进度信息，如果存在则执行相应的“after”或“before”回调函数
             if (this.skeletonPlay.progress) {
                 if ("after" in this.skeletonPlay.progress) {
                     runFun(this.skeletonPlay.progress.after, this.nameOrIndex);
@@ -2511,15 +2516,17 @@ window.tsCore = {};
                     runFun(this.skeletonPlay.progress, this.nameOrIndex);
                 }
             }
+            // 如果当前动画播放队列（nameOrIndex）是一个数组且长度大于0，则进行如下处理：
             if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
+                // 获取当前播放索引对应的动画数据
                 const playData = this.skeletonPlay.nameOrIndex[this.playGroupIndex];
                 // 当前动画播放完成后需要循环播放的次数
                 let loopCount = 0;
                 if (typeof playData === "object") {
-                    loopCount = playData.loopCount || loopCount;
-                    runFun(playData.playComplete);
+                    loopCount = (_a = playData.loopCount) !== null && _a !== void 0 ? _a : loopCount;
+                    runFun(playData.playComplete, this._loopCount);
                 }
-                // 在播放动画数组
+                // 更新循环播放计数器并判断是否需要切换到下一个动画
                 if (loopCount > 0 && loopCount != this._loopCount) {
                     this._loopCount++;
                 }
@@ -2527,9 +2534,11 @@ window.tsCore = {};
                     this.playGroupIndex++;
                     this._loopCount = 0;
                 }
+                // 判断是否需要开始新的动画序列或循环播放
                 let isNewPro = false;
                 if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex
                     || (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
+                    // 若是新序列且设置有延迟循环播放时间，则延时后播放
                     if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
                         // 循环播放有延迟的时候  单独处理
                         Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
@@ -2547,7 +2556,9 @@ window.tsCore = {};
                 }
             }
             else {
+                // 当播放队列不是数组时，根据loop属性和动画时长来决定是否循环播放当前动画
                 if (this.skeletonPlay.loop && this.getAnimDuration(0) > 0 && this.getAnimFrame(0) > 1) {
+                    // 若设置了延迟循环播放时间，则延时后播放；否则立即播放
                     if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
                         Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
                     }
@@ -2557,10 +2568,10 @@ window.tsCore = {};
                     return;
                 }
             }
+            // 执行播放完成的回调函数
             runFun(this.skeletonPlay.playComplete);
-            for (let i = 0; i < this.stoppedHandler.length; i++) {
-                this.stoppedHandler[i].run();
-            }
+            // 执行播放完成的回调函数
+            this.stoppedHandler.forEach(value => value.run());
         }
         paused() {
             this.asSkeleton.paused();
