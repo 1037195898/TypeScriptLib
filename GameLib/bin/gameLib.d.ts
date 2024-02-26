@@ -4060,7 +4060,8 @@ declare module tsCore.SoundUtils {
      * @param [startTime=0] 声音播放起始时间 单位秒
      * @param [coverBefore=false] 是否覆盖正在播放的音乐
      */
-    export function playGameMusic(url: string, loops = 0, complete?: Laya.Handler, volume = -1, startTime = 0, coverBefore = false)
+    export function playGameMusic(url: string, loops?: number, complete?: Laya.Handler, volume?: number, startTime?: number, coverBefore?: boolean)
+
     /**
      *
      * @param url 声音文件地址。 是从 sounds/gameName/  文件夹中读取的
