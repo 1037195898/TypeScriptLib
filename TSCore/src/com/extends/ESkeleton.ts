@@ -133,7 +133,7 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
         if (this.skeletonPlay.progress) {
             if ("after" in this.skeletonPlay.progress) {
                 runFun(this.skeletonPlay.progress.after, this.nameOrIndex)
-            } else {
+            } else if (typeof this.skeletonPlay.progress === "function") {
                 runFun(this.skeletonPlay.progress, this.nameOrIndex)
             }
         }

@@ -3488,7 +3488,7 @@ declare type ISkeletonPlay = {
      *
      * 默认是播放结束， 可以设置 before 播放之前和 after之后
      */
-    progress?: ParamHandler | { before: ParamHandler, after: ParamHandler }
+    progress?: ParamHandler | { before?: ParamHandler, after?: ParamHandler }
     /**
      *
      * false,如果要播的动画跟上一个相同就不生效
