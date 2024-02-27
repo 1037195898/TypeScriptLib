@@ -6946,7 +6946,7 @@ window.tsCore = {};
             }
         }
         /**
-         * 骨骼动画加载完成
+         * 骨骼动画加载完成,加载一次骨骼动画会被调用一次
          * @protected
          */
         onLoadComplete() {

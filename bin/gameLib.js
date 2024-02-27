@@ -2073,20 +2073,24 @@ window.gameLib = {};
                         Player.inst.guestModel.guestPlayCount++;
                 }
                 runFun(callback, data);
-            }, () => {
-                WaitResult.inst.hide();
-                this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1005 /* LibStr.NET_ERROR */, null, () => {
-                    // this.sendAction(ActionLib.GAME_RESET_BET)
-                    SceneManager.inst.gameErrorExit();
-                });
+            }, this.onSendBetError.bind(this));
+        }
+        onSendBetError() {
+            WaitResult.inst.hide();
+            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1005 /* LibStr.NET_ERROR */, null, () => {
+                // this.sendAction(ActionLib.GAME_RESET_BET)
+                SceneManager.inst.gameErrorExit();
             });
         }
         /**
          * 当请求不通过的时候  发出提示信息并重置bet
          * @param data
          */
-        betFail(data) {
-            tsCore.MessageTip.showTip(StateCode.getShowMessage(data));
+        betFail(data, isWindow = false) {
+            if (isWindow)
+                this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, StateCode.getShowMessage(data));
+            else
+                tsCore.MessageTip.showTip(StateCode.getShowMessage(data));
             this.sendAction(ActionLib.GAME_RESET_BET);
         }
         /**

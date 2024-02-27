@@ -2794,7 +2794,7 @@ declare namespace tsCore {
         get spine(): GSpineSkeleton;
         protected _onLoadComplete(): void;
         /**
-         * 骨骼动画加载完成
+         * 骨骼动画加载完成,加载一次骨骼动画会被调用一次
          * @protected
          */
         protected onLoadComplete(): void;
@@ -3486,7 +3486,7 @@ declare type ISkeletonPlay = {
     /**
      * 当前播放动画的进度
      *
-     * 默认是播放结束， 可以设置 before 播放之前和 after之后
+     * 默认是播放结束， 可以设置 before 播放之前和 after之后 会带参数  nameOrIndex: string | number
      */
     progress?: ParamHandler | { before?: ParamHandler, after?: ParamHandler }
     /**

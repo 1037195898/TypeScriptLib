@@ -1038,11 +1038,12 @@ declare namespace gameLib {
          * @param callback
          */
         sendBet(url: string, data: any, callback: ParamHandler): void;
+        protected onSendBetError(): void;
         /**
          * 当请求不通过的时候  发出提示信息并重置bet
          * @param data
          */
-        betFail(data: HttpResponse): void;
+        betFail(data: HttpResponse, isWindow?: boolean): void;
         /**
          * 领取奖金池
          * @param id
