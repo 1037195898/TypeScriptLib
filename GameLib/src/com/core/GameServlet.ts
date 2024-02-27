@@ -394,12 +394,14 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
                 if (Player.inst.isGuest) Player.inst.guestModel.guestPlayCount++
             }
             runFun(callback, data)
-        }, () => {
-            WaitResult.inst.hide()
-            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.NET_ERROR, null, () => {
-                // this.sendAction(ActionLib.GAME_RESET_BET)
-                SceneManager.inst.gameErrorExit()
-            })
+        }, this.onSendBetError.bind(this))
+    }
+
+    protected onSendBetError() {
+        WaitResult.inst.hide()
+        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.NET_ERROR, null, () => {
+            // this.sendAction(ActionLib.GAME_RESET_BET)
+            SceneManager.inst.gameErrorExit()
         })
     }
 
@@ -407,8 +409,9 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
      * 当请求不通过的时候  发出提示信息并重置bet
      * @param data
      */
-    betFail(data:HttpResponse) {
-        MessageTip.showTip(StateCode.getShowMessage(data))
+    betFail(data: HttpResponse, isWindow = false) {
+        if (isWindow) this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, StateCode.getShowMessage(data))
+        else MessageTip.showTip(StateCode.getShowMessage(data))
         this.sendAction(ActionLib.GAME_RESET_BET)
     }
 
