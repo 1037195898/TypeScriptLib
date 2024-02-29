@@ -7530,3 +7530,15 @@ String.prototype.substringsBetween = function (open, close) {
     }
     return list;
 };
+String.prototype.toBoolean = function () {
+    return this !== null && this.trim().length > 0 && !this.equalsAnyIgnore("false", "0");
+};
+String.prototype.toInt = function () {
+    let value = 0;
+    try {
+        value = parseInt(this);
+    }
+    catch (e) {
+    }
+    return value;
+};

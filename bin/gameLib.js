@@ -5463,18 +5463,18 @@ window.gameLib = {};
             let isweb = this.getValue(json, "isweb");
             isweb !== null && isweb !== void 0 ? isweb : (isweb = Laya.Render.isConchApp ? "false" : "true");
             Player.inst.isWeb = (isweb != "false");
-            this.getQueryBoolean(json, v => Player.inst.isGuest = v, "isGuest", "guest", "demo");
-            this.getQueryBoolean(json, v => this.debug = v, "debug");
             this.getQuery(json, v => Player.inst.token = v, "token");
             this.getQuery(json, v => this.channel = v, "channel");
             this.getQuery(json, v => this._country = v, "country");
             this.getQuery(json, v => this._language = v, "language", "lang");
             this.getQuery(json, v => this._playWith = v, "playWith");
             this.getQuery(json, v => this._roomId = v, "roomId");
-            this.getQuery(json, v => this._role = Laya.Utils.parseInt(v), "role");
+            this.getQuery(json, v => this._role = v.toInt(), "role");
             this.getQuery(json, v => this._amount = v, "amount");
             this.getQuery(json, v => this._inviteCode = v, "invite_code");
-            this.getQuery(json, v => SceneManager.inst.isCall = !v.equalsAnyIgnore("false", "0"), "isCall", "call");
+            this.getQuery(json, v => Player.inst.isGuest = v.toBoolean(), "isGuest", "guest", "demo");
+            this.getQuery(json, v => SceneManager.inst.isCall = v.toBoolean(), "isCall", "call");
+            this.getQueryBoolean(json, v => this.debug = v, "debug");
             this.getQueryBoolean(json, v => this._isGift = v ? 1 : 0, "isGift", "gift");
             this.getQueryBoolean(json, v => Laya.SoundManager.musicMuted = v, "musicMuted");
             this.getQueryBoolean(json, v => Laya.SoundManager.soundMuted = v, "soundMuted");
@@ -8468,10 +8468,8 @@ window.gameLib = {};
     /** 加载 */
     class WaitResult extends fgui.GComponent {
         static get inst() {
-            if (!this._instance) {
-                fgui.UIObjectFactory.setPackageItemExtension("//gameCommon/WaitResult", WaitResult);
-                this._instance = fgui.UIPackage.createObjectFromURL("//gameCommon/WaitResult");
-            }
+            var _a;
+            (_a = this._instance) !== null && _a !== void 0 ? _a : (this._instance = createView("//gameCommon/WaitResult", WaitResult));
             return this._instance;
         }
         /*@override*/
@@ -8482,10 +8480,10 @@ window.gameLib = {};
             this.img = this.getChild("n0").asImage;
             this.graph = this.getChild("n1").asGraph;
         }
-        show() {
+        show(delay = WaitResult.defaultDelay) {
             this.graph.visible = this.img.visible = false;
             fgui.GRoot.inst.addChild(this);
-            Laya.timer.once(1000, this, this.showContent);
+            Laya.timer.once(delay, this, this.showContent);
         }
         showContent() {
             this.graph.visible = this.img.visible = true;
@@ -8495,6 +8493,7 @@ window.gameLib = {};
             this.removeFromParent();
         }
     }
+    WaitResult.defaultDelay = 1000;
     gameLib.WaitResult = WaitResult;
 })(gameLib || (gameLib = {}));
 /**

@@ -1,26 +1,23 @@
-import GComponent = fgui.GComponent
-import UIObjectFactory = fgui.UIObjectFactory
-import UIPackage = fgui.UIPackage
-import GImage = fgui.GImage
-import GRoot = fgui.GRoot
-import RelationType = fgui.RelationType
-import GGraph = fgui.GGraph
+import GComponent = fgui.GComponent;
+import GImage = fgui.GImage;
+import GRoot = fgui.GRoot;
+import RelationType = fgui.RelationType;
+import GGraph = fgui.GGraph;
 
 /** 加载 */
 export class WaitResult extends GComponent {
 
     private static _instance: WaitResult
-
     static get inst() {
-        if (!this._instance) {
-            UIObjectFactory.setPackageItemExtension("//gameCommon/WaitResult", WaitResult)
-            this._instance = UIPackage.createObjectFromURL("//gameCommon/WaitResult") as WaitResult
-        }
+        this._instance ??= createView("//gameCommon/WaitResult", WaitResult)
         return this._instance
     }
 
+    static defaultDelay = 1000
+
     private img: GImage
     private graph: GGraph
+
 
     protected override onConstruct() {
         super.onConstruct();
@@ -32,17 +29,17 @@ export class WaitResult extends GComponent {
 
     }
 
-    show(): void {
+    show(delay = WaitResult.defaultDelay) {
         this.graph.visible = this.img.visible = false
         GRoot.inst.addChild(this)
-        Laya.timer.once(1000, this, this.showContent)
+        Laya.timer.once(delay, this, this.showContent)
     }
 
-    private showContent(): void {
+    private showContent() {
         this.graph.visible = this.img.visible = true
     }
 
-    hide(): void {
+    hide() {
         Laya.timer.clear(this, this.showContent)
         this.removeFromParent()
     }

@@ -3875,10 +3875,11 @@ declare namespace gameLib {
     export class WaitResult extends fgui.GComponent {
         private static _instance;
         static get inst(): WaitResult;
+        static defaultDelay: number;
         private img;
         private graph;
         protected onConstruct(): void;
-        show(): void;
+        show(delay?: number): void;
         private showContent;
         hide(): void;
     }

@@ -3170,6 +3170,18 @@ declare interface String {
      * @param close
      */
     substringsBetween(open: string, close: string): string[]
+    /**
+     * 将字符串转换为布尔值
+     *
+     * 会判断字符串是否为null，是否为空字符串，是否包含"false"或"0"
+     * @returns {boolean} 转换后的布尔值
+     */
+    toBoolean(): boolean
+    /**
+     * 将字符串转换为整数
+     * @returns {number} 转换后的整数
+     */
+    toInt(): number
 
 }
 
