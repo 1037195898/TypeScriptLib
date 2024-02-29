@@ -134,7 +134,7 @@ export class BaseSlotGameData extends BaseGameData {
     getRandomNumber(arr: number[], min = 1, max = 10) {
         let len = this.itemCount - arr.length
         for (let i = 0; i < len; i++) {
-            arr.push(MathKit.random(min, max))
+            arr.push(random(min, max))
         }
         return arr
     }

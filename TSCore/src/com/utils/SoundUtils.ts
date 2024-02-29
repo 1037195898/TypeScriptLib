@@ -52,7 +52,7 @@ export class SoundUtils {
      * @param complete 声音播放完成回调 Handler对象。
      * @param [volume=-1] 音量范围从 0（静音）至 1（最大音量）。 -1表示不调整
      * @param [startTime=0] 声音播放起始时间 单位秒
-     * @param [coverBefore=false] 是否覆盖正在播放的音乐
+     * @param [coverBefore=false] 地址相同，是否覆盖正在播放的音乐
      */
     static playMusic(url: string, loops = 0, complete?: Laya.Handler, volume = -1, startTime = 0, coverBefore = false) {
         if (SoundManager["_bgMusic"] == URL.formatURL(url) && SoundManager["_musicChannel"] && !coverBefore) {

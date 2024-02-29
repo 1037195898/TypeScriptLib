@@ -412,6 +412,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     betFail(data: HttpResponse, isWindow = false) {
         if (isWindow) this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, StateCode.getShowMessage(data))
         else MessageTip.showTip(StateCode.getShowMessage(data))
+        this.sendAction(ActionLib.GAME_STOP_SLOT_LIST_RUN_ANI)
         this.sendAction(ActionLib.GAME_RESET_BET)
     }
 

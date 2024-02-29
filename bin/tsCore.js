@@ -4677,7 +4677,7 @@ window.tsCore = {};
          * @param complete 声音播放完成回调 Handler对象。
          * @param [volume=-1] 音量范围从 0（静音）至 1（最大音量）。 -1表示不调整
          * @param [startTime=0] 声音播放起始时间 单位秒
-         * @param [coverBefore=false] 是否覆盖正在播放的音乐
+         * @param [coverBefore=false] 地址相同，是否覆盖正在播放的音乐
          */
         static playMusic(url, loops = 0, complete, volume = -1, startTime = 0, coverBefore = false) {
             if (Laya.SoundManager["_bgMusic"] == Laya.URL.formatURL(url) && Laya.SoundManager["_musicChannel"] && !coverBefore) {

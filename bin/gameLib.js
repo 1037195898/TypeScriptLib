@@ -1024,7 +1024,7 @@ window.gameLib = {};
         getRandomNumber(arr, min = 1, max = 10) {
             let len = this.itemCount - arr.length;
             for (let i = 0; i < len; i++) {
-                arr.push(tsCore.MathKit.random(min, max));
+                arr.push(random(min, max));
             }
             return arr;
         }
@@ -2091,6 +2091,7 @@ window.gameLib = {};
                 this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, StateCode.getShowMessage(data));
             else
                 tsCore.MessageTip.showTip(StateCode.getShowMessage(data));
+            this.sendAction(ActionLib.GAME_STOP_SLOT_LIST_RUN_ANI);
             this.sendAction(ActionLib.GAME_RESET_BET);
         }
         /**
@@ -6634,7 +6635,7 @@ window.gameLib = {};
             tsCore.Log.debug(`alert-> msg:${msg}, title=${title}, okText=${okText}, cancelText=${cancelText}`);
             if (AppManager.callIOS("alert", { msg: msg, title: title, ensureTv: okText, cancelTv: cancelText }))
                 return;
-            ((_b = (_a = Laya.Browser.window.APP) === null || _a === void 0 ? void 0 : _a.alert) === null || _b === void 0 ? void 0 : _b.call(_a, msg)) ||
+            ((_b = (_a = Laya.Browser.window.APP) === null || _a === void 0 ? void 0 : _a.alert) === null || _b === void 0 ? void 0 : _b.call(_a, msg, title, okText, cancelText)) ||
                 ((_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.alert) === null || _e === void 0 ? void 0 : _e.call(_d, msg)) ||
                 ((_h = (_g = (_f = Laya.Browser.window.parent) === null || _f === void 0 ? void 0 : _f.GameToHall) === null || _g === void 0 ? void 0 : _g.openModal) === null || _h === void 0 ? void 0 : _h.call(_g, msg));
             AppManager.showWeb({ javascript: `window.GameToHall.alert && window.GameToHall.alert('${msg}')` });
