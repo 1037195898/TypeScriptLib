@@ -2018,6 +2018,8 @@ declare namespace tsCore {
         private static bgVolume;
         private static bgComplete;
         private static bgStartTime;
+        /** 当前自动播放的声音文件路径 */
+        private static autoPlayUrl;
         /**
          * 添加需要使用 SoundUtils.load() 加载的资源文件
          * @param res

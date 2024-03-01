@@ -4665,8 +4665,11 @@ window.tsCore = {};
         static onLoader() {
             for (let i = 0; i < SoundUtils.autoPlay.length; i++) {
                 let url = SoundUtils.autoPlay[i];
-                SoundUtils.playMusic(url, SoundUtils.bgMusicLoop, SoundUtils.bgComplete, SoundUtils.bgVolume, SoundUtils.bgStartTime);
-                Log.info("auto play = " + url);
+                if (SoundUtils.autoPlayUrl == url) {
+                    SoundUtils.playMusic(url, SoundUtils.bgMusicLoop, SoundUtils.bgComplete, SoundUtils.bgVolume, SoundUtils.bgStartTime);
+                    Log.info("auto play = " + url);
+                    SoundUtils.autoPlayUrl = null;
+                }
             }
             SoundUtils.autoPlay.length = 0;
         }
@@ -4702,6 +4705,7 @@ window.tsCore = {};
             }
             else {
                 Log.info("sound not load " + url);
+                this.autoPlayUrl = url;
                 if (SoundUtils.autoPlay.indexOf(url) == -1)
                     SoundUtils.autoPlay.push(url);
                 const index = SoundUtils.loadAsset.findIndex(function (value) {

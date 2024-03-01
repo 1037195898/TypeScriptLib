@@ -16,6 +16,8 @@ export class SoundUtils {
     private static bgVolume = 1
     private static bgComplete: Laya.Handler
     private static bgStartTime = 0
+    /** 当前自动播放的声音文件路径 */
+    private static autoPlayUrl: string;
 
     /**
      * 添加需要使用 SoundUtils.load() 加载的资源文件
@@ -39,8 +41,11 @@ export class SoundUtils {
     private static onLoader() {
         for (let i = 0; i < SoundUtils.autoPlay.length; i++) {
             let url = SoundUtils.autoPlay[i]
-            SoundUtils.playMusic(url, SoundUtils.bgMusicLoop, SoundUtils.bgComplete, SoundUtils.bgVolume, SoundUtils.bgStartTime)
-            Log.info("auto play = " + url)
+            if (SoundUtils.autoPlayUrl == url) {
+                SoundUtils.playMusic(url, SoundUtils.bgMusicLoop, SoundUtils.bgComplete, SoundUtils.bgVolume, SoundUtils.bgStartTime)
+                Log.info("auto play = " + url)
+                SoundUtils.autoPlayUrl = null
+            }
         }
         SoundUtils.autoPlay.length = 0
     }
@@ -75,6 +80,7 @@ export class SoundUtils {
             return channel
         } else {
             Log.info("sound not load " + url)
+            this.autoPlayUrl = url
             if (SoundUtils.autoPlay.indexOf(url) == -1) SoundUtils.autoPlay.push(url)
             const index = SoundUtils.loadAsset.findIndex(function (value: LoadRes) {
                 return value.url == url
