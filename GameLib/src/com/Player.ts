@@ -236,9 +236,11 @@ export class Player {
         this.coupons.forEach(value => value.isUse = false)
     }
 
-
-
-    /** 获取请求发送的  token */
+    /**
+     * 获取请求发送的token，无?和&符号
+     *
+     * token=xxxxx
+     */
     getRequestToken() {
         return "token=" + this.token
     }

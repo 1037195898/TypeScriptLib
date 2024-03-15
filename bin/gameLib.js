@@ -1874,7 +1874,7 @@ window.gameLib = {};
             runFun(handler);
         }
         /**
-         * 进入游戏失败
+         * 进入游戏失败 执行退出游戏
          * @param [isTip = true] 是否需要弹窗
          * @param message 弹窗内容
          */
@@ -1982,9 +1982,13 @@ window.gameLib = {};
                 Player.inst.jackpotData = data.scratcher_tickets;
             this.sendAction(ActionLib.GAME_UPDATE_JACKPOT_POOL);
         }
-        /** 获取投注劵 */
-        getCoupon(onComplete) {
-            this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(), null, Laya.Handler.create(this, this.couponHandler, [onComplete]), this.userDataErrorHandler.bind(this));
+        /**
+         * 获取优惠券信息的函数。
+         * @param onComplete - 请求完成后的回调函数，参数为从服务器返回的数据。
+         * @param error - 请求发生错误时的回调函数，参数为错误信息。
+         */
+        getCoupon(onComplete, error) {
+            this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(), null, Laya.Handler.create(this, this.couponHandler, [onComplete]), error !== null && error !== void 0 ? error : this.userDataErrorHandler.bind(this));
         }
         /** 收到投注劵数据 */
         couponHandler(handler, data) {
@@ -5770,7 +5774,11 @@ window.gameLib = {};
         stopAllCoupon() {
             this.coupons.forEach(value => value.isUse = false);
         }
-        /** 获取请求发送的  token */
+        /**
+         * 获取请求发送的token，无?和&符号
+         *
+         * token=xxxxx
+         */
         getRequestToken() {
             return "token=" + this.token;
         }
@@ -8268,7 +8276,6 @@ window.gameLib = {};
          * @param callback 确定回调方法
          * @param isAction 动画显示或关闭
          *
-         * @deprecated
          * @see LibStr
          * @see ActionLib.GAME_SHOW_PROMPT_WINDOW
          */
@@ -8289,7 +8296,6 @@ window.gameLib = {};
          * @param callback 取消回调方法
          * @param continueFun 确定回调方法
          * @param isAction 动画显示或关闭
-         * @deprecated
          * @see LibStr
          * @see ActionLib.GAME_SHOW_PROMPT_CANCEL_WINDOW
          */

@@ -987,7 +987,7 @@ declare namespace gameLib {
          */
         checkState(handler: ParamHandler): void;
         /**
-         * 进入游戏失败
+         * 进入游戏失败 执行退出游戏
          * @param [isTip = true] 是否需要弹窗
          * @param message 弹窗内容
          */
@@ -1008,8 +1008,12 @@ declare namespace gameLib {
          * @param data
          */
         readJackpotData(data: HttpData): void;
-        /** 获取投注劵 */
-        getCoupon(onComplete?: ParamHandler): void;
+        /**
+         * 获取优惠券信息的函数。
+         * @param onComplete - 请求完成后的回调函数，参数为从服务器返回的数据。
+         * @param error - 请求发生错误时的回调函数，参数为错误信息。
+         */
+        getCoupon(onComplete?: ParamHandler, error?: ((data: any) => void)): void;
         /** 收到投注劵数据 */
         protected couponHandler(handler: ParamHandler, data: HttpResponse): void;
         initComplete(): void;
@@ -3025,7 +3029,11 @@ declare namespace gameLib {
         getCanUseCoupon(): boolean;
         /** 停止所有的优惠价使用 */
         stopAllCoupon(): void;
-        /** 获取请求发送的  token */
+        /**
+         * 获取请求发送的token，无?和&符号
+         *
+         * token=xxxxx
+         */
         getRequestToken(): string;
         /** 玩家头像 */
         get icon(): string;
@@ -3804,7 +3812,6 @@ declare namespace gameLib {
          * @param callback 确定回调方法
          * @param isAction 动画显示或关闭
          *
-         * @deprecated
          * @see LibStr
          * @see ActionLib.GAME_SHOW_PROMPT_WINDOW
          */
@@ -3816,7 +3823,6 @@ declare namespace gameLib {
          * @param callback 取消回调方法
          * @param continueFun 确定回调方法
          * @param isAction 动画显示或关闭
-         * @deprecated
          * @see LibStr
          * @see ActionLib.GAME_SHOW_PROMPT_CANCEL_WINDOW
          */

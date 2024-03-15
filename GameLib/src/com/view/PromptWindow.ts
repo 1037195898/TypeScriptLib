@@ -106,7 +106,6 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
      * @param callback 确定回调方法
      * @param isAction 动画显示或关闭
      *
-     * @deprecated
      * @see LibStr
      * @see ActionLib.GAME_SHOW_PROMPT_WINDOW
      */
@@ -127,7 +126,6 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
      * @param callback 取消回调方法
      * @param continueFun 确定回调方法
      * @param isAction 动画显示或关闭
-     * @deprecated
      * @see LibStr
      * @see ActionLib.GAME_SHOW_PROMPT_CANCEL_WINDOW
      */

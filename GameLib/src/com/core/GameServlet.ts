@@ -184,7 +184,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     }
 
     /**
-     * 进入游戏失败
+     * 进入游戏失败 执行退出游戏
      * @param [isTip = true] 是否需要弹窗
      * @param message 弹窗内容
      */
@@ -293,10 +293,14 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
         this.sendAction(ActionLib.GAME_UPDATE_JACKPOT_POOL)
     }
 
-    /** 获取投注劵 */
-    getCoupon(onComplete?: ParamHandler) {
+    /**
+     * 获取优惠券信息的函数。
+     * @param onComplete - 请求完成后的回调函数，参数为从服务器返回的数据。
+     * @param error - 请求发生错误时的回调函数，参数为错误信息。
+     */
+    getCoupon(onComplete?: ParamHandler, error?: ((data: any) => void)) {
         this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(),
-            null, Handler.create(this, this.couponHandler, [onComplete]), this.userDataErrorHandler.bind(this))
+            null, Handler.create(this, this.couponHandler, [onComplete]), error ?? this.userDataErrorHandler.bind(this))
     }
 
     /** 收到投注劵数据 */
