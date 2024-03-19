@@ -6589,10 +6589,13 @@ window.tsCore = {};
             return (_b = (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.skeletonData) === null || _b === void 0 ? void 0 : _b.skins;
         }
         getAnimation(aniIndex) {
+            let animation;
             if (typeof aniIndex === "string") {
-                return this.getAllAnimation().find(value => value.name === aniIndex);
+                animation = this.getAllAnimation().find(value => value.name === aniIndex);
             }
-            return this.getAllAnimation()[aniIndex];
+            else
+                animation = this.getAllAnimation()[aniIndex];
+            return animation;
         }
         /**
          * 获取动画时长 秒
@@ -6600,14 +6603,15 @@ window.tsCore = {};
          */
         getAnimDuration(aniIndex) {
             var _a;
+            let duration = 0;
             if (Array.isArray(aniIndex)) {
-                let duration = 0;
                 for (let i = 0; i < aniIndex.length; i++) {
                     duration += this.getAnimDuration(aniIndex[i]);
                 }
-                return duration;
             }
-            return ((_a = this.getAnimation(aniIndex)) === null || _a === void 0 ? void 0 : _a.duration) || 0;
+            else
+                duration = ((_a = this.getAnimation(aniIndex)) === null || _a === void 0 ? void 0 : _a.duration) || 0;
+            return duration;
         }
         getAnimFrame(aniIndex) {
             return this.getAnimation(aniIndex).timelines.length;

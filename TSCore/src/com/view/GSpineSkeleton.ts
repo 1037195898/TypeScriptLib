@@ -126,10 +126,11 @@ export class GSpineSkeleton extends ESkeleton {
     }
 
     getAnimation(aniIndex: number | string): spine.Animation {
+        let animation: spine.Animation
         if (typeof aniIndex === "string") {
-            return this.getAllAnimation().find(value => value.name === aniIndex)
-        }
-        return this.getAllAnimation()[aniIndex]
+            animation = this.getAllAnimation().find(value => value.name === aniIndex)
+        } else animation = this.getAllAnimation()[aniIndex]
+        return animation
     }
 
     /**
@@ -137,14 +138,13 @@ export class GSpineSkeleton extends ESkeleton {
      * @param aniIndex
      */
     getAnimDuration(aniIndex: number | string | (number | string)[]) {
+        let duration = 0
         if (Array.isArray(aniIndex)) {
-            let duration = 0
             for (let i = 0; i < aniIndex.length; i++) {
                 duration += this.getAnimDuration(aniIndex[i])
             }
-            return duration
-        }
-        return this.getAnimation(aniIndex)?.duration || 0
+        } else duration = this.getAnimation(aniIndex)?.duration || 0
+        return duration
     }
 
     getAnimFrame(aniIndex: number | string) {
