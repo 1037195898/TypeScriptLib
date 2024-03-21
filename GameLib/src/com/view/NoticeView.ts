@@ -2,7 +2,6 @@ import {BaseView} from "../core/BaseView"
 import {BaseGameData} from "../core/BaseGameData"
 import {Player} from "../Player"
 import {LibStr} from "../LibStr"
-import StringUtil = tsCore.StringUtil;
 import {GameConfigKit} from "../kit/GameConfigKit";
 
 export class NoticeView extends BaseView {

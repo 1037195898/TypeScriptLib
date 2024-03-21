@@ -5,7 +5,6 @@ import Ease = Laya.Ease;
 import GComponent = fgui.GComponent;
 import Sound = Laya.Sound;
 import SoundUtils = tsCore.SoundUtils;
-import MathKit = tsCore.MathKit;
 import {GoldLoader} from "../effect/GoldLoader"
 import {SceneManager} from "../manager/SceneManager";
 
@@ -115,8 +114,8 @@ export class GoldAniUtils {
             let endP = Laya.Point.create().setTo(this.endPoint.x - loader.width / 2, this.endPoint.y - loader.height / 2)
 
             loader.setStartPoint(tempX, tempY)
-            loader.setMiddlePoint(tempX + (endP.x - tempX) / 2 + MathKit.random(200, 300),
-                tempY + (endP.y - tempY) / 2 + MathKit.random(0, 100))
+            loader.setMiddlePoint(tempX + (endP.x - tempX) / 2 + random(200, 300),
+                tempY + (endP.y - tempY) / 2 + random(0, 100))
             loader.setEndPoint(endP.x, endP.y)
 
 

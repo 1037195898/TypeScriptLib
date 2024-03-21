@@ -1,6 +1,4 @@
 import {BaseGameData, GameType} from "./BaseGameData"
-import MathKit = tsCore.MathKit;
-
 
 export class BaseSlotGameData extends BaseGameData {
 
@@ -65,10 +63,40 @@ export class BaseSlotGameData extends BaseGameData {
     /** 免费游戏剩余次数 */
     freeCount = 0
 
+    /** 第一列是否存在 bounds
+     * @deprecated
+     * @see firstExistBonus
+     * */
+    get firstExistBounds() {
+        return this.firstExistBonus
+    }
+    /** 第一列是否存在 bounds
+     * @deprecated
+     * @see firstExistBonus
+     * */
+    set firstExistBounds(value) {
+        this.firstExistBonus = value
+    }
+
+    /** 当前开出免费游戏图标个数
+     * @deprecated
+     * @see freeBonusNum
+     * */
+    get freeBoundsCount() {
+        return this.freeBonusNum
+    }
+    /** 当前开出免费游戏图标个数
+     * @deprecated
+     * @see freeBonusNum
+     * */
+    set freeBoundsCount(value) {
+        this.freeBonusNum = value
+    }
+
     /** 第一列是否存在 bounds */
-    firstExistBounds: boolean
+    firstExistBonus: boolean
     /** 当前开出免费游戏图标个数 */
-    freeBoundsCount = 0
+    freeBonusNum = 0
 
     /**
      * 是否有 reSpin
@@ -77,7 +105,7 @@ export class BaseSlotGameData extends BaseGameData {
     /**
      * 当前在reSpin模式
      */
-    isReSpinModel :boolean
+    isReSpinModel: boolean
 
     constructor() {
         super()
@@ -112,7 +140,7 @@ export class BaseSlotGameData extends BaseGameData {
      * @param index 列
      */
     getSlotListArr(index: number): number[] {
-        return this[`slotList${index}`] ?? ( this[`slotList${index}`] = [] && this.getSlotListArr(index) )
+        return this[`slotList${index}`] ?? (this[`slotList${index}`] = [] && this.getSlotListArr(index))
     }
 
     /**

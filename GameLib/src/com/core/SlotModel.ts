@@ -164,10 +164,19 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
      */
     protected rollComplete() {
         // 统计freeBounds开出来的数量
-        if (this.gameData.freeBoundsCount == 0) {
-            this.gameData.freeBoundsCount = this.gameData.lotteryId.count(value => value == this.SPECIAL_PLAY)
-        }
+        this.countFreeBonus()
         this.lotteryComplete()
+    }
+
+    /**
+     * 统计FreeBonus开出来的数量
+     * @protected
+     */
+    protected countFreeBonus() {
+        if (this.gameData.freeBonusNum == 0) {
+            this.gameData.freeBonusNum = this.gameData.lotteryId.count(value => value == this.SPECIAL_PLAY)
+        }
+        return this.gameData.freeBonusNum
     }
 
     protected override lotteryComplete() {
@@ -195,7 +204,7 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
             return
         }
         // 开出三个免费游戏启动项目  并且服务端告诉有免费游戏
-        if (this.gameData.freeBoundsCount >= 3 && this.gameData.hasFreeSpin != 0) {
+        if (this.gameData.freeBonusNum >= 3 && this.gameData.hasFreeSpin != 0) {
             this.gameData.tempServerWinMoney = this.gameData.serverWinMoney
             // 交给scene处理
             Laya.timer.once(this.delayGetBonus, this, () => {

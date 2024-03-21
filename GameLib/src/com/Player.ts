@@ -74,6 +74,7 @@ export class Player {
      *  是否是web端口
      *  @default true
      *  @deprecated
+     *  @see Render.isConchApp
      */
     isWeb = true
     /** 1=>投注中，2=>计算中，3=>开奖  4=>收取金币  5=>比分中 */
@@ -108,7 +109,7 @@ export class Player {
     /** 每次投注达到多少 就可以获得刮刮卡 */
     getTicketIncBet = 100
     /** 当前游戏的奖金池 */
-    gamePool = MathKit.random(1000, 99999)
+    gamePool = random(1000, 99999)
     /** 获得奖励的次数 */
     jackpotCount = 0
 
@@ -282,7 +283,7 @@ export class Player {
 
     set guestModel(value: IGuestModel) {
         this._guestModel = value;
-        this._guestModel.guestUID = MathKit.random(1, 99999999) * 1000
+        this._guestModel.guestUID = random(1, 99999999) * 1000
     }
 
     /**

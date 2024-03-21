@@ -21,7 +21,8 @@ import StringUtil = tsCore.StringUtil;
 import {LoaderConfig} from "../configs/LoaderConfig";
 import {AssetsLoader} from "../manager/AssetsLoader";
 import {IGameData} from "../Interfaces";
-import {BaseSlotGameData} from "./BaseSlotGameData";
+import Browser = Laya.Browser;
+import Render = Laya.Render;
 
 /**
  *
@@ -113,7 +114,7 @@ export class GameModel<T extends IGameData = BaseGameData> extends EProxy implem
     /** 通知信息 */
     private onNotification(obj: { message: { title: string, text: string, subText: string, open: string } }) {
         const mes = obj.message
-        if (Player.inst.isWeb) {
+        if (!Render.isConchApp) {
             function show() {
                 let notification = new Notification(mes.title, {body: mes.text, icon: "favicon.ico"})
                 notification.onclick = function () {

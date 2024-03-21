@@ -41,7 +41,7 @@ export class UrlParam {
 
         this.parseData(null)
 
-        if (Player.inst.isWeb) {
+        if (!Render.isConchApp) {
             let url = window.location.href
             let newUrl = url.split("?")[0]
             let clearCache = Utils.getQueryString("clearCache")

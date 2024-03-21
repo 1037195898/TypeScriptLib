@@ -1,8 +1,7 @@
-import Point = Laya.Point
-import Tween = Laya.Tween
-import GObject = fgui.GObject
+import Point = Laya.Point;
+import Tween = Laya.Tween;
+import GObject = fgui.GObject;
 import {GoldSpray} from "./GoldSpray"
-import MathKit = tsCore.MathKit;
 
 /** 播放各种金币动画 */
 export class GoldSprayAni {
@@ -137,9 +136,9 @@ export class GoldSprayAni {
             goldAniBox = this.goldAniBox[i]
             goldAniBox.setStartPoint(goldAniBox.x, goldAniBox.y)
             goldAniBox.setMiddlePoint(
-                goldAniBox.x + (this.endPoint.x - goldAniBox.x) / 2 + MathKit.random(200, 300),
+                goldAniBox.x + (this.endPoint.x - goldAniBox.x) / 2 + random(200, 300),
                 goldAniBox.y + (this.endPoint.y - goldAniBox.y) / 2
-                - (MathKit.random(0, 100) * (this.endPoint.y > this.centreY ? -1 : 1))
+                - (random(0, 100) * (this.endPoint.y > this.centreY ? -1 : 1))
             )
             goldAniBox.setEndPoint(this.endPoint.x, this.endPoint.y)
             Tween.to(goldAniBox, {t: 1},

@@ -1,5 +1,5 @@
 import {Card} from "./Card"
-import UtilKit = tsCore.UtilKit;
+
 
 export class Deck {
 
@@ -142,7 +142,7 @@ export class Deck {
         this.handler = handler
 
         this.completeNum = 0
-        UtilKit.shuffle(this.cards)
+        this.cards.shuffle()
         for (let i = 0; i < this.cards.length; i++) {
             let card: Card = this.cards[i]
             card.offset = i * card.offsetMultiple

@@ -1,22 +1,22 @@
-import GTextField = fgui.GTextField
-import GButton = fgui.GButton
-import Controller = fgui.Controller
-import UIPackage = fgui.UIPackage
-import GRoot = fgui.GRoot
-import RelationType = fgui.RelationType
-import Browser = Laya.Browser
-import Utils = Laya.Utils
+import GTextField = fgui.GTextField;
+import GButton = fgui.GButton;
+import Controller = fgui.Controller;
+import UIPackage = fgui.UIPackage;
+import GRoot = fgui.GRoot;
+import RelationType = fgui.RelationType;
+import Browser = Laya.Browser;
+import Utils = Laya.Utils;
+import IRecord = tsCore.IRecord;
+import App = tsCore.App;
+import Log = tsCore.Log;
+import HistoryManager = tsCore.HistoryManager;
+import Render = Laya.Render;
 import {AppRecordManager} from "../manager/AppRecordManager"
 import {Player} from "../Player"
 import {AppManager} from "../manager/AppManager"
 import {SceneManager} from "../manager/SceneManager"
 import {ActionLib} from "../ActionLib"
 import {CommonCmd} from "../net/Common";
-import IRecord = tsCore.IRecord;
-import App = tsCore.App;
-import StringUtil = tsCore.StringUtil;
-import Log = tsCore.Log;
-import HistoryManager = tsCore.HistoryManager;
 
 export class HtmlWindow extends fgui.Window implements IRecord {
 
@@ -87,9 +87,9 @@ export class HtmlWindow extends fgui.Window implements IRecord {
         this.loadMovieClip.selectedIndex = 0
 
         // 是否要使用  默认的  url
-        let isHtmlUrl: boolean = !StringUtil.beginsWith(url, "http")
+        let isHtmlUrl: boolean = !url.startsWith("http")
 
-        if (Player.inst.isWeb) {
+        if (!Render.isConchApp) {
             if (isHtmlUrl) {
                 Player.inst.windowOpen(Browser.window.htmlUrl + url)
             } else {
@@ -136,9 +136,9 @@ export class HtmlWindow extends fgui.Window implements IRecord {
         this.loadMovieClip.selectedIndex = 0
 
         // 是否要使用  默认的  url
-        let isHtmlUrl: boolean = !StringUtil.beginsWith(url, "http")
+        let isHtmlUrl: boolean = !url.startsWith("http")
 
-        if (Player.inst.isWeb) {
+        if (!Render.isConchApp) {
             this.btn.visible = this.htmlText.visible = !full
 
             let webElement = Browser.getElementById("webId")
@@ -262,7 +262,7 @@ export class HtmlWindow extends fgui.Window implements IRecord {
 
     hideRecord() {
         GRoot.inst.displayObject.stage.off(Laya.Event.RESIZE, this, this.sizeChangeHandler)
-        if (Player.inst.isWeb) {
+        if (!Render.isConchApp) {
             Browser.removeElement(Browser.getElementById("webId"))
         } else {
             AppManager.closeHtml()

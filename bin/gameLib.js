@@ -924,6 +924,34 @@ window.gameLib = {};
     }
     gameLib.BaseSkeletonWindow = BaseSkeletonWindow;
     class BaseSlotGameData extends BaseGameData {
+        /** 第一列是否存在 bounds
+         * @deprecated
+         * @see firstExistBonus
+         * */
+        get firstExistBounds() {
+            return this.firstExistBonus;
+        }
+        /** 第一列是否存在 bounds
+         * @deprecated
+         * @see firstExistBonus
+         * */
+        set firstExistBounds(value) {
+            this.firstExistBonus = value;
+        }
+        /** 当前开出免费游戏图标个数
+         * @deprecated
+         * @see freeBonusNum
+         * */
+        get freeBoundsCount() {
+            return this.freeBonusNum;
+        }
+        /** 当前开出免费游戏图标个数
+         * @deprecated
+         * @see freeBonusNum
+         * */
+        set freeBoundsCount(value) {
+            this.freeBonusNum = value;
+        }
         constructor() {
             super();
             /** 中奖配置表 按列排序 */
@@ -970,7 +998,7 @@ window.gameLib = {};
             /** 免费游戏剩余次数 */
             this.freeCount = 0;
             /** 当前开出免费游戏图标个数 */
-            this.freeBoundsCount = 0;
+            this.freeBonusNum = 0;
             /**
              * 是否有 reSpin
              */
@@ -1520,7 +1548,7 @@ window.gameLib = {};
         /** 通知信息 */
         onNotification(obj) {
             const mes = obj.message;
-            if (Player.inst.isWeb) {
+            if (!Laya.Render.isConchApp) {
                 function show() {
                     let notification = new Notification(mes.title, { body: mes.text, icon: "favicon.ico" });
                     notification.onclick = function () {
@@ -2089,6 +2117,7 @@ window.gameLib = {};
         /**
          * 当请求不通过的时候  发出提示信息并重置bet
          * @param data
+         * @param isWindow
          */
         betFail(data, isWindow = false) {
             if (isWindow)
@@ -2339,10 +2368,18 @@ window.gameLib = {};
          */
         rollComplete() {
             // 统计freeBounds开出来的数量
-            if (this.gameData.freeBoundsCount == 0) {
-                this.gameData.freeBoundsCount = this.gameData.lotteryId.count(value => value == this.SPECIAL_PLAY);
-            }
+            this.countFreeBonus();
             this.lotteryComplete();
+        }
+        /**
+         * 统计FreeBonus开出来的数量
+         * @protected
+         */
+        countFreeBonus() {
+            if (this.gameData.freeBonusNum == 0) {
+                this.gameData.freeBonusNum = this.gameData.lotteryId.count(value => value == this.SPECIAL_PLAY);
+            }
+            return this.gameData.freeBonusNum;
         }
         /*@override*/
         lotteryComplete() {
@@ -2370,7 +2407,7 @@ window.gameLib = {};
                 return;
             }
             // 开出三个免费游戏启动项目  并且服务端告诉有免费游戏
-            if (this.gameData.freeBoundsCount >= 3 && this.gameData.hasFreeSpin != 0) {
+            if (this.gameData.freeBonusNum >= 3 && this.gameData.hasFreeSpin != 0) {
                 this.gameData.tempServerWinMoney = this.gameData.serverWinMoney;
                 // 交给scene处理
                 Laya.timer.once(this.delayGetBonus, this, () => {
@@ -3248,8 +3285,8 @@ window.gameLib = {};
             for (let i = 0; i < this.goldAniBox.length; i++) {
                 goldAniBox = this.goldAniBox[i];
                 goldAniBox.setStartPoint(goldAniBox.x, goldAniBox.y);
-                goldAniBox.setMiddlePoint(goldAniBox.x + (this.endPoint.x - goldAniBox.x) / 2 + tsCore.MathKit.random(200, 300), goldAniBox.y + (this.endPoint.y - goldAniBox.y) / 2
-                    - (tsCore.MathKit.random(0, 100) * (this.endPoint.y > this.centreY ? -1 : 1)));
+                goldAniBox.setMiddlePoint(goldAniBox.x + (this.endPoint.x - goldAniBox.x) / 2 + random(200, 300), goldAniBox.y + (this.endPoint.y - goldAniBox.y) / 2
+                    - (random(0, 100) * (this.endPoint.y > this.centreY ? -1 : 1)));
                 goldAniBox.setEndPoint(this.endPoint.x, this.endPoint.y);
                 Laya.Tween.to(goldAniBox, { t: 1 }, this.recoveryDuration, null, Laya.Handler.create(this, this.playComplete), i * 5 + 300);
             }
@@ -5435,7 +5472,7 @@ window.gameLib = {};
             this.channel = defaults === null || defaults === void 0 ? void 0 : defaults.channel;
             this.debug = !!(defaults === null || defaults === void 0 ? void 0 : defaults.debug);
             this.parseData(null);
-            if (Player.inst.isWeb) {
+            if (!Laya.Render.isConchApp) {
                 let url = window.location.href;
                 let newUrl = url.split("?")[0];
                 let clearCache = Laya.Utils.getQueryString("clearCache");
@@ -5632,6 +5669,7 @@ window.gameLib = {};
              *  是否是web端口
              *  @default true
              *  @deprecated
+             *  @see Laya.Render.isConchApp
              */
             this.isWeb = true;
             /** 游戏发布版本号 */
@@ -5652,7 +5690,7 @@ window.gameLib = {};
             /** 每次投注达到多少 就可以获得刮刮卡 */
             this.getTicketIncBet = 100;
             /** 当前游戏的奖金池 */
-            this.gamePool = tsCore.MathKit.random(1000, 99999);
+            this.gamePool = random(1000, 99999);
             /** 获得奖励的次数 */
             this.jackpotCount = 0;
         }
@@ -5812,7 +5850,7 @@ window.gameLib = {};
         }
         set guestModel(value) {
             this._guestModel = value;
-            this._guestModel.guestUID = tsCore.MathKit.random(1, 99999999) * 1000;
+            this._guestModel.guestUID = random(1, 99999999) * 1000;
         }
         /**
          * 获取设备号
@@ -6025,7 +6063,7 @@ window.gameLib = {};
             this.executeNum = num;
             this.handler = handler;
             this.completeNum = 0;
-            tsCore.UtilKit.shuffle(this.cards);
+            this.cards.shuffle();
             for (let i = 0; i < this.cards.length; i++) {
                 let card = this.cards[i];
                 card.offset = i * card.offsetMultiple;
@@ -6487,7 +6525,7 @@ window.gameLib = {};
                 let tempY = this.startPoint.y + Math.random() * 50 + 100;
                 let endP = Laya.Point.create().setTo(this.endPoint.x - loader.width / 2, this.endPoint.y - loader.height / 2);
                 loader.setStartPoint(tempX, tempY);
-                loader.setMiddlePoint(tempX + (endP.x - tempX) / 2 + tsCore.MathKit.random(200, 300), tempY + (endP.y - tempY) / 2 + tsCore.MathKit.random(0, 100));
+                loader.setMiddlePoint(tempX + (endP.x - tempX) / 2 + random(200, 300), tempY + (endP.y - tempY) / 2 + random(0, 100));
                 loader.setEndPoint(endP.x, endP.y);
                 this.addChild(loader);
                 this.loaders.push(loader);
@@ -7715,8 +7753,8 @@ window.gameLib = {};
             tsCore.App.inst.sendAction(ActionLib.GAME_UPDATE_DEFAULT_SCREEN);
             this.loadMovieClip.selectedIndex = 0;
             // 是否要使用  默认的  url
-            let isHtmlUrl = !tsCore.StringUtil.beginsWith(url, "http");
-            if (Player.inst.isWeb) {
+            let isHtmlUrl = !url.startsWith("http");
+            if (!Laya.Render.isConchApp) {
                 if (isHtmlUrl) {
                     Player.inst.windowOpen(Laya.Browser.window.htmlUrl + url);
                 }
@@ -7761,8 +7799,8 @@ window.gameLib = {};
             tsCore.App.inst.sendAction(ActionLib.GAME_UPDATE_DEFAULT_SCREEN);
             this.loadMovieClip.selectedIndex = 0;
             // 是否要使用  默认的  url
-            let isHtmlUrl = !tsCore.StringUtil.beginsWith(url, "http");
-            if (Player.inst.isWeb) {
+            let isHtmlUrl = !url.startsWith("http");
+            if (!Laya.Render.isConchApp) {
                 this.btn.visible = this.htmlText.visible = !full;
                 let webElement = Laya.Browser.getElementById("webId");
                 if (!webElement) {
@@ -7792,7 +7830,7 @@ window.gameLib = {};
                     elementFrame.style.height = "100%";
                     elementFrame.style.display = "none";
                     Laya.Browser.document.body.appendChild(webElement);
-                    //			    tsCore.Log.debug(Laya.stage.width, Render.canvas.width, Render._mainCanvas.width)
+                    //			    tsCore.Log.debug(Laya.stage.width, Laya.Render.canvas.width, Laya.Render._mainCanvas.width)
                     webElement.appendChild(elementFrame);
                 }
                 let loadEnd = () => {
@@ -7874,7 +7912,7 @@ window.gameLib = {};
         }
         hideRecord() {
             fgui.GRoot.inst.displayObject.stage.off(Laya.Event.RESIZE, this, this.sizeChangeHandler);
-            if (Player.inst.isWeb) {
+            if (!Laya.Render.isConchApp) {
                 Laya.Browser.removeElement(Laya.Browser.getElementById("webId"));
             }
             else {
@@ -7984,8 +8022,7 @@ window.gameLib = {};
             // 得出当前加载所占百分比的数量
             let pro = value / 100 * pieces;
             let totalPro = pieces * (tempCount - 1) + pro;
-            let finalTotalPro = Math.ceil(totalPro);
-            return finalTotalPro;
+            return Math.ceil(totalPro);
         }
         /**
          * 显示加载错误提示

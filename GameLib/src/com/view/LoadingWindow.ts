@@ -1,12 +1,12 @@
-import UIPackage = fgui.UIPackage
-import GLoader = fgui.GLoader
-import GTextField = fgui.GTextField
-import Controller = fgui.Controller
-import GRoot = fgui.GRoot
+import UIPackage = fgui.UIPackage;
+import GLoader = fgui.GLoader;
+import GTextField = fgui.GTextField;
+import Controller = fgui.Controller;
+import GRoot = fgui.GRoot;
+import HistoryManager = tsCore.HistoryManager;
 import {BaseView} from "../core/BaseView"
 import {LibStr} from "../LibStr"
 import {JSUtils} from "../utils/JSUtils"
-import HistoryManager = tsCore.HistoryManager;
 
 /** 加载界面 */
 export class LoadingWindow extends BaseView {
@@ -97,8 +97,7 @@ export class LoadingWindow extends BaseView {
         // 得出当前加载所占百分比的数量
         let pro = value / 100 * pieces
         let totalPro = pieces * (tempCount - 1) + pro
-        let finalTotalPro = Math.ceil(totalPro)
-        return finalTotalPro
+        return Math.ceil(totalPro)
     }
 
     /**

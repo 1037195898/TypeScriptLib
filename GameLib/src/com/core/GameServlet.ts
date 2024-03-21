@@ -412,6 +412,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     /**
      * 当请求不通过的时候  发出提示信息并重置bet
      * @param data
+     * @param isWindow
      */
     betFail(data: HttpResponse, isWindow = false) {
         if (isWindow) this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, StateCode.getShowMessage(data))

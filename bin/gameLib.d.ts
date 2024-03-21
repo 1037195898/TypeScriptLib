@@ -534,10 +534,30 @@ declare namespace gameLib {
         freeSpinObj: any;
         /** 免费游戏剩余次数 */
         freeCount: number;
+        /** 第一列是否存在 bounds
+         * @deprecated
+         * @see firstExistBonus
+         * */
+        get firstExistBounds(): boolean;
+        /** 第一列是否存在 bounds
+         * @deprecated
+         * @see firstExistBonus
+         * */
+        set firstExistBounds(value: boolean);
+        /** 当前开出免费游戏图标个数
+         * @deprecated
+         * @see freeBonusNum
+         * */
+        get freeBoundsCount(): number;
+        /** 当前开出免费游戏图标个数
+         * @deprecated
+         * @see freeBonusNum
+         * */
+        set freeBoundsCount(value: number);
         /** 第一列是否存在 bounds */
-        firstExistBounds: boolean;
+        firstExistBonus: boolean;
         /** 当前开出免费游戏图标个数 */
-        freeBoundsCount: number;
+        freeBonusNum: number;
         /**
          * 是否有 reSpin
          */
@@ -1046,6 +1066,7 @@ declare namespace gameLib {
         /**
          * 当请求不通过的时候  发出提示信息并重置bet
          * @param data
+         * @param isWindow
          */
         betFail(data: HttpResponse, isWindow?: boolean): void;
         /**
@@ -1196,6 +1217,11 @@ declare namespace gameLib {
          * @protected
          */
         protected rollComplete(): void;
+        /**
+         * 统计FreeBonus开出来的数量
+         * @protected
+         */
+        protected countFreeBonus(): number;
         protected lotteryComplete(): void;
         /**
          * 判断当前开的奖里面是否有中奖线
@@ -2933,6 +2959,7 @@ declare namespace gameLib {
          *  是否是web端口
          *  @default true
          *  @deprecated
+         *  @see Laya.Render.isConchApp
          */
         isWeb: boolean;
         /** 1=>投注中，2=>计算中，3=>开奖  4=>收取金币  5=>比分中 */
