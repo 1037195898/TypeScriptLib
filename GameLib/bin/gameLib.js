@@ -1005,6 +1005,7 @@ window.gameLib = {};
             this.hasReSpin = 0;
             this.lineValue = this.lottery.length;
             this.gameType = GameType.SLOT;
+            tsCore.App.inst.regAction(ActionLib.GAME_INIT_DATA, this, this.initData);
         }
         /**
          * 总共要投注的钱

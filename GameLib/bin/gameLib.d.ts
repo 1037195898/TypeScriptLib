@@ -505,7 +505,7 @@ declare namespace gameLib {
          */
         protected set gameData(value: T);
     }
-    export class BaseSlotGameData extends BaseGameData {
+    export abstract class BaseSlotGameData extends BaseGameData {
         /** 中奖配置表 按列排序 */
         lottery: number[][];
         /** 线数字 */
@@ -567,6 +567,11 @@ declare namespace gameLib {
          */
         isReSpinModel: boolean;
         constructor();
+        /**
+         * 初始化数据
+         * 在创建Scene之前会被初始化
+         */
+        abstract initData(): void;
         /**
          * 总共要投注的钱
          * @example 默认

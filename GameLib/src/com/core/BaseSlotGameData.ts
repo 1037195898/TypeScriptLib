@@ -1,6 +1,8 @@
 import {BaseGameData, GameType} from "./BaseGameData"
+import App = tsCore.App;
+import {ActionLib} from "../ActionLib";
 
-export class BaseSlotGameData extends BaseGameData {
+export abstract class BaseSlotGameData extends BaseGameData {
 
     /** 中奖配置表 按列排序 */
     lottery = [
@@ -70,6 +72,7 @@ export class BaseSlotGameData extends BaseGameData {
     get firstExistBounds() {
         return this.firstExistBonus
     }
+
     /** 第一列是否存在 bounds
      * @deprecated
      * @see firstExistBonus
@@ -85,6 +88,7 @@ export class BaseSlotGameData extends BaseGameData {
     get freeBoundsCount() {
         return this.freeBonusNum
     }
+
     /** 当前开出免费游戏图标个数
      * @deprecated
      * @see freeBonusNum
@@ -111,7 +115,15 @@ export class BaseSlotGameData extends BaseGameData {
         super()
         this.lineValue = this.lottery.length
         this.gameType = GameType.SLOT
+
+        App.inst.regAction(ActionLib.GAME_INIT_DATA, this, this.initData)
     }
+
+    /**
+     * 初始化数据
+     * 在创建Scene之前会被初始化
+     */
+    abstract initData(): void
 
     /**
      * 总共要投注的钱
