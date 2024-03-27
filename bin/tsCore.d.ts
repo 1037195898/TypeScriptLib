@@ -3215,6 +3215,30 @@ declare interface Array<T> {
     distinct(): Array<T>
 
     /**
+     * 将数组元素按指定键值进行分组，并可选地应用一个值转换器来变换每个元素的值。
+     * @template T 元素类型
+     * @template K 键类型
+     * @template V 转换后元素的类型（若未提供 valueTransform，则与 T 类型相同）
+     * @param {function(value: T): K} keySelector 用于提取元素键值的函数
+     * @param {function(value: T): V} [valueTransform] 可选的函数，用于将元素转换为新值
+     * @returns {Map<K, V[]>} 返回一个映射对象，键为 K 类型，值为包含相应键值元素的 V 类型数组
+     */
+    groupBy<T, K, V>(keySelector: (value: T) => K, valueTransform?: (value: T) => V)
+
+    /**
+     * 将数组元素按指定键值进行分组并将结果添加到目标映射中，同时可选地应用一个值转换器来变换每个元素的值。
+     * @template T 元素类型
+     * @template K 键类型
+     * @template V 转换后元素的类型（若未提供 valueTransform，则与 T 类型相同）
+     * @template M 扩展自 Map<K, V[]> 的目标映射类型
+     * @param {M} destination 目标映射对象，用于存储分组结果
+     * @param {function(value: T): K} keySelector 用于提取元素键值的函数
+     * @param {function(value: T): V} [valueTransform] 可选的函数，用于将元素转换为新值
+     * @returns {M} 返回已填充了分组结果的目标映射对象
+     */
+    groupByTo<T, K, V, M extends Map<K, V[]>>(destination: M, keySelector: (value: T) => K, valueTransform?: (value: T) => V)
+
+    /**
      * 随机洗牌此数组中的元素。
      */
     shuffle(): void

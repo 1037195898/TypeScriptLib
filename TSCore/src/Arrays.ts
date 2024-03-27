@@ -19,6 +19,28 @@ Object.defineProperty(Array.prototype, "distinctBy", {
     }
 })
 
+Object.defineProperty(Array.prototype, "groupBy", {
+    value: function <T, K, V>(keySelector: (value: T) => K, valueTransform?: (value: T) => V) {
+        return this.groupByTo({}, keySelector, valueTransform)
+    }
+})
+
+Object.defineProperty(Array.prototype, "groupByTo", {
+    value: function <T, K, V, M extends Map<K, V[]>>(destination: M, keySelector: (value: T) => K, valueTransform?: (value: T) => V) {
+        let len = this.length
+        for (let i = len - 1; i > 0; i--) {
+            const key = keySelector(this[i])
+            let list = destination.get(key)
+            if (list == null) {
+                list = []
+                destination.set(key, list)
+            }
+            list.push(valueTransform?.(this[i]) ?? this[i])
+        }
+        return destination
+    }
+})
+
 Object.defineProperty(Array.prototype, "shuffle", {
     value: function () {
         let len = this.length

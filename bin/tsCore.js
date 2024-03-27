@@ -7387,6 +7387,27 @@ Object.defineProperty(Array.prototype, "distinctBy", {
         return list;
     }
 });
+Object.defineProperty(Array.prototype, "groupBy", {
+    value: function (keySelector, valueTransform) {
+        return this.groupByTo({}, keySelector, valueTransform);
+    }
+});
+Object.defineProperty(Array.prototype, "groupByTo", {
+    value: function (destination, keySelector, valueTransform) {
+        var _a;
+        let len = this.length;
+        for (let i = len - 1; i > 0; i--) {
+            const key = keySelector(this[i]);
+            let list = destination.get(key);
+            if (list == null) {
+                list = [];
+                destination.set(key, list);
+            }
+            list.push((_a = valueTransform === null || valueTransform === void 0 ? void 0 : valueTransform(this[i])) !== null && _a !== void 0 ? _a : this[i]);
+        }
+        return destination;
+    }
+});
 Object.defineProperty(Array.prototype, "shuffle", {
     value: function () {
         let len = this.length;
