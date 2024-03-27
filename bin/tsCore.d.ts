@@ -3184,6 +3184,7 @@ declare interface String {
      * @param close
      */
     substringsBetween(open: string, close: string): string[]
+
     /**
      * 将字符串转换为布尔值
      *
@@ -3191,6 +3192,7 @@ declare interface String {
      * @returns {boolean} 转换后的布尔值
      */
     toBoolean(): boolean
+
     /**
      * 将字符串转换为整数
      * @returns {number} 转换后的整数
@@ -3223,7 +3225,7 @@ declare interface Array<T> {
      * @param {function(value: T): V} [valueTransform] 可选的函数，用于将元素转换为新值
      * @returns {Map<K, V[]>} 返回一个映射对象，键为 K 类型，值为包含相应键值元素的 V 类型数组
      */
-    groupBy<K, V>(keySelector: (value: T) => K, valueTransform?: (value: T) => V)
+    groupBy<K, V>(keySelector: (value: T) => K, valueTransform?: (value: T) => V): Map<K, V[]>
 
     /**
      * 将数组元素按指定键值进行分组并将结果添加到目标映射中，同时可选地应用一个值转换器来变换每个元素的值。
@@ -3236,7 +3238,7 @@ declare interface Array<T> {
      * @param {function(value: T): V} [valueTransform] 可选的函数，用于将元素转换为新值
      * @returns {M} 返回已填充了分组结果的目标映射对象
      */
-    groupByTo<K, V, M extends Map<K, V[]>>(destination: M, keySelector: (value: T) => K, valueTransform?: (value: T) => V)
+    groupByTo<K, V, M extends Map<K, V[]>>(destination: M, keySelector: (value: T) => K, valueTransform?: (value: T) => V): M
 
     /**
      * 随机洗牌此数组中的元素。
