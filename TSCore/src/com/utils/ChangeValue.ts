@@ -158,6 +158,7 @@ export class ChangeValue {
         }
         this.lastValue = parseFloat(this.label.text)
         this.label.text = ante + ""
+        this.checkAutoEnabled()
         if (isEvent) this.sendEventValue(ante)
     }
 
@@ -187,6 +188,7 @@ export class ChangeValue {
             if (newValue === lastValue) return
             this.lastValue = lastValue
             this.label.text = newValue + ""
+            this.checkAutoEnabled()
             if (isEvent) this.sendEventValue(newValue)
         }
     }
