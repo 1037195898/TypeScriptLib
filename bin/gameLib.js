@@ -5948,8 +5948,6 @@ window.gameLib = {};
             this.cards = [];
             /** 已经完成了动画个数 */
             this.completeNum = 0;
-            /** 动画执行次数 */
-            this.executeNum = 1;
         }
         createCard() {
             for (let i = 0; i < 54; i++) {
@@ -6073,14 +6071,22 @@ window.gameLib = {};
         /**
          * 洗牌
          * @param handler 执行完成回调
-         * @param num 执行次数 暂未实现
+         * @param num 执行次数
          */
         shuffle(handler, num = 1) {
             if (this.isRun)
                 return;
             this.isRun = true;
-            this.executeNum = num;
             this.handler = handler;
+            this._shuffle(num);
+        }
+        _shuffle(runNum) {
+            if (runNum < 1) {
+                this.isRun = false;
+                runFun(this.handler);
+                return;
+            }
+            runNum--;
             this.completeNum = 0;
             this.cards.shuffle();
             for (let i = 0; i < this.cards.length; i++) {
@@ -6092,21 +6098,24 @@ window.gameLib = {};
                     x: offsetX,
                     y: card.initY - card.offset,
                     rotation: 0
-                }, 200, null, Laya.Handler.create(this, this.onAnimationFinish, [card]), delay);
+                }, 200, null, Laya.Handler.create(this, this.onAnimationFinish, [card, Laya.Handler.create(this, this._shuffle, [runNum])]), delay);
                 Laya.timer.once(100 + delay, this, this.setChildIndexHandler, [card, i], false);
             }
         }
-        onAnimationFinish(card) {
+        onAnimationFinish(card, callback) {
             Laya.Tween.to(card, {
                 x: card.initX - card.offset,
                 y: card.initY - card.offset
             }, 200);
             this.completeNum++;
             if (this.completeNum == this.cards.length) {
-                Laya.timer.once(200, this, () => {
-                    this.isRun = false;
-                    runFun(this.handler);
-                });
+                if (callback)
+                    callback.run();
+                else
+                    Laya.timer.once(200, this, () => {
+                        this.isRun = false;
+                        runFun(this.handler);
+                    });
             }
         }
         plusMinus(value) {

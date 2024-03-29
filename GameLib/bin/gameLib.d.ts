@@ -3141,8 +3141,6 @@ declare namespace gameLib {
         cards: Card[];
         /** 已经完成了动画个数 */
         private completeNum;
-        /** 动画执行次数 */
-        private executeNum;
         /** 是否正在运行动画 */
         private isRun;
         private handler;
@@ -3167,9 +3165,10 @@ declare namespace gameLib {
         /**
          * 洗牌
          * @param handler 执行完成回调
-         * @param num 执行次数 暂未实现
+         * @param num 执行次数
          */
         shuffle(handler?: ParamHandler, num?: number): void;
+        private _shuffle;
         private onAnimationFinish;
         private plusMinus;
         setChildIndexHandler(card: Card, index: number): void;

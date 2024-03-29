@@ -1,5 +1,6 @@
 import {Card} from "./Card"
 import Point = Laya.Point;
+import Handler = Laya.Handler;
 
 export class Deck {
 
@@ -7,8 +8,6 @@ export class Deck {
     cards: Card[] = []
     /** 已经完成了动画个数 */
     private completeNum = 0
-    /** 动画执行次数 */
-    private executeNum = 1
     /** 是否正在运行动画 */
     private isRun: boolean
 
@@ -81,7 +80,7 @@ export class Deck {
     }
 
     /** 展示牌 铺开 */
-    bySuit(handler?: ParamHandler, spacing = 20, offsetY?:number) {
+    bySuit(handler?: ParamHandler, spacing = 20, offsetY?: number) {
         if (this.isRun) return
         this.isRun = true
         this.handler = handler
@@ -109,7 +108,6 @@ export class Deck {
                         runFun(handler)
                     }
                 }, [card, index]))
-
 
 
         })
@@ -150,14 +148,22 @@ export class Deck {
     /**
      * 洗牌
      * @param handler 执行完成回调
-     * @param num 执行次数 暂未实现
+     * @param num 执行次数
      */
     shuffle(handler?: ParamHandler, num = 1) {
         if (this.isRun) return
         this.isRun = true
-        this.executeNum = num
         this.handler = handler
+        this._shuffle(num)
+    }
 
+    private _shuffle(runNum: number) {
+        if (runNum < 1) {
+            this.isRun = false
+            runFun(this.handler)
+            return
+        }
+        runNum--
         this.completeNum = 0
         this.cards.shuffle()
         for (let i = 0; i < this.cards.length; i++) {
@@ -171,21 +177,24 @@ export class Deck {
                     y: card.initY - card.offset,
                     rotation: 0
                 }, 200, null,
-                Laya.Handler.create(this, this.onAnimationFinish, [card]), delay)
+                Laya.Handler.create(this,
+                    this.onAnimationFinish,
+                    [card, Handler.create(this, this._shuffle, [runNum])]
+                ), delay)
 
             Laya.timer.once(100 + delay, this, this.setChildIndexHandler, [card, i], false)
-
         }
     }
 
-    private onAnimationFinish(card: Card) {
+    private onAnimationFinish(card: Card, callback?: Handler) {
         Laya.Tween.to(card, {
             x: card.initX - card.offset,
             y: card.initY - card.offset
         }, 200)
         this.completeNum++
         if (this.completeNum == this.cards.length) {
-            Laya.timer.once(200, this, () => {
+            if (callback) callback.run()
+            else Laya.timer.once(200, this, () => {
                 this.isRun = false
                 runFun(this.handler)
             })

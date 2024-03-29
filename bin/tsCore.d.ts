@@ -2871,19 +2871,6 @@ declare function runFun(func?: ParamHandler, ...args: any[]): any;
  */
 declare function getString(id: string | number, ...args: any[]): string;
 /**
- * 延迟指定时间执行方法
- * @param delay 延迟时间
- * @param fun 方法
- * @param args 方法参数
- */
-declare function delayCall(delay: number, fun: Function, ...args: any[]): void;
-/**
- * 延迟到下一帧执行方法
- * @param fun 方法
- * @param args 方法参数
- */
-declare function callLater(fun: Function, ...args: any[]): void;
-/**
  * 配置定义
  *
  * @param args 自定义的配置
