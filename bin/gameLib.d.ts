@@ -3156,18 +3156,21 @@ declare namespace gameLib {
         /** 展示牌 铺开 */
         bySuit(handler?: ParamHandler): void;
         /**
-         * 展示牌
-         * @param handler
-         * @param pivot 设置单张牌的中心点
+         * 扇形动画效果函数。
+         * @param handler 可选，参数处理函数。
+         * @param pivot 扇形旋转的中心点，默认为(new Laya.Point(.5, 1.3))。
+         * @param maxRot 最大旋转角度，默认为260度。
+         * 此函数用于执行一个扇形展开的动画效果，通过调整每个卡片的位置和旋转角度，从中心点向外展开。
+         * 动画基于Laya.Tween实现，对每个卡片分别进行动画处理。
          */
-        fan(handler?: ParamHandler, pivot?: Laya.Point): void;
+        fan(handler?: ParamHandler, pivot?: Laya.Point, maxRot?: number): void;
         /**
          * 洗牌
          * @param handler 执行完成回调
          * @param num 执行次数 暂未实现
          */
         shuffle(handler?: ParamHandler, num?: number): void;
-        private moveHandler;
+        private onAnimationFinish;
         private plusMinus;
         setChildIndexHandler(card: Card, index: number): void;
         dispose(): void;

@@ -98,7 +98,11 @@ export class Deck {
             let posX = -(6.75 - value) * 20 + card.initX
             let posY = -(1.5 - suit) * (card.height + 5) + card.initY
 
-            Laya.Tween.to(card, {x: posX, y: posY, rotation: 0}, delay, null,
+            Laya.Tween.to(card, {
+                    x: posX,
+                    y: posY,
+                    rotation: 0
+                }, delay, null,
                 Laya.Handler.create(this, (card: Card, i: number) => {
                     this.setChildIndexHandler(card, i)
                     this.completeNum++
@@ -111,27 +115,36 @@ export class Deck {
     }
 
     /**
-     * 展示牌
-     * @param handler
-     * @param pivot 设置单张牌的中心点
+     * 扇形动画效果函数。
+     * @param handler 可选，参数处理函数。
+     * @param pivot 扇形旋转的中心点，默认为(new Point(.5, 1.3))。
+     * @param maxRot 最大旋转角度，默认为260度。
+     * 此函数用于执行一个扇形展开的动画效果，通过调整每个卡片的位置和旋转角度，从中心点向外展开。
+     * 动画基于Laya.Tween实现，对每个卡片分别进行动画处理。
      */
-    fan(handler?: ParamHandler, pivot: Laya.Point = new Point(.5, 1.3)) {
-        if (this.isRun) return
+    fan(handler?: ParamHandler, pivot = new Point(.5, 1.3), maxRot = 260) {
+        if (this.isRun) return // 如果当前正在运行动画，则直接返回，避免重复执行
         this.isRun = true
-        this.handler = handler
-        this.completeNum = 0
-        let len = this.cards.length
-        for (let i = 0; i < len; i++) {
+        this.handler = handler // 设置参数处理函数
+        this.completeNum = 0 // 重置完成数量
+        let len = this.cards.length // 获取卡片数量
+        for (let i = 0; i < len; i++) { // 遍历每个卡片
             let card = this.cards[i]
-            card.offset = i / 4
-            let delay = i * 10
-            let rot = i / (len - 1) * 260 - 130
-            card.setPivot(pivot.x, pivot.y)
+            card.offset = i / 4 // 计算每个卡片的偏移量
+            let delay = i * 10 // 计算动画延迟，使每个卡片有先后动画效果
+            let rot = i / (len - 1) * maxRot - maxRot / 2 // 计算每个卡片的旋转角度
+            card.setPivot(pivot.x, pivot.y) // 设置卡片的旋转中心点
 
-            Laya.Tween.to(card, {x: card.initX - card.offset, y: card.initY - card.offset, rotation: rot},
-                300 + delay, null, Laya.Handler.create(this, this.moveHandler, [card]), delay)
+            // 对卡片进行动画处理，包括位置和旋转的改变
+            Laya.Tween.to(card, {
+                    x: card.initX - card.offset,
+                    y: card.initY - card.offset,
+                    rotation: rot
+                }, 300 + delay, null,
+                Laya.Handler.create(this, this.onAnimationFinish, [card]), delay)
         }
     }
+
 
     /**
      * 洗牌
@@ -152,16 +165,23 @@ export class Deck {
             let offsetX = this.plusMinus(Math.random() * 90 + 30) + card.initX
             let delay = i * 2
 
-            Laya.Tween.to(card, {x: offsetX, y: card.initY - card.offset, rotation: 0}, 200, null,
-                Laya.Handler.create(this, this.moveHandler, [card]), delay)
+            Laya.Tween.to(card, {
+                    x: offsetX,
+                    y: card.initY - card.offset,
+                    rotation: 0
+                }, 200, null,
+                Laya.Handler.create(this, this.onAnimationFinish, [card]), delay)
 
             Laya.timer.once(100 + delay, this, this.setChildIndexHandler, [card, i], false)
 
         }
     }
 
-    private moveHandler(card: Card) {
-        Laya.Tween.to(card, {x: card.initX - card.offset, y: card.initY - card.offset}, 200)
+    private onAnimationFinish(card: Card) {
+        Laya.Tween.to(card, {
+            x: card.initX - card.offset,
+            y: card.initY - card.offset
+        }, 200)
         this.completeNum++
         if (this.completeNum == this.cards.length) {
             Laya.timer.once(200, this, () => {
@@ -181,9 +201,7 @@ export class Deck {
     }
 
     dispose() {
-        for (let i = 0; i < this.cards.length; i++) {
-            Laya.Tween.clearAll(this.cards[i])
-        }
+        this.cards.forEach(value => Laya.Tween.clearAll(value))
         Laya.timer.clearAll(this)
         this.isRun = false
     }
