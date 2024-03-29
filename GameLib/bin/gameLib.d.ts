@@ -3154,7 +3154,7 @@ declare namespace gameLib {
          */
         sort(handler?: ParamHandler, sort?: boolean): void;
         /** 展示牌 铺开 */
-        bySuit(handler?: ParamHandler): void;
+        bySuit(handler?: ParamHandler, spacing?: number, offsetY?: number): void;
         /**
          * 扇形动画效果函数。
          * @param handler 可选，参数处理函数。

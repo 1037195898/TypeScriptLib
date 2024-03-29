@@ -81,7 +81,7 @@ export class Deck {
     }
 
     /** 展示牌 铺开 */
-    bySuit(handler?: ParamHandler) {
+    bySuit(handler?: ParamHandler, spacing = 20, offsetY?:number) {
         if (this.isRun) return
         this.isRun = true
         this.handler = handler
@@ -90,14 +90,12 @@ export class Deck {
             return a.code - b.code
         })
         let len = this.cards.length
-        for (let i = 0; i < len; i++) {
-            let card = this.cards[i]
+        this.cards.forEach((card, index) => {
             let value = card.value
             let suit = card.suit
-            let delay = i * 10
-            let posX = -(6.75 - value) * 20 + card.initX
-            let posY = -(1.5 - suit) * (card.height + 5) + card.initY
-
+            let delay = index * 10
+            let posX = -(6.75 - value) * spacing + card.initX
+            let posY = -(1.5 - suit) * (card.actualHeight + 5) + (offsetY ?? card.initY)
             Laya.Tween.to(card, {
                     x: posX,
                     y: posY,
@@ -110,8 +108,11 @@ export class Deck {
                         this.isRun = false
                         runFun(handler)
                     }
-                }, [card, i]))
-        }
+                }, [card, index]))
+
+
+
+        })
     }
 
     /**

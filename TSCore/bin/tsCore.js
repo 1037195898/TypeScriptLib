@@ -7104,9 +7104,10 @@ window.tsCore = {};
     tsCore.Upload = Upload;
 })(tsCore || (tsCore = {}));
 /**
- * 执行 ParamHandler 方法
- * @param func ParamHandler 对象
- * @param args 参数 传入数组会将数组当场一个参数传递
+ * 执行提供的 ParamHandler 函数。
+ * @param func 可选，要执行的函数或Laya.Handler实例。如果提供，它将根据其类型执行。
+ * @param args 可变参数，传递给函数的参数。
+ * @returns 如果func存在且不为null，则根据func的类型执行并返回相应的结果；否则返回null。
  */
 function runFun(func, ...args) {
     if (func)
@@ -7125,6 +7126,23 @@ function getString(id, ...args) {
         return content;
     // @ts-ignore
     return tsCore.StringUtil.format(content, ...args);
+}
+/**
+ * 延迟指定时间执行方法
+ * @param delay 延迟时间
+ * @param fun 方法
+ * @param args 方法参数
+ */
+function delayCall(delay, fun, ...args) {
+    Laya.timer.once(delay, fun.caller, fun, args);
+}
+/**
+ * 延迟到下一帧执行方法
+ * @param fun 方法
+ * @param args 方法参数
+ */
+function callLater(fun, ...args) {
+    Laya.timer.callLater(fun.caller, fun, args);
 }
 /**
  * 配置定义

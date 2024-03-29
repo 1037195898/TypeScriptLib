@@ -2858,9 +2858,10 @@ declare namespace tsCore {
     export {};
 }
 /**
- * 执行 ParamHandler 方法
- * @param func ParamHandler 对象
- * @param args 参数 传入数组会将数组当场一个参数传递
+ * 执行提供的 ParamHandler 函数。
+ * @param func 可选，要执行的函数或Laya.Handler实例。如果提供，它将根据其类型执行。
+ * @param args 可变参数，传递给函数的参数。
+ * @returns 如果func存在且不为null，则根据func的类型执行并返回相应的结果；否则返回null。
  */
 declare function runFun(func?: ParamHandler, ...args: any[]): any;
 /**
@@ -2869,6 +2870,19 @@ declare function runFun(func?: ParamHandler, ...args: any[]): any;
  * @param args 如果包含占位符，这里可传入占位符的替换文案
  */
 declare function getString(id: string | number, ...args: any[]): string;
+/**
+ * 延迟指定时间执行方法
+ * @param delay 延迟时间
+ * @param fun 方法
+ * @param args 方法参数
+ */
+declare function delayCall(delay: number, fun: Function, ...args: any[]): void;
+/**
+ * 延迟到下一帧执行方法
+ * @param fun 方法
+ * @param args 方法参数
+ */
+declare function callLater(fun: Function, ...args: any[]): void;
 /**
  * 配置定义
  *

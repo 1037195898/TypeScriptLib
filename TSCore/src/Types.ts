@@ -23,6 +23,25 @@ function getString(id: string | number, ...args: any[]) {
 }
 
 /**
+ * 延迟指定时间执行方法
+ * @param delay 延迟时间
+ * @param fun 方法
+ * @param args 方法参数
+ */
+function delayCall(delay: number, fun: Function, ...args: any[]) {
+    Laya.timer.once(delay, fun.caller, fun, args)
+}
+
+/**
+ * 延迟到下一帧执行方法
+ * @param fun 方法
+ * @param args 方法参数
+ */
+function callLater(fun: Function, ...args: any[]) {
+    Laya.timer.callLater(fun.caller, fun, args)
+}
+
+/**
  * 配置定义
  *
  * @param args 自定义的配置
