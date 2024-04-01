@@ -157,15 +157,17 @@ export class Deck<T extends Card = Card> {
      * 洗牌
      * @param handler 执行完成回调
      * @param num 执行次数
+     * @param onceComplete 执行完成一次回调一次
      */
-    shuffle(handler?: ParamHandler, num = 1) {
+    shuffle(handler?: ParamHandler, num = 1, onceComplete?: () => void) {
         if (this.isRun) return
         this.isRun = true
         this.handler = handler
-        this._shuffle(num)
+        this._shuffle(num, onceComplete, true)
     }
 
-    private _shuffle(runNum: number) {
+    private _shuffle(runNum: number, onceComplete?: () => void, first = false) {
+        if (!first) onceComplete()
         if (runNum < 1) {
             this.isRun = false
             runFun(this.handler)
@@ -187,7 +189,7 @@ export class Deck<T extends Card = Card> {
                 }, 200, null,
                 Laya.Handler.create(this,
                     this.onAnimationFinish,
-                    [card, Handler.create(this, this._shuffle, [runNum])]
+                    [card, Handler.create(this, this._shuffle, [runNum, onceComplete])]
                 ), delay)
 
             Laya.timer.once(100 + delay, this, this.setChildIndexHandler, [card, i], false)

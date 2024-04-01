@@ -6079,15 +6079,18 @@ window.gameLib = {};
          * 洗牌
          * @param handler 执行完成回调
          * @param num 执行次数
+         * @param onceComplete 执行完成一次回调一次
          */
-        shuffle(handler, num = 1) {
+        shuffle(handler, num = 1, onceComplete) {
             if (this.isRun)
                 return;
             this.isRun = true;
             this.handler = handler;
-            this._shuffle(num);
+            this._shuffle(num, onceComplete, true);
         }
-        _shuffle(runNum) {
+        _shuffle(runNum, onceComplete, first = false) {
+            if (!first)
+                onceComplete();
             if (runNum < 1) {
                 this.isRun = false;
                 runFun(this.handler);
@@ -6105,7 +6108,7 @@ window.gameLib = {};
                     x: offsetX,
                     y: card.initY - card.offset,
                     rotation: 0
-                }, 200, null, Laya.Handler.create(this, this.onAnimationFinish, [card, Laya.Handler.create(this, this._shuffle, [runNum])]), delay);
+                }, 200, null, Laya.Handler.create(this, this.onAnimationFinish, [card, Laya.Handler.create(this, this._shuffle, [runNum, onceComplete])]), delay);
                 Laya.timer.once(100 + delay, this, this.setChildIndexHandler, [card, i], false);
             }
         }
