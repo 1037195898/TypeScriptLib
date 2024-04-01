@@ -3169,7 +3169,7 @@ declare namespace gameLib {
          * @param num 执行次数
          * @param onceComplete 执行完成一次回调一次
          */
-        shuffle(handler?: ParamHandler, num?: number, onceComplete?: () => void): void;
+        shuffle(handler?: ParamHandler, num?: number, onceComplete?: (remainingNum: number) => void): void;
         private _shuffle;
         private onAnimationFinish;
         private plusMinus;

@@ -159,15 +159,15 @@ export class Deck<T extends Card = Card> {
      * @param num 执行次数
      * @param onceComplete 执行完成一次回调一次
      */
-    shuffle(handler?: ParamHandler, num = 1, onceComplete?: () => void) {
+    shuffle(handler?: ParamHandler, num = 1, onceComplete?: (remainingNum: number) => void) {
         if (this.isRun) return
         this.isRun = true
         this.handler = handler
         this._shuffle(num, onceComplete, true)
     }
 
-    private _shuffle(runNum: number, onceComplete?: () => void, first = false) {
-        if (!first) onceComplete()
+    private _shuffle(runNum: number, onceComplete?: (remainingNum: number) => void, first = false) {
+        if (!first) onceComplete?.(runNum)
         if (runNum < 1) {
             this.isRun = false
             runFun(this.handler)

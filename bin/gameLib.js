@@ -6090,7 +6090,7 @@ window.gameLib = {};
         }
         _shuffle(runNum, onceComplete, first = false) {
             if (!first)
-                onceComplete();
+                onceComplete === null || onceComplete === void 0 ? void 0 : onceComplete(runNum);
             if (runNum < 1) {
                 this.isRun = false;
                 runFun(this.handler);
