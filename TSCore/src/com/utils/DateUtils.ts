@@ -189,6 +189,7 @@ export class DateUtils {
      *  const timeDifference = calculateTimeDifference(targetDate)
      *  console.log(timeDifference)
      *
+     *  是timeDifference 总时间差 毫秒
      * @param time ms | Date
      */
     static calculateTimeDifference(time: number | Date) {
@@ -200,7 +201,7 @@ export class DateUtils {
         const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
         const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60))
         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000)
-        return {days, hours, minutes, seconds}
+        return {days, hours, minutes, seconds, timeDifference}
     }
 
 

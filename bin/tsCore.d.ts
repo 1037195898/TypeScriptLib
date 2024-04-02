@@ -1817,6 +1817,7 @@ declare namespace tsCore {
          *  const timeDifference = calculateTimeDifference(targetDate)
          *  console.log(timeDifference)
          *
+         *  是timeDifference 总时间差 毫秒
          * @param time ms | Date
          */
         static calculateTimeDifference(time: number | Date): {
@@ -1824,6 +1825,7 @@ declare namespace tsCore {
             hours: number;
             minutes: number;
             seconds: number;
+            timeDifference: number;
         };
     }
     export class HTTPUtils {
