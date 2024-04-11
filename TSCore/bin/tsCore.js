@@ -256,7 +256,8 @@ window.tsCore = {};
             this.p4 = Laya.Point.create().setTo(x, y);
         }
         /**
-         * 释放曲线数据
+         * 释放数据
+         * 这里回收了所有坐标信息 Point.recover()
          */
         recover() {
             var _a, _b, _c, _d;

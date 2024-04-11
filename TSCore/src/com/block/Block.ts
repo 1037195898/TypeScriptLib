@@ -56,7 +56,8 @@ export class BezierCurves {
     }
 
     /**
-     * 释放曲线数据
+     * 释放数据
+     * 这里回收了所有坐标信息 Point.recover()
      */
     recover() {
         this._t = -1

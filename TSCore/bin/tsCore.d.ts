@@ -95,7 +95,8 @@ declare namespace tsCore {
         setMiddlePoint2(x1: number, y1: number, x2: number, y2: number): void;
         setEndPoint(x: number, y: number): void;
         /**
-         * 释放曲线数据
+         * 释放数据
+         * 这里回收了所有坐标信息 Point.recover()
          */
         recover(): void;
     }

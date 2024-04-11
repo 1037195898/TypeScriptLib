@@ -39,6 +39,13 @@ export class GoldLoader extends mixinExt(BezierCurves, GLoader) {
         Laya.timer.clearAll(this)
         this.removeFromParent()
         super.recover()
+        // 还原属性初始值
+        this.rotation = 0
+        this.setSkew(0, 0)
+        this.setPivot(0, 0, false)
+        this.setScale(1, 1)
+        this.alpha = 1
+        this.visible = true
         this.icon = null
         Pool.recover(GoldLoader.NAME, this)
     }
