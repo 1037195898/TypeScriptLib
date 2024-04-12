@@ -3269,7 +3269,7 @@ declare interface Array<T> {
     /**
      * 随机洗牌此数组中的元素。
      */
-    shuffle(): void
+    shuffle(): this
 
     /**
      * 返回产生给定函数的最小值的第一个元素。

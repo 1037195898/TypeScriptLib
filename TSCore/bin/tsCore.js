@@ -7419,6 +7419,7 @@ Object.defineProperty(Array.prototype, "shuffle", {
             let rnd = Math.floor(Math.random() * (i + 1));
             [this[i], this[rnd]] = [this[rnd], this[i]];
         }
+        return this;
     }
 });
 Object.defineProperty(Array.prototype, "minBy", {
