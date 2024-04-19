@@ -34,7 +34,7 @@ function loadBatch(url, parallel = true, onComplete = null) {
                 complete()
             }, [key.split("?")[0]])
         }
-    } else loadScript(loadRes, parallel, complete)
+    } else loadScript(loadRes, parallel, complete.bind(this))
 
     function complete() {
         completeLoaderNum++
@@ -228,6 +228,17 @@ function sendError(data) {
 
 
 // ios
+
+function onIos() {
+    var u = window.navigator.userAgent
+    var maxTouchPoints = window.navigator.maxTouchPoints || 0
+    var platform = window.navigator.platform
+    var onIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+    var onIPhone = u.indexOf("iPhone") > -1;
+    var onMac = u.indexOf("Mac OS X") > -1;
+    var onIPad = u.indexOf("iPad") > -1 || ( platform === 'MacIntel' && maxTouchPoints >1 );
+    return onIOS || onIPad || onIPhone || onMac
+}
 
 /**
  * 判断是否是原生ios壳子

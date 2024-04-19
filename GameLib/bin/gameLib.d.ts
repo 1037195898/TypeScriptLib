@@ -676,9 +676,12 @@ declare namespace gameLib {
         protected autoPlayWinLineTime: number;
         protected onInit(): void;
         /**
-         * 播放获胜线状态改成false
-         * 清理绘制
-         * 清除执行下一步显示线 nextLine
+         * 播放获胜线状态改成false,清理绘制,清除执行下一步显示线 nextLine
+         * ```
+         * this.isPlayWinLine = false
+         * this.lineGraphics?.clear()
+         * Laya.timer.clear(this, this.nextLine)
+         * ```
          */
         protected onCloseAllAni(): void;
         /**

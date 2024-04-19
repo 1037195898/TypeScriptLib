@@ -28,7 +28,7 @@ Object.defineProperty(Array.prototype, "groupBy", {
 Object.defineProperty(Array.prototype, "groupByTo", {
     value: function <T, K, V, M extends Map<K, V[]>>(destination: M, keySelector: (value: T) => K, valueTransform?: (value: T) => V) {
         let len = this.length
-        for (let i = len - 1; i > 0; i--) {
+        for (let i = len - 1; i >= 0; i--) {
             const key = keySelector(this[i])
             let list = destination.get(key)
             if (list == null) {
