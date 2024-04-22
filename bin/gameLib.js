@@ -261,6 +261,8 @@ window.gameLib = {};
         GameType[GameType["NORMAL"] = 0] = "NORMAL";
         /** 连线游戏 */
         GameType[GameType["SLOT"] = 1] = "SLOT";
+        /** 连线游戏,单独的bet bet值和线数量无关 */
+        GameType[GameType["SLOT_SINGLE_BET"] = 2] = "SLOT_SINGLE_BET";
     })(GameType = gameLib.GameType || (gameLib.GameType = {}));
     /**
      * 游戏数据的基类

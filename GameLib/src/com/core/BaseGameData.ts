@@ -9,6 +9,8 @@ export enum GameType {
     NORMAL,
     /** 连线游戏 */
     SLOT,
+    /** 连线游戏,单独的bet bet值和线数量无关 */
+    SLOT_SINGLE_BET,
 }
 
 /**

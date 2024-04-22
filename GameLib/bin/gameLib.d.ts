@@ -241,7 +241,9 @@ declare namespace gameLib {
         /** 正常游戏 */
         NORMAL = 0,
         /** 连线游戏 */
-        SLOT = 1
+        SLOT = 1,
+        /** 连线游戏,单独的bet bet值和线数量无关 */
+        SLOT_SINGLE_BET = 2
     }
     /**
      * 游戏数据的基类
