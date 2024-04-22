@@ -6949,7 +6949,7 @@ window.tsCore = {};
         /*@override*/
         update(newValue) {
             // super.update(newValue);
-            var _a;
+            var _a, _b, _c, _d;
             // @ts-ignore
             var percent = fgui.ToolSet.clamp01((newValue - this._min) / (this._max - this._min));
             // @ts-ignore
@@ -6970,7 +6970,7 @@ window.tsCore = {};
                             titleObject.text = Math.floor(percent * 100) + "%";
                         break;
                     case fgui.ProgressTitleType.ValueAndMax:
-                        if (titleObject.templateVars && titleObject.text.contains("{num=", "{max=")) {
+                        if (titleObject.templateVars && ((_a = titleObject.text) === null || _a === void 0 ? void 0 : _a.contains("{num=", "{max="))) {
                             titleObject
                                 .setVar("num", Math.floor(newValue) + "")
                                 .setVar("max", max)
@@ -6980,7 +6980,7 @@ window.tsCore = {};
                             titleObject.text = Math.floor(newValue) + "/" + Math.floor(max);
                         break;
                     case fgui.ProgressTitleType.Value:
-                        if (titleObject.templateVars && titleObject.text.contains("{num=")) {
+                        if (titleObject.templateVars && ((_b = titleObject.text) === null || _b === void 0 ? void 0 : _b.contains("{num="))) {
                             titleObject
                                 .setVar("num", Math.floor(newValue) + "")
                                 .flushVars();
@@ -6989,7 +6989,7 @@ window.tsCore = {};
                             titleObject.text = "" + Math.floor(newValue);
                         break;
                     case fgui.ProgressTitleType.Max:
-                        if (titleObject.templateVars && titleObject.text.contains("{max=")) {
+                        if (titleObject.templateVars && ((_c = titleObject.text) === null || _c === void 0 ? void 0 : _c.contains("{max="))) {
                             titleObject
                                 .setVar("max", Math.floor(max) + "")
                                 .flushVars();
@@ -7041,7 +7041,7 @@ window.tsCore = {};
                 }
             }
             // @ts-ignore
-            (_a = this._aniObject) === null || _a === void 0 ? void 0 : _a.setProp(fgui.ObjectPropID.Frame, Math.floor(percent * 100));
+            (_d = this._aniObject) === null || _d === void 0 ? void 0 : _d.setProp(fgui.ObjectPropID.Frame, Math.floor(percent * 100));
         }
     }
     tsCore.ProgressBar = ProgressBar;

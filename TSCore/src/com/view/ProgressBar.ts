@@ -50,7 +50,7 @@ export class ProgressBar extends mixinExt(ActionEvent, ViewBlock, GProgressBar) 
                     break;
 
                 case ProgressTitleType.ValueAndMax:
-                    if (titleObject.templateVars && titleObject.text.contains("{num=", "{max=")) {
+                    if (titleObject.templateVars && titleObject.text?.contains("{num=", "{max=")) {
                         titleObject
                             .setVar("num", Math.floor(newValue) + "")
                             .setVar("max", max)
@@ -60,7 +60,7 @@ export class ProgressBar extends mixinExt(ActionEvent, ViewBlock, GProgressBar) 
                     break;
 
                 case ProgressTitleType.Value:
-                    if (titleObject.templateVars && titleObject.text.contains("{num=")) {
+                    if (titleObject.templateVars && titleObject.text?.contains("{num=")) {
                         titleObject
                             .setVar("num", Math.floor(newValue) + "")
                             .flushVars()
@@ -69,7 +69,7 @@ export class ProgressBar extends mixinExt(ActionEvent, ViewBlock, GProgressBar) 
                     break;
 
                 case ProgressTitleType.Max:
-                    if (titleObject.templateVars && titleObject.text.contains("{max=")) {
+                    if (titleObject.templateVars && titleObject.text?.contains("{max=")) {
                         titleObject
                             .setVar("max", Math.floor(max) + "")
                             .flushVars()
