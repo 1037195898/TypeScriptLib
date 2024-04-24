@@ -3376,7 +3376,7 @@ window.gameLib = {};
         static gameNameCanonical(code = null, format = null) {
             let name = GameConfigKit.gameName(code);
             if (name) {
-                if (format) {
+                if (format != null) {
                     name = name.replace(/\s+/g, format);
                 }
                 else {

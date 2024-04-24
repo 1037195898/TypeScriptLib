@@ -36,7 +36,7 @@ export class GameConfigKit {
     static gameNameCanonical(code: number = null, format: string = null) {
         let name = GameConfigKit.gameName(code)
         if (name) {
-            if (format) {
+            if (format != null) {
                 name = name.replace(/\s+/g, format)
             } else {
                 const names = name.split(/\s+/g)
