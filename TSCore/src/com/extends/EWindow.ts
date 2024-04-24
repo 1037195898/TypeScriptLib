@@ -7,6 +7,7 @@ import {HistoryManager} from "../manager/HistoryManager"
 import {ActionEvent, StringBlock, ViewProxy} from "../block/Block"
 import {IRecord} from "../interfaces/ICommon";
 import {App} from "../App";
+import {Log} from "../Log";
 
 /**
  * 实现了 fgui.Window 的窗口
@@ -23,6 +24,7 @@ export class EWindow extends mixinExt(StringBlock, ViewProxy, ActionEvent, fgui.
 
     protected override onInit() {
         let scale = App.inst.getEqualRatioScale()
+        Log.debug(`window scale ratio ${scale}`)
         this.contentPane.setSize(this.width * scale, this.height * scale)
         this.setSize(this.contentPane.width, this.contentPane.height)
         if (this.isAction) {

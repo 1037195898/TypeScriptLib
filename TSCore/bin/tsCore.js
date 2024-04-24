@@ -2663,6 +2663,7 @@ window.tsCore = {};
         /*@override*/
         onInit() {
             let scale = App.inst.getEqualRatioScale();
+            Log.debug(`window scale ratio ${scale}`);
             this.contentPane.setSize(this.width * scale, this.height * scale);
             this.setSize(this.contentPane.width, this.contentPane.height);
             if (this.isAction) {

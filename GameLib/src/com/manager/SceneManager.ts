@@ -214,7 +214,7 @@ export class SceneManager extends EProxy {
         Player.inst.guestModel.clearData()
         HtmlWindow.inst.hide()
         // 处理房间名字
-        if (code > 0 || !config) config = GameConfigKit.gameNameCanonical(code)
+        if (code > 0 || !config) config = GameConfigKit.gameNameCanonical(code, "")
         // 处理房间号
         if (code <= 0 && config) code = GameConfigKit.gameCode(config)
         if (!config || code <= 0) {
@@ -227,7 +227,7 @@ export class SceneManager extends EProxy {
         Player.inst.gameName = config
         Player.inst.simpleName = config.charAt(0).toLowerCase() + config.substring(1)
         this.isCloseGame = false
-        //		// 如果是未登陆状态
+        // 如果是未登陆状态
 //		if (!Player.inst.isGuest && !Player.inst.token) {
 //			LoadingWindow.inst.hide()
 //			SceneManager.inst.showLogin()
