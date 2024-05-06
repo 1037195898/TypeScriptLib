@@ -195,13 +195,25 @@ export class DateUtils {
     static calculateTimeDifference(time: number | Date) {
         if (time instanceof Date) time = time.getTime()
         // 计算时间差（毫秒）
-        const timeDifference = time - Date.now()
+        const diff = time - Date.now()
+        return DateUtils.calculateTimeByMillisecond(diff)
+    }
+
+    /**
+     * 根据剩余毫秒 计算具体时间
+     * @param time
+     */
+    static calculateTimeByMillisecond(time: number) {
+        // 如果diff已经是负数，意味着时间已经过去，这里假设我们只处理未来的时间
+        if (time <= 0) {
+            return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+        }
         // 计算剩余的天数、小时数、分钟数和秒数
-        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24))
-        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60))
-        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000)
-        return {days, hours, minutes, seconds, timeDifference}
+        const days = Math.floor(time / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((time % (1000 * 60)) / 1000)
+        return {days, hours, minutes, seconds, timeDifference: time}
     }
 
 

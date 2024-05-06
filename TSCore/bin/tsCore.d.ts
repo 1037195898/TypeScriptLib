@@ -1820,6 +1820,29 @@ declare namespace tsCore {
             hours: number;
             minutes: number;
             seconds: number;
+            timeDifference?: undefined;
+        } | {
+            days: number;
+            hours: number;
+            minutes: number;
+            seconds: number;
+            timeDifference: number;
+        };
+        /**
+         * 根据剩余毫秒 计算具体时间
+         * @param time
+         */
+        static calculateTimeByMillisecond(time: number): {
+            days: number;
+            hours: number;
+            minutes: number;
+            seconds: number;
+            timeDifference?: undefined;
+        } | {
+            days: number;
+            hours: number;
+            minutes: number;
+            seconds: number;
             timeDifference: number;
         };
     }
