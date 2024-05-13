@@ -18,12 +18,32 @@ export enum GameType {
  */
 export class BaseGameData implements IGameData {
 
+    /**
+     * 服务器返回的当前本金
+     */
     currentBalance = 0
+    /** 最后盈利总额 */
+    totalWinMoneyLast = 0
+    /** 本轮总盈利额 */
     totalWinMoney = 0
+    /** 服务器返回当前盈利额 */
     serverWinMoney = 0
+    /**
+     * 玩的次数
+     */
     playCount = 0
+    /**
+     * 推荐
+     */
     isRecommend = false
+    /**
+     * 是否已启动特殊游戏模式
+     */
     specialMode = false
+    /**
+     * 游戏类型
+     * @see GameType
+     */
     gameType = GameType.NORMAL
 
     /** 是否快速播放 */

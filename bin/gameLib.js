@@ -269,12 +269,32 @@ window.gameLib = {};
      */
     class BaseGameData {
         constructor() {
+            /**
+             * 服务器返回的当前本金
+             */
             this.currentBalance = 0;
+            /** 最后盈利总额 */
+            this.totalWinMoneyLast = 0;
+            /** 本轮总盈利额 */
             this.totalWinMoney = 0;
+            /** 服务器返回当前盈利额 */
             this.serverWinMoney = 0;
+            /**
+             * 玩的次数
+             */
             this.playCount = 0;
+            /**
+             * 推荐
+             */
             this.isRecommend = false;
+            /**
+             * 是否已启动特殊游戏模式
+             */
             this.specialMode = false;
+            /**
+             * 游戏类型
+             * @see GameType
+             */
             this.gameType = GameType.NORMAL;
             /** 是否快速播放 */
             this._isTurboMode = false;
@@ -1087,15 +1107,30 @@ window.gameLib = {};
              */
             this.state = SlotItemType.NORMAL;
         }
-        /** 还原最原始状态 */
+        /**
+         * 还原最原始状态
+         * ```
+         * this.state = SlotItemType.NORMAL
+         * ```
+         */
         resetUI() {
             this.state = SlotItemType.NORMAL;
         }
-        /** 显示中奖 */
+        /**
+         * 显示中奖
+         * ```
+         * this.state = SlotItemType.WIN
+         * ```
+         */
         showWin() {
             this.state = SlotItemType.WIN;
         }
-        /** 变暗 */
+        /**
+         * 变暗
+         * ```
+         * this.state = SlotItemType.DARK
+         * ```
+         */
         dark() {
             this.state = SlotItemType.DARK;
         }
@@ -1106,6 +1141,9 @@ window.gameLib = {};
         }
         /**
          * 变暗取消
+         * ```
+         * this.state = SlotItemType.NORMAL
+         * ```
          * @deprecated
          */
         darkCancel() {

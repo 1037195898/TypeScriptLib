@@ -249,12 +249,32 @@ declare namespace gameLib {
      * 游戏数据的基类
      */
     export class BaseGameData implements IGameData {
+        /**
+         * 服务器返回的当前本金
+         */
         currentBalance: number;
+        /** 最后盈利总额 */
+        totalWinMoneyLast: number;
+        /** 本轮总盈利额 */
         totalWinMoney: number;
+        /** 服务器返回当前盈利额 */
         serverWinMoney: number;
+        /**
+         * 玩的次数
+         */
         playCount: number;
+        /**
+         * 推荐
+         */
         isRecommend: boolean;
+        /**
+         * 是否已启动特殊游戏模式
+         */
         specialMode: boolean;
+        /**
+         * 游戏类型
+         * @see GameType
+         */
         gameType: GameType;
         /** 是否快速播放 */
         protected _isTurboMode: boolean;
@@ -631,11 +651,26 @@ declare namespace gameLib {
          * @protected
          */
         protected state: SlotItemType;
-        /** 还原最原始状态 */
+        /**
+         * 还原最原始状态
+         * ```
+         * this.state = SlotItemType.NORMAL
+         * ```
+         */
         resetUI(): void;
-        /** 显示中奖 */
+        /**
+         * 显示中奖
+         * ```
+         * this.state = SlotItemType.WIN
+         * ```
+         */
         showWin(): void;
-        /** 变暗 */
+        /**
+         * 变暗
+         * ```
+         * this.state = SlotItemType.DARK
+         * ```
+         */
         dark(): void;
         /**
          * 刷新界面
@@ -643,6 +678,9 @@ declare namespace gameLib {
         refresh(): void;
         /**
          * 变暗取消
+         * ```
+         * this.state = SlotItemType.NORMAL
+         * ```
          * @deprecated
          */
         darkCancel(): void;

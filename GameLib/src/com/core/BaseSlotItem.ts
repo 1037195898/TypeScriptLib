@@ -27,17 +27,32 @@ export class BaseSlotItem extends ELabel {
      */
     protected state = SlotItemType.NORMAL
 
-    /** 还原最原始状态 */
+    /**
+     * 还原最原始状态
+     * ```
+     * this.state = SlotItemType.NORMAL
+     * ```
+     */
     resetUI() {
         this.state = SlotItemType.NORMAL
     }
 
-    /** 显示中奖 */
+    /**
+     * 显示中奖
+     * ```
+     * this.state = SlotItemType.WIN
+     * ```
+     */
     showWin() {
         this.state = SlotItemType.WIN
     }
 
-    /** 变暗 */
+    /**
+     * 变暗
+     * ```
+     * this.state = SlotItemType.DARK
+     * ```
+     */
     dark() {
         this.state = SlotItemType.DARK
     }
@@ -50,6 +65,9 @@ export class BaseSlotItem extends ELabel {
 
     /**
      * 变暗取消
+     * ```
+     * this.state = SlotItemType.NORMAL
+     * ```
      * @deprecated
      */
     darkCancel() {
