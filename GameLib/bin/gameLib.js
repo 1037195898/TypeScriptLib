@@ -7140,6 +7140,28 @@ window.gameLib = {};
     ObjectUtil.colorTransform = new Laya.ColorFilter();
     ObjectUtil.colorMatrixFilters = [new Laya.ColorFilter()];
     gameLib.ObjectUtil = ObjectUtil;
+    class ResUtils {
+        static parseRes(urls) {
+            for (let i = 0; i < urls.length; i++) {
+                const value = urls[i];
+                let matchArray = value.match(/\{(\d+,\d+)}/);
+                if ((matchArray === null || matchArray === void 0 ? void 0 : matchArray.length) == 2) {
+                    let nums = matchArray[1].split(",");
+                    if ((nums === null || nums === void 0 ? void 0 : nums.length) == 2) {
+                        urls.splice(i, 1);
+                        i--;
+                        let start = tsCore.StringUtil.getNumbers(nums[0]);
+                        let end = tsCore.StringUtil.getNumbers(nums[1]) + 1;
+                        for (let j = start; j < end; j++) {
+                            const newValue = value.replace(/\{(\d+,\d+)}/, j + "");
+                            urls.push(newValue);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    gameLib.ResUtils = ResUtils;
     class RotationUtils {
         constructor() {
             /**

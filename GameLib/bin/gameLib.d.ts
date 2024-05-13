@@ -3563,6 +3563,9 @@ declare namespace gameLib {
          */
         static getClass(classStr: string): any;
     }
+    export class ResUtils {
+        static parseRes(urls: string[]): void;
+    }
     export class RotationUtils {
         /** 当前速度 */
         private speed;
