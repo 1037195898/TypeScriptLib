@@ -177,14 +177,14 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
             }
         } else {
             // 当播放队列不是数组时，根据loop属性和动画时长来决定是否循环播放当前动画
-            if (this.skeletonPlay.loop && this.getAnimDuration(0) > 0) {
+            if (this.skeletonPlay.loop && this.getAnimDuration(this.nameOrIndex ?? 0) > 0) {
                 let len = 0
                 if (this instanceof GSpineSkeleton) {
-                    len = (this as GSpineSkeleton).getAnimation(0).timelines[0].getFrameCount()
+                    len = (this as GSpineSkeleton).getAnimation(this.nameOrIndex ?? 0).timelines[0].getFrameCount()
                 } else if (this instanceof GSkeleton) {
-                    len = (this as GSkeleton).getAnimation(0).totalKeyframeDatasLength
+                    len = (this as GSkeleton).getAnimation(this.nameOrIndex ?? 0).totalKeyframeDatasLength
                 }
-                if (this.getAnimFrame(0) > 1 || len > 1) {
+                if (this.getAnimFrame(this.nameOrIndex ?? 0) > 1 || len > 1) {
                     // 若设置了延迟循环播放时间，则延时后播放；否则立即播放
                     if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
                         Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex])

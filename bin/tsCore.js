@@ -2496,7 +2496,7 @@ window.tsCore = {};
          * 当动画停止时的回调函数
          */
         onPlayStopped() {
-            var _a;
+            var _a, _b, _c, _d, _e;
             // 检查播放进度信息，如果存在则执行相应的“after”或“before”回调函数
             if (this.skeletonPlay.progress) {
                 if ("after" in this.skeletonPlay.progress) {
@@ -2547,15 +2547,15 @@ window.tsCore = {};
             }
             else {
                 // 当播放队列不是数组时，根据loop属性和动画时长来决定是否循环播放当前动画
-                if (this.skeletonPlay.loop && this.getAnimDuration(0) > 0) {
+                if (this.skeletonPlay.loop && this.getAnimDuration((_b = this.nameOrIndex) !== null && _b !== void 0 ? _b : 0) > 0) {
                     let len = 0;
                     if (this instanceof GSpineSkeleton) {
-                        len = this.getAnimation(0).timelines[0].getFrameCount();
+                        len = this.getAnimation((_c = this.nameOrIndex) !== null && _c !== void 0 ? _c : 0).timelines[0].getFrameCount();
                     }
                     else if (this instanceof GSkeleton) {
-                        len = this.getAnimation(0).totalKeyframeDatasLength;
+                        len = this.getAnimation((_d = this.nameOrIndex) !== null && _d !== void 0 ? _d : 0).totalKeyframeDatasLength;
                     }
-                    if (this.getAnimFrame(0) > 1 || len > 1) {
+                    if (this.getAnimFrame((_e = this.nameOrIndex) !== null && _e !== void 0 ? _e : 0) > 1 || len > 1) {
                         // 若设置了延迟循环播放时间，则延时后播放；否则立即播放
                         if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
                             Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
