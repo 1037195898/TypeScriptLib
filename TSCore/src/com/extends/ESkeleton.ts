@@ -59,7 +59,7 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
         this.playAni({
             nameOrIndex: nameOrIndex, loop: loop, force: force,
             start: start, end: end, freshSkin: freshSkin, playAudio: playAudio
-        })
+        }, Array.isArray(nameOrIndex) ? 0 : -1)
     }
 
     /**
