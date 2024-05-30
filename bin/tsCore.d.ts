@@ -2112,6 +2112,7 @@ declare namespace tsCore {
          * @param [aniMode = -1]
          */
         static playSpine(skeleton: GSkeleton | GSpineSkeleton, url: string, nameOrIndex?: string | number | (string | number)[] | ISkeletonPlay, loop?: boolean, playComplete?: ParamHandler, loaderComplete?: ParamHandler, aniMode?: number): void;
+        private static onStopped;
         private static parseComplete;
         /**
          * 创建spine 骨骼动画组件

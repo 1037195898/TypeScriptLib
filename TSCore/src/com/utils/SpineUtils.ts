@@ -17,10 +17,8 @@ export class SpineUtils {
     static playSpine(skeleton: GSkeleton | GSpineSkeleton, url: string, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay = 0,
                      loop = true, playComplete?: ParamHandler, loaderComplete?: ParamHandler, aniMode = -1) {
 
-        skeleton.offAll(Laya.Event.STOPPED)
-        skeleton.on(Laya.Event.STOPPED, this, function (handler: ParamHandler) {
-            runFun(handler)
-        }, [playComplete])
+        skeleton.off(Laya.Event.STOPPED, this, SpineUtils.onStopped)
+        skeleton.on(Laya.Event.STOPPED, this, SpineUtils.onStopped, [playComplete])
 
         if (skeleton instanceof GSpineSkeleton) {
             if (skeleton.aniPath == url && skeleton.asSkeleton) {
@@ -45,6 +43,10 @@ export class SpineUtils {
         // 界面显示了  在加载资源
         skeleton.load(url,
             Laya.Handler.create(this, SpineUtils.parseComplete, [skeleton, nameOrIndex, loop, loaderComplete]), aniMode)
+    }
+
+    private static onStopped(handler: ParamHandler) {
+        runFun(handler)
     }
 
     private static parseComplete(skeleton: GSkeleton | GSpineSkeleton,

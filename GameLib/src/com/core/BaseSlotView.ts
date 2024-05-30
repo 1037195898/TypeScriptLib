@@ -159,7 +159,7 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
     }
 
     /**
-     * 显示指定条线上的线
+     * 显示指定线上的中奖项
      * @param lineId 线id 0开始
      */
     protected showWinSlotItem(lineId: number) {
