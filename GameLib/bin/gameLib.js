@@ -1296,7 +1296,7 @@ window.gameLib = {};
             Laya.timer.once(this.autoPlayWinLineTime, this, this.nextLine);
         }
         /**
-         * 显示指定条线上的线
+         * 显示指定线上的中奖项
          * @param lineId 线id 0开始
          */
         showWinSlotItem(lineId) {
@@ -2796,9 +2796,9 @@ window.gameLib = {};
             list.numItems = list.data.length;
         }
         getDuration(index, isTurboMode) {
-            let duration = 500 + (index * 800); // 动画持续时间
+            let duration = 500 + (index * 200); // 动画持续时间
             if (isTurboMode) {
-                duration = 1300; // 动画持续时间
+                duration = 300; // 动画持续时间
             }
             return duration;
         }

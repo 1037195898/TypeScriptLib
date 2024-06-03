@@ -737,7 +737,7 @@ declare namespace gameLib {
          */
         protected showWinning(isChangeFirst?: boolean): void;
         /**
-         * 显示指定条线上的线
+         * 显示指定线上的中奖项
          * @param lineId 线id 0开始
          */
         protected showWinSlotItem(lineId: number): void;
