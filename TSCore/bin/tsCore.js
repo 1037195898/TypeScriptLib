@@ -4872,7 +4872,7 @@ window.tsCore = {};
          * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
          */
         static createSpine(url, optional, skeletonClass) {
-            var _a, _b, _c, _d, _e;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j;
             if (optional && !this.isInterface(optional)) {
                 skeletonClass = optional;
                 optional = null;
@@ -4907,45 +4907,35 @@ window.tsCore = {};
             }
             skeleton.setXY((_c = optional.x) !== null && _c !== void 0 ? _c : 0, (_d = optional.y) !== null && _d !== void 0 ? _d : 0);
             let onLoadComplete = optional.loaderComplete;
-            let _onComplete;
             if (optional.relation) {
                 let relation = optional.relation;
-                _onComplete = () => {
-                    var _a, _b, _c, _d, _e, _f;
-                    const types = relation.types;
-                    if (types) {
-                        for (const type of types) {
-                            let reTypes = type.relationType;
-                            if (!Array.isArray(reTypes))
-                                reTypes = [reTypes];
-                            reTypes.forEach(value => {
-                                skeleton.addRelation(type.target, value, type.usePercent);
-                            });
-                        }
+                const types = relation.types;
+                if (types) {
+                    for (const type of types) {
+                        let reTypes = type.relationType;
+                        if (!Array.isArray(reTypes))
+                            reTypes = [reTypes];
+                        reTypes.forEach(value => {
+                            skeleton.addRelation(type.target, value, type.usePercent);
+                        });
                     }
-                    if (relation.target) {
-                        (_a = relation.lr) !== null && _a !== void 0 ? _a : (relation.lr = relation.target);
-                        (_b = relation.ud) !== null && _b !== void 0 ? _b : (relation.ud = relation.target);
-                    }
-                    relation.lr && skeleton.addRelation(relation.lr, fgui.RelationType.Center_Center, (_c = relation.usePercent) !== null && _c !== void 0 ? _c : true);
-                    relation.ud && skeleton.addRelation(relation.ud, fgui.RelationType.Middle_Middle, (_d = relation.usePercent) !== null && _d !== void 0 ? _d : true);
-                    Log.debug("loader spine complete", url);
-                    if (Log.level <= LogLevel.DEBUG)
-                        Log.debug("all animation name and skins", (_e = skeleton.getAllAnimation()) === null || _e === void 0 ? void 0 : _e.map(item => item.name), (_f = skeleton.getAllSkin()) === null || _f === void 0 ? void 0 : _f.map(item => item.name));
-                    runFun(onLoadComplete);
-                };
+                }
+                if (relation.target) {
+                    (_e = relation.lr) !== null && _e !== void 0 ? _e : (relation.lr = relation.target);
+                    (_f = relation.ud) !== null && _f !== void 0 ? _f : (relation.ud = relation.target);
+                }
+                relation.lr && skeleton.addRelation(relation.lr, fgui.RelationType.Center_Center, (_g = relation.usePercent) !== null && _g !== void 0 ? _g : true);
+                relation.ud && skeleton.addRelation(relation.ud, fgui.RelationType.Middle_Middle, (_h = relation.usePercent) !== null && _h !== void 0 ? _h : true);
             }
-            else {
-                _onComplete = () => {
-                    var _a, _b;
-                    Log.debug("loader spine complete", url);
-                    if (Log.level <= LogLevel.DEBUG)
-                        Log.debug("all animation name and skins", (_a = skeleton.getAllAnimation()) === null || _a === void 0 ? void 0 : _a.map(item => item.name), (_b = skeleton.getAllSkin()) === null || _b === void 0 ? void 0 : _b.map(item => item.name));
-                    runFun(onLoadComplete);
-                };
-            }
+            const _onComplete = () => {
+                var _a, _b;
+                Log.debug("loader spine complete", url);
+                if (Log.level <= LogLevel.DEBUG)
+                    Log.debug("all animation name and skins", (_a = skeleton.getAllAnimation()) === null || _a === void 0 ? void 0 : _a.map(item => item.name), (_b = skeleton.getAllSkin()) === null || _b === void 0 ? void 0 : _b.map(item => item.name));
+                runFun(onLoadComplete);
+            };
             if (url)
-                SpineUtils.playSpine(skeleton, url, optional.play, (_e = optional.play) === null || _e === void 0 ? void 0 : _e.loop, optional.playComplete, _onComplete, optional.aniMode);
+                SpineUtils.playSpine(skeleton, url, optional.play, (_j = optional.play) === null || _j === void 0 ? void 0 : _j.loop, optional.playComplete, _onComplete, optional.aniMode);
             return skeleton;
         }
         /**

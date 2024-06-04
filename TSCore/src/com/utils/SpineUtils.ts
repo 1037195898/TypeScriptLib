@@ -108,39 +108,30 @@ export class SpineUtils {
         skeleton.setXY(optional.x ?? 0, optional.y ?? 0)
 
         let onLoadComplete = optional.loaderComplete
-        let _onComplete
         if (optional.relation) {
             let relation = optional.relation
-            _onComplete = () => {
-                const types = relation.types
-                if (types) {
-                    for (const type of types) {
-                        let reTypes = type.relationType
-                        if (!Array.isArray(reTypes)) reTypes = [reTypes]
-                        reTypes.forEach(value => {
-                            skeleton.addRelation(type.target, value, type.usePercent)
-                        })
-                    }
+            const types = relation.types
+            if (types) {
+                for (const type of types) {
+                    let reTypes = type.relationType
+                    if (!Array.isArray(reTypes)) reTypes = [reTypes]
+                    reTypes.forEach(value => {
+                        skeleton.addRelation(type.target, value, type.usePercent)
+                    })
                 }
-                if (relation.target) {
-                    relation.lr ??= relation.target
-                    relation.ud ??= relation.target
-                }
-                relation.lr && skeleton.addRelation(relation.lr, fgui.RelationType.Center_Center, relation.usePercent ?? true)
-                relation.ud && skeleton.addRelation(relation.ud, fgui.RelationType.Middle_Middle, relation.usePercent ?? true)
-                Log.debug("loader spine complete", url)
-                if (Log.level <= LogLevel.DEBUG)
-                    Log.debug("all animation name and skins", skeleton.getAllAnimation()?.map(item => item.name), skeleton.getAllSkin()?.map(item => item.name))
-                runFun(onLoadComplete)
-
             }
-        } else {
-            _onComplete = () => {
-                Log.debug("loader spine complete", url)
-                if (Log.level <= LogLevel.DEBUG)
-                    Log.debug("all animation name and skins", skeleton.getAllAnimation()?.map(item => item.name), skeleton.getAllSkin()?.map(item => item.name))
-                runFun(onLoadComplete)
+            if (relation.target) {
+                relation.lr ??= relation.target
+                relation.ud ??= relation.target
             }
+            relation.lr && skeleton.addRelation(relation.lr, fgui.RelationType.Center_Center, relation.usePercent ?? true)
+            relation.ud && skeleton.addRelation(relation.ud, fgui.RelationType.Middle_Middle, relation.usePercent ?? true)
+        }
+        const _onComplete = () => {
+            Log.debug("loader spine complete", url)
+            if (Log.level <= LogLevel.DEBUG)
+                Log.debug("all animation name and skins", skeleton.getAllAnimation()?.map(item => item.name), skeleton.getAllSkin()?.map(item => item.name))
+            runFun(onLoadComplete)
         }
         if (url) SpineUtils.playSpine(skeleton, url, optional.play, optional.play?.loop, optional.playComplete, _onComplete, optional.aniMode)
         return skeleton as T extends { new(): infer R } ? R : GSkeleton | GSpineSkeleton
