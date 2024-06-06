@@ -335,13 +335,24 @@ declare interface Array<T> {
     random(): T
 
     /**
+     * 通过提供一个回调函数来定义移除元素的条件。
+     * 如果数组中存在满足条件的元素，则移除该元素并返回true，否则返回false。
+     *
+     * @param filter 一个回调函数，用于测试每个元素是否应该被移除。
+     *               回调函数接受数组的当前元素作为参数，并返回一个布尔值，
+     *               表示该元素是否应该被移除。
+     * @returns 如果成功移除了任何元素，则返回true；否则返回false。
+     */
+    removeIf(filter: (value: T) => boolean): boolean
+
+    /**
      * 在原数组上进行过滤操作，根据predicate函数的结果移除元素。
      * 该函数尝试在原数组上进行过滤，避免创建新的数组实例，以提高性能和减少内存使用。
      *
      * @param predicate 过滤条件函数，接受数组元素作为参数，返回一个布尔值。
      * @returns 如果数组发生了改变（有元素被移除），则返回true；否则返回false。
      */
-    removeAll(predicate: (value: T) => boolean)
+    removeAll(predicate: (value: T) => boolean): boolean
 
     /**
      * 在原数组上进行过滤操作，根据predicate函数的结果保留元素。
@@ -350,7 +361,7 @@ declare interface Array<T> {
      * @param predicate 过滤条件函数，接受数组元素作为参数，返回一个布尔值。
      * @returns 如果数组发生了改变（有元素被移除），则返回true；否则返回false。
      */
-    retainAll(predicate: (value: T) => boolean)
+    retainAll(predicate: (value: T) => boolean): boolean
 
 }
 
