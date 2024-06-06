@@ -7609,16 +7609,31 @@ Object.defineProperty(Array.prototype, "random", {
         return this[random(0, this.length)];
     }
 });
+/**
+ * 通过提供一个回调函数来定义移除元素的条件。
+ * 如果数组中存在满足条件的元素，则移除该元素并返回true，否则返回false。
+ *
+ * @param filter 一个回调函数，用于测试每个元素是否应该被移除。
+ *               回调函数接受数组的当前元素作为参数，并返回一个布尔值，
+ *               表示该元素是否应该被移除。
+ * @returns 如果成功移除了任何元素，则返回true；否则返回false。
+ */
 Object.defineProperty(Array.prototype, "removeIf", {
     value: function (filter) {
-        let removed = false;
+        let removed = false; // 初始化一个标志变量，用于记录是否成功移除了元素。
+        // 遍历数组中的每个元素。
         for (let i = 0; i < this.length; i++) {
+            // 使用提供的过滤函数检查当前元素是否应该被移除。
             if (filter(this[i])) {
+                // 如果当前元素满足移除条件，则将其从数组中移除。
                 this.splice(i, 1);
+                // 由于元素被移除，数组长度减小，需要调整索引i以避免跳过下一个元素。
                 i--;
+                // 标记已移除元素。
                 removed = true;
             }
         }
+        // 返回是否成功移除了元素。
         return removed;
     }
 });
