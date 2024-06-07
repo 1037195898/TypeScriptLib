@@ -256,7 +256,7 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
             let tempArray: number[] = []
             for (let i = 0; i < lottery.length; i++) {
                 if (lottery[i] == 1) { // 判断标签
-                    tempArray.push(lotteryId[i]);// 中奖的线ID
+                    tempArray.push(lotteryId[i]) // 中奖的线ID
                 }
             }
             let col = this.listRolls.length
@@ -265,9 +265,9 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
             for (let i = 1; i < col; i++) { // 这里最大判断列表数  满足 就中奖
                 let temp = tempArray[i]
                 if (duibi >= this.WILD) {
-                    duibi = temp;// 如果正在对比的值大于wild，一律按照wild处理
-                } else if (temp < this.WILD && temp != duibi) {
-                    return null;//小于wild 并且和对比值不一样
+                    duibi = temp // 如果正在对比的值大于wild，一律按照wild处理
+                } else if (temp < this.WILD && temp != duibi && i == 1) {
+                    return null //小于wild 并且和对比值不一样 并且才是第2个对比 这里就表示这组数据本来就不是一组中奖数据
                 }
                 if (i == 1) {// 2个一样  且不再小奖里面
                     if (duibi < this.WILD && duibi != this.SPECIAL_PLAY && this.smallPrize.indexOf(duibi) != -1) {
