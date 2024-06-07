@@ -15,17 +15,28 @@ export class BaseStarter extends EProxy {
 
     constructor() {
         super()
-        this.regGameAction(ActionLib.GAME_CREATE_SCENE_SHOW, this, this.createSceneShow)
+        this.regGameAction(ActionLib.GAME_CREATE_SCENE_SHOW, this, this.onCreateScene)
     }
 
     /**
      * 创建游戏到舞台
      * @param handler 创建完成回调
      */
-    protected createSceneShow(handler: ParamHandler) {
+    protected onCreateScene(handler: ParamHandler) {
         this.callback = handler
         this.updateScreenOrientation()
+
+        // 兼容旧版本
+        this.createSceneShow(handler)
     }
+
+    /**
+     * 创建游戏到舞台
+     * @param handler 创建完成回调
+     * @deprecated
+     * @see onCreateScene
+     */
+    protected createSceneShow(handler: ParamHandler) {}
 
     /** 当前游戏的方向 */
     updateScreenOrientation() {

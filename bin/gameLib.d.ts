@@ -798,6 +798,13 @@ declare namespace gameLib {
          * 创建游戏到舞台
          * @param handler 创建完成回调
          */
+        protected onCreateScene(handler: ParamHandler): void;
+        /**
+         * 创建游戏到舞台
+         * @param handler 创建完成回调
+         * @deprecated
+         * @see onCreateScene
+         */
         protected createSceneShow(handler: ParamHandler): void;
         /** 当前游戏的方向 */
         updateScreenOrientation(): void;
