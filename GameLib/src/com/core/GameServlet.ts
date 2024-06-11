@@ -269,10 +269,13 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
 
     nextInit() {
         this.onUserData.call(this, (result: CustomResult) => {
-            result.succeed ? this.getCoupon(this.initComplete.bind(this)) : this.enterFail(true, result.msg)
+            if (result.succeed) {
+                this.getCoupon(this.initComplete.bind(this))
+            } else {
+                this.enterFail(true, result.msg)
+            }
         })
     }
-
 
     /**
      * 用户信息初始化完成 返回false表示 出现错误
