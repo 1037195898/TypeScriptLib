@@ -301,16 +301,24 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
     }
 
     /**
-     * list使用的数据转换 切换成列的数据
-     * @param arr 通用的数据
-     * @return
+     * 根据列数重新组织数组元素。
+     *
+     * 该方法将输入的数组按照指定的列数重新排列，每列的元素来自原数组的相同索引位置。
+     * 这种重新组织的方式适用于需要将一维列表转换为多列显示的情况。
+     *
+     * @param arr 输入的数组，包含需要重新组织的元素。
+     * @returns 返回一个新数组，其中元素按照指定的列数重新排列。
      */
     changeListData<V>(arr: V[]) {
         let temps: V[] = []
+        // 获取列表滚动的列数。
         let col = this.listRolls.length
+        // 遍历每一列。
         for (let i = 0; i < col; i++) {
+            // 遍历输入数组中的每个元素。
             for (let j = 0; j < arr.length; j++) {
                 let va = arr[j]
+                // 如果当前元素的索引能被列数整除，则将其添加到临时数组中。
                 if (j % col == i) {
                     temps.push(va)
                 }
