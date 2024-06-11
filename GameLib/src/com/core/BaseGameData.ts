@@ -45,7 +45,7 @@ export class BaseGameData implements IGameData {
      * @see GameType
      */
     gameType = GameType.NORMAL
-
+    attachedDebugData: any
     /** 是否快速播放 */
     protected _isTurboMode = false
     /** 缓存的下注值 */

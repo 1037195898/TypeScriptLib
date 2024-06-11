@@ -276,6 +276,7 @@ declare namespace gameLib {
          * @see GameType
          */
         gameType: GameType;
+        attachedDebugData: any;
         /** 是否快速播放 */
         protected _isTurboMode: boolean;
         /** 缓存的下注值 */
@@ -1316,9 +1317,13 @@ declare namespace gameLib {
          */
         getRotationLong(item: number, count: number, Qmin: number, Qmax: number, location: number): number;
         /**
-         * list使用的数据转换 切换成列的数据
-         * @param arr 通用的数据
-         * @return
+         * 根据列数重新组织数组元素。
+         *
+         * 该方法将输入的数组按照指定的列数重新排列，每列的元素来自原数组的相同索引位置。
+         * 这种重新组织的方式适用于需要将一维列表转换为多列显示的情况。
+         *
+         * @param arr 输入的数组，包含需要重新组织的元素。
+         * @returns 返回一个新数组，其中元素按照指定的列数重新排列。
          */
         changeListData<V>(arr: V[]): V[];
         /**
@@ -1632,6 +1637,10 @@ declare namespace gameLib {
         getTotalBetMoney(): number;
         /** 上报错误数据 */
         reportError(): any;
+        /**
+         * 附带调试数据
+         */
+        attachedDebugData: any;
         /** 服务器发来的当前余额 */
         currentBalance: number;
         /** 本次总共盈利 */

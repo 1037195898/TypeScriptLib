@@ -12,6 +12,11 @@ export interface IGameData {
     /** 上报错误数据 */
     reportError(): any
 
+    /**
+     * 附带调试数据
+     */
+    attachedDebugData: any
+
     /** 服务器发来的当前余额 */
     currentBalance: number
     /** 本次总共盈利 */
