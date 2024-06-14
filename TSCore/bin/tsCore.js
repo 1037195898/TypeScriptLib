@@ -200,6 +200,16 @@ window.tsCore = {};
             }
             return new Laya.Point(s1, s2);
         }
+        getStackTrace() {
+            try {
+                // 故意抛出一个错误来捕获堆栈信息
+                throw new Error();
+            }
+            catch (error) {
+                // 返回错误对象的堆栈信息
+                return error.stack;
+            }
+        }
     }
     /** 默认的分组名
      * @default group

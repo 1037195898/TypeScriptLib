@@ -78,6 +78,7 @@ declare namespace tsCore {
          * @param [h=Laya.stage.height] 当前屏幕实际渲染高度
          */
         getEqualRatioRatio(w?: number, h?: number): Laya.Point;
+        getStackTrace(): string;
     }
     export class BezierCurves {
         /** 经过时间 */
