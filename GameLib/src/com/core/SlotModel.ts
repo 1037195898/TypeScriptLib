@@ -270,7 +270,7 @@ export abstract class SlotModel<T extends BaseSlotGameData = BaseSlotGameData> e
                     return null //小于wild 并且和对比值不一样 并且才是第2个对比 这里就表示这组数据本来就不是一组中奖数据
                 }
                 if (i == 1) {// 2个一样  且不再小奖里面
-                    if (duibi < this.WILD && duibi != this.SPECIAL_PLAY && this.smallPrize.indexOf(duibi) != -1) {
+                    if (duibi < this.WILD && duibi != this.SPECIAL_PLAY && this.smallPrize.includes(duibi)) {
                         return tempArray
                     }
                 } else if (i >= 2) {
