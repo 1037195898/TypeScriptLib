@@ -1,6 +1,6 @@
 import {BaseGameData, GameType} from "./BaseGameData"
-import App = tsCore.App;
 import {ActionLib} from "../ActionLib";
+import App = tsCore.App;
 
 export abstract class BaseSlotGameData extends BaseGameData {
 
@@ -131,7 +131,10 @@ export abstract class BaseSlotGameData extends BaseGameData {
      * this.lineValue * this.betValue
      */
     override getTotalBetMoney() {
-        return this.lineValue * this.betValue
+        if (this.gameType == GameType.SLOT) {
+            return this.lineValue * this.betValue
+        }
+        return this.betValue
     }
 
     /** 获取当前的开奖数据 */
