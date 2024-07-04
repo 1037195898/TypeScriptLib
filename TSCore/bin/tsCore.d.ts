@@ -2696,7 +2696,7 @@ declare namespace tsCore {
     }
     export class GSpineSkeleton extends ESkeleton {
         ver: Laya.SpineVersion;
-        private template;
+        template: Laya.SpineTemplet;
         constructor(ver?: Laya.SpineVersion);
         protected createDisplayObject(): void;
         get asSkeleton(): Laya.SpineSkeleton;

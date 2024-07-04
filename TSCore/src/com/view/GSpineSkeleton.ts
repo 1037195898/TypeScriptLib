@@ -8,7 +8,7 @@ import {ESkeleton} from "../extends/ESkeleton";
 export class GSpineSkeleton extends ESkeleton {
 
     ver: SpineVersion
-    private template: Laya.SpineTemplet
+    template: Laya.SpineTemplet
 
     constructor(ver: SpineVersion = SpineVersion.v3_8) {
         super()
