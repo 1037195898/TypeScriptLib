@@ -696,7 +696,7 @@ declare namespace tsCore {
         playAni(skeletonPlay: ISkeletonPlay, playGroupIndex?: number): void;
         private _play;
         /**
-         * 当动画停止时的回调函数
+         * 当动画停止时的回调函数 或 使用 skeleton.stop()
          */
         protected onPlayStopped(): void;
         paused(): void;

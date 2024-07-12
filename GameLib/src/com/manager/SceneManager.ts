@@ -469,7 +469,7 @@ export class SceneManager extends EProxy {
         if (config || code) {
             let href = location.href
             if (config) href = href.replace(/(?<=gameName=)\d+/, config)
-            if (code) href = href.replace(/(?<=openG3ame=)\d+/, code + "")
+            if (code) href = href.replace(/(?<=openGame=)\d+/, code + "")
             location.replace(href)
         }
     }

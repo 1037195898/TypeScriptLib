@@ -46,6 +46,7 @@ export class LoadingWindow extends BaseView {
     show(index = 0, headText?: string) {
         HistoryManager.pauseHistory = true
         this.changeView(index, headText)
+        this.setSize(GRoot.inst.width, GRoot.inst.height)
         GRoot.inst.addChild(this)
     }
 

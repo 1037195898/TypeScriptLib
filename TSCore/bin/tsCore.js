@@ -2503,71 +2503,45 @@ window.tsCore = {};
             this.asSkeleton.play(this.nameOrIndex, false, force, start, end, freshSkin, playAudio);
         }
         /**
-         * 当动画停止时的回调函数
+         * 当动画停止时的回调函数 或 使用 skeleton.stop()
          */
         onPlayStopped() {
             var _a, _b, _c, _d, _e;
-            // 检查播放进度信息，如果存在则执行相应的“after”或“before”回调函数
-            if (this.skeletonPlay.progress) {
-                if ("after" in this.skeletonPlay.progress) {
-                    runFun(this.skeletonPlay.progress.after, this.nameOrIndex);
+            if (this.skeletonPlay) {
+                // 检查播放进度信息，如果存在则执行相应的“after”或“before”回调函数
+                if (this.skeletonPlay.progress) {
+                    if ("after" in this.skeletonPlay.progress) {
+                        runFun(this.skeletonPlay.progress.after, this.nameOrIndex);
+                    }
+                    else if (typeof this.skeletonPlay.progress === "function") {
+                        runFun(this.skeletonPlay.progress, this.nameOrIndex);
+                    }
                 }
-                else if (typeof this.skeletonPlay.progress === "function") {
-                    runFun(this.skeletonPlay.progress, this.nameOrIndex);
-                }
-            }
-            // 如果当前动画播放队列（nameOrIndex）是一个数组且长度大于0，则进行如下处理：
-            if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
-                // 获取当前播放索引对应的动画数据
-                const playData = this.skeletonPlay.nameOrIndex[this.playGroupIndex];
-                // 当前动画播放完成后需要循环播放的次数
-                let loopCount = 0;
-                if (typeof playData === "object") {
-                    loopCount = (_a = playData.loopCount) !== null && _a !== void 0 ? _a : loopCount;
-                    runFun(playData.playComplete, this._loopCount);
-                }
-                // 更新循环播放计数器并判断是否需要切换到下一个动画
-                if (loopCount > 0 && loopCount != this._loopCount) {
-                    this._loopCount++;
-                }
-                else {
-                    this.playGroupIndex++;
-                    this._loopCount = 0;
-                }
-                // 判断是否需要开始新的动画序列或循环播放
-                let isNewPro = false;
-                if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex
-                    || (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
-                    // 若是新序列且设置有延迟循环播放时间，则延时后播放
-                    if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
-                        // 循环播放有延迟的时候  单独处理
-                        Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
+                // 如果当前动画播放队列（nameOrIndex）是一个数组且长度大于0，则进行如下处理：
+                if (Array.isArray(this.skeletonPlay.nameOrIndex) && this.skeletonPlay.nameOrIndex.length > 0) {
+                    // 获取当前播放索引对应的动画数据
+                    const playData = this.skeletonPlay.nameOrIndex[this.playGroupIndex];
+                    // 当前动画播放完成后需要循环播放的次数
+                    let loopCount = 0;
+                    if (typeof playData === "object") {
+                        loopCount = (_a = playData.loopCount) !== null && _a !== void 0 ? _a : loopCount;
+                        runFun(playData.playComplete, this._loopCount);
+                    }
+                    // 更新循环播放计数器并判断是否需要切换到下一个动画
+                    if (loopCount > 0 && loopCount != this._loopCount) {
+                        this._loopCount++;
                     }
                     else {
-                        this.playAni(this.skeletonPlay, this.playGroupIndex);
+                        this.playGroupIndex++;
+                        this._loopCount = 0;
                     }
-                    return;
-                }
-                // 当全局数组动画loop是false loopPlayIndex > -1
-                if (this.skeletonPlay.loopPlayIndex > -1 && this.skeletonPlay.loopPlayIndex < this.skeletonPlay.nameOrIndex.length) {
-                    this.playGroupIndex = this.skeletonPlay.loopPlayIndex;
-                    this.playAni(this.skeletonPlay, this.playGroupIndex);
-                    return;
-                }
-            }
-            else {
-                // 当播放队列不是数组时，根据loop属性和动画时长来决定是否循环播放当前动画
-                if (this.skeletonPlay.loop && this.getAnimDuration((_b = this.nameOrIndex) !== null && _b !== void 0 ? _b : 0) > 0) {
-                    let len = 0;
-                    if (this instanceof GSpineSkeleton) {
-                        len = this.getAnimation((_c = this.nameOrIndex) !== null && _c !== void 0 ? _c : 0).timelines[0].getFrameCount();
-                    }
-                    else if (this instanceof GSkeleton) {
-                        len = this.getAnimation((_d = this.nameOrIndex) !== null && _d !== void 0 ? _d : 0).totalKeyframeDatasLength;
-                    }
-                    if (this.getAnimFrame((_e = this.nameOrIndex) !== null && _e !== void 0 ? _e : 0) > 1 || len > 1) {
-                        // 若设置了延迟循环播放时间，则延时后播放；否则立即播放
-                        if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                    // 判断是否需要开始新的动画序列或循环播放
+                    let isNewPro = false;
+                    if (this.skeletonPlay.nameOrIndex.length > this.playGroupIndex
+                        || (this.skeletonPlay.loop && (isNewPro = true) && (this.playGroupIndex = 0) === 0)) {
+                        // 若是新序列且设置有延迟循环播放时间，则延时后播放
+                        if (isNewPro && this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                            // 循环播放有延迟的时候  单独处理
                             Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
                         }
                         else {
@@ -2575,10 +2549,40 @@ window.tsCore = {};
                         }
                         return;
                     }
+                    // 当全局数组动画loop是false loopPlayIndex > -1
+                    if (this.skeletonPlay.loopPlayIndex > -1 && this.skeletonPlay.loopPlayIndex < this.skeletonPlay.nameOrIndex.length) {
+                        this.playGroupIndex = this.skeletonPlay.loopPlayIndex;
+                        this.playAni(this.skeletonPlay, this.playGroupIndex);
+                        return;
+                    }
                 }
+                else {
+                    // 当播放队列不是数组时，根据loop属性和动画时长来决定是否循环播放当前动画
+                    if (this.skeletonPlay.loop && this.getAnimDuration((_b = this.nameOrIndex) !== null && _b !== void 0 ? _b : 0) > 0) {
+                        let len = 0;
+                        if (this instanceof GSpineSkeleton) {
+                            len = this.getAnimation((_c = this.nameOrIndex) !== null && _c !== void 0 ? _c : 0).timelines[0].getFrameCount();
+                        }
+                        else if (this instanceof GSkeleton) {
+                            len = this.getAnimation((_d = this.nameOrIndex) !== null && _d !== void 0 ? _d : 0).totalKeyframeDatasLength;
+                        }
+                        if (this.getAnimFrame((_e = this.nameOrIndex) !== null && _e !== void 0 ? _e : 0) > 1 || len > 1) {
+                            // 若设置了延迟循环播放时间，则延时后播放；否则立即播放
+                            if (this.skeletonPlay.delayLoopPlay && this.skeletonPlay.delayLoopPlay > 0) {
+                                Laya.timer.once(this.skeletonPlay.delayLoopPlay, this, this.playAni, [this.skeletonPlay, this.playGroupIndex]);
+                            }
+                            else {
+                                this.playAni(this.skeletonPlay, this.playGroupIndex);
+                            }
+                            return;
+                        }
+                    }
+                }
+                // 执行播放完成的回调函数
+                runFun(this.skeletonPlay.playComplete);
+                // 执行播放结束 并且没有循环播放 那么清理播放数据源
+                this.skeletonPlay = null;
             }
-            // 执行播放完成的回调函数
-            runFun(this.skeletonPlay.playComplete);
             // 执行播放完成的回调函数
             this.stoppedHandler.forEach(value => value.run());
         }

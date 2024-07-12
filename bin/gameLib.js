@@ -5201,7 +5201,7 @@ window.gameLib = {};
                 if (config)
                     href = href.replace(/(?<=gameName=)\d+/, config);
                 if (code)
-                    href = href.replace(/(?<=openG3ame=)\d+/, code + "");
+                    href = href.replace(/(?<=openGame=)\d+/, code + "");
                 location.replace(href);
             }
         }
@@ -8188,6 +8188,7 @@ window.gameLib = {};
         show(index = 0, headText) {
             tsCore.HistoryManager.pauseHistory = true;
             this.changeView(index, headText);
+            this.setSize(fgui.GRoot.inst.width, fgui.GRoot.inst.height);
             fgui.GRoot.inst.addChild(this);
         }
         /**
