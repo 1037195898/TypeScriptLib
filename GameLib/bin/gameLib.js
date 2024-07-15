@@ -2823,7 +2823,7 @@ window.gameLib = {};
         getDuration(index, isTurboMode) {
             let duration = 500 + (index * 200); // 动画持续时间
             if (isTurboMode) {
-                duration = 300; // 动画持续时间
+                duration = 500; // 动画默认快速持续时间 必须500起步  否则completeHandler中的延迟Laya.time 会有丢失的情况
             }
             return duration;
         }
