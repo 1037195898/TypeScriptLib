@@ -196,10 +196,12 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
                     }
                 }
             }
-            // 执行播放完成的回调函数
-            runFun(this.skeletonPlay.playComplete)
+            const fun = this.skeletonPlay.playComplete
             // 执行播放结束 并且没有循环播放 那么清理播放数据源
             this.skeletonPlay = null
+            // 执行播放完成的回调函数
+            runFun(fun)
+
         }
         // 执行播放完成的回调函数
         this.stoppedHandler.forEach(value => value.run())
