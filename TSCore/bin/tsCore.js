@@ -2594,6 +2594,7 @@ window.tsCore = {};
             this.asSkeleton.resume();
         }
         stop() {
+            this.skeletonPlay = null;
             Laya.timer.clearAll(this);
             this.asSkeleton.stop();
         }

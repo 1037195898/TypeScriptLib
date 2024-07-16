@@ -216,6 +216,7 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
     }
 
     stop() {
+        this.skeletonPlay = null
         Laya.timer.clearAll(this)
         this.asSkeleton.stop()
     }
