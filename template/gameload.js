@@ -14,6 +14,13 @@ let onError
 let crashUrl
 
 /**
+ * 上传错误验证函数
+ * @type {(msg:Event|string, url:string)=>boolean}
+ * @return false 验证失败 true 验证成功可以上传
+ */
+let sendErrorVerifies
+
+/**
  * 批量加载资源
  * @param url {{ key:string, v:number} | { key:string, v:number}[]}
  * @param parallel {boolean} 是否一起执行，false。顺序执行
@@ -190,6 +197,7 @@ function loadError(e) {
  * @param error {Error}
  */
 window.onerror = (msg, url, line, column, error) => {
+    if (sendErrorVerifies != null && !sendErrorVerifies(msg,  url)) return
     if (error) {
         let errorLog = {
             codeVersion: codeVersion,
@@ -238,7 +246,7 @@ function onIos() {
     var onIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
     var onIPhone = u.indexOf("iPhone") > -1;
     var onMac = u.indexOf("Mac OS X") > -1;
-    var onIPad = u.indexOf("iPad") > -1 || ( platform === 'MacIntel' && maxTouchPoints >1 );
+    var onIPad = u.indexOf("iPad") > -1 || (platform === 'MacIntel' && maxTouchPoints > 1);
     return onIOS || onIPad || onIPhone || onMac
 }
 
