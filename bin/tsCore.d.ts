@@ -18,6 +18,16 @@ declare namespace tsCore {
         options: InitApp;
         private _controller;
         /**
+         * 绑定的类属性
+         * 类名 -> [属性名，属性名]
+         */
+        static beanClassProperty: Map<string, string[]>;
+        /**
+         * 绑定的类
+         * 类名 -> 类 class
+         */
+        static beanClassComponent: Map<string, new () => any>;
+        /**
          *
          * @param init
          * @param options
@@ -52,6 +62,20 @@ declare namespace tsCore {
         removeTarget(groupObj: any, caller: any): void;
         sendAction(action: string, ...args: any[]): void;
         sendGroupAction(group: string, action: string, ...args: any[]): void;
+        addBean<T extends {
+            new (...args: any[]): any;
+        }>(key: string | {
+            new (): T;
+        }, view: T): boolean;
+        removeBean<T extends {
+            new (...args: any[]): any;
+        }>(key: string | T): void;
+        getBean<T>(key: string | {
+            new (): T;
+        }): T;
+        hasBean<T>(key: string | {
+            new (): T;
+        }): boolean;
         addView<T extends IView & IKey>(key: string | {
             new (): T;
         }, view: T): boolean;
@@ -475,6 +499,20 @@ declare namespace tsCore {
         sendGroupAction(group: string, action: string, ...args: any[]): void;
         sendAction(action: string, ...args: any[]): void;
         sendActionEvent(group: string, action: string, ...args: any[]): boolean;
+        addBean<T extends {
+            new (...args: any[]): any;
+        }>(key: string | {
+            new (): T;
+        }, bean: T): boolean;
+        removeBean<T extends {
+            new (...args: any[]): any;
+        }>(key: string | T): void;
+        getBean<T>(key: string | {
+            new (): T;
+        }): T;
+        hasBean<T>(key: string | {
+            new (): T;
+        }): boolean;
         addView<T extends IView & IKey>(key: string | {
             new (): T;
         }, view: T): boolean;
@@ -905,7 +943,7 @@ declare namespace tsCore {
          * 设置标识
          * @param key
          */
-        setKey(key: string): any;
+        setKey(key: string): void;
         /**
          * 获取当前的key值
          */
@@ -925,7 +963,7 @@ declare namespace tsCore {
          * 删除一个键值对
          * @param key 键
          */
-        removeView<T extends IView & IKey>(key: string | T): any;
+        removeView<T extends IView & IKey>(key: string | T): void;
         /**
          * 获取一个值
          * @param key 键
@@ -939,16 +977,57 @@ declare namespace tsCore {
         getProxy<T>(key: string | {
             new (): T;
         }): T;
-        removeProxy<T extends IProxy & IKey>(key: string | T): any;
+        removeProxy<T extends IProxy & IKey>(key: string | T): void;
         addProxy<T extends IProxy & IKey>(key: string | {
             new (): T;
         }, proxy: T): boolean;
     }
     export interface IController extends IView, IProxy {
+        /**
+         * 向缓存中添加一个bean实例
+         *
+         * @param {string | { new(): T }} key - bean的唯一标识符，可以是字符串或构造函数
+         * @param {T} bean - 要添加的bean实例
+         * @returns {boolean} - 添加成功返回true，否则返回false
+         */
+        addBean<T extends {
+            new (...args: any[]): any;
+        }>(key: string | {
+            new (): T;
+        }, bean: T): boolean;
+        /**
+         * 从缓存中移除一个bean实例
+         *
+         * @param {string | T} key - 要移除的bean的唯一标识符，可以是字符串或构造函数
+         */
+        removeBean<T extends {
+            new (...args: any[]): any;
+        }>(key: string | T): void;
+        /**
+         * 从缓存中获取一个bean实例
+         *
+         * @param {string | { new(): T }} key - 要获取的bean的唯一标识符，可以是字符串或构造函数
+         * @returns {T} - 返回对应的bean实例，如果找不到则返回undefined
+         */
+        getBean<T>(key: string | {
+            new (): T;
+        }): T;
+        /**
+         * 检查指定的键是否存在于缓存中
+         *
+         * 此函数用于确定某个特定的键是否已经被缓存它支持传入一个字符串作为键，
+         * 或者传入一个类的构造函数通过构造函数，它能够获取到类的标志（signature）作为键进行查询
+         *
+         * @param key {string | { new(): T }} - 要检查的键，可以是字符串，也可以是类的构造函数
+         * @returns {boolean} - 如果键存在缓存中，则返回true；否则返回false
+         */
+        hasBean<T>(key: string | {
+            new (): T;
+        }): boolean;
         /** 清除所有UI缓存 */
-        clearView(): any;
+        clearView(): void;
         /** 清除所有分组和包含的事件 */
-        clearGroup(): any;
+        clearGroup(): void;
     }
     export interface IRecord {
         /**
@@ -3000,6 +3079,41 @@ declare function randomFloat(minNum: number, maxNum: number, p?: number): number
  * @returns 如果数组发生了改变（有元素被移除），则返回true；否则返回false。
  */
 declare function filterInPlace<T>(array: Array<T>, predicate: (value: T) => boolean, predicateResultToRemove: boolean): boolean;
+declare function initBean(...cls: {
+    new (): any;
+}[]): void;
+declare function getBean<T>(name: string | {
+    new (): T;
+}): T;
+/**
+ * 一个用于创建组件的高阶函数，它接受一个类作为参数，并返回一个继承了该类的新类。
+ * 这个新类会在实例化时自动注册到应用的容器中，以便于依赖注入和管理。
+ *
+ * @param classTarget 被装饰的类。
+ * @return 返回一个继承了传入类的新类。
+ */
+declare function Component<T extends {
+    new (...args: any[]): {};
+}>(classTarget: T): {
+    new (...args: any[]): {};
+} & T;
+/**
+ * 一个装饰器函数，用于标记类的属性，该属性对应的对象会被自动实例化并注册到应用的容器中。
+ * 这个函数主要解决了如何自动实例化和注册类的依赖，以便于在应用中使用时能够轻松地进行依赖注入。
+ *
+ * @param target 被装饰的类的实例。
+ * @param propertyKey 被装饰的属性的键名。
+ */
+declare function Resource(target: any, propertyKey: string): void;
+/**
+ * Bean装饰器函数，用于自动注册带有该装饰器的类实例到应用容器中
+ * 它通过反射机制获取类的返回类型，并将类实例注册为一个Bean
+ *
+ * @param target 被装饰的类的原型
+ * @param propertyKey 被装饰的方法的属性名
+ * @param descriptor 被装饰的方法的属性描述符
+ */
+declare function Bean(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
 
 /**
  * 动态参数 function 或 Laya.Handler

@@ -7,6 +7,7 @@ import {Log} from "./Log";
 import {IController, IInitEngine, IKey, IProxy, IView} from "./interfaces/ICommon";
 import Handler = Laya.Handler;
 import {Path} from "./Path";
+import {StringUtil} from "./utils/StringUtil";
 
 export class App implements IAction {
 
@@ -32,6 +33,16 @@ export class App implements IAction {
     static initEngine?: IInitEngine
     options: InitApp
     private _controller: IController
+    /**
+     * 绑定的类属性
+     * 类名 -> [属性名，属性名]
+     */
+    static beanClassProperty = new Map<string, string[]>()
+    /**
+     * 绑定的类
+     * 类名 -> 类 class
+     */
+    static beanClassComponent = new Map<string, { new(): any }>()
 
     /**
      *
@@ -201,6 +212,22 @@ export class App implements IAction {
         this._controller.sendGroupAction.apply(this._controller, args)
     }
 
+
+    addBean<T extends { new(...args: any[]) }>(key: string | { new(): T }, view: T) {
+        return this._controller.addBean(key, view)
+    }
+
+    removeBean<T extends { new(...args: any[]) }>(key: string | T) {
+        this._controller.removeBean(key)
+    }
+
+    getBean<T>(key: string | { new(): T }): T {
+        return this._controller.getBean(key)
+    }
+
+    hasBean<T>(key: string | { new(): T }): boolean {
+        return this._controller.hasBean(key)
+    }
 
     addView<T extends IView & IKey>(key: string | { new(): T }, view: T) {
         return this._controller.addView(key, view)

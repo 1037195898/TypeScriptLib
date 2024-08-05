@@ -17,6 +17,8 @@
     "noImplicitOverride": true,
     // 禁用发出在其 JSDoc 注释中包含“@internal”的声明。
     "stripInternal": true,
+    "experimentalDecorators": true, //  启用装饰器支持。
+    "emitDecoratorMetadata": true, //  输出针对装饰器的额外元数据。
     // 编译器可用的类型定义和内置对象
     "lib": [
       "DOM",

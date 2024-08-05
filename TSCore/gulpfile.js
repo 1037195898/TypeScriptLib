@@ -13,7 +13,7 @@ let beforeTs = ["src/com/App.ts", "src/com/block/Block.ts", "src/com/core/View.t
     "src/com/extends/EView.ts", "src/com/utils/ChangeValue.ts",
     "src/com/kit/UtilKit.ts"]
 
-generate.global = ["src/Types.ts", "src/Arrays.ts", "src/Strings.ts"]
+generate.global = ["src/Types.ts", "src/Arrays.ts", "src/Strings.ts", "src/com/annotation/Annotations.ts"]
 generate.tsProject = 'tsconfig.json'
 generate.beforeTs = beforeTs
 generate.libs = ["../libs/**/*", "./src/**/*.d.ts"]

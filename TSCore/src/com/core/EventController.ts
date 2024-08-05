@@ -138,6 +138,46 @@ export class EventController implements IController {
         return false
     }
 
+    addBean<T extends { new(...args: any[]) }>(key: string | { new(): T }, bean: T) {
+        if (typeof key !== "string") {
+            key = this._getClassSign(key)
+        }
+        if (StringUtil.isEmpty(key)) {
+            Log.warn("cannot be empty, key = " + key)
+            return false
+        }
+        if (this.getView(key)) {
+            Log.warn("already exist key = " + key + ", add failure!")
+            return false
+        }
+        this.cacheTarget.set(key, bean)
+        return true
+    }
+
+    removeBean<T extends { new(...args: any[]) }>(key: string | T) {
+        if (!key) return
+        if (typeof key !== "string") {
+            key = this._getClassSign(key, false)
+        }
+        if (StringUtil.isEmpty(key)) return
+        this.cacheTarget.delete(key)
+    }
+
+    getBean<T>(key: string | { new(): T }): T {
+        if (!key) return
+        if (typeof key !== "string") {
+            key = this._getClassSign(key, false)
+        }
+        return this.cacheTarget.get(key)
+    }
+
+    hasBean<T>(key: string | { new(): T }): boolean {
+        if (typeof key !== "string") {
+            key = this._getClassSign(key, false)
+        }
+        if (!key) return false
+        return this.cacheTarget.has(key)
+    }
 
     addView<T extends IView & IKey>(key: string | { new(): T }, view: T) {
         if (typeof key !== "string") {
@@ -167,11 +207,7 @@ export class EventController implements IController {
     }
 
     getView<T>(key: string | { new(): T }): T {
-        if (!key) return
-        if (typeof key !== "string") {
-            key = this._getClassSign(key)
-        }
-        return this.cacheTarget.get(key)
+        return this.getBean(key)
     }
 
     addProxy<T extends IProxy & IKey>(key: string | { new(): T }, proxy: T) {
@@ -201,11 +237,7 @@ export class EventController implements IController {
     }
 
     getProxy<T>(name: string | { new(): T }): T {
-        if (!name) return
-        if (typeof name !== "string") {
-            name = this._getClassSign(name)
-        }
-        return this.cacheTarget.get(name)
+        return this.getBean(name)
     }
 
     getMap() {
@@ -215,10 +247,10 @@ export class EventController implements IController {
     /**
      * 返回类的唯一标识
      */
-    private _getClassSign(cla: any): string {
-        let className = cla["__className"] || cla._cacheId
-        if (!className) {
-            cla._cacheId = className = `${App.DEFAULT_CACHE_HEAD}_${EventController._CLSID}`
+    private _getClassSign<T>(cla: { new(): T }, create = true): string {
+        let className = cla.name || cla["__className"] || cla["_cacheId"]
+        if (!className && create) {
+            cla["_cacheId"] = className = `${App.DEFAULT_CACHE_HEAD}_${EventController._CLSID}`
             EventController._CLSID++
         }
         return className

@@ -153,6 +153,18 @@ window.tsCore = {};
             args.unshift(group);
             this._controller.sendGroupAction.apply(this._controller, args);
         }
+        addBean(key, view) {
+            return this._controller.addBean(key, view);
+        }
+        removeBean(key) {
+            this._controller.removeBean(key);
+        }
+        getBean(key) {
+            return this._controller.getBean(key);
+        }
+        hasBean(key) {
+            return this._controller.hasBean(key);
+        }
         addView(key, view) {
             return this._controller.addView(key, view);
         }
@@ -223,6 +235,16 @@ window.tsCore = {};
      *  游戏公用组
      */
     App.GAME_GROUP = "game_group";
+    /**
+     * 绑定的类属性
+     * 类名 -> [属性名，属性名]
+     */
+    App.beanClassProperty = new Map();
+    /**
+     * 绑定的类
+     * 类名 -> 类 class
+     */
+    App.beanClassComponent = new Map();
     tsCore.App = App;
     class BezierCurves {
         constructor() {
@@ -1144,6 +1166,47 @@ window.tsCore = {};
             }
             return false;
         }
+        addBean(key, bean) {
+            if (typeof key !== "string") {
+                key = this._getClassSign(key);
+            }
+            if (StringUtil.isEmpty(key)) {
+                Log.warn("cannot be empty, key = " + key);
+                return false;
+            }
+            if (this.getView(key)) {
+                Log.warn("already exist key = " + key + ", add failure!");
+                return false;
+            }
+            this.cacheTarget.set(key, bean);
+            return true;
+        }
+        removeBean(key) {
+            if (!key)
+                return;
+            if (typeof key !== "string") {
+                key = this._getClassSign(key, false);
+            }
+            if (StringUtil.isEmpty(key))
+                return;
+            this.cacheTarget.delete(key);
+        }
+        getBean(key) {
+            if (!key)
+                return;
+            if (typeof key !== "string") {
+                key = this._getClassSign(key, false);
+            }
+            return this.cacheTarget.get(key);
+        }
+        hasBean(key) {
+            if (typeof key !== "string") {
+                key = this._getClassSign(key, false);
+            }
+            if (!key)
+                return false;
+            return this.cacheTarget.has(key);
+        }
         addView(key, view) {
             if (typeof key !== "string") {
                 key = this._getClassSign(key);
@@ -1171,12 +1234,7 @@ window.tsCore = {};
             this.cacheTarget.delete(key);
         }
         getView(key) {
-            if (!key)
-                return;
-            if (typeof key !== "string") {
-                key = this._getClassSign(key);
-            }
-            return this.cacheTarget.get(key);
+            return this.getBean(key);
         }
         addProxy(key, proxy) {
             if (typeof key !== "string") {
@@ -1205,12 +1263,7 @@ window.tsCore = {};
             this.cacheTarget.delete(key);
         }
         getProxy(name) {
-            if (!name)
-                return;
-            if (typeof name !== "string") {
-                name = this._getClassSign(name);
-            }
-            return this.cacheTarget.get(name);
+            return this.getBean(name);
         }
         getMap() {
             return this.cacheTarget;
@@ -1218,10 +1271,10 @@ window.tsCore = {};
         /**
          * 返回类的唯一标识
          */
-        _getClassSign(cla) {
-            let className = cla["__className"] || cla._cacheId;
-            if (!className) {
-                cla._cacheId = className = `${App.DEFAULT_CACHE_HEAD}_${EventController._CLSID}`;
+        _getClassSign(cla, create = true) {
+            let className = cla.name || cla["__className"] || cla["_cacheId"];
+            if (!className && create) {
+                cla["_cacheId"] = className = `${App.DEFAULT_CACHE_HEAD}_${EventController._CLSID}`;
                 EventController._CLSID++;
             }
             return className;
@@ -7871,3 +7924,104 @@ String.prototype.toInt = function () {
     }
     return value;
 };
+function initBean(...cls) {
+    cls.forEach(value => {
+        // @ts-ignore
+        if (!tsCore.App.inst.hasBean(value.name)) {
+            const target = new value();
+            // @ts-ignore
+            tsCore.App.inst.addBean(value.name, target);
+        }
+    });
+}
+function getBean(name) {
+    if (typeof name !== "string") {
+        name = name.name;
+    }
+    // @ts-ignore
+    return tsCore.App.inst.getBean(name);
+}
+/**
+ * 一个用于创建组件的高阶函数，它接受一个类作为参数，并返回一个继承了该类的新类。
+ * 这个新类会在实例化时自动注册到应用的容器中，以便于依赖注入和管理。
+ *
+ * @param classTarget 被装饰的类。
+ * @return 返回一个继承了传入类的新类。
+ */
+function Component(classTarget) {
+    const classTemp = class extends classTarget {
+        constructor(...args) {
+            super(...args);
+            const name = classTarget.name;
+            // @ts-ignore
+            if (!tsCore.App.inst.hasBean(name)) {
+                // @ts-ignore
+                tsCore.App.inst.addBean(name, this);
+            }
+            // @ts-ignore
+            let beanProperty = tsCore.App.beanClassProperty.get(name);
+            beanProperty === null || beanProperty === void 0 ? void 0 : beanProperty.forEach(value => {
+                // @ts-ignore
+                const propertyClass = Reflect.getMetadata("design:type", this, value);
+                const propertyName = propertyClass.name;
+                // @ts-ignore
+                if (!tsCore.App.inst.hasBean(value) && tsCore.App.beanClassComponent.has(propertyName)) {
+                    // @ts-ignore
+                    const newProperty = new (tsCore.App.beanClassComponent.get(propertyName))();
+                    console.log("create class " + propertyName);
+                    // @ts-ignore
+                    if (!tsCore.App.inst.hasBean(value)) {
+                        // @ts-ignore
+                        tsCore.App.inst.addBean(value, newProperty);
+                    }
+                }
+                // @ts-ignore
+                this[value] = tsCore.App.inst.getBean(value);
+            });
+        }
+    };
+    Object.defineProperty(classTemp, "name", {
+        get() {
+            return classTarget.name;
+        }
+    });
+    // @ts-ignore
+    tsCore.App.beanClassComponent.set(classTemp.name, classTemp);
+    return classTemp;
+}
+/**
+ * 一个装饰器函数，用于标记类的属性，该属性对应的对象会被自动实例化并注册到应用的容器中。
+ * 这个函数主要解决了如何自动实例化和注册类的依赖，以便于在应用中使用时能够轻松地进行依赖注入。
+ *
+ * @param target 被装饰的类的实例。
+ * @param propertyKey 被装饰的属性的键名。
+ */
+function Resource(target, propertyKey) {
+    const classTarget = Reflect.getMetadata("design:type", target, propertyKey);
+    if (classTarget) {
+        // @ts-ignore
+        let bean = tsCore.App.beanClassProperty.get(target.constructor.name) || [];
+        bean.push(propertyKey);
+        // @ts-ignore
+        tsCore.App.beanClassProperty.set(target.constructor.name, bean);
+    }
+    else
+        throw Error("class type null");
+}
+/**
+ * Bean装饰器函数，用于自动注册带有该装饰器的类实例到应用容器中
+ * 它通过反射机制获取类的返回类型，并将类实例注册为一个Bean
+ *
+ * @param target 被装饰的类的原型
+ * @param propertyKey 被装饰的方法的属性名
+ * @param descriptor 被装饰的方法的属性描述符
+ */
+function Bean(target, propertyKey, descriptor) {
+    const returnTarget = Reflect.getMetadata("design:returntype", target, propertyKey);
+    if (returnTarget) {
+        // @ts-ignore
+        tsCore.App.inst.addBean(propertyKey, descriptor.value.call(target));
+    }
+    else
+        throw Error("class type null");
+}
