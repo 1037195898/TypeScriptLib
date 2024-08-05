@@ -28,6 +28,11 @@ declare namespace tsCore {
          */
         static beanClassComponent: Map<string, new () => any>;
         /**
+         * 绑定的方法
+         * 类名 -> 生成方法
+         */
+        static beanClassFunction: Map<string, Function>;
+        /**
          *
          * @param init
          * @param options
@@ -3083,6 +3088,8 @@ declare function initBean(...cls: {
     new (): any;
 }[]): void;
 declare function getBean<T>(name: string | {
+    new (): T;
+}, bean?: {
     new (): T;
 }): T;
 /**

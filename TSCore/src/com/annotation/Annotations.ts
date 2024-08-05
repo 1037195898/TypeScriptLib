@@ -9,9 +9,30 @@ function initBean(...cls: { new(): any }[]) {
     })
 }
 
-function getBean<T>(name: string | { new(): T }): T {
+function getBean<T>(name: string | { new(): T }, bean?: { new(): T }): T {
     if (typeof name !== "string") {
         name = name.name
+    }
+    // @ts-ignore
+    if (!tsCore.App.inst.hasBean(name)) {
+        let newProperty: any
+        // @ts-ignore
+        if (tsCore.App.beanClassFunction.has(name)) {
+            // @ts-ignore
+            newProperty = tsCore.App.beanClassFunction.get(name)()
+            console.log("function-> create class " + name)
+        } else { // @ts-ignore
+            if (bean && tsCore.App.beanClassComponent.has(bean.name)) {
+                console.log("component-> create class " + bean.name)
+                // @ts-ignore
+                newProperty = new (tsCore.App.beanClassComponent.get(bean.name))()
+            }
+        }
+        // @ts-ignore
+        if (!tsCore.App.inst.hasBean(name) && newProperty) {
+            // @ts-ignore
+            tsCore.App.inst.addBean(name, newProperty)
+        }
     }
     // @ts-ignore
     return tsCore.App.inst.getBean(name)
@@ -36,27 +57,15 @@ function Component<T extends { new(...args: any[]): {} }>(classTarget: T) {
             }
             // @ts-ignore
             let beanProperty = tsCore.App.beanClassProperty.get(name)
-            beanProperty?.forEach(value => {
+            beanProperty?.forEach((value: string) => {
                 // @ts-ignore
                 const propertyClass = Reflect.getMetadata("design:type", this, value)
-                const propertyName = propertyClass.name
                 // @ts-ignore
-                if (!tsCore.App.inst.hasBean(value) && tsCore.App.beanClassComponent.has(propertyName)) {
-                    // @ts-ignore
-                    const newProperty = new (tsCore.App.beanClassComponent.get(propertyName))()
-                    console.log("create class " + propertyName)
-                    // @ts-ignore
-                    if (!tsCore.App.inst.hasBean(value)) {
-                        // @ts-ignore
-                        tsCore.App.inst.addBean(value, newProperty)
-                    }
-                }
-                // @ts-ignore
-                this[value] = tsCore.App.inst.getBean(value)
+                this[value] = getBean(value, propertyClass)
             })
         }
     }
-    Object.defineProperty(classTemp,  "name", {
+    Object.defineProperty(classTemp, "name", {
         get(): any {
             return classTarget.name
         }
@@ -65,6 +74,7 @@ function Component<T extends { new(...args: any[]): {} }>(classTarget: T) {
     tsCore.App.beanClassComponent.set(classTemp.name, classTemp)
     return classTemp
 }
+
 /**
  * 一个装饰器函数，用于标记类的属性，该属性对应的对象会被自动实例化并注册到应用的容器中。
  * 这个函数主要解决了如何自动实例化和注册类的依赖，以便于在应用中使用时能够轻松地进行依赖注入。
@@ -82,6 +92,7 @@ function Resource(target: any, propertyKey: string) {
         tsCore.App.beanClassProperty.set(target.constructor.name, bean)
     } else throw Error("class type null")
 }
+
 /**
  * Bean装饰器函数，用于自动注册带有该装饰器的类实例到应用容器中
  * 它通过反射机制获取类的返回类型，并将类实例注册为一个Bean
@@ -94,6 +105,6 @@ function Bean(target: any, propertyKey: string, descriptor: PropertyDescriptor) 
     const returnTarget = Reflect.getMetadata("design:returntype", target, propertyKey)
     if (returnTarget) {
         // @ts-ignore
-        tsCore.App.inst.addBean(propertyKey, descriptor.value.call(target))
+        tsCore.App.beanClassFunction.set(propertyKey, descriptor.value)
     } else throw Error("class type null")
 }

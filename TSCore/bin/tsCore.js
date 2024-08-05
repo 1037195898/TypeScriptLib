@@ -245,6 +245,11 @@ window.tsCore = {};
      * 类名 -> 类 class
      */
     App.beanClassComponent = new Map();
+    /**
+     * 绑定的方法
+     * 类名 -> 生成方法
+     */
+    App.beanClassFunction = new Map();
     tsCore.App = App;
     class BezierCurves {
         constructor() {
@@ -7934,9 +7939,31 @@ function initBean(...cls) {
         }
     });
 }
-function getBean(name) {
+function getBean(name, bean) {
     if (typeof name !== "string") {
         name = name.name;
+    }
+    // @ts-ignore
+    if (!tsCore.App.inst.hasBean(name)) {
+        let newProperty;
+        // @ts-ignore
+        if (tsCore.App.beanClassFunction.has(name)) {
+            // @ts-ignore
+            newProperty = tsCore.App.beanClassFunction.get(name)();
+            console.log("function-> create class " + name);
+        }
+        else { // @ts-ignore
+            if (bean && tsCore.App.beanClassComponent.has(bean.name)) {
+                console.log("component-> create class " + bean.name);
+                // @ts-ignore
+                newProperty = new (tsCore.App.beanClassComponent.get(bean.name))();
+            }
+        }
+        // @ts-ignore
+        if (!tsCore.App.inst.hasBean(name) && newProperty) {
+            // @ts-ignore
+            tsCore.App.inst.addBean(name, newProperty);
+        }
     }
     // @ts-ignore
     return tsCore.App.inst.getBean(name);
@@ -7963,20 +7990,8 @@ function Component(classTarget) {
             beanProperty === null || beanProperty === void 0 ? void 0 : beanProperty.forEach(value => {
                 // @ts-ignore
                 const propertyClass = Reflect.getMetadata("design:type", this, value);
-                const propertyName = propertyClass.name;
                 // @ts-ignore
-                if (!tsCore.App.inst.hasBean(value) && tsCore.App.beanClassComponent.has(propertyName)) {
-                    // @ts-ignore
-                    const newProperty = new (tsCore.App.beanClassComponent.get(propertyName))();
-                    console.log("create class " + propertyName);
-                    // @ts-ignore
-                    if (!tsCore.App.inst.hasBean(value)) {
-                        // @ts-ignore
-                        tsCore.App.inst.addBean(value, newProperty);
-                    }
-                }
-                // @ts-ignore
-                this[value] = tsCore.App.inst.getBean(value);
+                this[value] = getBean(value, propertyClass);
             });
         }
     };
@@ -8020,7 +8035,7 @@ function Bean(target, propertyKey, descriptor) {
     const returnTarget = Reflect.getMetadata("design:returntype", target, propertyKey);
     if (returnTarget) {
         // @ts-ignore
-        tsCore.App.inst.addBean(propertyKey, descriptor.value.call(target));
+        tsCore.App.beanClassFunction.set(propertyKey, descriptor.value);
     }
     else
         throw Error("class type null");

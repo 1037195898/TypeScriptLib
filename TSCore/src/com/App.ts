@@ -43,7 +43,11 @@ export class App implements IAction {
      * 类名 -> 类 class
      */
     static beanClassComponent = new Map<string, { new(): any }>()
-
+    /**
+     * 绑定的方法
+     * 类名 -> 生成方法
+     */
+    static beanClassFunction = new Map<string, Function>()
     /**
      *
      * @param init
