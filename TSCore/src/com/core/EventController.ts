@@ -138,7 +138,7 @@ export class EventController implements IController {
         return false
     }
 
-    addBean<T extends { new(...args: any[]) }>(key: string | { new(): T }, bean: T) {
+    addBean<T>(key: string | { new(): T }, bean: T) {
         if (typeof key !== "string") {
             key = this._getClassSign(key)
         }

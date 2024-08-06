@@ -48,6 +48,7 @@ export class App implements IAction {
      * 类名 -> 生成方法
      */
     static beanClassFunction = new Map<string, Function>()
+
     /**
      *
      * @param init
@@ -217,8 +218,8 @@ export class App implements IAction {
     }
 
 
-    addBean<T extends { new(...args: any[]) }>(key: string | { new(): T }, view: T) {
-        return this._controller.addBean(key, view)
+    addBean<T>(key: string | { new(): T }, bean: T) {
+        return this._controller.addBean(key, bean)
     }
 
     removeBean<T extends { new(...args: any[]) }>(key: string | T) {

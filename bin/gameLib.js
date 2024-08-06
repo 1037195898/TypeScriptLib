@@ -1478,7 +1478,8 @@ window.gameLib = {};
          * @deprecated
          * @see onCreateScene
          */
-        createSceneShow(handler) { }
+        createSceneShow(handler) {
+        }
         /** 当前游戏的方向 */
         updateScreenOrientation() {
         }
@@ -1488,6 +1489,11 @@ window.gameLib = {};
             Laya.timer.callLater(this, () => {
                 this.baseScene = fgui.UIPackage.createObjectFromURL(url, cls);
                 fgui.GRoot.inst.addChild(this.baseScene);
+                const name = url.substringAfterLast("/");
+                const _name = name.charAt(0).toLowerCase() + name.slice(1);
+                if (tsCore.App.inst.hasBean(_name) && tsCore.App.beanClassComponent.has(cls.name)) {
+                    tsCore.App.inst.addBean(_name, this.baseScene);
+                }
                 runFun(this.callback);
             });
             //        Laya.timer.once(2000, this, function() {

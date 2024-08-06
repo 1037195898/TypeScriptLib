@@ -153,8 +153,8 @@ window.tsCore = {};
             args.unshift(group);
             this._controller.sendGroupAction.apply(this._controller, args);
         }
-        addBean(key, view) {
-            return this._controller.addBean(key, view);
+        addBean(key, bean) {
+            return this._controller.addBean(key, bean);
         }
         removeBean(key) {
             this._controller.removeBean(key);

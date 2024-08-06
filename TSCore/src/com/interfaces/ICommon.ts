@@ -121,7 +121,7 @@ export interface IController extends IView, IProxy {
      * @param {T} bean - 要添加的bean实例
      * @returns {boolean} - 添加成功返回true，否则返回false
      */
-    addBean<T extends { new(...args: any[]) }>(key: string | { new(): T }, bean: T): boolean
+    addBean<T>(key: string | { new(): T }, bean: T): boolean
 
     /**
      * 从缓存中移除一个bean实例

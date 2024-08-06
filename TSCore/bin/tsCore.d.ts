@@ -67,11 +67,9 @@ declare namespace tsCore {
         removeTarget(groupObj: any, caller: any): void;
         sendAction(action: string, ...args: any[]): void;
         sendGroupAction(group: string, action: string, ...args: any[]): void;
-        addBean<T extends {
-            new (...args: any[]): any;
-        }>(key: string | {
+        addBean<T>(key: string | {
             new (): T;
-        }, view: T): boolean;
+        }, bean: T): boolean;
         removeBean<T extends {
             new (...args: any[]): any;
         }>(key: string | T): void;
@@ -504,9 +502,7 @@ declare namespace tsCore {
         sendGroupAction(group: string, action: string, ...args: any[]): void;
         sendAction(action: string, ...args: any[]): void;
         sendActionEvent(group: string, action: string, ...args: any[]): boolean;
-        addBean<T extends {
-            new (...args: any[]): any;
-        }>(key: string | {
+        addBean<T>(key: string | {
             new (): T;
         }, bean: T): boolean;
         removeBean<T extends {
@@ -995,9 +991,7 @@ declare namespace tsCore {
          * @param {T} bean - 要添加的bean实例
          * @returns {boolean} - 添加成功返回true，否则返回false
          */
-        addBean<T extends {
-            new (...args: any[]): any;
-        }>(key: string | {
+        addBean<T>(key: string | {
             new (): T;
         }, bean: T): boolean;
         /**

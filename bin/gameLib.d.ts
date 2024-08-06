@@ -810,7 +810,7 @@ declare namespace gameLib {
         /** 当前游戏的方向 */
         updateScreenOrientation(): void;
         /** 创建并显示一个舞台 */
-        protected createShowScene(url: string, cls: any): void;
+        protected createShowScene(url: string, cls?: new () => fgui.GObject): void;
     }
     export class BaseWindow<T extends BaseGameData = BaseGameData> extends tsCore.EWindow {
         /**
