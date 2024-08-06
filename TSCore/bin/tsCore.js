@@ -7957,6 +7957,7 @@ function initBean(...cls) {
  */
 function getBean(name, bean) {
     if (typeof name !== "string") {
+        bean !== null && bean !== void 0 ? bean : (bean = name);
         name = name.name.charAt(0).toLowerCase() + name.name.slice(1);
     }
     // @ts-ignore

@@ -27,6 +27,7 @@ function initBean(...cls: { new(): any }[]) {
  */
 function getBean<T>(name: string | { new(): T }, bean?: { new(): T }): T {
     if (typeof name !== "string") {
+        bean ??= name
         name = name.name.charAt(0).toLowerCase() + name.name.slice(1)
     }
     // @ts-ignore
