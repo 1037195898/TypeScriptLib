@@ -996,7 +996,7 @@ declare namespace gameLib {
          * 在 parseInitData 方法前执行
          */
         static customParseUser: (data: any) => void;
-        protected constructor();
+        constructor();
         protected get gameData(): T;
         /**
          * @deprecated

@@ -7,11 +7,12 @@
  */
 function initBean(...cls: { new(): any }[]) {
     cls.forEach(value => {
+        const name = value.name.charAt(0).toLowerCase() + value.name.slice(1)
         // @ts-ignore
-        if (!tsCore.App.inst.hasBean(value.name)) {
+        if (!tsCore.App.inst.hasBean(name)) {
             const target = new value()
             // @ts-ignore
-            tsCore.App.inst.addBean(value.name, target)
+            tsCore.App.inst.addBean(name, target)
         }
     })
 }
@@ -26,7 +27,7 @@ function initBean(...cls: { new(): any }[]) {
  */
 function getBean<T>(name: string | { new(): T }, bean?: { new(): T }): T {
     if (typeof name !== "string") {
-        name = name.name
+        name = name.name.charAt(0).toLowerCase() + name.name.slice(1)
     }
     // @ts-ignore
     if (!tsCore.App.inst.hasBean(name)) {
@@ -65,11 +66,6 @@ function Component<T extends { new(...args: any[]): {} }>(classTarget: T) {
         constructor(...args: any[]) {
             super(...args)
             const name = classTarget.name
-            // @ts-ignore
-            if (!tsCore.App.inst.hasBean(name)) {
-                // @ts-ignore
-                tsCore.App.inst.addBean(name, this)
-            }
             // @ts-ignore
             let beanProperty = tsCore.App.beanClassProperty.get(name)
             beanProperty?.forEach((value: string) => {

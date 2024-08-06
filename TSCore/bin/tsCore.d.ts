@@ -3084,9 +3084,24 @@ declare function randomFloat(minNum: number, maxNum: number, p?: number): number
  * @returns 如果数组发生了改变（有元素被移除），则返回true；否则返回false。
  */
 declare function filterInPlace<T>(array: Array<T>, predicate: (value: T) => boolean, predicateResultToRemove: boolean): boolean;
+/**
+ * 初始化Bean对象
+ * 该函数接受一个或多个类的构造函数，为每个类创建一个实例，并将其添加到应用程序的Bean管理器中
+ * 如果应用程序的Bean管理器中尚不存在某个类的实例，则创建该类的实例并添加
+ *
+ * @param cls 一个或多个类的构造函数，这些类是准备初始化为Bean对象的
+ */
 declare function initBean(...cls: {
     new (): any;
 }[]): void;
+/**
+ * 根据给定的名称或构造函数获取单例bean对象
+ * 如果bean不存在，则根据名称或构造函数创建并添加bean对象
+ *
+ * @param name - bean的名称或构造函数
+ * @param bean - 可选参数，bean的构造函数
+ * @returns 返回获取到的bean对象
+ */
 declare function getBean<T>(name: string | {
     new (): T;
 }, bean?: {
