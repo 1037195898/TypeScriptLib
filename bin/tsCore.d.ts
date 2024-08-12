@@ -3157,7 +3157,7 @@ declare function Resource(target: any, propertyKey: string): void;
  */
 declare function Bean(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
 declare function Actions(action: number | string, group?: string, order?: number): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
-declare function addBeanProperty(target: any, name: string): void;
+declare function initBean(target: any, name: string): void;
 /**
  * 运行应用程序，并初始化所有Bean实例。
  * @param classTarget - 应用程序主类的构造函数。

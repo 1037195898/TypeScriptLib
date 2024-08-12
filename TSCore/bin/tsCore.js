@@ -7992,7 +7992,7 @@ function Component(value = "", uiUrl) {
                 constructor(...args) {
                     super(...args);
                     const name = classTarget.name;
-                    addBeanProperty(this, name);
+                    initBean(this, name);
                 }
             };
             Object.defineProperty(classTemp, "name", {
@@ -8049,13 +8049,20 @@ function Actions(action, group, order) {
         tsCore.App.beanActionsFunction.push(new ActionsData(className, fun, action, group, order));
     };
 }
-function addBeanProperty(target, name) {
+function initBean(target, name) {
     // @ts-ignore
     let beanProperty = tsCore.App.beanClassProperty.get(name);
     beanProperty === null || beanProperty === void 0 ? void 0 : beanProperty.forEach((value) => {
         // @ts-ignore
         // const propertyClass = Reflect.getMetadata("design:type", target, value)
         target[value] = getBean(value);
+    });
+    // @ts-ignore
+    tsCore.App.beanActionsFunction
+        .filter((actionData) => name == actionData.className)
+        .forEach((actionData) => {
+        // @ts-ignore
+        tsCore.App.inst.regAction(actionData.action, target, actionData.fun, actionData.group || tsCore.App.GAME_GROUP, actionData.order);
     });
 }
 /**
@@ -8092,17 +8099,10 @@ function runApplication(classTarget) {
                 // @ts-ignore
                 tsCore.App.inst.addBean(key, target, false);
             }
-            addBeanProperty(target, classTargetName);
-            // @ts-ignore
-            tsCore.App.beanActionsFunction
-                .filter((actionData) => classTargetName == actionData.className)
-                .forEach((actionData) => {
-                // @ts-ignore
-                tsCore.App.inst.regAction(actionData.action, target, actionData.fun, actionData.group || tsCore.App.GAME_GROUP, actionData.order);
-            });
+            initBean(target, classTargetName);
         }
     });
-    addBeanProperty(app, classTarget.name);
+    initBean(app, classTarget.name);
     if (typeof app["start"] == "function") {
         app["start"]();
     }

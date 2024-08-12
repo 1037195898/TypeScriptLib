@@ -82,7 +82,7 @@ function Component<T extends { new(...args: any[]): {} }>(value: string | T = ""
                 constructor(...args: any[]) {
                     super(...args)
                     const name = classTarget.name
-                    addBeanProperty(this, name)
+                    initBean(this, name)
                 }
             }
             Object.defineProperty(classTemp, "name", {
@@ -139,7 +139,7 @@ function Actions(action: number | string, group?: string, order?: number) {
     }
 }
 
-function addBeanProperty(target: any, name: string) {
+function initBean(target: any, name: string) {
     // @ts-ignore
     let beanProperty = tsCore.App.beanClassProperty.get(name)
     beanProperty?.forEach((value: string) => {
@@ -147,6 +147,14 @@ function addBeanProperty(target: any, name: string) {
         // const propertyClass = Reflect.getMetadata("design:type", target, value)
         target[value] = getBean(value)
     })
+
+    // @ts-ignore
+    tsCore.App.beanActionsFunction
+        .filter((actionData: ActionsData) => name == actionData.className)
+        .forEach((actionData: ActionsData) => {
+            // @ts-ignore
+            tsCore.App.inst.regAction(actionData.action, target, actionData.fun, actionData.group || tsCore.App.GAME_GROUP, actionData.order)
+        })
 }
 
 /**
@@ -182,18 +190,10 @@ function runApplication<T>(classTarget: { new(...args: any[]): T }): T {
                 // @ts-ignore
                 tsCore.App.inst.addBean(key, target, false)
             }
-            addBeanProperty(target, classTargetName)
-
-            // @ts-ignore
-            tsCore.App.beanActionsFunction
-                .filter((actionData: ActionsData) => classTargetName == actionData.className)
-                .forEach((actionData: ActionsData) => {
-                    // @ts-ignore
-                    tsCore.App.inst.regAction(actionData.action, target, actionData.fun, actionData.group || tsCore.App.GAME_GROUP, actionData.order)
-                })
+            initBean(target, classTargetName)
         }
     })
-    addBeanProperty(app, classTarget.name)
+    initBean(app, classTarget.name)
     if (typeof app["start"] == "function") {
         app["start"]()
     }
