@@ -3156,6 +3156,12 @@ declare function Resource(target: any, propertyKey: string): void;
  * @param descriptor - 属性描述符。
  */
 declare function Bean(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+/**
+ * 注册事件
+ * @param {number | string} action 事件名字
+ * @param {string} group 分组集合
+ * @param {number} order 值越大 越后执行 默认 100
+ */
 declare function Actions(action: number | string, group?: string, order?: number): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
 declare function initBean(target: any, name: string): void;
 /**

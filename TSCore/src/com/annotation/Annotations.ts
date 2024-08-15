@@ -129,6 +129,12 @@ function Bean(target: any, propertyKey: string, descriptor: PropertyDescriptor) 
     } else throw Error("class type null")
 }
 
+/**
+ * 注册事件
+ * @param {number | string} action 事件名字
+ * @param {string} group 分组集合
+ * @param {number} order 值越大 越后执行 默认 100
+ */
 function Actions(action: number | string, group?: string, order?: number) {
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const className = target.constructor.name
