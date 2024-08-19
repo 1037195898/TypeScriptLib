@@ -11,29 +11,33 @@ import {BaseGameData} from "../core/BaseGameData";
 /** 提示框 */
 export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
 
-    private static _instance: PromptWindow
+    protected static _instance: PromptWindow
 
     static get inst() {
         PromptWindow._instance ??= new PromptWindow()
         return PromptWindow._instance
     }
 
-    private titleText?: fgui.GTextField
-    private content?: GTextField
+    protected titleText?: fgui.GTextField
+    protected content?: GTextField
     /** 确定取消 */
-    private cancelBtn?: GButton
-    private closeBtn?: GButton
+    protected cancelBtn?: GButton
+    protected closeBtn?: GButton
     /** 确定 */
-    private continueBtn?: GButton
+    protected continueBtn?: GButton
     /** 提示框的击中类型 */
-    private controller: Controller
+    protected buttonController: Controller
     /** 标题显示控制器 */
-    private controller2: fgui.Controller
-    private controller3: fgui.Controller
-    private continueFun: ParamHandler
-    private callback: ParamHandler
+    protected titleDisplayController: fgui.Controller
+    /**
+     * 关闭按钮显示控制器
+     */
+    protected closeButtonDisplayController: fgui.Controller
+    protected closeFun: ParamHandler
+    protected continueFun: ParamHandler
+    protected callback: ParamHandler
     /** 缓存的提示框 */
-    private cacheMessage: PromptData[] = []
+    protected cacheMessage: PromptData[] = []
 
     constructor() {
         super()
@@ -57,23 +61,30 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
 
         // this.cancelBtn.getTextField().bold = true
         // this.continueBtn.getTextField().bold = true
+        this.buttonController = this.getController("c1")
+        this.titleDisplayController = this.getController("c2")
+        this.closeButtonDisplayController = this.getController("c3")
 
-        this.controller = this.getController("c1")
-        this.controller2 = this.getController("c2")
-        this.controller3 = this.getController("c3")
-
-        this.closeBtn?.onClick(this, this.cancelHandler)
+        this.closeBtn?.onClick(this, this.closeHandler)
         this.cancelBtn?.onClick(this, this.cancelHandler)
         this.continueBtn?.onClick(this, this.continueHandler)
 
     }
 
-    private continueHandler() {
-        if (this.continueFun) this.callback = null
+    protected continueHandler() {
+        this.callback = null
+        this.closeFun = null
         if (this.parent) AppRecordManager.backHistory()
     }
 
-    private cancelHandler() {
+    protected closeHandler() {
+        this.continueFun = null
+        this.callback = null
+        if (this.parent) AppRecordManager.backHistory()
+    }
+
+    protected cancelHandler() {
+        this.closeFun = null
         this.continueFun = null
         if (this.parent) AppRecordManager.backHistory()
     }
@@ -87,7 +98,8 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
     endCallHandler() {
         runFun(this.continueFun)
         runFun(this.callback)
-        this.callback = this.continueFun = null
+        runFun(this.closeFun)
+        this.callback = this.continueFun = this.closeFun = null
         if (this.cacheMessage.length > 0) {
             let arr = this.cacheMessage.shift()
             this._showWindow(arr.msg, arr.obj, arr.callback, arr.continue, arr.isAction)
@@ -133,7 +145,7 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
         this._show({msg: msg, obj: options, callback: callback, continue: continueFun, isAction: isAction})
     }
 
-    private _showWindow(msg: string | number | any[] | PromptData, options?: IPromptData, callback?: ParamHandler, continueFun?: ParamHandler, isAction = true) {
+    protected _showWindow(msg: string | number | any[] | PromptData, options?: IPromptData, callback?: ParamHandler, continueFun?: ParamHandler, isAction = true) {
         if (!this.isPromptData(msg)) msg = {
             msg: msg,
             obj: options,
@@ -144,7 +156,7 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
         this._show(msg)
     }
 
-    private _show(data: PromptData) {
+    protected _show(data: PromptData) {
         let msg = data.msg
         if (Array.isArray(msg)) {
             msg = getString.apply(null, msg) as string
@@ -169,14 +181,15 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
         this.show()
         if (this.continueBtn) this.continueBtn.text = obj.okName
         if (this.cancelBtn) this.cancelBtn.text = obj.cancelName
-        if (this.controller) this.controller.selectedIndex = data.continue ? 1 : 0
-        if (this.controller2) this.controller2.selectedIndex = data.title ? 1 : 0
-        if (this.controller3) this.controller3.selectedIndex = data.continue ? 1 : 0
+        if (this.buttonController) this.buttonController.selectedIndex = data.continue ? 1 : 0
+        if (this.titleDisplayController) this.titleDisplayController.selectedIndex = data.title ? 1 : 0
+        if (this.closeButtonDisplayController) this.closeButtonDisplayController.selectedIndex = data.close ? 1 : 0
 
         this.content.text = msg
         if (this.titleText) this.titleText.text = data.title || ""
         this.callback = data.callback
         this.continueFun = data.continue
+        this.closeFun = data.close
     }
 
     override dispose() {

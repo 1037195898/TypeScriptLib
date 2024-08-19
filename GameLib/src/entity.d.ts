@@ -78,6 +78,8 @@ declare type PromptData = {
     callback?: ParamHandler
     /** 确认按键 */
     continue?: ParamHandler
+    /** 关闭按钮 */
+    close?: ParamHandler
     /** 是否动画弹出 默认true */
     isAction?: boolean
 }

@@ -3948,28 +3948,33 @@ declare namespace gameLib {
     }
     /** 提示框 */
     export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
-        private static _instance;
+        protected static _instance: PromptWindow;
         static get inst(): PromptWindow<BaseGameData>;
-        private titleText?;
-        private content?;
+        protected titleText?: fgui.GTextField;
+        protected content?: fgui.GTextField;
         /** 确定取消 */
-        private cancelBtn?;
-        private closeBtn?;
+        protected cancelBtn?: fgui.GButton;
+        protected closeBtn?: fgui.GButton;
         /** 确定 */
-        private continueBtn?;
+        protected continueBtn?: fgui.GButton;
         /** 提示框的击中类型 */
-        private controller;
+        protected buttonController: fgui.Controller;
         /** 标题显示控制器 */
-        private controller2;
-        private controller3;
-        private continueFun;
-        private callback;
+        protected titleDisplayController: fgui.Controller;
+        /**
+         * 关闭按钮显示控制器
+         */
+        protected closeButtonDisplayController: fgui.Controller;
+        protected closeFun: ParamHandler;
+        protected continueFun: ParamHandler;
+        protected callback: ParamHandler;
         /** 缓存的提示框 */
-        private cacheMessage;
+        protected cacheMessage: PromptData[];
         constructor();
         protected onInit(): void;
-        private continueHandler;
-        private cancelHandler;
+        protected continueHandler(): void;
+        protected closeHandler(): void;
+        protected cancelHandler(): void;
         protected onHide(): void;
         /** 结束回调 */
         endCallHandler(): void;
@@ -3996,8 +4001,8 @@ declare namespace gameLib {
          * @see ActionLib.GAME_SHOW_PROMPT_CANCEL_WINDOW
          */
         showCancelTip(msg: string | number | any[], options?: IPromptData, callback?: ParamHandler, continueFun?: ParamHandler, isAction?: boolean): void;
-        private _showWindow;
-        private _show;
+        protected _showWindow(msg: string | number | any[] | PromptData, options?: IPromptData, callback?: ParamHandler, continueFun?: ParamHandler, isAction?: boolean): void;
+        protected _show(data: PromptData): void;
         dispose(): void;
         /**
          * 判断是否是接口 用 prototype 是否存在判断
@@ -4166,6 +4171,8 @@ declare type PromptData = {
     callback?: ParamHandler
     /** 确认按键 */
     continue?: ParamHandler
+    /** 关闭按钮 */
+    close?: ParamHandler
     /** 是否动画弹出 默认true */
     isAction?: boolean
 }

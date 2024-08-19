@@ -8485,20 +8485,27 @@ window.gameLib = {};
             this.closeBtn = (_e = this.getChild("close")) === null || _e === void 0 ? void 0 : _e.asButton;
             // this.cancelBtn.getTextField().bold = true
             // this.continueBtn.getTextField().bold = true
-            this.controller = this.getController("c1");
-            this.controller2 = this.getController("c2");
-            this.controller3 = this.getController("c3");
-            (_f = this.closeBtn) === null || _f === void 0 ? void 0 : _f.onClick(this, this.cancelHandler);
+            this.buttonController = this.getController("c1");
+            this.titleDisplayController = this.getController("c2");
+            this.closeButtonDisplayController = this.getController("c3");
+            (_f = this.closeBtn) === null || _f === void 0 ? void 0 : _f.onClick(this, this.closeHandler);
             (_g = this.cancelBtn) === null || _g === void 0 ? void 0 : _g.onClick(this, this.cancelHandler);
             (_h = this.continueBtn) === null || _h === void 0 ? void 0 : _h.onClick(this, this.continueHandler);
         }
         continueHandler() {
-            if (this.continueFun)
-                this.callback = null;
+            this.callback = null;
+            this.closeFun = null;
+            if (this.parent)
+                AppRecordManager.backHistory();
+        }
+        closeHandler() {
+            this.continueFun = null;
+            this.callback = null;
             if (this.parent)
                 AppRecordManager.backHistory();
         }
         cancelHandler() {
+            this.closeFun = null;
             this.continueFun = null;
             if (this.parent)
                 AppRecordManager.backHistory();
@@ -8512,7 +8519,8 @@ window.gameLib = {};
         endCallHandler() {
             runFun(this.continueFun);
             runFun(this.callback);
-            this.callback = this.continueFun = null;
+            runFun(this.closeFun);
+            this.callback = this.continueFun = this.closeFun = null;
             if (this.cacheMessage.length > 0) {
                 let arr = this.cacheMessage.shift();
                 this._showWindow(arr.msg, arr.obj, arr.callback, arr.continue, arr.isAction);
@@ -8593,17 +8601,18 @@ window.gameLib = {};
                 this.continueBtn.text = obj.okName;
             if (this.cancelBtn)
                 this.cancelBtn.text = obj.cancelName;
-            if (this.controller)
-                this.controller.selectedIndex = data.continue ? 1 : 0;
-            if (this.controller2)
-                this.controller2.selectedIndex = data.title ? 1 : 0;
-            if (this.controller3)
-                this.controller3.selectedIndex = data.continue ? 1 : 0;
+            if (this.buttonController)
+                this.buttonController.selectedIndex = data.continue ? 1 : 0;
+            if (this.titleDisplayController)
+                this.titleDisplayController.selectedIndex = data.title ? 1 : 0;
+            if (this.closeButtonDisplayController)
+                this.closeButtonDisplayController.selectedIndex = data.close ? 1 : 0;
             this.content.text = msg;
             if (this.titleText)
                 this.titleText.text = data.title || "";
             this.callback = data.callback;
             this.continueFun = data.continue;
+            this.closeFun = data.close;
         }
         /*@override*/
         dispose() {
