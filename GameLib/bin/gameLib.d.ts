@@ -474,6 +474,11 @@ declare namespace gameLib {
          * @param count 剩余重复次数
          */
         reconnectionNet(callback: ParamHandler, count?: number): void;
+        /**
+         * 邀请玩现金场 的基本需求
+         * @returns {boolean}
+         */
+        static inviteRealMoneyNeed: () => boolean;
         /** 新游戏开始  这里可以处理一些逻辑 */
         newGameStartLogic(handler?: ParamHandler): void;
         /**

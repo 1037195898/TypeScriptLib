@@ -365,13 +365,23 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
         })
     }
 
+    /**
+     * 邀请玩现金场 的基本需求
+     * @returns {boolean}
+     */
+    static inviteRealMoneyNeed = (): boolean => {
+        let gameData = Player.inst.gameData
+        let winLimit = gameData?.getTotalBetMoney() * 3 ?? 0
+        return Player.inst.isGuest && Player.inst.guestModel.guestPlayCount >= CommonCmd.GUEST_MAX_PLAY_COUNT && (
+            gameData != null && !gameData.isRecommend && winLimit <= (gameData?.totalWinMoney ?? 100)
+        );
+
+    }
+
     /** 新游戏开始  这里可以处理一些逻辑 */
     newGameStartLogic(handler?: ParamHandler) {
         let gameData = Player.inst.gameData
-        let winLimit = gameData ? gameData.getTotalBetMoney() * 3 : 0
-        if (Player.inst.isGuest && Player.inst.guestModel.guestPlayCount >= CommonCmd.GUEST_MAX_PLAY_COUNT && (
-            gameData != null && !gameData.isRecommend && winLimit <= gameData.totalWinMoney
-        )) {
+        if (BaseScene.inviteRealMoneyNeed()) {
             gameData.isRecommend = true
             this.showInviteRealMoney(handler)
             return
@@ -467,7 +477,8 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
      * ● 未做处理
      * ```
      */
-    resetBet() {}
+    resetBet() {
+    }
 
     override dispose() {
         Log.debug("game dispose")

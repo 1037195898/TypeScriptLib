@@ -710,8 +710,7 @@ window.gameLib = {};
         /** 新游戏开始  这里可以处理一些逻辑 */
         newGameStartLogic(handler) {
             let gameData = Player.inst.gameData;
-            let winLimit = gameData ? gameData.getTotalBetMoney() * 3 : 0;
-            if (Player.inst.isGuest && Player.inst.guestModel.guestPlayCount >= CommonCmd.GUEST_MAX_PLAY_COUNT && (gameData != null && !gameData.isRecommend && winLimit <= gameData.totalWinMoney)) {
+            if (BaseScene.inviteRealMoneyNeed()) {
                 gameData.isRecommend = true;
                 this.showInviteRealMoney(handler);
                 return;
@@ -803,7 +802,8 @@ window.gameLib = {};
          * ● 未做处理
          * ```
          */
-        resetBet() { }
+        resetBet() {
+        }
         /*@override*/
         dispose() {
             tsCore.Log.debug("game dispose");
@@ -917,6 +917,16 @@ window.gameLib = {};
             fgui.GRoot.inst.addChild(this.guideSprite);
         }
     }
+    /**
+     * 邀请玩现金场 的基本需求
+     * @returns {boolean}
+     */
+    BaseScene.inviteRealMoneyNeed = () => {
+        var _a, _b;
+        let gameData = Player.inst.gameData;
+        let winLimit = (_a = (gameData === null || gameData === void 0 ? void 0 : gameData.getTotalBetMoney()) * 3) !== null && _a !== void 0 ? _a : 0;
+        return Player.inst.isGuest && Player.inst.guestModel.guestPlayCount >= CommonCmd.GUEST_MAX_PLAY_COUNT && (gameData != null && !gameData.isRecommend && winLimit <= ((_b = gameData === null || gameData === void 0 ? void 0 : gameData.totalWinMoney) !== null && _b !== void 0 ? _b : 100));
+    };
     gameLib.BaseScene = BaseScene;
     class BaseSkeletonWindow extends tsCore.SkeletonWindow {
         /**
