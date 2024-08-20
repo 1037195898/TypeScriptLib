@@ -2174,8 +2174,10 @@ window.gameLib = {};
                 else {
                     Player.inst.gameData.playCount++;
                     Player.inst.playCount++;
-                    if (Player.inst.isGuest)
+                    if (Player.inst.isGuest) {
                         Player.inst.guestModel.guestPlayCount++;
+                        Player.inst.guestModel.guestTotalWin += data.data.win;
+                    }
                 }
                 runFun(callback, data);
             }, this.onSendBetError.bind(this));
@@ -5093,7 +5095,7 @@ window.gameLib = {};
             // 如果是游客模式
             if (Player.inst.isGuest) {
                 Player.inst.cacheMoney = Player.inst.money;
-                Player.inst.money = Laya.Browser.window.demoFreeMoney || 10000;
+                Player.inst.money = Player.inst.guestModel.guestInitMoney;
             }
             this.sendAction(ActionLib.GAME_CHECK_STATE, Laya.Handler.create(this, this.checkComplete));
         }

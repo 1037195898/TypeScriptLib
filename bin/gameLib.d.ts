@@ -1725,6 +1725,12 @@ declare namespace gameLib {
         guestUID: number;
         /** 游客模式玩次数 */
         guestPlayCount: number;
+        /** 游客模式总win额度 */
+        guestTotalWin: number;
+        /**
+         * 游客初始金额
+         */
+        guestInitMoney: number;
         /** 清除数据  */
         clearData(): void;
         /**

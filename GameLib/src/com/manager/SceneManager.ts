@@ -336,7 +336,7 @@ export class SceneManager extends EProxy {
         // 如果是游客模式
         if (Player.inst.isGuest) {
             Player.inst.cacheMoney = Player.inst.money
-            Player.inst.money = Browser.window.demoFreeMoney || 10000
+            Player.inst.money = Player.inst.guestModel.guestInitMoney
         }
         this.sendAction(ActionLib.GAME_CHECK_STATE, Handler.create(this, this.checkComplete))
     }

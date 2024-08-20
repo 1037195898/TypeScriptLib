@@ -374,8 +374,7 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
         let winLimit = gameData?.getTotalBetMoney() * 3 ?? 0
         return Player.inst.isGuest && Player.inst.guestModel.guestPlayCount >= CommonCmd.GUEST_MAX_PLAY_COUNT && (
             gameData != null && !gameData.isRecommend && winLimit <= (gameData?.totalWinMoney ?? 100)
-        );
-
+        )
     }
 
     /** 新游戏开始  这里可以处理一些逻辑 */

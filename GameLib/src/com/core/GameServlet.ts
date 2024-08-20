@@ -398,7 +398,10 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
             } else {
                 Player.inst.gameData.playCount++
                 Player.inst.playCount++
-                if (Player.inst.isGuest) Player.inst.guestModel.guestPlayCount++
+                if (Player.inst.isGuest) {
+                    Player.inst.guestModel.guestPlayCount++
+                    Player.inst.guestModel.guestTotalWin += data.data.win
+                }
             }
             runFun(callback, data)
         }, this.onSendBetError.bind(this))
