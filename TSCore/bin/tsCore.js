@@ -7956,7 +7956,8 @@ function Component(value = "") {
                 value = classTarget;
             }
             (_a = data.autoInit) !== null && _a !== void 0 ? _a : (data.autoInit = true);
-            data.key = typeof value === "string" && value.trim().length > 0 ? value : classTarget.name.firstLowerCase();
+            const className = Reflect.getMetadata("class:name", classTarget) || classTarget.name;
+            data.key = typeof value === "string" && value.trim().length > 0 ? value : className.firstLowerCase();
             data.classTarget = classTarget;
             if (!data.autoInit) {
                 return proxyClass(classTarget, typeof value === "string" ? value : data.key);

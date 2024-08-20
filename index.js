@@ -123,11 +123,13 @@ class GenerateModule {
                 /** @type string[] */
                 let newContent = []
                 let isNamespace = false
+                // 上一次出现组件标签
+                let isComponentTag = false
                 for (let line of contents) {
                     // if (line.startsWith("declare namespace ")) {
                     //     break
                     // } else
-                    if (/\s?namespace(\s+)?\w*\s*.*\{/.test(line)) {
+                    if (/\s*namespace\s*\w*\s*.*\{/.test(line)) {
                         isNamespace = true
                         // 忽略掉 已有命名空间
                     } else if (line.trimStart().startsWith("import ")) {// 将 import导入的库 缓存起来
@@ -136,8 +138,24 @@ class GenerateModule {
                         }
                     } else {
                         // 有重写方法
-                        if (/(?<=\s?)override(?=\s.+\(.*?\))/.test(line)) {
+                        if (/\s*override(?=\s.+\(.*?\))/.test(line)) {
                             newContent.push("\t/*@override*/")
+                        }
+                        if (/\s*@Component(\s*|\(.*\))((\s+)|$)/.test(line)) {
+                            isComponentTag = true
+                        }
+                        if (/\s*class\s+\w+\s*/.test(line) && isComponentTag) {
+                            // 发现类并且上一次有组件标签
+                            isComponentTag = false
+                            const match = line.match(/\s*class\s+\w+\s*/)
+                            if (match) {
+                                // 添加保存类名的数据
+                                let className = match[0]
+                                if (className) {
+                                    className = className.replace("class", "").trim()
+                                    newContent.push(`@Reflect.metadata("className", "${className}")`)
+                                }
+                            }
                         }
                         // 如果没有引入其它库文件  直接跳过替换
                         if (arr.length === 0) {

@@ -64,7 +64,8 @@ function Component<T extends { new(...args: any[]): {} }>(value: string | T | Co
                 value = classTarget
             }
             data.autoInit ??= true
-            data.key = typeof value === "string" && value.trim().length > 0 ? value : classTarget.name.firstLowerCase()
+            const className = Reflect.getMetadata("class:name", classTarget) || classTarget.name
+            data.key = typeof value === "string" && value.trim().length > 0 ? value : className.firstLowerCase()
             data.classTarget = classTarget
 
             if (!data.autoInit) {
