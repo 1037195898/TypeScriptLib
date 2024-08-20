@@ -2,12 +2,11 @@ import Browser = Laya.Browser;
 import Render = Laya.Render;
 import LocalStorage = Laya.LocalStorage;
 import UtilKit = tsCore.UtilKit;
-import MathKit = tsCore.MathKit;
 import StringUtil = tsCore.StringUtil;
 import ConfigKit = tsCore.ConfigKit;
+import Log = tsCore.Log;
 import {UrlParam} from "./net/UrlParam"
 import {IData, IGameData, IGuestModel, ILogin} from "./Interfaces";
-import Log = tsCore.Log;
 
 /** 用户数据 */
 export class Player {
@@ -31,6 +30,8 @@ export class Player {
     channelName = "wap"
 
     private _icon = "ui://cw0f8xaqgn9s6x"
+    /** 进入游戏的初始金额 */
+    initMoney = 0
     /** 玩家身上主账户的钱 */
     money = 0
     /** 金币 */
@@ -113,6 +114,10 @@ export class Player {
     /** 获得奖励的次数 */
     jackpotCount = 0
 
+    /** 当前盈利情况 */
+    getProfit() {
+        return this.money - this.initMoney
+    }
 
     /**
      * 游戏类型  id

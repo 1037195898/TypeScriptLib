@@ -1715,7 +1715,7 @@ declare namespace gameLib {
      */
     export interface ILogin {
         /** 使用Token登录 并获取用户数据 */
-        loginToken(callback: ParamHandler): any;
+        loginToken(callback: ParamHandler): void;
     }
     /**
      * 游戏模式
@@ -1731,8 +1731,6 @@ declare namespace gameLib {
         guestInitMoney: number;
         /** 清除数据  */
         clearData(): void;
-        /** 游客模式总win额度 */
-        getTotalWin(): number;
         /**
          * post请求 返回数据  可以在这里对返回数据进行修改
          * @param url 访问网址
@@ -3026,6 +3024,8 @@ declare namespace gameLib {
         /** 渠道名字 */
         channelName: string;
         private _icon;
+        /** 进入游戏的初始金额 */
+        initMoney: number;
         /** 玩家身上主账户的钱 */
         money: number;
         /** 金币 */
@@ -3106,6 +3106,8 @@ declare namespace gameLib {
         gamePool: number;
         /** 获得奖励的次数 */
         jackpotCount: number;
+        /** 当前盈利情况 */
+        getProfit(): number;
         /**
          * 游戏类型  id
          * @default -1

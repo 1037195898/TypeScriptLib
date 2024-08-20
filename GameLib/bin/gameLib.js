@@ -5120,6 +5120,7 @@ window.gameLib = {};
             tsCore.SoundUtils.stopMusic(); // 关闭进入游戏前的音乐
             tsCore.Log.debug("init data");
             this.sendAction(ActionLib.GAME_INIT_DATA);
+            Player.inst.initMoney = Player.inst.money;
             tsCore.Log.debug("create scene");
             // 创建游戏到舞台上
             this.sendAction(ActionLib.GAME_CREATE_SCENE_SHOW, Laya.Handler.create(this, function () {
@@ -5775,6 +5776,8 @@ window.gameLib = {};
             /** 渠道名字 */
             this.channelName = "wap";
             this._icon = "ui://cw0f8xaqgn9s6x";
+            /** 进入游戏的初始金额 */
+            this.initMoney = 0;
             /** 玩家身上主账户的钱 */
             this.money = 0;
             /** 金币 */
@@ -5831,6 +5834,10 @@ window.gameLib = {};
             var _a;
             (_a = this._instance) !== null && _a !== void 0 ? _a : (this._instance = new Player());
             return this._instance;
+        }
+        /** 当前盈利情况 */
+        getProfit() {
+            return this.money - this.initMoney;
         }
         /**
          * 游戏类型  id

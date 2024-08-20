@@ -367,6 +367,8 @@ export class SceneManager extends EProxy {
         Log.debug("init data")
         this.sendAction(ActionLib.GAME_INIT_DATA)
 
+        Player.inst.initMoney = Player.inst.money
+
         Log.debug("create scene")
         // 创建游戏到舞台上
         this.sendAction(ActionLib.GAME_CREATE_SCENE_SHOW, Handler.create(this, function () {

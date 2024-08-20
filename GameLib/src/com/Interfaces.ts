@@ -22,7 +22,7 @@ export interface IGameData {
     /** 本次总共盈利 */
     totalWinMoney?: number
     /** 后端计算   当前盈利 */
-    serverWinMoney?:number
+    serverWinMoney?: number
     /** 玩的次数 计数 */
     playCount: number
     /** 是否已经弹出过一次推荐正式场的游戏 */
@@ -31,7 +31,7 @@ export interface IGameData {
      * 当前是否在特殊模式
      * @default false
      */
-    specialMode:boolean
+    specialMode: boolean
     /**
      * 游戏类型
      * @default GameType.NORMAL
@@ -97,7 +97,7 @@ export interface IData {
 export interface ILogin {
 
     /** 使用Token登录 并获取用户数据 */
-    loginToken(callback: ParamHandler)
+    loginToken(callback: ParamHandler): void
 
 }
 
@@ -117,9 +117,6 @@ export interface IGuestModel {
 
     /** 清除数据  */
     clearData(): void
-
-    /** 游客模式总win额度 */
-    getTotalWin(): number
 
     /**
      * post请求 返回数据  可以在这里对返回数据进行修改
