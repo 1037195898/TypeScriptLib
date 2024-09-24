@@ -5,7 +5,7 @@
   <!-- 进入游戏中 -->
   <string name="LOADING" id="1001">Loading...</string>
   <!-- 游戏暂停中 -->
-  <string name="GAME_OFF" id="1002">The game is under testing, pls wait.</string>
+  <string name="GAME_OFF" id="1002">Game is under maintenance</string>
   <!-- 投注金币大于最大值 -->
   <string name="ANTE_MAX_MONEY" id="1003">Bet the maximum amount can not be more than {0}</string>
   <!-- 还需XX秒才可以再次发言 -->
