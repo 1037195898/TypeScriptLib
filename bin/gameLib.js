@@ -5265,14 +5265,18 @@ window.gameLib = {};
         }
         /** 游戏报错 退出游戏 */
         gameErrorExit(msg = 1009 /* LibStr.GAME_ERROR */) {
-            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, msg, null, Laya.Handler.create(this, function () {
-                Laya.timer.callLater(this, function () {
-                    if (Player.inst.gameId != CommonCmd.GAME_HOME) {
-                        AnalyticsManager.send("exit_game_net_error_" + Player.inst.gameId);
-                        JSUtils.gameClose();
-                    }
-                });
-            }));
+            const promptData = {
+                msg: msg,
+                continue: () => {
+                    Laya.timer.callLater(this, function () {
+                        if (Player.inst.gameId != CommonCmd.GAME_HOME) {
+                            AnalyticsManager.send("exit_game_net_error_" + Player.inst.gameId);
+                            JSUtils.gameClose();
+                        }
+                    });
+                }
+            };
+            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, promptData);
         }
         /**
          * 出乎意料的退出游戏

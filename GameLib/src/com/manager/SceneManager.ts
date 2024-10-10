@@ -524,14 +524,18 @@ export class SceneManager extends EProxy {
 
     /** 游戏报错 退出游戏 */
     gameErrorExit(msg = LibStr.GAME_ERROR) {
-        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, msg, null, Handler.create(this, function () {
-            Laya.timer.callLater(this, function () {
-                if (Player.inst.gameId != CommonCmd.GAME_HOME) {
-                    AnalyticsManager.send("exit_game_net_error_" + Player.inst.gameId)
-                    JSUtils.gameClose()
-                }
-            })
-        }))
+        const promptData: PromptData = {
+            msg: msg,
+            continue: () => {
+                Laya.timer.callLater(this, function () {
+                    if (Player.inst.gameId != CommonCmd.GAME_HOME) {
+                        AnalyticsManager.send("exit_game_net_error_" + Player.inst.gameId)
+                        JSUtils.gameClose()
+                    }
+                })
+            }
+        };
+        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, promptData)
     }
 
     /**
