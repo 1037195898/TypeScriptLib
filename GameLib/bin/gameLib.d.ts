@@ -2712,7 +2712,7 @@ declare namespace gameLib {
         /** 获取游戏开奖结果超时退出游戏 */
         gameGameTimeOutExit(): void;
         /** 游戏报错 退出游戏 */
-        gameErrorExit(): void;
+        gameErrorExit(msg?: LibStr): void;
         /**
          * 出乎意料的退出游戏
          * @param msg
@@ -3472,11 +3472,11 @@ declare namespace gameLib {
         static reloadAll(): void;
         /** 刷新 */
         static reload(): void;
-        /** 进入登录界面 */
+        /** 进入登录界面 /login */
         static login(): void;
-        /** 充值 */
+        /** 充值 /deposit */
         static deposit(): void;
-        /** 进入刮刮卡 */
+        /** 进入刮刮卡 /jackpot */
         static jackpot(): void;
         /**
          * 打开指定的web页面 不关闭游戏的前提下

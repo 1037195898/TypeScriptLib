@@ -409,9 +409,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
      */
     protected onSendBetError() {
         WaitResult.inst.hide()
-        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.NET_ERROR, null, () => {
-            SceneManager.inst.gameErrorExit()
-        })
+        SceneManager.inst.gameErrorExit(LibStr.NET_ERROR)
     }
 
 

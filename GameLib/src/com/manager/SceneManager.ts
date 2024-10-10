@@ -2,7 +2,6 @@ import Render = Laya.Render;
 import LocalStorage = Laya.LocalStorage;
 import GRoot = fgui.GRoot;
 import Handler = Laya.Handler;
-import Browser = Laya.Browser;
 import UIPackage = fgui.UIPackage;
 import SoundManager = Laya.SoundManager;
 import Loader = Laya.Loader;
@@ -524,16 +523,14 @@ export class SceneManager extends EProxy {
     }
 
     /** 游戏报错 退出游戏 */
-    gameErrorExit() {
-        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, LibStr.GAME_ERROR, null, Handler.create(this, function () {
-            this.sendAction(ActionLib.GAME_RECONNECTION_NET, Handler.create(this, function () {
-                Laya.timer.callLater(this, function () {
-                    if (Player.inst.gameId != CommonCmd.GAME_HOME) {
-                        AnalyticsManager.send("exit_game_net_error_" + Player.inst.gameId)
-                        JSUtils.gameClose()
-                    }
-                })
-            }))
+    gameErrorExit(msg = LibStr.GAME_ERROR) {
+        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, msg, null, Handler.create(this, function () {
+            Laya.timer.callLater(this, function () {
+                if (Player.inst.gameId != CommonCmd.GAME_HOME) {
+                    AnalyticsManager.send("exit_game_net_error_" + Player.inst.gameId)
+                    JSUtils.gameClose()
+                }
+            })
         }))
     }
 
@@ -547,7 +544,7 @@ export class SceneManager extends EProxy {
         this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, msg, null, Handler.create(this, function () {
             Laya.timer.callLater(this, function () {
                 if (Player.inst.gameId != CommonCmd.GAME_HOME) {
-                    AppRecordManager.backHistory()
+                    AppRecordManager.backGame()
                 }
                 runFun(callback)
             })

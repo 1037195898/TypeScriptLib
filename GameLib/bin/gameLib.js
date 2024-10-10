@@ -2185,9 +2185,7 @@ window.gameLib = {};
          */
         onSendBetError() {
             WaitResult.inst.hide();
-            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1005 /* LibStr.NET_ERROR */, null, () => {
-                SceneManager.inst.gameErrorExit();
-            });
+            SceneManager.inst.gameErrorExit(1005 /* LibStr.NET_ERROR */);
         }
         /**
          * 当请求不通过的时候  发出提示信息并重置bet
@@ -5266,16 +5264,14 @@ window.gameLib = {};
             }));
         }
         /** 游戏报错 退出游戏 */
-        gameErrorExit() {
-            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, 1009 /* LibStr.GAME_ERROR */, null, Laya.Handler.create(this, function () {
-                this.sendAction(ActionLib.GAME_RECONNECTION_NET, Laya.Handler.create(this, function () {
-                    Laya.timer.callLater(this, function () {
-                        if (Player.inst.gameId != CommonCmd.GAME_HOME) {
-                            AnalyticsManager.send("exit_game_net_error_" + Player.inst.gameId);
-                            JSUtils.gameClose();
-                        }
-                    });
-                }));
+        gameErrorExit(msg = 1009 /* LibStr.GAME_ERROR */) {
+            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, msg, null, Laya.Handler.create(this, function () {
+                Laya.timer.callLater(this, function () {
+                    if (Player.inst.gameId != CommonCmd.GAME_HOME) {
+                        AnalyticsManager.send("exit_game_net_error_" + Player.inst.gameId);
+                        JSUtils.gameClose();
+                    }
+                });
             }));
         }
         /**
@@ -5288,7 +5284,7 @@ window.gameLib = {};
             this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, msg, null, Laya.Handler.create(this, function () {
                 Laya.timer.callLater(this, function () {
                     if (Player.inst.gameId != CommonCmd.GAME_HOME) {
-                        AppRecordManager.backHistory();
+                        AppRecordManager.backGame();
                     }
                     runFun(callback);
                 });
@@ -6812,15 +6808,15 @@ window.gameLib = {};
         static reload() {
             Laya.Browser.window.location.reload();
         }
-        /** 进入登录界面 */
+        /** 进入登录界面 /login */
         static login() {
             JSUtils.openPage("/login");
         }
-        /** 充值 */
+        /** 充值 /deposit */
         static deposit() {
             JSUtils.openPage("/deposit");
         }
-        /** 进入刮刮卡 */
+        /** 进入刮刮卡 /jackpot */
         static jackpot() {
             JSUtils.openPage("/jackpot");
         }
