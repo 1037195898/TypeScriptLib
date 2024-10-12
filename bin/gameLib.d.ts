@@ -723,7 +723,7 @@ declare namespace gameLib {
         /**
          * 用于显示动画的面板
          */
-        protected aniPanel: fgui.GComponent;
+        aniPanel: fgui.GComponent;
         protected onInit(): void;
         /**
          * 播放获胜线状态改成false,清理绘制,清除执行下一步显示线 nextLine

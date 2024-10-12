@@ -45,7 +45,7 @@ export class BaseSlotView<T extends BaseSlotGameData = BaseSlotGameData> extends
     /**
      * 用于显示动画的面板
      */
-    protected aniPanel: GComponent
+    aniPanel: GComponent
 
     protected override onInit() {
         super.onInit()
