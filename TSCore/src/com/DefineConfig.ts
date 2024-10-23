@@ -691,15 +691,39 @@ export class DefineConfig {
     }
 
     private static defineSpineSkeleton() {
+
+        Object.defineProperties(Laya.SpineTempletBase.prototype, {
+            loadResUrl: {
+                value: null,
+                writable: true
+            }
+        })
+        // @ts-ignore
+        const SpineTemplet_3_x_loadAni = Laya.SpineTemplet_3_x.prototype.loadAni
+        // @ts-ignore
+        Object.defineProperty(Laya.SpineTemplet_3_x.prototype, "loadAni", {
+            value: function (jsonOrSkelUrl: string) {
+                this.loadResUrl = jsonOrSkelUrl
+                SpineTemplet_3_x_loadAni.call(this,  jsonOrSkelUrl)
+            }
+        })
+        // @ts-ignore
+        const SpineTemplet_4_0_loadAni = Laya.SpineTemplet_4_0.prototype.loadAni
+        // @ts-ignore
+        Object.defineProperty(Laya.SpineTemplet_4_0.prototype, "loadAni", {
+            value: function (jsonOrSkelUrl: string) {
+                this.loadResUrl = jsonOrSkelUrl
+                SpineTemplet_4_0_loadAni.call(this,  jsonOrSkelUrl)
+            }
+        })
+
         // 修改4.0
         if (spine.AssetManager.prototype["success"]) {
-            Object.defineProperty(spine.AssetManager.prototype, "tempSuccess", {
-                // @ts-ignore
-                value: spine.AssetManager.prototype.success
-            })
+            // @ts-ignore
+            const SpineAssetManager_success = spine.AssetManager.prototype.success
             Object.defineProperty(Laya.SpineAssetManager.prototype, "success", {
                 value: function (callback: (path: string, asset) => void, path: string, data: any) {
-                    this.tempSuccess(callback, path, data)
+                    SpineAssetManager_success.call(this, callback, path, data)
                     if (!callback) {
                         if (typeof data !== "string") {
                             data = JSON.stringify(data)
@@ -710,42 +734,36 @@ export class DefineConfig {
             })
         } else {
             // 修改3.x
-            Object.defineProperty(spine.AssetManager.prototype, "tempLoadText", {
-                value: spine.AssetManager.prototype.loadText
-            })
+            const AssetManager_loadText = spine.AssetManager.prototype.loadText
             Object.defineProperty(spine.AssetManager.prototype, "loadText", {
                 value: function (path: string, success?: (path: string, text: string) => void, error?: (path: string, message: string) => void) {
                     if (!success) {
-                        this.tempLoadText(path, (path: string, text: any) => {
+                        AssetManager_loadText.call(this, path, (path: string, text: any) => {
                             if (typeof text !== "string") {
                                 text = JSON.stringify(text)
                             }
                             this.assets[path] = text.replace(/3\.8\.75/g, "3.8")
                         })
-                    } else this.tempLoadText(path, success, error)
+                    } else AssetManager_loadText.call(this, path, success, error)
                 }
             })
         }
 
         // 销毁 templet 检查判断
-        Object.defineProperty(Laya.SpineSkeleton.prototype, "tempDestroy", {
-            value: Laya.SpineSkeleton.prototype.destroy
-        })
+        const SpineSkeleton_destroy = Laya.SpineSkeleton.prototype.destroy
         Object.defineProperty(Laya.SpineSkeleton.prototype, "destroy", {
             value: function (destroyChild = true) {
                 this._templet ??= new Laya.SpineTempletBase()
                 this.state ??= new spine.AnimationState(null)
-                this.tempDestroy(destroyChild)
+                SpineSkeleton_destroy.call(this, destroyChild)
             }
         })
 
-        Object.defineProperty(Laya.SpineSkeleton.prototype, "temp_init", {
-            value: Laya.SpineSkeleton.prototype.init
-        })
+        const SpineSkeleton_init = Laya.SpineSkeleton.prototype.init
         Object.defineProperty(Laya.SpineSkeleton.prototype, "init", {
             value: function (templet: Laya.SpineTempletBase) {
                 let that = this
-                this.temp_init(templet)
+                SpineSkeleton_init.call(this, templet)
                 this.state.listeners[0].event = function (entry: spine.TrackEntry, event: spine.Event) {
                     let eventData = {
                         audioValue: event.data.audioPath,
@@ -790,13 +808,11 @@ export class DefineConfig {
         })
 
         // 添加动画渲染通知
-        Object.defineProperty(Laya.SpineSkeleton.prototype, "tempUpdate", {
-            // @ts-ignore
-            value: Laya.SpineSkeleton.prototype._update
-        })
+        // @ts-ignore
+        const SpineSkeleton_update = Laya.SpineSkeleton.prototype._update
         Object.defineProperty(Laya.SpineSkeleton.prototype, "_update", {
             value: function () {
-                this.tempUpdate()
+                SpineSkeleton_update.call(this)
                 let events = this._events
                 let slot: string[] = []
                 for (const key in events) {

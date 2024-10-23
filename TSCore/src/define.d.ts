@@ -80,6 +80,13 @@ declare module Laya {
 
     }
 
+    interface SpineTempletBase {
+        /**
+         * 当前正在使用纹理的加载url
+         */
+        loadResUrl?:string
+    }
+
     interface Templet {
         /**
          * 所有动画

@@ -2024,15 +2024,37 @@ window.tsCore = {};
             });
         }
         static defineSpineSkeleton() {
+            Object.defineProperties(Laya.SpineTempletBase.prototype, {
+                loadResUrl: {
+                    value: null,
+                    writable: true
+                }
+            });
+            // @ts-ignore
+            const SpineTemplet_3_x_loadAni = Laya.SpineTemplet_3_x.prototype.loadAni;
+            // @ts-ignore
+            Object.defineProperty(Laya.SpineTemplet_3_x.prototype, "loadAni", {
+                value: function (jsonOrSkelUrl) {
+                    this.loadResUrl = jsonOrSkelUrl;
+                    SpineTemplet_3_x_loadAni.call(this, jsonOrSkelUrl);
+                }
+            });
+            // @ts-ignore
+            const SpineTemplet_4_0_loadAni = Laya.SpineTemplet_4_0.prototype.loadAni;
+            // @ts-ignore
+            Object.defineProperty(Laya.SpineTemplet_4_0.prototype, "loadAni", {
+                value: function (jsonOrSkelUrl) {
+                    this.loadResUrl = jsonOrSkelUrl;
+                    SpineTemplet_4_0_loadAni.call(this, jsonOrSkelUrl);
+                }
+            });
             // 修改4.0
             if (spine.AssetManager.prototype["success"]) {
-                Object.defineProperty(spine.AssetManager.prototype, "tempSuccess", {
-                    // @ts-ignore
-                    value: spine.AssetManager.prototype.success
-                });
+                // @ts-ignore
+                const SpineAssetManager_success = spine.AssetManager.prototype.success;
                 Object.defineProperty(Laya.SpineAssetManager.prototype, "success", {
                     value: function (callback, path, data) {
-                        this.tempSuccess(callback, path, data);
+                        SpineAssetManager_success.call(this, callback, path, data);
                         if (!callback) {
                             if (typeof data !== "string") {
                                 data = JSON.stringify(data);
@@ -2044,13 +2066,11 @@ window.tsCore = {};
             }
             else {
                 // 修改3.x
-                Object.defineProperty(spine.AssetManager.prototype, "tempLoadText", {
-                    value: spine.AssetManager.prototype.loadText
-                });
+                const AssetManager_loadText = spine.AssetManager.prototype.loadText;
                 Object.defineProperty(spine.AssetManager.prototype, "loadText", {
                     value: function (path, success, error) {
                         if (!success) {
-                            this.tempLoadText(path, (path, text) => {
+                            AssetManager_loadText.call(this, path, (path, text) => {
                                 if (typeof text !== "string") {
                                     text = JSON.stringify(text);
                                 }
@@ -2058,29 +2078,25 @@ window.tsCore = {};
                             });
                         }
                         else
-                            this.tempLoadText(path, success, error);
+                            AssetManager_loadText.call(this, path, success, error);
                     }
                 });
             }
             // 销毁 templet 检查判断
-            Object.defineProperty(Laya.SpineSkeleton.prototype, "tempDestroy", {
-                value: Laya.SpineSkeleton.prototype.destroy
-            });
+            const SpineSkeleton_destroy = Laya.SpineSkeleton.prototype.destroy;
             Object.defineProperty(Laya.SpineSkeleton.prototype, "destroy", {
                 value: function (destroyChild = true) {
                     var _a, _b;
                     (_a = this._templet) !== null && _a !== void 0 ? _a : (this._templet = new Laya.SpineTempletBase());
                     (_b = this.state) !== null && _b !== void 0 ? _b : (this.state = new spine.AnimationState(null));
-                    this.tempDestroy(destroyChild);
+                    SpineSkeleton_destroy.call(this, destroyChild);
                 }
             });
-            Object.defineProperty(Laya.SpineSkeleton.prototype, "temp_init", {
-                value: Laya.SpineSkeleton.prototype.init
-            });
+            const SpineSkeleton_init = Laya.SpineSkeleton.prototype.init;
             Object.defineProperty(Laya.SpineSkeleton.prototype, "init", {
                 value: function (templet) {
                     let that = this;
-                    this.temp_init(templet);
+                    SpineSkeleton_init.call(this, templet);
                     this.state.listeners[0].event = function (entry, event) {
                         let eventData = {
                             audioValue: event.data.audioPath,
@@ -2121,14 +2137,12 @@ window.tsCore = {};
                 }
             });
             // 添加动画渲染通知
-            Object.defineProperty(Laya.SpineSkeleton.prototype, "tempUpdate", {
-                // @ts-ignore
-                value: Laya.SpineSkeleton.prototype._update
-            });
+            // @ts-ignore
+            const SpineSkeleton_update = Laya.SpineSkeleton.prototype._update;
             Object.defineProperty(Laya.SpineSkeleton.prototype, "_update", {
                 value: function () {
                     var _a;
-                    this.tempUpdate();
+                    SpineSkeleton_update.call(this);
                     let events = this._events;
                     let slot = [];
                     for (const key in events) {
@@ -2466,6 +2480,9 @@ window.tsCore = {};
         }
         get aniPath() {
             return this._aniPath;
+        }
+        get spineResPath() {
+            return this._spineResPath;
         }
         /**
          * 播放动画
@@ -4954,7 +4971,7 @@ window.tsCore = {};
             skeleton.off(Laya.Event.STOPPED, this, SpineUtils.onStopped);
             skeleton.on(Laya.Event.STOPPED, this, SpineUtils.onStopped, [playComplete]);
             if (skeleton instanceof GSpineSkeleton) {
-                if (skeleton.aniPath == url && skeleton.asSkeleton) {
+                if (skeleton.aniPath == url && skeleton.spineResPath == url && skeleton.asSkeleton) {
                     if (skeleton.asSkeleton.templet) {
                         // loaderComplete && loaderComplete.run()
                         SpineUtils.parseComplete(skeleton, nameOrIndex, loop, loaderComplete);
@@ -6354,7 +6371,7 @@ window.tsCore = {};
             this._loadAniMode = aniMode;
             const content = Laya.Loader.getRes(url);
             if (!content) {
-                Laya.loader.load([{ url: url, type: Laya.Loader.BUFFER }], Laya.Handler.create(this, this._onLoaded));
+                Laya.loader.load([{ url: url, type: Laya.Loader.BUFFER }], Laya.Handler.create(this, this._onLoaded, [url]));
             }
             else {
                 this._onLoaded();
@@ -6364,12 +6381,15 @@ window.tsCore = {};
         /**
          * 加载完成
          */
-        _onLoaded() {
+        _onLoaded(url) {
             var _a;
             var _b;
+            if (url) {
+                this._spineResPath = url;
+            }
             const arraybuffer = Laya.Loader.getRes(this._aniPath);
             if (!arraybuffer) {
-                this._aniPath = null;
+                this._spineResPath = this._aniPath = null;
                 return;
             }
             (_a = (_b = Laya.Templet)["TEMPLET_DICTIONARY"]) !== null && _a !== void 0 ? _a : (_b["TEMPLET_DICTIONARY"] = {});
@@ -6669,8 +6689,12 @@ window.tsCore = {};
             this.template.loadAni(jsonOrSkelUrl);
         }
         onError() {
+            this._spineResPath = null;
         }
         onComplete(spine) {
+            if (spine.loadResUrl != this.aniPath)
+                return;
+            this._spineResPath = spine.loadResUrl;
             const template = spine !== null && spine !== void 0 ? spine : this.template;
             this.asSkeleton.init(template);
             // 销毁已有的动画

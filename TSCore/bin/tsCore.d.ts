@@ -720,6 +720,10 @@ declare namespace tsCore {
         protected skeletonPlay: ISkeletonPlay;
         /** 加载路径 */
         protected _aniPath: string;
+        /**
+         * 当前spine正在使用的资源路径
+         */
+        protected _spineResPath: string;
         protected _complete: ParamHandler;
         /**
          * 播放循环次数
@@ -727,6 +731,7 @@ declare namespace tsCore {
          */
         private _loopCount;
         get aniPath(): string;
+        get spineResPath(): string;
         /**
          * 播放动画
          *
@@ -3320,6 +3325,13 @@ declare module Laya {
          */
         getAniIndexByName(name: string): number
 
+    }
+
+    interface SpineTempletBase {
+        /**
+         * 当前正在使用纹理的加载url
+         */
+        loadResUrl?:string
     }
 
     interface Templet {

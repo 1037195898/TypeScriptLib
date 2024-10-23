@@ -24,6 +24,10 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
     protected skeletonPlay: ISkeletonPlay
     /** 加载路径 */
     protected _aniPath: string
+    /**
+     * 当前spine正在使用的资源路径
+     */
+    protected _spineResPath: string
     protected _complete: ParamHandler
     /**
      * 播放循环次数
@@ -33,6 +37,10 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
 
     get aniPath() {
         return this._aniPath
+    }
+    
+    get spineResPath() {
+        return this._spineResPath
     }
 
     /**

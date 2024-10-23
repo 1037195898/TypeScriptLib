@@ -21,7 +21,7 @@ export class SpineUtils {
         skeleton.on(Laya.Event.STOPPED, this, SpineUtils.onStopped, [playComplete])
 
         if (skeleton instanceof GSpineSkeleton) {
-            if (skeleton.aniPath == url && skeleton.asSkeleton) {
+            if (skeleton.aniPath == url && skeleton.spineResPath == url && skeleton.asSkeleton) {
                 if (skeleton.asSkeleton.templet) {
                     // loaderComplete && loaderComplete.run()
                     SpineUtils.parseComplete(skeleton, nameOrIndex, loop, loaderComplete)

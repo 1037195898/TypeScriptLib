@@ -73,7 +73,7 @@ export class GSkeleton extends ESkeleton {
         this._loadAniMode = aniMode
         const content = Loader.getRes(url)
         if (!content) {
-            Laya.loader.load([{url: url, type: Loader.BUFFER}], Handler.create(this, this._onLoaded))
+            Laya.loader.load([{url: url, type: Loader.BUFFER}], Handler.create(this, this._onLoaded, [url]))
         } else {
             this._onLoaded()
         }
@@ -83,10 +83,13 @@ export class GSkeleton extends ESkeleton {
     /**
      * 加载完成
      */
-    private _onLoaded() {
+    private _onLoaded(url?: string) {
+        if (url) {
+            this._spineResPath = url
+        }
         const arraybuffer: ArrayBuffer = Loader.getRes(this._aniPath)
         if (!arraybuffer) {
-            this._aniPath = null
+            this._spineResPath = this._aniPath = null
             return
         }
         Templet["TEMPLET_DICTIONARY"] ??= {}

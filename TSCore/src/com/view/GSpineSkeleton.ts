@@ -58,10 +58,12 @@ export class GSpineSkeleton extends ESkeleton {
     }
 
     private onError() {
-
+        this._spineResPath = null
     }
 
     private onComplete(spine: SpineTempletBase) {
+        if (spine.loadResUrl != this.aniPath) return
+        this._spineResPath = spine.loadResUrl
         const template = spine ?? this.template
         this.asSkeleton.init(template)
         // 销毁已有的动画
