@@ -41,6 +41,10 @@ declare namespace tsCore {
          */
         static beanEventFunction: EventData[];
         /**
+         * 启动历史记录监听
+         */
+        static enableHistory: boolean;
+        /**
          *
          * @param init
          * @param options
@@ -1518,10 +1522,6 @@ declare namespace tsCore {
         static clearHistory(): void;
         /** 初始化是否创建一个历史页 默认 true */
         static initCreateHistory: boolean;
-        /**
-         * 启动历史记录监听
-         */
-        static enableHistory: boolean;
         static historyManager: {
             history: History;
             call: any;

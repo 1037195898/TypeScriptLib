@@ -55,6 +55,10 @@ export class App implements IAction {
      * 绑定监听事件处理方法
      */
     static beanEventFunction: EventData[] = []
+    /**
+     * 启动历史记录监听
+     */
+    static enableHistory = false
 
     /**
      *

@@ -258,6 +258,10 @@ window.tsCore = {};
      * 绑定监听事件处理方法
      */
     App.beanEventFunction = [];
+    /**
+     * 启动历史记录监听
+     */
+    App.enableHistory = false;
     tsCore.App = App;
     class BezierCurves {
         constructor() {
@@ -3814,7 +3818,7 @@ window.tsCore = {};
             HistoryManager.history.splice(0, HistoryManager.history.length);
         }
         static init() {
-            if (HistoryManager.enableHistory)
+            if (!App.enableHistory)
                 return;
             if (!Laya.Browser.onLayaRuntime) {
                 HistoryManager.initCreateHistory && HistoryManager.addNewHistory();
@@ -3831,13 +3835,13 @@ window.tsCore = {};
         }
         /** 添加新的记录 */
         static addNewHistory() {
-            if (!HistoryManager.enableHistory)
+            if (!App.enableHistory)
                 return;
             HistoryManager.pushHistory("title", "#");
         }
         /** 添加历史记录 */
         static pushHistory(title, url) {
-            if (!HistoryManager.enableHistory)
+            if (!App.enableHistory)
                 return;
             Log.debug(`history push state title=${title} url=${url}`);
             const state = { title: title, url: url };
@@ -3852,10 +3856,6 @@ window.tsCore = {};
     HistoryManager.pauseHistory = false;
     /** 初始化是否创建一个历史页 默认 true */
     HistoryManager.initCreateHistory = true;
-    /**
-     * 启动历史记录监听
-     */
-    HistoryManager.enableHistory = true;
     HistoryManager.historyManager = { history: window.history, call: null };
     tsCore.HistoryManager = HistoryManager;
     /**
