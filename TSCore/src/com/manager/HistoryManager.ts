@@ -96,13 +96,13 @@ export class HistoryManager {
     static historyManager = {history: window.history, call: null}
 
     static init() {
-        if (this.enableHistory) return
+        if (HistoryManager.enableHistory) return
         if (!Laya.Browser.onLayaRuntime) {
             HistoryManager.initCreateHistory && HistoryManager.addNewHistory()
             Log.debug("history add event Listener")
-            if (this.historyManager.call) {
-                this.historyManager.call.call(null, this.nativeBack)
-            } else window.addEventListener("popstate", this.nativeBack, false)
+            if (HistoryManager.historyManager.call) {
+                HistoryManager.historyManager.call.call(null, HistoryManager.nativeBack)
+            } else window.addEventListener("popstate", HistoryManager.nativeBack, false)
         }
     }
 
@@ -112,16 +112,16 @@ export class HistoryManager {
 
     /** 添加新的记录 */
     static addNewHistory() {
-        if (!this.enableHistory) return
+        if (!HistoryManager.enableHistory) return
         HistoryManager.pushHistory("title", "#")
     }
 
     /** 添加历史记录 */
     static pushHistory(title: string, url: string) {
-        if (!this.enableHistory) return
+        if (!HistoryManager.enableHistory) return
         Log.debug(`history push state title=${title} url=${url}`)
         const state = {title: title, url: url}
-        this.historyManager.history.pushState(state, title, url)
+        HistoryManager.historyManager.history.pushState(state, title, url)
     }
 
 }
