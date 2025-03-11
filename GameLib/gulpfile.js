@@ -99,36 +99,36 @@ gulp.task('build', gulp.series("clean", 'createTs', "createJs", "minifyJs", "cre
 ))
 
 gulp.task('buildStream', gulp.series("clean", () => {
-    let libs = {}
-    if (fs.existsSync(libCache)) {
-        libs = JSON.parse(fs.readFileSync(libCache, "utf8"))
-    }
-    let cacheFile = generate.distPath + "/nameCache.json"
-    if (!fs.existsSync(cacheFile)) {
-        createDirectory(cacheFile)
-        fs.writeFileSync(cacheFile, "{}", "utf8")
-    }
-    let minCaches = JSON.parse(fs.readFileSync(cacheFile, "utf8"))
-    minCaches = {}
-    let nameCaches = {...libs, ...minCaches}
+    // let libs = {}
+    // if (fs.existsSync(libCache)) {
+    //     libs = JSON.parse(fs.readFileSync(libCache, "utf8"))
+    // }
+    // let cacheFile = generate.distPath + "/nameCache.json"
+    // if (!fs.existsSync(cacheFile)) {
+    //     createDirectory(cacheFile)
+    //     fs.writeFileSync(cacheFile, "{}", "utf8")
+    // }
+    // let minCaches = JSON.parse(fs.readFileSync(cacheFile, "utf8"))
+    // minCaches = {}
+    // let nameCaches = {...libs, ...minCaches}
 
     return generate.createTs(["src/**/*.ts", "!**/*.d.ts"])
         .pipe(generate.createJsStream())
         .pipe(generate.minifyJsStream())
-        .pipe(generate.mangleJsStream({
-            sourceMap: true,
-            nameCache: nameCaches,
-            mangle: {properties: {reserved: reserved}},
-            format: {preserve_annotations: true},
-            toplevel: true
-        }, null, generate.distPath + "/min", "../map"))
-        .pipe(runStream(function () {
-            console.log("write cache")
-            // 把 nameCache 写入到文件中
-            // console.log(nameCaches)
-            fs.writeFileSync(cacheFile, JSON.stringify(nameCaches));
-            return true
-        }))
+        // .pipe(generate.mangleJsStream({
+        //     sourceMap: true,
+        //     nameCache: nameCaches,
+        //     mangle: {properties: {reserved: reserved}},
+        //     format: {preserve_annotations: true},
+        //     toplevel: true
+        // }, null, generate.distPath + "/min", "../map"))
+        // .pipe(runStream(function () {
+        //     console.log("write cache")
+        //     // 把 nameCache 写入到文件中
+        //     // console.log(nameCaches)
+        //     fs.writeFileSync(cacheFile, JSON.stringify(nameCaches));
+        //     return true
+        // }))
         .pipe(generate.createDTsStream())
         .pipe(generate.dtsAppendStream(["src/**/*.d.ts"]))
 
