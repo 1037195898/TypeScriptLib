@@ -85,7 +85,7 @@ export class App implements IAction {
 
         const asyncInit = async () => {
 
-            await init?.run?.()
+            await init?.onRun?.()
 
             options.init?.laya && Laya.init(options.laya.width, options.laya.height, ...options.laya.renders)
 

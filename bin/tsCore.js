@@ -29,7 +29,7 @@ window.tsCore = {};
             ((_b = options.init) === null || _b === void 0 ? void 0 : _b.coreLib) && App._init();
             const asyncInit = () => __awaiter(this, void 0, void 0, function* () {
                 var _c, _d, _e, _f;
-                yield ((_c = init === null || init === void 0 ? void 0 : init.run) === null || _c === void 0 ? void 0 : _c.call(init));
+                yield ((_c = init === null || init === void 0 ? void 0 : init.onRun) === null || _c === void 0 ? void 0 : _c.call(init));
                 ((_d = options.init) === null || _d === void 0 ? void 0 : _d.laya) && Laya.init(options.laya.width, options.laya.height, ...options.laya.renders);
                 ((_e = options.init) === null || _e === void 0 ? void 0 : _e.fgui) && Laya.stage.addChild(fgui.GRoot.inst.displayObject);
                 yield ((_f = init === null || init === void 0 ? void 0 : init.onEngine) === null || _f === void 0 ? void 0 : _f.call(init));

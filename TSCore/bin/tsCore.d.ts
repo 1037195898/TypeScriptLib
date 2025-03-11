@@ -908,18 +908,6 @@ declare namespace tsCore {
         GET = "get",
         POST = "post"
     }
-    /**
-     * 初始化引擎接口
-     * @example
-     * App._init()
-     * init?.run?.()
-     *
-     * Laya.init()
-     * Laya.stage.addChild(fgui.GRoot.inst.displayObject)
-     * init?.onEngine?.()
-     * openResize()
-     * App.initEngine?.onEnd?.()
-     */
     export interface IFormatPath {
         /**
          * 格式化路径
@@ -3729,11 +3717,23 @@ declare type InitApp = {
     isNotchEnable?: boolean
 }
 
+/**
+ * 初始化引擎接口
+ * @example
+ * App._init()
+ * init?.run?.()
+ *
+ * Laya.init()
+ * Laya.stage.addChild(fgui.GRoot.inst.displayObject)
+ * init?.onEngine?.()
+ * openResize()
+ * App.initEngine?.onEnd?.()
+ */
 declare type IInitEngine = {
     /**
      * 引擎初始化结束
      */
-    run?: () => Promise<void>
+    onRun?: () => Promise<void>
 
     /**
      * 引擎初始化结束
