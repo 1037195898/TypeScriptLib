@@ -125,6 +125,8 @@ class GenerateModule {
                 let isNamespace = false
                 // 上一次出现组件标签
                 let isComponentTag = false
+                /** @type string[] */
+                const importShader = []
                 for (let line of contents) {
                     // if (line.startsWith("declare namespace ")) {
                     //     break
@@ -133,7 +135,9 @@ class GenerateModule {
                         isNamespace = true
                         // 忽略掉 已有命名空间
                     } else if (line.trimStart().startsWith("import ")) {// 将 import导入的库 缓存起来
-                        if (!line.match(/((\s|})from(\s|"|{))/g) && line.indexOf("=") > -1) {
+                        if (line.match(/((\s|})from(\s|"|{))/g) && (line.indexOf(".fs") > 0 || line.indexOf(".vs") > 0)) {
+                            importShader.push(line)
+                        } else if (line.indexOf("=") > -1) {
                             arr.push(line)
                         }
                     } else {
@@ -183,6 +187,30 @@ class GenerateModule {
                             break
                         }
                     }
+                }
+
+                for (const line of importShader) {
+                    const start = line.indexOf("import ") + 6
+                    let end = line.indexOf("from")
+                    let tar = line.substring(start, end).trim()
+                    end = line.lastIndexOf("\"")
+                    let name = line.substring(line.indexOf("\"") + 1, end)
+                    end = name.indexOf("/")
+                    if (end > -1) name = name.substring(end + 1)
+                    let content = fs.readFileSync(`${file.dirname}/${name}`).toString()
+                    const lines = content.split(/\r?\n/)
+                    let string = ""
+                    lines.forEach((value, index) => {
+                        const pos = value.indexOf("//")
+                        if (pos > -1) {
+                            string += value.substring(0, pos) + "\\r\\n"
+                        } else {
+                            string += value + "\\r\\n"
+                        }
+                    });
+                    newContent.unshift(
+                        `var ${tar} = '${string}'`
+                    )
                 }
                 callback(null, newContent.join("\n"))
             }))
