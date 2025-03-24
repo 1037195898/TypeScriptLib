@@ -1,4 +1,58 @@
 window.gameLib = {};
+/**
+ * 给资源绑定一个实现对象
+ * @example
+ *
+ * bindView("ui://package/uiName", MyUIClass)
+ *  可以简写成：
+ * bindView("//package/uiName", MyUIClass)
+ *
+ * //以下这种只能在游戏已经确认的时候使用，会自动根据游戏名字做为包填入
+ * bindView("uiName", MyUIClass)
+ *
+ * @param url
+ * @param type
+ */
+function bindView(url, type) {
+    if (!url.includes("/")) {
+        // @ts-ignore
+        url = `//${gameLib.Player.inst.simpleName}/${url}`;
+    }
+    fgui.UIObjectFactory.setPackageItemExtension(url, type);
+}
+/**
+ * 根据url 创建一个对象
+ * @param url 如果url不带/符号 则自动转成 gameName/url
+ * @param userClass
+ */
+function createView(url, userClass) {
+    if (!url.includes("/")) {
+        // @ts-ignore
+        url = `//${gameLib.Player.inst.simpleName}/${url}`;
+    }
+    return fgui.UIPackage.createObjectFromURL(url, userClass);
+}
+Object.defineProperty(tsCore.SoundUtils, "playGameMusic", {
+    value: function (url, loops, complete, volume, startTime, coverBefore = false) {
+        // @ts-ignore
+        url = `sounds/${gameLib.Player.inst.simpleName}/${url}`;
+        return tsCore.SoundUtils.playMusic(url, loops, complete, volume, startTime, coverBefore);
+    }
+});
+Object.defineProperty(tsCore.SoundUtils, "playGameSound", {
+    value: function (url, loops, complete, volume, startTime) {
+        // @ts-ignore
+        url = `sounds/${gameLib.Player.inst.simpleName}/${url}`;
+        return tsCore.SoundUtils.playSound(url, loops, complete, volume, startTime);
+    }
+});
+Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
+    value: function (url) {
+        // @ts-ignore
+        url = `sounds/${gameLib.Player.inst.simpleName}/${url}`;
+        return tsCore.SoundUtils.stopSound(url);
+    }
+});
 
 (function (gameLib) {
     class BaseView extends tsCore.EView {
@@ -5690,7 +5744,8 @@ window.gameLib = {};
             const tempGameName = this.getValue(json, "gameName");
             // 游戏名字
             if (this.openGame || tempGameName) {
-                AppRecordManager.executeJson = { type: 2, data: Laya.Utils.parseInt(this.openGame), gameName: tempGameName };
+                const gameId = Laya.Utils.parseInt(this.openGame);
+                AppRecordManager.executeJson = { type: 2, data: gameId, openGame: gameId, gameName: tempGameName };
             }
         }
         /**
@@ -8829,57 +8884,3 @@ window.gameLib = {};
     WaitResult.defaultDelay = 1000;
     gameLib.WaitResult = WaitResult;
 })(gameLib || (gameLib = {}));
-/**
- * 给资源绑定一个实现对象
- * @example
- *
- * bindView("ui://package/uiName", MyUIClass)
- *  可以简写成：
- * bindView("//package/uiName", MyUIClass)
- *
- * //以下这种只能在游戏已经确认的时候使用，会自动根据游戏名字做为包填入
- * bindView("uiName", MyUIClass)
- *
- * @param url
- * @param type
- */
-function bindView(url, type) {
-    if (!url.includes("/")) {
-        // @ts-ignore
-        url = `//${gameLib.Player.inst.simpleName}/${url}`;
-    }
-    fgui.UIObjectFactory.setPackageItemExtension(url, type);
-}
-/**
- * 根据url 创建一个对象
- * @param url 如果url不带/符号 则自动转成 gameName/url
- * @param userClass
- */
-function createView(url, userClass) {
-    if (!url.includes("/")) {
-        // @ts-ignore
-        url = `//${gameLib.Player.inst.simpleName}/${url}`;
-    }
-    return fgui.UIPackage.createObjectFromURL(url, userClass);
-}
-Object.defineProperty(tsCore.SoundUtils, "playGameMusic", {
-    value: function (url, loops, complete, volume, startTime, coverBefore = false) {
-        // @ts-ignore
-        url = `sounds/${gameLib.Player.inst.simpleName}/${url}`;
-        return tsCore.SoundUtils.playMusic(url, loops, complete, volume, startTime, coverBefore);
-    }
-});
-Object.defineProperty(tsCore.SoundUtils, "playGameSound", {
-    value: function (url, loops, complete, volume, startTime) {
-        // @ts-ignore
-        url = `sounds/${gameLib.Player.inst.simpleName}/${url}`;
-        return tsCore.SoundUtils.playSound(url, loops, complete, volume, startTime);
-    }
-});
-Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
-    value: function (url) {
-        // @ts-ignore
-        url = `sounds/${gameLib.Player.inst.simpleName}/${url}`;
-        return tsCore.SoundUtils.stopSound(url);
-    }
-});
