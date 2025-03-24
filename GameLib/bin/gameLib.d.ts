@@ -2078,8 +2078,9 @@ declare namespace gameLib {
         /**
          * 获取游戏配置数据
          * @param [name=null] 游戏名字,如果不传，将获取当前打开游戏名字
+         * @param [ignoreCase=false] 是否忽略名字大小写
          */
-        static gameRes(name?: string): ResConfig;
+        static gameRes(name?: string, ignoreCase?: boolean): ResConfig;
     }
     export const enum LibStr {
         /** 等待处理 */

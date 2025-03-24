@@ -72,11 +72,24 @@ export class GameConfigKit {
     /**
      * 获取游戏配置数据
      * @param [name=null] 游戏名字,如果不传，将获取当前打开游戏名字
+     * @param [ignoreCase=false] 是否忽略名字大小写
      */
-    static gameRes(name: string = null): ResConfig {
+    static gameRes(name: string = null, ignoreCase: boolean = false): ResConfig {
         name ??= Player.inst.gameName
         name ??= GameConfigKit.gameNameCanonical()
-        return name ? window[name] : null
+
+
+        // @ts-ignore
+        const table: { [key: string]: ResConfig } = window.ConfigureTable
+        if (table) {
+            for (const tableKey in table) {
+                const findName = ignoreCase ? tableKey.toLowerCase() : tableKey
+                if (findName == name) {
+                    return table[tableKey]
+                }
+            }
+        }
+        return name ? ignoreCase ? window[name] : window[name] : null
     }
 
 }

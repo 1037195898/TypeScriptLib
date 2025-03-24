@@ -3564,11 +3564,22 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
         /**
          * 获取游戏配置数据
          * @param [name=null] 游戏名字,如果不传，将获取当前打开游戏名字
+         * @param [ignoreCase=false] 是否忽略名字大小写
          */
-        static gameRes(name = null) {
+        static gameRes(name = null, ignoreCase = false) {
             name !== null && name !== void 0 ? name : (name = Player.inst.gameName);
             name !== null && name !== void 0 ? name : (name = GameConfigKit.gameNameCanonical());
-            return name ? window[name] : null;
+            // @ts-ignore
+            const table = window.ConfigureTable;
+            if (table) {
+                for (const tableKey in table) {
+                    const findName = ignoreCase ? tableKey.toLowerCase() : tableKey;
+                    if (findName == name) {
+                        return table[tableKey];
+                    }
+                }
+            }
+            return name ? ignoreCase ? window[name] : window[name] : null;
         }
     }
     /**
