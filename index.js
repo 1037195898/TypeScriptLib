@@ -220,7 +220,7 @@ class GenerateModule {
                 if (this.namespace) {
                     chunkString = 'namespace ' + this.namespace + ' {\n' + chunkString + '\n}'
                 }
-                chunkString = content.join("\n\n") + chunkString
+                chunkString = content.join("\n\n") + "\n\n" + chunkString
                 chunk.contents = Buffer.from(chunkString)
                 customFun && customFun(chunk)
             }))
