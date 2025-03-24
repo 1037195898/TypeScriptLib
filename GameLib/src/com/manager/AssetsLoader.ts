@@ -7,13 +7,15 @@ import Loader = Laya.Loader;
 import LocalStorage = Laya.LocalStorage;
 import Utils = Laya.Utils;
 import URL = Laya.URL;
-import IFormatPath = tsCore.IFormatPath
+import IFormatPath = tsCore.IFormatPath;
 import ELoader = tsCore.ELoader;
 import StringUtil = tsCore.StringUtil;
 import Log = tsCore.Log;
 import UtilKit = tsCore.UtilKit;
 import SoundUtils = tsCore.SoundUtils;
 import App = tsCore.App;
+import ConfigKit = tsCore.ConfigKit;
+import Path = tsCore.Path;
 import {Player} from "../Player"
 import {AnalyticsManager} from "./AnalyticsManager"
 import {JSUtils} from "../utils/JSUtils"
@@ -23,8 +25,6 @@ import {ActionLib} from "../ActionLib"
 import {LibStr} from "../LibStr"
 import {GameConfigKit} from "../kit/GameConfigKit";
 import {ILoadSoundFilter} from "../interfaces/IGame";
-import ConfigKit = tsCore.ConfigKit;
-import Path = tsCore.Path;
 
 /**
  * 资源管理类
@@ -285,8 +285,7 @@ export class AssetsLoader implements IFormatPath {
         let obj = GameConfigKit.gameRes(config)
         let jsName = "js/" + obj.js + ".min.js"
         this.loadJsProgress(0)
-        const res = obj.libs?.concat(jsName) ?? [jsName]
-        ELoader.loader.load(res, Laya.Handler.create(this, loadJsComplete),
+        ELoader.loader.load(jsName, Laya.Handler.create(this, loadJsComplete),
             new Laya.Handler(this.loadJsProgress), Loader.TEXT)
 
         function loadJsComplete(success: boolean) {
@@ -294,11 +293,9 @@ export class AssetsLoader implements IFormatPath {
                 loadJsError()
                 return
             }
-            res.forEach(value => {
-                const jsCode = AssetProxy.inst.getRes(value)
-                UtilKit.loadScript(jsCode, true, Render.isConchApp ? null : URL.formatURL(jsName))
-                ELoader.loader.clearRes(value)
-            })
+            const jsCode = AssetProxy.inst.getRes(jsName)
+            UtilKit.loadScript(jsCode, true, Render.isConchApp ? null : URL.formatURL(jsName))
+            ELoader.loader.clearRes(jsName)
             runFun(handler)
         }
 
