@@ -4649,6 +4649,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
          */
         parseRes(res) {
             let data = res.concat();
+            // ResUtils.parseRes(data)
             // 先检查批量加载
             for (let i = 0; i < data.length; i++) {
                 const value = data[i];
@@ -7294,19 +7295,31 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
     gameLib.ObjectUtil = ObjectUtil;
     class ResUtils {
         static parseRes(urls) {
-            for (let i = 0; i < urls.length; i++) {
+            let len = urls.length;
+            for (let i = 0; i < len; i++) {
                 const value = urls[i];
-                let matchArray = value.match(/\{(\d+,\d+)}/);
+                const isStr = typeof value === "string";
+                let url = isStr ? value : value.url;
+                let matchArray = url.match(/\{(\d+,\d+)}/);
                 if ((matchArray === null || matchArray === void 0 ? void 0 : matchArray.length) == 2) {
                     let nums = matchArray[1].split(",");
                     if ((nums === null || nums === void 0 ? void 0 : nums.length) == 2) {
                         urls.splice(i, 1);
                         i--;
+                        len--;
                         let start = tsCore.StringUtil.getNumbers(nums[0]);
                         let end = tsCore.StringUtil.getNumbers(nums[1]) + 1;
                         for (let j = start; j < end; j++) {
-                            const newValue = value.replace(/\{(\d+,\d+)}/, j + "");
-                            urls.push(newValue);
+                            const newUrl = url.replace(/\{(\d+,\d+)}/, j + "");
+                            if (isStr) {
+                                // @ts-ignore
+                                urls.push(newUrl);
+                            }
+                            else {
+                                const newValue = Object.create(value);
+                                newValue.url = newUrl;
+                                urls.push(newValue);
+                            }
                         }
                     }
                 }

@@ -62,7 +62,7 @@ declare type InitApp = {
  */
 declare type IInitEngine = {
     /**
-     * 引擎初始化结束
+     * 引擎初始化前
      */
     onRun?: () => Promise<void>
 

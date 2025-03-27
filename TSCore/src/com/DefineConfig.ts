@@ -24,7 +24,7 @@ export class DefineConfig {
     private static defineLaya() {
         Object.defineProperty(Laya.Stage.prototype, "_changeCanvasSize", {
             value: function () {
-                Log.debug("_changeCanvasSize = " + Laya.Browser.clientWidth + " | " + Laya.Browser.clientHeight)
+                // Log.debug("_changeCanvasSize = " + Laya.Browser.clientWidth + " | " + Laya.Browser.clientHeight)
                 if (Laya.Browser.clientHeight == Laya.Browser.clientWidth) {
                     Log.debug("refuse =!")
                     this.setScreenSize(this._width, this._height)

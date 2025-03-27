@@ -25,6 +25,7 @@ import {ActionLib} from "../ActionLib"
 import {LibStr} from "../LibStr"
 import {GameConfigKit} from "../kit/GameConfigKit";
 import {ILoadSoundFilter} from "../interfaces/IGame";
+import {ResUtils} from "../utils/ResUtils";
 
 /**
  * 资源管理类
@@ -430,7 +431,7 @@ export class AssetsLoader implements IFormatPath {
      */
     private parseRes(res: LoadRes[]) {
         let data: LoadRes[] = res.concat()
-
+// ResUtils.parseRes(data)
         // 先检查批量加载
         for (let i = 0; i < data.length; i++) {
             const value = data[i]
