@@ -345,6 +345,7 @@ export class AssetsLoader implements IFormatPath {
             } else {
                 temps = [obj.guide]
             }
+            ResUtils.parseRes(temps)
             for (let i = 0; i < temps.length; i++) {
                 let guide = temps[i]
                 if (typeof guide === "string") {
@@ -431,26 +432,8 @@ export class AssetsLoader implements IFormatPath {
      */
     private parseRes(res: LoadRes[]) {
         let data: LoadRes[] = res.concat()
-// ResUtils.parseRes(data)
         // 先检查批量加载
-        for (let i = 0; i < data.length; i++) {
-            const value = data[i]
-            let matchArray = value.url.match(/\{(\d+,\d+)}/)
-            if (matchArray?.length == 2) {
-                let nums = matchArray[1].split(",")
-                if (nums?.length == 2) {
-                    data.splice(i, 1)
-                    i--
-                    let start = StringUtil.getNumbers(nums[0])
-                    let end = StringUtil.getNumbers(nums[1]) + 1
-                    for (let j = start; j < end; j++) {
-                        let newValue = Object.create(value)
-                        newValue.url = newValue.url.replace(/\{(\d+,\d+)}/, j + "")
-                        data.push(newValue)
-                    }
-                }
-            }
-        }
+        ResUtils.parseRes(data)
         let sks = data.filter(function (value, index, array) {
             let temp
             return Utils.getFileExtension(value.url) === "sk" && value.type === "spine"

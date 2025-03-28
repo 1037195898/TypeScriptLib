@@ -3628,9 +3628,12 @@ declare namespace gameLib {
         static getClass(classStr: string): any;
     }
     export class ResUtils {
-        static parseRes(urls: string[] | {
+        static matchReg: RegExp;
+        static parseRes(urls: (string | {
             url: string;
-        }[]): void;
+        })[]): (string | {
+            url: string;
+        })[];
     }
     export class RotationUtils {
         /** 当前速度 */

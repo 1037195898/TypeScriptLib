@@ -4567,6 +4567,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
                 else {
                     temps = [obj.guide];
                 }
+                ResUtils.parseRes(temps);
                 for (let i = 0; i < temps.length; i++) {
                     let guide = temps[i];
                     if (typeof guide === "string") {
@@ -4649,26 +4650,8 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
          */
         parseRes(res) {
             let data = res.concat();
-            // ResUtils.parseRes(data)
             // 先检查批量加载
-            for (let i = 0; i < data.length; i++) {
-                const value = data[i];
-                let matchArray = value.url.match(/\{(\d+,\d+)}/);
-                if ((matchArray === null || matchArray === void 0 ? void 0 : matchArray.length) == 2) {
-                    let nums = matchArray[1].split(",");
-                    if ((nums === null || nums === void 0 ? void 0 : nums.length) == 2) {
-                        data.splice(i, 1);
-                        i--;
-                        let start = tsCore.StringUtil.getNumbers(nums[0]);
-                        let end = tsCore.StringUtil.getNumbers(nums[1]) + 1;
-                        for (let j = start; j < end; j++) {
-                            let newValue = Object.create(value);
-                            newValue.url = newValue.url.replace(/\{(\d+,\d+)}/, j + "");
-                            data.push(newValue);
-                        }
-                    }
-                }
-            }
+            ResUtils.parseRes(data);
             let sks = data.filter(function (value, index, array) {
                 let temp;
                 return Laya.Utils.getFileExtension(value.url) === "sk" && value.type === "spine"
@@ -7300,7 +7283,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
                 const value = urls[i];
                 const isStr = typeof value === "string";
                 let url = isStr ? value : value.url;
-                let matchArray = url.match(/\{(\d+,\d+)}/);
+                let matchArray = url.match(ResUtils.matchReg);
                 if ((matchArray === null || matchArray === void 0 ? void 0 : matchArray.length) == 2) {
                     let nums = matchArray[1].split(",");
                     if ((nums === null || nums === void 0 ? void 0 : nums.length) == 2) {
@@ -7310,9 +7293,8 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
                         let start = tsCore.StringUtil.getNumbers(nums[0]);
                         let end = tsCore.StringUtil.getNumbers(nums[1]) + 1;
                         for (let j = start; j < end; j++) {
-                            const newUrl = url.replace(/\{(\d+,\d+)}/, j + "");
+                            const newUrl = url.replace(ResUtils.matchReg, j + "");
                             if (isStr) {
-                                // @ts-ignore
                                 urls.push(newUrl);
                             }
                             else {
@@ -7324,8 +7306,10 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
                     }
                 }
             }
+            return urls;
         }
     }
+    ResUtils.matchReg = /\{(\d+,\d+)}/;
     gameLib.ResUtils = ResUtils;
     class RotationUtils {
         constructor() {
