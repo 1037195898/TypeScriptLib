@@ -938,8 +938,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
         }
         /** 显示引导页 默认不显示引导页 */
         showGuide() {
-            const configName = GameConfigKit.gameNameCanonical();
-            let obj = Laya.Browser.window[configName];
+            let obj = GameConfigKit.gameRes();
             if (obj.guide) { // 如果存在引导页配置  默认使用全屏展示
                 this.loadFillImage(obj.guide);
                 return true;

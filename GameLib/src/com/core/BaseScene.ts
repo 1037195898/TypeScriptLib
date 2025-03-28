@@ -561,8 +561,7 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
 
     /** 显示引导页 默认不显示引导页 */
     protected showGuide() {
-        const configName = GameConfigKit.gameNameCanonical()
-        let obj = Browser.window[configName]
+        let obj = GameConfigKit.gameRes()
         if (obj.guide) {// 如果存在引导页配置  默认使用全屏展示
             this.loadFillImage(obj.guide)
             return true
