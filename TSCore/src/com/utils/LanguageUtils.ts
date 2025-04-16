@@ -86,6 +86,7 @@ export class LanguageUtils {
     }
 
     private __getStr(element: Element) {
+        if (!element) return null
         let content = element.textContent
         if (this.customConvert) content = runFun(this.customConvert, content)
         return this.replaceLang(content)

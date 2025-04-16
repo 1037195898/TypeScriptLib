@@ -3811,16 +3811,6 @@ declare namespace gameLib {
         private onDragStart;
     }
     /**
-     * 弹窗层
-     * @author boge
-     */
-    export class AlertPanel extends fgui.GComponent {
-        private static _instance;
-        static get inst(): AlertPanel;
-        constructor();
-        private __winResize;
-    }
-    /**
      * 洗牌的牌
      * @author boge
      *

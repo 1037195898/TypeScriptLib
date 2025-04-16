@@ -7893,27 +7893,6 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
     }
     gameLib.ActivityButton = ActivityButton;
     /**
-     * 弹窗层
-     * @author boge
-     */
-    class AlertPanel extends fgui.GComponent {
-        static get inst() {
-            var _a;
-            (_a = this._instance) !== null && _a !== void 0 ? _a : (this._instance = new AlertPanel);
-            return this._instance;
-        }
-        constructor() {
-            super();
-            this.touchable = false;
-            Laya.stage.on(Laya.Event.RESIZE, this, this.__winResize);
-            this.__winResize();
-        }
-        __winResize() {
-            this.setSize(Laya.stage.width, Laya.stage.height);
-        }
-    }
-    gameLib.AlertPanel = AlertPanel;
-    /**
      * 洗牌的牌
      * @author boge
      *

@@ -5610,6 +5610,8 @@ function runApplication(classTarget) {
             return null;
         }
         __getStr(element) {
+            if (!element)
+                return null;
             let content = element.textContent;
             if (this.customConvert)
                 content = runFun(this.customConvert, content);
