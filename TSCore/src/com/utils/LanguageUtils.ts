@@ -47,7 +47,7 @@ export class LanguageUtils {
         return this.__getStr(element) ?? str
     }
 
-    getStrArray(str: number | string, out?: string[]) {
+    getStringArray(str: number | string, out?: string[]) {
         if (typeof (str) == "number") {
             str = str + ""
         }

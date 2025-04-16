@@ -11,6 +11,7 @@ declare function runFun(func?: ParamHandler, ...args: any[]): any;
  * @param args 如果包含占位符，这里可传入占位符的替换文案
  */
 declare function getString(id: string | number, ...args: any[]): string;
+declare function getStringArray(id: string | number, ...args: any[]): string[];
 /**
  * 配置定义
  *
@@ -2323,7 +2324,7 @@ declare namespace tsCore {
          * @param str key
          */
         getStr(str: number | string): string;
-        getStrArray(str: number | string, out?: string[]): string[];
+        getStringArray(str: number | string, out?: string[]): string[];
         getElement(str: string): Element;
         private __getStr;
         /**

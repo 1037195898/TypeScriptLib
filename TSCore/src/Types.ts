@@ -14,9 +14,17 @@ function runFun(func?: ParamHandler, ...args: any[]) {
  * @param id 获取文案的key
  * @param args 如果包含占位符，这里可传入占位符的替换文案
  */
-function getString(id: string | number, ...args: any[]) {
+function getString(id: string | number, ...args: any[]): string {
     // @ts-ignore
     let content = tsCore.LanguageUtils.inst.getStr(id)
+    if (args.length == 0) return content
+    // @ts-ignore
+    return tsCore.StringUtil.format(content, ...args)
+}
+
+function getStringArray(id: string | number, ...args: any[]): string[] {
+    // @ts-ignore
+    let content = tsCore.LanguageUtils.inst.getStringArray(id)
     if (args.length == 0) return content
     // @ts-ignore
     return tsCore.StringUtil.format(content, ...args)

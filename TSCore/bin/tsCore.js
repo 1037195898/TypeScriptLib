@@ -23,6 +23,14 @@ function getString(id, ...args) {
     // @ts-ignore
     return tsCore.StringUtil.format(content, ...args);
 }
+function getStringArray(id, ...args) {
+    // @ts-ignore
+    let content = tsCore.LanguageUtils.inst.getStringArray(id);
+    if (args.length == 0)
+        return content;
+    // @ts-ignore
+    return tsCore.StringUtil.format(content, ...args);
+}
 /**
  * 配置定义
  *
@@ -5564,7 +5572,7 @@ function runApplication(classTarget) {
             const element = this.getElement(str);
             return (_a = this.__getStr(element)) !== null && _a !== void 0 ? _a : str;
         }
-        getStrArray(str, out) {
+        getStringArray(str, out) {
             if (typeof (str) == "number") {
                 str = str + "";
             }
