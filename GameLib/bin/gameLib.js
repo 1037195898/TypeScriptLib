@@ -5898,8 +5898,6 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
             this.codeVersion = 1;
             /** 当前app游戏发布版本号 */
             this.currentAppVersion = 1;
-            /** 本玩家今日玩的次数 */
-            this.playCount = 0;
             /**
              * 用户持有的优惠劵
              **/
@@ -5920,6 +5918,30 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
             var _a;
             (_a = this._instance) !== null && _a !== void 0 ? _a : (this._instance = new Player());
             return this._instance;
+        }
+        initPlayCount() {
+            var _a;
+            const time = Laya.Browser.now();
+            if (!this.playCountCache) {
+                this.playCountCache = Laya.LocalStorage.getJSON("dayPlayCount");
+                (_a = this.playCountCache) !== null && _a !== void 0 ? _a : (this.playCountCache = {
+                    count: 0,
+                    time: time
+                });
+            }
+            if (!tsCore.DateUtils.isSameDay(this.playCountCache.time, time))
+                this.playCountCache.count = 0;
+        }
+        /** 玩家今日玩的次数 */
+        get playCount() {
+            this.initPlayCount();
+            return this.playCountCache.count;
+        }
+        set playCount(value) {
+            this.initPlayCount();
+            this.playCountCache.count = value;
+            this.playCountCache.time = Laya.Browser.now();
+            Laya.LocalStorage.setJSON("dayPlayCount", this.playCountCache);
         }
         /** 当前盈利情况 */
         getProfit() {

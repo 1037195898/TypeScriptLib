@@ -3122,8 +3122,6 @@ declare namespace gameLib {
         data: IData;
         /** 登录接口 */
         login: ILogin;
-        /** 本玩家今日玩的次数 */
-        playCount: number;
         /**
          * 用户持有的优惠劵
          **/
@@ -3142,6 +3140,11 @@ declare namespace gameLib {
         gamePool: number;
         /** 获得奖励的次数 */
         jackpotCount: number;
+        private playCountCache;
+        private initPlayCount;
+        /** 玩家今日玩的次数 */
+        get playCount(): number;
+        set playCount(value: number);
         /** 当前盈利情况 */
         getProfit(): number;
         /**

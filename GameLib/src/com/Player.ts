@@ -7,6 +7,7 @@ import ConfigKit = tsCore.ConfigKit;
 import Log = tsCore.Log;
 import {UrlParam} from "./net/UrlParam"
 import {IData, IGameData, IGuestModel, ILogin} from "./Interfaces";
+import DateUtils = tsCore.DateUtils;
 
 /** 用户数据 */
 export class Player {
@@ -92,8 +93,6 @@ export class Player {
     data: IData
     /** 登录接口 */
     login: ILogin
-    /** 本玩家今日玩的次数 */
-    playCount = 0
     /**
      * 用户持有的优惠劵
      **/
@@ -113,6 +112,32 @@ export class Player {
     gamePool = random(1000, 99999)
     /** 获得奖励的次数 */
     jackpotCount = 0
+    private playCountCache: { count: number, time: number }
+
+    private initPlayCount() {
+        const time = Browser.now()
+        if (!this.playCountCache) {
+            this.playCountCache = LocalStorage.getJSON("dayPlayCount")
+            this.playCountCache ??= {
+                count: 0,
+                time: time
+            }
+        }
+        if (!DateUtils.isSameDay(this.playCountCache.time, time))
+            this.playCountCache.count = 0
+    }
+    /** 玩家今日玩的次数 */
+    get playCount() {
+        this.initPlayCount()
+        return this.playCountCache.count
+    }
+
+    set playCount(value: number) {
+        this.initPlayCount()
+        this.playCountCache.count = value
+        this.playCountCache.time = Browser.now()
+        LocalStorage.setJSON("dayPlayCount", this.playCountCache)
+    }
 
     /** 当前盈利情况 */
     getProfit() {
