@@ -5353,7 +5353,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
                     }));
                 }
             };
-            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, promptData);
+            PromptWindow.inst.showTip(promptData);
         }
         /** 游戏报错 退出游戏 */
         gameErrorExit(msg = 1009 /* LibStr.GAME_ERROR */) {
@@ -5368,7 +5368,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
                     });
                 }
             };
-            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, promptData);
+            PromptWindow.inst.showTip(promptData);
         }
         /**
          * 出乎意料的退出游戏
@@ -5388,7 +5388,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
                     });
                 }
             };
-            this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, promptData);
+            PromptWindow.inst.showTip(promptData);
         }
         get starter() {
             return this._starter;

@@ -11,7 +11,7 @@
   <!-- 还需XX秒才可以再次发言 -->
   <string name="SEND_CHAT_TIMER_ERROR" id="1004">Send your next message in {0} seconds</string>
   <!-- 网络访问失败，请检查网络 -->
-  <string name="NET_ERROR" id="1005">Unable to connect to the Internet! Please check and try again</string>
+  <string name="NET_ERROR" id="1005">Server traffic is high. Please try again later. Thank you for your patience!</string>
   <!-- 当前不可投注 -->
   <string name="CANNOT_BET" id="1006">You cannot bet right now</string>
   <!-- 未登陆，请先登陆 -->

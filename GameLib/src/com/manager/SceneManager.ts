@@ -525,7 +525,7 @@ export class SceneManager extends EProxy {
                 }))
             }
         }
-        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, promptData)
+        PromptWindow.inst.showTip(promptData)
     }
 
     /** 游戏报错 退出游戏 */
@@ -541,7 +541,7 @@ export class SceneManager extends EProxy {
                 })
             }
         }
-        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, promptData)
+        PromptWindow.inst.showTip(promptData)
     }
 
     /**
@@ -562,7 +562,7 @@ export class SceneManager extends EProxy {
                 })
             }
         }
-        this.sendAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, promptData)
+        PromptWindow.inst.showTip(promptData)
     }
 
     get starter() {

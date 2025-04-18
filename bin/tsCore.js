@@ -5569,7 +5569,17 @@ function runApplication(classTarget) {
             if (typeof (str) == "number") {
                 str = str + "";
             }
-            const element = this.getElement(str);
+            let element = this.getElement(str);
+            if ((element === null || element === void 0 ? void 0 : element.nodeName) == "array") {
+                const arr = [];
+                for (let i = 0; i < element.childNodes.length; i++) {
+                    const childNode = element.childNodes[i];
+                    if (childNode.nodeType == Node.ELEMENT_NODE) {
+                        arr.push(childNode);
+                    }
+                }
+                element = arr.random();
+            }
             return (_a = this.__getStr(element)) !== null && _a !== void 0 ? _a : str;
         }
         getStringArray(str, out) {
