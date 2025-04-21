@@ -2244,10 +2244,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
          */
         sendBet(url, data, callback) {
             this.postData(url, data, (data) => {
-                if (data.code != HttpCode.OK) {
-                    this.betFail(data);
-                }
-                else {
+                if (data.code == HttpCode.OK) {
                     Player.inst.gameData.playCount++;
                     Player.inst.playCount++;
                     if (Player.inst.isGuest)
@@ -2263,19 +2260,17 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
             WaitResult.inst.hide();
             SceneManager.inst.gameErrorExit(1005 /* LibStr.NET_ERROR */);
         }
-        /**
-         * 当请求不通过的时候  发出提示信息并重置bet
-         * @param data
-         * @param isWindow
-         */
-        betFail(data, isWindow = false) {
-            if (isWindow)
-                PromptWindow.inst.showTip(StateCode.getShowMessage(data));
-            else
-                tsCore.MessageTip.showTip(StateCode.getShowMessage(data));
-            this.sendAction(ActionLib.GAME_STOP_SLOT_LIST_RUN_ANI);
-            this.sendAction(ActionLib.GAME_RESET_BET);
-        }
+        // /**
+        //  * 当请求不通过的时候  发出提示信息并重置bet
+        //  * @param data
+        //  * @param isWindow
+        //  */
+        // betFail(data?: HttpResponse, isWindow = false) {
+        //     if (isWindow) PromptWindow.inst.showTip(StateCode.getShowMessage(data))
+        //     else tsCore.MessageTip.showTip(StateCode.getShowMessage(data))
+        //     this.sendAction(ActionLib.GAME_STOP_SLOT_LIST_RUN_ANI)
+        //     this.sendAction(ActionLib.GAME_RESET_BET)
+        // }
         /**
          * 领取奖金池
          * @param id

@@ -1166,12 +1166,6 @@ declare namespace gameLib {
          */
         protected onSendBetError(): void;
         /**
-         * 当请求不通过的时候  发出提示信息并重置bet
-         * @param data
-         * @param isWindow
-         */
-        betFail(data?: HttpResponse, isWindow?: boolean): void;
-        /**
          * 领取奖金池
          * @param id
          * @param handler
