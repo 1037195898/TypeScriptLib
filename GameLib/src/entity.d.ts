@@ -18,6 +18,7 @@ declare type ResConfig = {
     odds?: number[][] | any[][]
     /** 自定义属性 */
     [key: string]: any
+
 }
 
 declare type OpenPage = {
