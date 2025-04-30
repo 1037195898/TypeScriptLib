@@ -5333,7 +5333,9 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
         checkAloneGame(gameId) {
             return true;
         }
-        /** 获取游戏开奖结果超时退出游戏 */
+        /** 获取游戏开奖结果超时退出游戏
+         * @deprecated
+         * */
         gameGameTimeOutExit() {
             const promptData = {
                 msg: 1011 /* LibStr.GET_GAME_RESULTS_TIME_OUT */,

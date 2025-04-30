@@ -2748,7 +2748,9 @@ declare namespace gameLib {
          *
          */
         checkAloneGame(gameId: number): boolean;
-        /** 获取游戏开奖结果超时退出游戏 */
+        /** 获取游戏开奖结果超时退出游戏
+         * @deprecated
+         * */
         gameGameTimeOutExit(): void;
         /** 游戏报错 退出游戏 */
         gameErrorExit(msg?: LibStr): void;

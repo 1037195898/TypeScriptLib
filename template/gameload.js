@@ -23,6 +23,12 @@ window.crashUrl = null
 window.sendErrorVerifies = null
 
 /**
+ * 获取路径名字的正则
+ * @type {RegExp}
+ */
+pathNameRegExp = /\/([^\/?#]+)(?:\?.*)?(?:#.*)?$/
+
+/**
  * 批量加载资源
  * @param url {{ key:string, v:number} | { key:string, v:number}[]}
  * @param parallel {boolean} 是否一起执行，false。顺序执行
@@ -37,6 +43,22 @@ function loadBatch(url, parallel = true, onComplete = null) {
     if (!check) { // 非js
         for (const key of loadRes) {
             loadContent(key, (data, url) => {
+                // 使用正则表达式提取文件名
+                const fileNameMatch = url.match(pathNameRegExp)
+                if (fileNameMatch) {
+                    /** @type {string} */
+                    const fileName = fileNameMatch[1]
+                    const name = fileName.split(".")[0]
+                    let parameter = window["$_parameter"]
+                    if (!parameter) {
+                        parameter = {}
+                        window["$_parameter"] = parameter
+                    }
+                    parameter[name] = [url, data]
+                    // console.log("fileName:", fileName)
+                } else {
+                    console.log("file name not found", url)
+                }
                 if (url.endsWith(".xml")) {
                     window["$_crc"] = data
                 }
