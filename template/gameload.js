@@ -114,11 +114,20 @@ function loadScript(url, parallel = true, callback = null) {
         return
     }
     const name = pathName(url)
+    function loadComplete() {
+        let parameter = window["$_parameter"]
+        if (!parameter) {
+            parameter = {}
+            window["$_parameter"] = parameter
+        }
+        parameter[name] = [url, "1"]
+        callback()
+    }
     const script = document.createElement("script")
     script.onerror = loadError
     script.id = "id_" + name
     script.async = true
-    if (callback) script.onload = callback
+    if (callback) script.onload = loadComplete
     script.src = url
     document.head.appendChild(script)
 }
