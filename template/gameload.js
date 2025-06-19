@@ -194,8 +194,7 @@ function version(url) {
 function getProgress(value, tempCount, totalCount) {
     let pieces = 100 / totalCount;
     let pro = value / 100 * pieces;
-    let totalPro = pieces * (tempCount - 1) + pro;
-    return Math.ceil(totalPro);
+    return pieces * (tempCount - 1) + pro
 }
 
 function getQueryString(name) {

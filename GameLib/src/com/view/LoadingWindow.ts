@@ -83,7 +83,7 @@ export class LoadingWindow extends BaseView {
 //			trace("LoadingWindow.updateMsg(vlaue)", value+"%")
         this.tempValue = LoadingWindow.getProgress(value, tempCount, totalCount)
         JSUtils.getProgress(this.tempValue)
-        this.mesText.text = this.getMsg() + this.tempValue + "%"
+        this.mesText.text = this.getMsg() + this.tempValue.toFixed(2) + "%"
     }
 
     /**
@@ -97,8 +97,7 @@ export class LoadingWindow extends BaseView {
         let pieces = 100 / totalCount
         // 得出当前加载所占百分比的数量
         let pro = value / 100 * pieces
-        let totalPro = pieces * (tempCount - 1) + pro
-        return Math.ceil(totalPro)
+        return pieces * (tempCount - 1) + pro
     }
 
     /**

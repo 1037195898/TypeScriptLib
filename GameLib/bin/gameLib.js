@@ -8368,7 +8368,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
             //			trace("LoadingWindow.updateMsg(vlaue)", value+"%")
             this.tempValue = LoadingWindow.getProgress(value, tempCount, totalCount);
             JSUtils.getProgress(this.tempValue);
-            this.mesText.text = this.getMsg() + this.tempValue + "%";
+            this.mesText.text = this.getMsg() + this.tempValue.toFixed(2) + "%";
         }
         /**
          * 更新进度
@@ -8381,8 +8381,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
             let pieces = 100 / totalCount;
             // 得出当前加载所占百分比的数量
             let pro = value / 100 * pieces;
-            let totalPro = pieces * (tempCount - 1) + pro;
-            return Math.ceil(totalPro);
+            return pieces * (tempCount - 1) + pro;
         }
         /**
          * 显示加载错误提示
