@@ -2696,6 +2696,14 @@ declare namespace gameLib {
          * @param code 游戏id
          */
         openGame(config: string, code?: number): void;
+        /**
+         * 执行加载资源
+         *
+         * @param {() => void} onComplete 已经初始化了 缓存在内存中了
+         * @param {(content?: any) => void} onLoadComplete 新加载完成后执行
+         */
+        runLoadResJs(onComplete: () => void, onLoadComplete?: (content?: any) => void): void;
+        private loadRes;
         private loadGameResComplete;
         private loadGameJs;
         private loadJsComplete;
@@ -4132,8 +4140,16 @@ declare type ResConfig = {
     res: LoadRes[]
     /** 加载的js文件名字 */
     js: string
-    /** 执行启动函数 */
+    /**
+     * 执行启动函数
+     * @deprecated
+     * @see startClass
+     */
     completeFun: Function
+    /**
+     * 启动类
+     */
+    startClass: { new(): gameLib.BaseStarter }
     /** 要加载的额外库 */
     libs?: string[],
     /** 引导帮助文档 */

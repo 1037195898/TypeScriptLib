@@ -15,7 +15,8 @@
  * @property {string} js - 项目的js名字。
  * @property {string[]} libs 要加载的额外库
  * @property {number[][] | any[][]} odds - 项目中的赔率配置。
- * @property {function} completeFun - 目标启动类。
+ * @property {function} completeFun - 执行启动函数。
+ * @property {string} startClass - 启动类。
  * @property {string|string[]} guide - 引导图片资源路径。
  * @property {string|string[]} helpRes - 帮助文档资源路径。
  */

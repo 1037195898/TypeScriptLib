@@ -238,16 +238,43 @@ export class SceneManager extends EProxy {
 
         Player.inst.gameId = code
 
-        // 游戏脚本加载
-        let gameResJS = "configs/gameRes" + (AssetsLoader.inst.httpProtocol ? "" : ".min") + ".js"
-        let content = ELoader.loader.getRes(gameResJS)
-        if (!content) {
-            ELoader.loader.load(gameResJS,
-                Handler.create(this, this.loadGameResComplete), null, Loader.TEXT)
-        } else {
-            this.loadGameJs()
-        }
+        this.runLoadResJs(
+            () => this.loadGameJs(),
+            content => this.loadGameResComplete(content)
+        )
 
+    }
+
+    /**
+     * 执行加载资源
+     *
+     * @param {() => void} onComplete 已经初始化了 缓存在内存中了
+     * @param {(content?: any) => void} onLoadComplete 新加载完成后执行
+     */
+    runLoadResJs(onComplete: () => void, onLoadComplete?: (content?: any) => void) {
+        // 优先执行新版本的加载方式
+        let obj = GameConfigKit.gameRes()
+        if (obj) { // 缓存中已经有了
+            onComplete()
+        } else {
+            let gameResJS = `${GameConfigKit.gameNameCanonical().firstLowerCase()}/res${AssetsLoader.inst.httpProtocol ? "" : ".min"}.js`
+            this.loadRes(gameResJS, (content) => {
+                if (!content) {// 加载失败
+                    // 游戏脚本加载
+                    gameResJS = "configs/gameRes" + (AssetsLoader.inst.httpProtocol ? "" : ".min") + ".js"
+                    this.loadRes(gameResJS, onLoadComplete)
+                } else onLoadComplete(content)
+            })
+        }
+    }
+
+    private loadRes(url: string, onComplete: (content?: any) => void) {
+        let content = ELoader.loader.getRes(url)
+        if (!content) {
+            ELoader.loader.load(url, Handler.create(this, onComplete), null, Loader.TEXT)
+        } else {
+            onComplete(content)
+        }
     }
 
     private loadGameResComplete(content: string) {
@@ -255,7 +282,7 @@ export class SceneManager extends EProxy {
             this.loadResErrorHandler()
             return
         }
-        UtilKit.loadScript(content, true, Render.isConchApp ? null : "gameRes.js")
+        UtilKit.loadScript(content, true, Render.isConchApp ? null : "res.js")
         this.loadGameJs()
     }
 
@@ -329,7 +356,13 @@ export class SceneManager extends EProxy {
             return
         }
         let obj = GameConfigKit.gameRes()
-        this._starter = obj.completeFun()
+
+        // todo 兼容旧版本 后面删除
+
+        if (obj.startClass) {
+            this._starter = new obj.startClass()
+        } else this._starter = obj.completeFun()
+
         AnalyticsManager.openGame()
         Player.inst.status = 1
         // 如果是游客模式

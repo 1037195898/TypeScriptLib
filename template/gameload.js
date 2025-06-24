@@ -76,7 +76,7 @@ function loadBatch(url, parallel = true, onComplete = null) {
                     window["$_crc"] = data
                 }
                 complete()
-            }, [key.split("?")[0]])
+            }, [key.split("?")[0]], (e)=> loadError(e))
         }
     } else loadScript(loadRes, parallel, complete.bind(this))
 
@@ -114,6 +114,7 @@ function loadScript(url, parallel = true, callback = null) {
         return
     }
     const name = pathName(url)
+
     function loadComplete() {
         let parameter = window["$_parameter"]
         if (!parameter) {
@@ -123,6 +124,7 @@ function loadScript(url, parallel = true, callback = null) {
         parameter[name] = [url, "1"]
         callback()
     }
+
     const script = document.createElement("script")
     script.onerror = loadError
     script.id = "id_" + name
@@ -209,10 +211,11 @@ function getQueryString(name) {
 /**
  *
  * @param url {string}
- * @param complete {Function}
+ * @param complete {(content)=>void}
  * @param args {any[]}
+ * @param error {(e)=>void}
  */
-function loadContent(url, complete, args = []) {
+function loadContent(url, complete, args = [], error) {
     let http = new XMLHttpRequest()
     http.args = args
     http.open("get", url, true)
@@ -224,10 +227,12 @@ function loadContent(url, complete, args = []) {
             else args.unshift(http.responseText)
             complete.apply(this, args)
         } else {
-            loadError()
+            error.apply(this, args)
         }
     }
-    http.onerror = loadError
+    http.onerror = ()=> {
+        error.apply(this, args)
+    }
     http.send()
 }
 

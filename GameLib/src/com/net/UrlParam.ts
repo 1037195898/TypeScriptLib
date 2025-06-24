@@ -103,9 +103,12 @@ export class UrlParam {
         // 游戏id
         this.getQuery(json, v => this.openGame = v, "openGame", "gameId")
         const tempGameName = this.getValue(json, "gameName")
+
         // 游戏名字
         if (this.openGame || tempGameName) {
             const gameId = Utils.parseInt(this.openGame)
+            Player.inst.gameId = gameId
+            Player.inst.gameName = tempGameName
             AppRecordManager.executeJson = {type: 2, data: gameId, openGame: gameId, gameName: tempGameName}
         }
 

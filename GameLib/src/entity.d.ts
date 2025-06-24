@@ -6,8 +6,16 @@ declare type ResConfig = {
     res: LoadRes[]
     /** 加载的js文件名字 */
     js: string
-    /** 执行启动函数 */
+    /**
+     * 执行启动函数
+     * @deprecated
+     * @see startClass
+     */
     completeFun: Function
+    /**
+     * 启动类
+     */
+    startClass: { new(): gameLib.BaseStarter }
     /** 要加载的额外库 */
     libs?: string[],
     /** 引导帮助文档 */

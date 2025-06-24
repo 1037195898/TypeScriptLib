@@ -83,6 +83,9 @@ export class GameConfigKit {
     static gameRes(name: string = null, ignoreCase: boolean = false): ResConfig {
         name ??= Player.inst.gameName
         name ??= GameConfigKit.gameNameCanonical()
+
+        //todo 过渡的一个资源获取版本  后面要删除掉
+
         // @ts-ignore
         const table: { [key: string]: ResConfig } = window.ConfigureTable
         if (table) {
@@ -94,7 +97,7 @@ export class GameConfigKit {
                 }
             }
         }
-        return name ? ignoreCase ? window[name] : window[name] : null
+        return name ? ignoreCase ?  window[name] || window[name.toLowerCase()] : window[name] : null
     }
 
 }

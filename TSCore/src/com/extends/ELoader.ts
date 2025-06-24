@@ -152,8 +152,8 @@ export class ELoader {
             Laya.loader.create(url, Handler.create(this, this.onSingleComplete, [resInfo]), resInfo.progress, resInfo.type, resInfo.createConstructParams, resInfo.createPropertyParams, resInfo.priority, resInfo.cache)
         } else Laya.loader.load(url, Handler.create(this, this.onSingleComplete, [resInfo]), resInfo.progress, resInfo.type, resInfo.priority, resInfo.cache, resInfo.group, resInfo.ignoreCache, resInfo.useWorkerLoader)
     }
-
     private onSingleComplete(resInfo: ResInfo, content?: any) {
+
         if (!content) {
             if (this.baseUrls) {
                 resInfo.useIndex++

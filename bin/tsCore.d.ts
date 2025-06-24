@@ -933,14 +933,28 @@ declare namespace tsCore {
          * @param    complete    加载结束回调。根据url类型不同分为2种情况：1. url为String类型，也就是单个资源地址，如果加载成功，则回调参数值为加载完成的资源，否则为null；2. url为数组类型，指定了一组要加载的资源，如果全部加载成功，则回调参数值为true，否则为false。
          * @param    progress    加载进度回调。回调参数值为当前资源的加载进度信息(0-1)。
          * @param    type        资源类型。比如：Loader.IMAGE。
-         * @param    priority    (default = 1)加载的优先级，优先级高的优先加载。有0-4共5个优先级，0最高，4最低。
-         * @param    cache        是否缓存加载结果。
+         * @param    [priority=1]    加载的优先级，优先级高的优先加载。有0-4共5个优先级，0最高，4最低。
+         * @param    [cache=true]        是否缓存加载结果。
          * @param    group        分组，方便对资源进行管理。
-         * @param    ignoreCache    是否忽略缓存，强制重新加载。
-         * @param    useWorkerLoader (default = false)是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
+         * @param    [ignoreCache=false]    是否忽略缓存，强制重新加载。
+         * @param    [useWorkerLoader=false] 是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
          * @return 此 LoaderManager 对象本身。
          */
         load(url: string | (string | LoadRes)[], complete?: Laya.Handler, progress?: Laya.Handler, type?: string, priority?: number, cache?: boolean, group?: string, ignoreCache?: boolean, useWorkerLoader?: boolean): void;
+        /**
+         * <p>根据clas类型创建一个未初始化资源的对象，随后进行异步加载，资源加载完成后，初始化对象的资源，并通过此对象派发 Event.LOADED 事件，事件回调参数值为此对象本身。套嵌资源的子资源会保留资源路径"?"后的部分。</p>
+         * <p>如果url为数组，返回true；否则返回指定的资源类对象，可以通过侦听此对象的 Event.LOADED 事件来判断资源是否已经加载完毕。</p>
+         * <p><b>注意：</b>cache参数只能对文件后缀为atlas的资源进行缓存控制，其他资源会忽略缓存，强制重新加载。</p>
+         * @param	url			资源地址或者数组。如果url和clas同时指定了资源类型，优先使用url指定的资源类型。参数形如：[{url:xx,clas:xx,priority:xx,params:xx},{url:xx,clas:xx,priority:xx,params:xx}]。
+         * @param	complete	加载结束回调。根据url类型不同分为2种情况：1. url为String类型，也就是单个资源地址，如果加载成功，则回调参数值为加载完成的资源，否则为null；2. url为数组类型，指定了一组要加载的资源，如果全部加载成功，则回调参数值为true，否则为false。
+         * @param	progress	资源加载进度回调，回调参数值为当前资源加载的进度信息(0-1)。
+         * @param	type	资源类型。
+         * @param	constructParams		资源构造函数参数。
+         * @param	propertyParams		资源属性参数。
+         * @param	[priority=1]	加载的优先级，优先级高的优先加载。有0-4共5个优先级，0最高，4最低。
+         * @param	[cache=true]		是否缓存加载的资源。
+         * @return	如果url为数组，返回true；否则返回指定的资源类对象。
+         */
         create(url: string | (string | LoadRes)[], complete?: Laya.Handler, progress?: Laya.Handler, type?: string, constructParams?: any, propertyParams?: any, priority?: number, cache?: boolean): void;
         private loadAssets;
         private _load;

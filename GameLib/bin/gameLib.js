@@ -3574,6 +3574,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
         static gameRes(name = null, ignoreCase = false) {
             name !== null && name !== void 0 ? name : (name = Player.inst.gameName);
             name !== null && name !== void 0 ? name : (name = GameConfigKit.gameNameCanonical());
+            //todo 过渡的一个资源获取版本  后面要删除掉
             // @ts-ignore
             const table = window.ConfigureTable;
             if (table) {
@@ -3585,7 +3586,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
                     }
                 }
             }
-            return name ? ignoreCase ? window[name] : window[name] : null;
+            return name ? ignoreCase ? window[name] || window[name.toLowerCase()] : window[name] : null;
         }
     }
     /**
@@ -5085,14 +5086,40 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
             if (!Player.inst.urlParam.isJumpPage())
                 fgui.GRoot.inst.showModalWait(getString(1000 /* LibStr.WAITING */));
             Player.inst.gameId = code;
-            // 游戏脚本加载
-            let gameResJS = "configs/gameRes" + (AssetsLoader.inst.httpProtocol ? "" : ".min") + ".js";
-            let content = tsCore.ELoader.loader.getRes(gameResJS);
-            if (!content) {
-                tsCore.ELoader.loader.load(gameResJS, Laya.Handler.create(this, this.loadGameResComplete), null, Laya.Loader.TEXT);
+            this.runLoadResJs(() => this.loadGameJs(), content => this.loadGameResComplete(content));
+        }
+        /**
+         * 执行加载资源
+         *
+         * @param {() => void} onComplete 已经初始化了 缓存在内存中了
+         * @param {(content?: any) => void} onLoadComplete 新加载完成后执行
+         */
+        runLoadResJs(onComplete, onLoadComplete) {
+            // 优先执行新版本的加载方式
+            let obj = GameConfigKit.gameRes();
+            if (obj) { // 缓存中已经有了
+                onComplete();
             }
             else {
-                this.loadGameJs();
+                let gameResJS = `${GameConfigKit.gameNameCanonical().firstLowerCase()}/res${AssetsLoader.inst.httpProtocol ? "" : ".min"}.js`;
+                this.loadRes(gameResJS, (content) => {
+                    if (!content) { // 加载失败
+                        // 游戏脚本加载
+                        gameResJS = "configs/gameRes" + (AssetsLoader.inst.httpProtocol ? "" : ".min") + ".js";
+                        this.loadRes(gameResJS, onLoadComplete);
+                    }
+                    else
+                        onLoadComplete(content);
+                });
+            }
+        }
+        loadRes(url, onComplete) {
+            let content = tsCore.ELoader.loader.getRes(url);
+            if (!content) {
+                tsCore.ELoader.loader.load(url, Laya.Handler.create(this, onComplete), null, Laya.Loader.TEXT);
+            }
+            else {
+                onComplete(content);
             }
         }
         loadGameResComplete(content) {
@@ -5100,7 +5127,7 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
                 this.loadResErrorHandler();
                 return;
             }
-            tsCore.UtilKit.loadScript(content, true, Laya.Render.isConchApp ? null : "gameRes.js");
+            tsCore.UtilKit.loadScript(content, true, Laya.Render.isConchApp ? null : "res.js");
             this.loadGameJs();
         }
         loadGameJs() {
@@ -5166,7 +5193,12 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
                 return;
             }
             let obj = GameConfigKit.gameRes();
-            this._starter = obj.completeFun();
+            // todo 兼容旧版本 后面删除
+            if (obj.startClass) {
+                this._starter = new obj.startClass();
+            }
+            else
+                this._starter = obj.completeFun();
             AnalyticsManager.openGame();
             Player.inst.status = 1;
             // 如果是游客模式
@@ -5758,6 +5790,8 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
             // 游戏名字
             if (this.openGame || tempGameName) {
                 const gameId = Laya.Utils.parseInt(this.openGame);
+                Player.inst.gameId = gameId;
+                Player.inst.gameName = tempGameName;
                 AppRecordManager.executeJson = { type: 2, data: gameId, openGame: gameId, gameName: tempGameName };
             }
         }
