@@ -112,11 +112,11 @@ function Component<T extends { new(...args: any[]): {} }>(value: string | T | Co
 function Resource(target: any, propertyKey: string) {
     const classTarget = Reflect.getMetadata("design:type", target, propertyKey)
     if (classTarget) {
-        // @ts-ignore
-        let bean = tsCore.App.beanClassProperty.get(target.constructor.name) || []
-        bean.push(propertyKey)
-        // @ts-ignore
-        tsCore.App.beanClassProperty.set(target.constructor.name, bean)
+        Object.defineProperty(target, propertyKey, {
+            get(): any {
+                return getBean(propertyKey)
+            }
+        })
     } else throw Error("class type null")
 }
 
@@ -227,14 +227,6 @@ function EventOn(eventName: string, childName?: string, args?: any[]) {
 
 
 function initBean(target: any, name: string) {
-    // @ts-ignore
-    let beanProperty = tsCore.App.beanClassProperty.get(name)
-    beanProperty?.forEach((value: string) => {
-        // @ts-ignore
-        // const propertyClass = Reflect.getMetadata("design:type", target, value)
-        target[value] = getBean(value)
-    })
-
     // @ts-ignore
     tsCore.App.beanActionsFunction
         .filter((actionData: ActionsData) => name == actionData.className)

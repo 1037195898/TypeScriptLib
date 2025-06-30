@@ -287,11 +287,6 @@ declare namespace tsCore {
         options: InitApp;
         private _controller;
         /**
-         * 绑定的类属性
-         * 类名 -> [属性名，属性名]
-         */
-        static beanClassProperty: Map<string, string[]>;
-        /**
          * 绑定的类
          * 类名 -> 类 class
          */

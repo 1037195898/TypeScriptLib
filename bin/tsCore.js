@@ -664,11 +664,11 @@ function Component(value = "") {
 function Resource(target, propertyKey) {
     const classTarget = Reflect.getMetadata("design:type", target, propertyKey);
     if (classTarget) {
-        // @ts-ignore
-        let bean = tsCore.App.beanClassProperty.get(target.constructor.name) || [];
-        bean.push(propertyKey);
-        // @ts-ignore
-        tsCore.App.beanClassProperty.set(target.constructor.name, bean);
+        Object.defineProperty(target, propertyKey, {
+            get() {
+                return getBean(propertyKey);
+            }
+        });
     }
     else
         throw Error("class type null");
@@ -777,13 +777,6 @@ function EventOn(eventName, childName, args) {
     };
 }
 function initBean(target, name) {
-    // @ts-ignore
-    let beanProperty = tsCore.App.beanClassProperty.get(name);
-    beanProperty === null || beanProperty === void 0 ? void 0 : beanProperty.forEach((value) => {
-        // @ts-ignore
-        // const propertyClass = Reflect.getMetadata("design:type", target, value)
-        target[value] = getBean(value);
-    });
     // @ts-ignore
     tsCore.App.beanActionsFunction
         .filter((actionData) => name == actionData.className)
@@ -1146,11 +1139,6 @@ function runApplication(classTarget) {
      *  游戏公用组
      */
     App.GAME_GROUP = "game_group";
-    /**
-     * 绑定的类属性
-     * 类名 -> [属性名，属性名]
-     */
-    App.beanClassProperty = new Map();
     /**
      * 绑定的类
      * 类名 -> 类 class
