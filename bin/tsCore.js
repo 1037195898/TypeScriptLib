@@ -626,8 +626,9 @@ function getBean(name) {
     return tsCore.App.inst.getBean(name);
 }
 /**
- * 组件装饰器，用于注册和创建组件实例。
- * @param value - 组件标识符或目标构造函数。 如果是null值 将不会自动初始化和添加到依赖管理器中，默认使用类名 首字母大小写都有
+ * 组件装饰器函数，用于创建和配置组件类
+ * @template T 限制为构造函数类型
+ * @param {string | T | ComponentData} value - 组件标识符或目标构造函数。默认使用类名 首字母大小写都有.值如果是`null`或`{isJoinBean:false}`,将不会自动初始化和添加到依赖管理器中.
  * @returns any 返回装饰后的类。
  */
 function Component(value = "") {
@@ -662,9 +663,9 @@ function Component(value = "") {
     return decorator;
 }
 /**
- * @bindThis 装饰器，用于自动绑定类方法中的this上下文
+ * @BindThis 装饰器，用于自动绑定类方法中的this上下文
  *
- * 当一个方法被@bindThis装饰器装饰时，该方法会被自动绑定到类的实例上
+ * 当一个方法被`@BindThis`装饰器装饰时，该方法会被自动绑定到类的实例上
  * 这意味着在该方法内部，this将始终指向类的实例，而不会因为函数的调用方式不同而改变
  *
  * @param target 目标类的原型
