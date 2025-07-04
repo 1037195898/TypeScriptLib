@@ -211,7 +211,7 @@ declare function Component<T extends {
  * @param descriptor 方法的描述符
  * @throws {TypeError} 如果装饰的不是方法，抛出类型错误
  */
-declare function bindThis<T extends Function>(target: any, propertyKey: string, descriptor: TypedPropertyDescriptor<T>): {
+declare function BindThis<T extends Function>(target: any, propertyKey: string, descriptor: TypedPropertyDescriptor<T>): {
     configurable: boolean;
     get(this: T): T;
 };

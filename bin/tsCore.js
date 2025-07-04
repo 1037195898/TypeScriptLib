@@ -672,10 +672,10 @@ function Component(value = "") {
  * @param descriptor 方法的描述符
  * @throws {TypeError} 如果装饰的不是方法，抛出类型错误
  */
-function bindThis(target, propertyKey, descriptor) {
+function BindThis(target, propertyKey, descriptor) {
     // 检查descriptor是否存在且为函数，因为只有函数可以被此装饰器装饰
     if (!descriptor || (typeof descriptor.value !== 'function')) {
-        throw new TypeError(`Only methods can be decorated with @bindThis. <${propertyKey}> is not a method!`);
+        throw new TypeError(`Only methods can be decorated with @BindThis. <${propertyKey}> is not a method!`);
     }
     return {
         configurable: true,
