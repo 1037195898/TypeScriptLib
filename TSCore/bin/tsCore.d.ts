@@ -204,50 +204,59 @@ declare function Component<T extends {
     new (...args: any[]): {};
 }>(value?: string | T | ComponentData): any;
 /**
- * 资源注入装饰器，用于自动解析并绑定Bean实例到类属性上。
+ * 资源注入装饰器，用于自动解析并绑定 Bean 实例到类属性上。
  *
- * @param name 可选参数，指定要注入的Bean名称。如果不传，默认使用属性名作为Bean名称。
+ * ### 支持以下写法：
+ * - `@Resource`                         // 直接装饰属性，使用属性名作为 Bean 名称
+ * - `@Resource()`                       // 与无括号写法等效
+ * - `@Resource("customName")`           // 使用指定名称查找 Bean
  *
  * ### 使用说明：
- * - 该装饰器只能用在被@{@link Component}注解管理的类中。
- * - 在类初始化时，会自动从全局Bean池中查找对应名称或类型的Bean，并将其赋值给目标属性。
- * - 如果找到对应的Bean，则会在当前实例上定义一个同名属性，并将Bean实例赋值给它。
+ * - 该装饰器只能用在被 `@Component` 注解管理的类中。
+ * - 在类初始化时，会自动从全局 Bean 池中查找对应名称或类型的 Bean，并将其赋值给目标属性。
+ * - 如果找到对应的 Bean，则会在当前实例上定义一个同名属性，并将 Bean 实例赋值给它。
  *
  * ### 注意事项：
- * - 目标属性必须有类型注解（TypeScript编译时元数据需要）。
- * - 如果找不到对应的Bean，返回值为 undefined，不会抛出异常。
+ * - 目标属性必须有类型注解（TypeScript 编译时元数据需要）
+ * - 如果找不到对应的 Bean，返回值为 undefined，不会抛出异常。
  *
  * ### 示例代码：
  * ```
- *
  * // 假设已经有一个组件类 MyService 并且已经被注册为 Bean
- * @Component
- * class MyService {
+ *  @Component
+ *  class MyService {
  *      sayHello() {
  *          console.log("Hello from MyService");
  *      }
- * }
+ *  }
  *
  * // 使用 Resource 注入 MyService
- * @Component
- * class MyComponent {
- *      \@Resource() // 使用默认属性名 "myService" 查找 Bean
+ *  @Component
+ *  class MyComponent {
+ *      @Resource() // 使用默认属性名 "myService" 查找 Bean
  *      private myService: MyService;
- *
  *      init() {
  *          this.myService.sayHello(); // 输出：Hello from MyService
  *      }
- * }
+ *  }
  *
  * // 或者自定义 Bean 名称
- * @Component
- * class MyCustomNamedComponent {
- *      \@Resource("customName") // 使用指定名称 "customName" 查找 Bean
+ *  @Component
+ *  class MyCustomNamedComponent {
+ *      @Resource("customName") // 使用指定名称 "customName" 查找 Bean
  *      private service: MyService;
- * }
+ *  }
  * ```
+ * @param args
  */
-declare function Resource(name?: string): (target: any, propertyKey: string) => {
+declare function Resource(...args: any[]): ((target: any, propertyKey: string) => {
+    configurable: boolean;
+    get(): any;
+}) | {
+    configurable: boolean;
+    get(): any;
+};
+declare function _Resource(name: string, target: any, propertyKey: string): {
     configurable: boolean;
     get(): any;
 };
