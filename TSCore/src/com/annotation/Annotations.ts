@@ -117,6 +117,136 @@ function Component<T extends { new(...args: any[]): {} }>(value: string | T | Co
 }
 
 /**
+ * 资源注入装饰器，用于自动解析并绑定Bean实例到类属性上。
+ *
+ * @param name 可选参数，指定要注入的Bean名称。如果不传，默认使用属性名作为Bean名称。
+ *
+ * ### 使用说明：
+ * - 该装饰器只能用在被@{@link Component}注解管理的类中。
+ * - 在类初始化时，会自动从全局Bean池中查找对应名称或类型的Bean，并将其赋值给目标属性。
+ * - 如果找到对应的Bean，则会在当前实例上定义一个同名属性，并将Bean实例赋值给它。
+ *
+ * ### 注意事项：
+ * - 目标属性必须有类型注解（TypeScript编译时元数据需要）。
+ * - 如果找不到对应的Bean，返回值为 undefined，不会抛出异常。
+ *
+ * ### 示例代码：
+ * ```
+ *
+ * // 假设已经有一个组件类 MyService 并且已经被注册为 Bean
+ * @Component
+ * class MyService {
+ *      sayHello() {
+ *          console.log("Hello from MyService");
+ *      }
+ * }
+ *
+ * // 使用 Resource 注入 MyService
+ * @Component
+ * class MyComponent {
+ *      \@Resource() // 使用默认属性名 "myService" 查找 Bean
+ *      private myService: MyService;
+ *
+ *      init() {
+ *          this.myService.sayHello(); // 输出：Hello from MyService
+ *      }
+ * }
+ *
+ * // 或者自定义 Bean 名称
+ * @Component
+ * class MyCustomNamedComponent {
+ *      \@Resource("customName") // 使用指定名称 "customName" 查找 Bean
+ *      private service: MyService;
+ * }
+ * ```
+ */
+function Resource(name?: string) {
+    return function (target: any, propertyKey: string) {
+        const classTarget = Reflect.getMetadata("design:type", target, propertyKey)
+        if (classTarget) {
+            return {
+                configurable: true,
+                get() {
+                    // 从bean池中获取指定的值
+                    const bean = getBean<any>(name ?? propertyKey)
+                    if (bean) {
+                        // 在类实例上定义属性，值为获取到底bean，以便后续调用
+                        Object.defineProperty(this, propertyKey, {
+                            value: bean,
+                            configurable: true,
+                            writable: true
+                        })
+                    }
+                    return bean
+                }
+            }
+        } else throw Error("class type null")
+    }
+}
+
+/**
+ * 创建一个用于获取fgui.GComponent属性的装饰器
+ * 该装饰器用于简化对嵌套UI组件属性的访问
+ *
+ * @param name 嵌套组件的路径，使用点号分隔
+ * @returns 返回一个装饰器，用于应用在类属性上
+ *
+ * ```
+ * class MyComponent {
+ *
+ *     // 假设 UI 中有一个名为 "panel" 的组件，其下有一个名为 "button" 的子组件
+ *     @PropertyFgui<fgui.GButton>("panel.button")
+ *     private myButton: fgui.GButton;
+ *
+ *     constructor() {
+ *         // 在构造函数中，myButton 还未初始化
+ *     }
+ *
+ *     public onInit(): void {
+ *         // 此时可以通过 this.myButton 访问到 panel 下的 button 组件
+ *         this.myButton.onClick(this, this.onButtonClick);
+ *     }
+ *
+ *     private onButtonClick(): void {
+ *         console.log("Button clicked!");
+ *     }
+ * }
+ * ```
+ */
+function PropertyFgui<T extends fgui.GComponent>(name: string) {
+    return function (target: any, propertyKey: string) {
+        return {
+            configurable: true,
+            get(this: T) {
+                const pathSegments = name.split(".")
+                let currentComponent: fgui.GComponent = this
+                let component: fgui.GObject = null
+                for (const segment of pathSegments) {
+                    component = currentComponent.getChild(segment);
+                    if (!component) {
+                        // @ts-ignore
+                        // 添加警告信息
+                        tsCore.Log.warn(`[PropertyFgui] Could not find child component "${segment}" in path "${name}"`);
+                        break;
+                    }
+                    currentComponent = component.asCom
+                }
+                if (!component) {
+                    // @ts-ignore
+                    tsCore.Log.warn(`[PropertyFgui] Component not found for property "${propertyKey}" in class "${this.constructor.name}"`);
+                }
+                Object.defineProperty(this, propertyKey, {
+                    value: component,
+                    configurable: true,
+                    writable: false
+                })
+                return component
+            }
+        }
+    }
+}
+
+/**
  * @BindThis 装饰器，用于自动绑定类方法中的this上下文
  *
  * 当一个方法被`@BindThis`装饰器装饰时，该方法会被自动绑定到类的实例上
@@ -147,23 +277,6 @@ function BindThis<T extends Function>(target: any, propertyKey: string, descript
             return bound
         }
     }
-}
-
-
-/**
- * 资源装饰器，标记类属性为资源依赖。 只有被@Component加入依赖管理的类才会被绑定属性
- * @param target - 类的原型。
- * @param propertyKey - 属性键名。
- */
-function Resource(target: any, propertyKey: string) {
-    const classTarget = Reflect.getMetadata("design:type", target, propertyKey)
-    if (classTarget) {
-        Object.defineProperty(target, propertyKey, {
-            get(): any {
-                return getBean(propertyKey)
-            }
-        })
-    } else throw Error("class type null")
 }
 
 /**
