@@ -79,6 +79,27 @@ function getBean<T>(name: string | { new(): T }): T {
     return tsCore.App.inst.getBean(name)
 }
 
+function Lazy<T>(callback: () => T) {
+    return function (target: any, propertyKey: string): PropertyDescriptor {
+        return {
+            configurable: false,
+            get() {
+                const bean = callback()
+                Object.defineProperty(this, propertyKey, {
+                    value: bean,
+                    configurable: false,
+                    writable: false
+                })
+                if (!bean) {
+                    // @ts-ignore
+                    tsCore.Log.warn(`[Lazy] Callback for property "${propertyKey}" returned null.`);
+                }
+                return bean
+            }
+        }
+    }
+}
+
 /**
  * 组件装饰器函数，用于创建和配置组件类
  * @template T 限制为构造函数类型
@@ -167,7 +188,7 @@ function Resource(...args: any[]) {
     if (args.length === 1 && typeof args[0] === 'string') {
         const name = args[0];
         return function (target: any, propertyKey: string) {
-           return _Resource(name, target, propertyKey)
+            return _Resource(name, target, propertyKey)
         };
     }
     // 作为直接装饰器调用 @Resource
@@ -188,13 +209,15 @@ function _Resource(name: string, target: any, propertyKey: string) {
             get() {
                 // 从bean池中获取指定的值 || 长度为0的字符串也会跳过
                 const bean = getBean<any>(name || propertyKey)
-                if (bean) {
-                    // 在类实例上定义属性，值为获取到底bean，以便后续调用
-                    Object.defineProperty(this, propertyKey, {
-                        value: bean,
-                        configurable: true,
-                        writable: true
-                    })
+                // 在类实例上定义属性，值为获取到底bean，以便后续调用
+                Object.defineProperty(this, propertyKey, {
+                    value: bean,
+                    configurable: true,
+                    writable: true
+                })
+                if (!bean) {
+                    // @ts-ignore
+                    tsCore.Log.warn(`[Resource] Failed to resolve bean for property "${propertyKey}".`);
                 }
                 return bean
             }

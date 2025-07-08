@@ -625,6 +625,26 @@ function getBean(name) {
     // @ts-ignore
     return tsCore.App.inst.getBean(name);
 }
+function Lazy(callback) {
+    return function (target, propertyKey) {
+        return {
+            configurable: false,
+            get() {
+                const bean = callback();
+                Object.defineProperty(this, propertyKey, {
+                    value: bean,
+                    configurable: false,
+                    writable: false
+                });
+                if (!bean) {
+                    // @ts-ignore
+                    tsCore.Log.warn(`[Lazy] Callback for property "${propertyKey}" returned null.`);
+                }
+                return bean;
+            }
+        };
+    };
+}
 /**
  * 组件装饰器函数，用于创建和配置组件类
  * @template T 限制为构造函数类型
@@ -733,13 +753,15 @@ function _Resource(name, target, propertyKey) {
             get() {
                 // 从bean池中获取指定的值 || 长度为0的字符串也会跳过
                 const bean = getBean(name || propertyKey);
-                if (bean) {
-                    // 在类实例上定义属性，值为获取到底bean，以便后续调用
-                    Object.defineProperty(this, propertyKey, {
-                        value: bean,
-                        configurable: true,
-                        writable: true
-                    });
+                // 在类实例上定义属性，值为获取到底bean，以便后续调用
+                Object.defineProperty(this, propertyKey, {
+                    value: bean,
+                    configurable: true,
+                    writable: true
+                });
+                if (!bean) {
+                    // @ts-ignore
+                    tsCore.Log.warn(`[Resource] Failed to resolve bean for property "${propertyKey}".`);
                 }
                 return bean;
             }

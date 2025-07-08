@@ -194,6 +194,7 @@ declare type EventData = {
 declare function getBean<T>(name: string | {
     new (): T;
 }): T;
+declare function Lazy<T>(callback: () => T): (target: any, propertyKey: string) => PropertyDescriptor;
 /**
  * 组件装饰器函数，用于创建和配置组件类
  * @template T 限制为构造函数类型
