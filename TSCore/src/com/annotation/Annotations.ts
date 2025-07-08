@@ -79,12 +79,18 @@ function getBean<T>(name: string | { new(): T }): T {
     return tsCore.App.inst.getBean(name)
 }
 
+/**
+ * Lazy装饰器工厂函数
+ * 用于延迟初始化类的属性，仅在属性值首次被访问时执行初始化
+ *
+ * @param {() => T} callback 一个无参数的回调函数，用于生成属性的值
+ */
 function Lazy<T>(callback: () => T) {
     return function (target: any, propertyKey: string): PropertyDescriptor {
         return {
             configurable: false,
             get() {
-                const bean = callback()
+                const bean = callback.call(this)
                 Object.defineProperty(this, propertyKey, {
                     value: bean,
                     configurable: false,
@@ -98,6 +104,22 @@ function Lazy<T>(callback: () => T) {
             }
         }
     }
+}
+
+/**
+ * 使用装饰器语法，延迟执行目标方法直到当前代码执行完毕
+ * 主要用途是避免在当前执行上下文中直接调用方法，从而延迟到当前代码块执行完毕后调用
+ *
+ * @param target 被装饰的类的原型
+ * @param propertyKey 被装饰的方法的名称
+ * @param descriptor 方法的属性描述符
+ */
+function CallLater(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+    descriptor.value = function (...args: any[]) {
+        Laya.timer.callLater(this, originalMethod, args)
+    }
+    return descriptor;
 }
 
 /**
