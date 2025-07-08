@@ -133,6 +133,8 @@ gulp.task('buildStream', gulp.series("clean", () => {
         .pipe(generate.dtsAppendStream(["src/**/*.d.ts"]))
 
 
-}, "removeTemp"))
+}
+// , "removeTemp"
+))
 
 gulp.task('default', gulp.series("buildStream"))

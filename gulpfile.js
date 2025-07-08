@@ -116,51 +116,12 @@ gulp.task('removeTemp', () => {
 })
 
 //完整构建
-// gulp.task('build', gulp.series("clean", 'createTs', "createJs", "minifyJs", "mangleJs", "createDTs", "dtsAppend"
-//     , "removeTemp"
-// ))
 gulp.task('build', gulp.series("clean", () => {
         return gulp.src([
             "./TSCore/bin/**/*",
             "./GameLib/bin/**/*"
         ]).pipe(gulp.dest("./bin"))
     }
-    // , () => {
-    //     return gulp.src("./bin2/*Lib.js")
-    //         .pipe(concat(`${generate.namespace}.js`))
-    //         .pipe(append(`window.${generate.namespace}=Object.assign({},window.enhanceLib,window.gameLib)`))
-    //         .pipe(gulp.dest("./bin2"))
-    //         .pipe(cleanStream(["./bin2/*Lib.js", `!./bin2/${generate.namespace}.js`]))
-    //         .pipe(print("create"))
-    // }, () => {
-    //     return gulp.src("./bin2/*.min.js")
-    //         .pipe(concat(`${generate.namespace}.min.js`))
-    //         .pipe(append(`window.${generate.namespace}=Object.assign({},window.enhanceLib,window.gameLib)`))
-    //         .pipe(gulp.dest("./bin2"))
-    //         .pipe(cleanStream(["./bin2/*.min.js", `!./bin2/${generate.namespace}.min.js`]))
-    //         .pipe(print("create"))
-    // }, () => {
-    //     return gulp.src("./bin2/*.d.ts")
-    //         .pipe(concat(`${generate.namespace}.d.ts`))
-    //         .pipe(append(`window.${generate.namespace}=Object.assign({},window.enhanceLib,window.gameLib)`))
-    //         .pipe(gulp.dest("./bin2"))
-    //         .pipe(cleanStream(["./bin2/*.d.ts", `!./bin2/${generate.namespace}.d.ts`]))
-    //         .pipe(print("create"))
-    // }, () => {
-    //     return gulp.src("./bin2/min/*.min.js")
-    //         .pipe(concat(`${generate.namespace}.min.js`))
-    //         .pipe(append(`window.${generate.namespace}=Object.assign({},window.enhanceLib,window.gameLib)`))
-    //         .pipe(gulp.dest("./bin2/min"))
-    //         .pipe(cleanStream(["./bin2/min/*.min.js", `!./bin2/min/${generate.namespace}.min.js`]))
-    //         .pipe(print("create"))
-    // }, () => {
-    //     return gulp.src("./bin2/map/*.js.map")
-    //         .pipe(concat(`${generate.namespace}.js.map`))
-    //         // .pipe(append(`window.${generate.namespace}=Object.assign({},window.enhanceLib,window.gameLib)`))
-    //         .pipe(gulp.dest("./bin2/map"))
-    //         .pipe(cleanStream(["./bin2/map/*.js.map", `!./bin2/map/${generate.namespace}.js.map`]))
-    //         .pipe(print("create"))
-    // }
 ))
 
 gulp.task('buildStream', gulp.series("clean", () => {

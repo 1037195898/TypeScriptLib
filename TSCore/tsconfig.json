@@ -4,17 +4,16 @@
   ],
   "compilerOptions": {
     "outDir": "./bin"
-//    "rootDir": "../",
-//    "baseUrl": ".",
-//    "paths": {
-//      ".": [
-//        "./src"
-//      ],
-//      "core/*": ["./bin"]
-//    }
+    //    "rootDir": "../",
+    //    "baseUrl": ".",
+    //    "paths": {
+    //      ".": [
+    //        "./src"
+    //      ],
+    //      "core/*": ["./bin"]
+    //    }
   },
   "exclude": [
-
   ],
   "include": [
     "../libs",

@@ -3,3 +3,5 @@ node_modules
 .idea/workspace.xml
 bin/temp/
 dist
+/TSCore/bin/temp/
+/GameLib/bin/temp/

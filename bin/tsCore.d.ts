@@ -343,6 +343,55 @@ declare function runApplication<T>(classTarget: {
 interface IRunApplication {
     start(): void;
 }
+/**
+ * FGui装饰器用于简化FGUI组件的访问
+ * 它通过名称字符串来定位和返回FGUI组件、控制器或过渡动画
+ * @param name 组件的名称路径，使用点号分隔
+ *
+ * ```
+ * // 假设你有一个组件类 MyComponent，它继承自 fgui.GComponent
+ * class MyComponent extends fgui.GComponent {
+ *     // 使用 @Fgui 注解来注入一个子组件
+ *     @Fgui("panel.button")
+ *     private myButton: fgui.GButton;
+ *
+ *     // 使用 @Fgui 注解来注入一个控制器
+ *     @Fgui("panel.controller")
+ *     private myController: fgui.Controller;
+ *
+ *     // 使用 @Fgui 注解来注入一个过渡动画
+ *     @Fgui("panel.transition")
+ *     private myTransition: fgui.Transition;
+ *
+ *     // 构造函数或其他初始化逻辑
+ *     constructor() {
+ *         super();
+ *         // 初始化逻辑...
+ *     }
+ *
+ *     // 示例方法：点击按钮时触发的动作
+ *     public initEvents(): void {
+ *         this.myButton.onClick(this.onButtonClick, this);
+ *     }
+ *
+ *     private onButtonClick(): void {
+ *         console.log("Button clicked!");
+ *         // 使用控制器切换状态
+ *         if (this.myController) {
+ *             this.myController.selectedIndex = 1;
+ *         }
+ *         // 播放过渡动画
+ *         if (this.myTransition) {
+ *             this.myTransition.play();
+ *         }
+ *     }
+ * }
+ * ```
+ */
+declare function Fgui(name: string): (target: any, propertyKey: string) => {
+    configurable: boolean;
+    get(this: fgui.GComponent): any;
+};
 declare namespace tsCore {
     export class App implements IAction {
         private static _instance;
