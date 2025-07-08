@@ -261,39 +261,6 @@ declare function _Resource(name: string, target: any, propertyKey: string): {
     get(): any;
 };
 /**
- * 创建一个用于获取fgui.GComponent属性的装饰器
- * 该装饰器用于简化对嵌套UI组件属性的访问
- *
- * @param name 嵌套组件的路径，使用点号分隔
- * @returns 返回一个装饰器，用于应用在类属性上
- *
- * ```
- * class MyComponent {
- *
- *     // 假设 UI 中有一个名为 "panel" 的组件，其下有一个名为 "button" 的子组件
- *     @PropertyFgui<fgui.GButton>("panel.button")
- *     private myButton: fgui.GButton;
- *
- *     constructor() {
- *         // 在构造函数中，myButton 还未初始化
- *     }
- *
- *     public onInit(): void {
- *         // 此时可以通过 this.myButton 访问到 panel 下的 button 组件
- *         this.myButton.onClick(this, this.onButtonClick);
- *     }
- *
- *     private onButtonClick(): void {
- *         console.log("Button clicked!");
- *     }
- * }
- * ```
- */
-declare function PropertyFgui<T extends fgui.GComponent>(name: string): (target: any, propertyKey: string) => {
-    configurable: boolean;
-    get(this: T): fairygui.GObject;
-};
-/**
  * @BindThis 装饰器，用于自动绑定类方法中的this上下文
  *
  * 当一个方法被`@BindThis`装饰器装饰时，该方法会被自动绑定到类的实例上
