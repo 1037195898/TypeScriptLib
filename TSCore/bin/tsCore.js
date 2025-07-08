@@ -722,6 +722,9 @@ function Resource(...args) {
         return _Resource(null, target, propertyKey);
     }
 }
+/**
+ * @internal
+ */
 function _Resource(name, target, propertyKey) {
     const classTarget = Reflect.getMetadata("design:type", target, propertyKey);
     if (classTarget) {
@@ -853,10 +856,13 @@ function EventOn(eventName, childName, args) {
         else {
             // 如果目标不是FGUI的GObject实例，输出调试日志
             // @ts-ignore
-            tsCore.Log.debug("[click] Can only be used in fgui.GObject = " + data.childName);
+            tsCore.Log.debug("[click] Can only be used in fgui.GObject = " + target);
         }
     };
 }
+/**
+ * @internal
+ */
 function initBean(target, name) {
     // @ts-ignore
     tsCore.App.beanActionsFunction
@@ -874,6 +880,7 @@ function initBean(target, name) {
  *
  * @param events 事件数据数组，包含了需要绑定的事件信息
  * @param target 当前组件
+ * @internal
  */
 function proxyComponentEvent(events, target) {
     // 遍历每个事件数据项
@@ -901,6 +908,7 @@ function proxyComponentEvent(events, target) {
  * 包装成代理类
  * @param {{new(...args: any[]): any}} classTarget
  * @param beanName 如果传入 将会被缓存到bean集合中 否则不存
+ * @internal
  */
 function proxyClass(classTarget, beanName) {
     const classTemp = class extends classTarget {
@@ -1053,10 +1061,10 @@ function Fgui(name) {
                 let obj = null;
                 const classTarget = Reflect.getMetadata("design:type", target, propertyKey);
                 switch (true) {
-                    case classTarget instanceof fgui.GObject:
+                    case classTarget == fgui.GObject || classTarget.prototype instanceof fgui.GObject:
                         obj = fguiFindChild(this, pathSegments);
                         break;
-                    case classTarget instanceof fgui.Controller:
+                    case classTarget == fgui.Controller || classTarget.prototype instanceof fgui.Controller:
                         if (pathSegments.length > 1) {
                             current = fguiFindChild(this, pathSegments.slice(0, -1));
                             if (current && current instanceof fgui.GComponent) {
@@ -1066,7 +1074,7 @@ function Fgui(name) {
                         else
                             obj = this.getController(pathSegments[0]);
                         break;
-                    case classTarget instanceof fgui.Transition:
+                    case classTarget == fgui.Transition || classTarget.prototype instanceof fgui.Transition:
                         if (pathSegments.length > 1) {
                             current = fguiFindChild(this, pathSegments.slice(0, -1));
                             if (current && current instanceof fgui.GComponent) {

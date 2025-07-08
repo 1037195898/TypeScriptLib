@@ -256,10 +256,6 @@ declare function Resource(...args: any[]): ((target: any, propertyKey: string) =
     configurable: boolean;
     get(): any;
 };
-declare function _Resource(name: string, target: any, propertyKey: string): {
-    configurable: boolean;
-    get(): any;
-};
 /**
  * @BindThis 装饰器，用于自动绑定类方法中的this上下文
  *
@@ -299,7 +295,7 @@ declare function Actions(action: number | string, group?: string, order?: number
  * @param childName 子节点名称，可选
  * @param args 附加参数，可选
  */
-declare function ClickOn(childName: string, args?: any[]): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
+declare function ClickOn(childName?: string, args?: any[]): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
 /**
  * 通用事件监听装饰器
  *
@@ -311,25 +307,6 @@ declare function ClickOn(childName: string, args?: any[]): (target: any, propert
  * @param args 附加参数，可选
  */
 declare function EventOn(eventName: string, childName?: string, args?: any[]): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
-declare function initBean(target: any, name: string): void;
-/**
- * 代理组件事件
- *
- * 此函数用于遍历事件数据数组，并为每个事件数据绑定相应的事件处理函数
- * 它主要通过检查事件数据中的子组件名称来决定是为子组件还是当前组件绑定事件
- *
- * @param events 事件数据数组，包含了需要绑定的事件信息
- * @param target 当前组件
- */
-declare function proxyComponentEvent(events: EventData[], target: any): void;
-/**
- * 包装成代理类
- * @param {{new(...args: any[]): any}} classTarget
- * @param beanName 如果传入 将会被缓存到bean集合中 否则不存
- */
-declare function proxyClass(classTarget: {
-    new (...args: any[]): any;
-}, beanName?: string): any;
 /**
  * 运行应用程序，并初始化所有Bean实例。
  * @param classTarget - 应用程序主类的构造函数。

@@ -23,6 +23,34 @@ declare function bindView(url: string, type: {
 declare function createView<T extends fgui.GObject>(url: string, userClass?: {
     new (): T;
 }): T;
+/**
+ * FguiBindView装饰器用于将一个类绑定到特定的FGUI视图资源
+ * 它可以自动处理视图资源的加载和初始化，并将它们与相应的类关联起来
+ * 主要用于简化FGUI组件类与资源文件的绑定过程
+ *
+ * 使用方式：
+ * 1. 直接通过字符串传入FGUI视图资源路径
+ *    示例:
+ *    ```
+ *    @FguiBindView("res/ui/ExampleView")
+ *    class ExampleView extends fgui.GComponent {
+ *        // 类实现
+ *    }
+ *    ```
+ * 2. 绑定已命名类（若未提供URL，则优先从类元数据获取，否则使用类名）
+ *    示例:
+ *    ```
+ *    @FguiBindView
+ *    class ExampleView extends fgui.GComponent {
+ *        // 类实现
+ *    }
+ *    ```
+ * @param target - 可选参数，FGUI视图资源路径(url) 或被装饰的类本身
+ * @see {@link bindView}
+ */
+declare function FguiBindView<T extends {
+    new (...args: any[]): fgui.GComponent;
+}>(target: string | any): (classTarget: T) => void;
 declare namespace gameLib {
     export class BaseView extends tsCore.EView {
         constructor();

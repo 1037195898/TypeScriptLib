@@ -53,10 +53,10 @@ function Fgui(name: string) {
                 let obj = null
                 const classTarget = Reflect.getMetadata("design:type", target, propertyKey)
                 switch (true) {
-                    case classTarget instanceof fgui.GObject:
+                    case classTarget == fgui.GObject || classTarget.prototype instanceof fgui.GObject:
                         obj = fguiFindChild(this, pathSegments)
                         break
-                    case classTarget instanceof fgui.Controller:
+                    case classTarget == fgui.Controller || classTarget.prototype instanceof fgui.Controller:
                         if (pathSegments.length > 1) {
                             current = fguiFindChild(this, pathSegments.slice(0, -1))
                             if (current && current instanceof fgui.GComponent) {
@@ -64,7 +64,7 @@ function Fgui(name: string) {
                             }
                         } else obj = this.getController(pathSegments[0])
                         break
-                    case classTarget instanceof fgui.Transition:
+                    case classTarget == fgui.Transition || classTarget.prototype instanceof fgui.Transition:
                         if (pathSegments.length > 1) {
                             current = fguiFindChild(this, pathSegments.slice(0, -1))
                             if (current && current instanceof fgui.GComponent) {

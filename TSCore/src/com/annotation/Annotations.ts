@@ -177,6 +177,9 @@ function Resource(...args: any[]) {
     }
 }
 
+/**
+ * @internal
+ */
 function _Resource(name: string, target: any, propertyKey: string) {
     const classTarget = Reflect.getMetadata("design:type", target, propertyKey)
     if (classTarget) {
@@ -278,7 +281,7 @@ function Actions(action: number | string, group?: string, order?: number) {
  * @param childName 子节点名称，可选
  * @param args 附加参数，可选
  */
-function ClickOn(childName: string, args?: any[]) {
+function ClickOn(childName?: string, args?: any[]) {
     return EventOn(Laya.Event.CLICK, childName, args)
 }
 
@@ -308,12 +311,14 @@ function EventOn(eventName: string, childName?: string, args?: any[]) {
         } else {
             // 如果目标不是FGUI的GObject实例，输出调试日志
             // @ts-ignore
-            tsCore.Log.debug("[click] Can only be used in fgui.GObject = " + data.childName)
+            tsCore.Log.debug("[click] Can only be used in fgui.GObject = " + target)
         }
     }
 }
 
-
+/**
+ * @internal
+ */
 function initBean(target: any, name: string) {
     // @ts-ignore
     tsCore.App.beanActionsFunction
@@ -333,6 +338,7 @@ function initBean(target: any, name: string) {
  *
  * @param events 事件数据数组，包含了需要绑定的事件信息
  * @param target 当前组件
+ * @internal
  */
 function proxyComponentEvent(events: EventData[], target: any) {
     // 遍历每个事件数据项
@@ -359,6 +365,7 @@ function proxyComponentEvent(events: EventData[], target: any) {
  * 包装成代理类
  * @param {{new(...args: any[]): any}} classTarget
  * @param beanName 如果传入 将会被缓存到bean集合中 否则不存
+ * @internal
  */
 function proxyClass(classTarget: { new(...args: any[]): any }, beanName?: string): any {
     const classTemp = class extends classTarget {
