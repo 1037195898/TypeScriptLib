@@ -1,5 +1,9 @@
 /**
- * 给资源绑定一个实现对象
+ * 绑定视图URL到特定的GComponent类型
+ *
+ * 此函数用于在给定的URL和一个GComponent类型之间建立关联。如果URL是唯一的`isUnique=true`，它会被添加到一个特殊集合中，
+ * 从而确保该 URL 对应的类不会被后续的绑定操作覆盖。
+ *
  * @example
  *
  * bindView("ui://package/uiName", MyUIClass)
@@ -9,12 +13,13 @@
  * //以下这种只能在游戏已经确认的时候使用，会自动根据游戏名字做为包填入
  * bindView("uiName", MyUIClass)
  *
- * @param url
- * @param type
+ * @param url 视图的资源URL。如果URL不包含"/"，它会被视为简单名称并自动加上当前游戏的名称作为前缀
+ * @param type GComponent的类型，必须是一个构造函数（new () => fgui.GComponent）
+ * @param isUnique 指示是否为唯一绑定。若设为 `true`，则该url的绑定关系将不会被后续相同url的绑定操作所覆盖，默认为 `false`
  */
 declare function bindView(url: string, type: {
     new (): fgui.GComponent;
-}): void;
+}, isUnique?: boolean): void;
 /**
  * 根据url 创建一个对象
  * @param url 如果url不带/符号 则自动转成 gameName/url

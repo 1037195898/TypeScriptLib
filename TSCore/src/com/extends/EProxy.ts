@@ -1,6 +1,7 @@
 import UIObjectFactory = fgui.UIObjectFactory
 import {Proxys} from "../core/Proxys"
 import {App} from "../App";
+import GComponent = fgui.GComponent;
 
 export class EProxy extends Proxys {
 
@@ -17,12 +18,12 @@ export class EProxy extends Proxys {
     }
 
     /** 设置扩展 */
-    protected insertExt(pkgName: string, resName: string, clas: any) {
+    protected insertExt(pkgName: string, resName: string, clas: new () => GComponent) {
         this.insertExtUrl("//" + pkgName + "/" + resName, clas)
     }
 
     /** 设置扩展 */
-    protected insertExtUrl(url: string, clas: any) {
+    protected insertExtUrl(url: string, clas: new () => GComponent) {
         UIObjectFactory.setPackageItemExtension(url, clas)
     }
 

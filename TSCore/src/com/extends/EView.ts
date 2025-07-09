@@ -5,6 +5,7 @@ import {HistoryManager} from "../manager/HistoryManager"
 import {View} from "../core/View"
 import {IRecord} from "../interfaces/ICommon";
 import {App} from "../App";
+import GComponent = fgui.GComponent;
 
 /** 全屏显示基类 */
 export class EView extends View implements IRecord {
@@ -73,12 +74,12 @@ export class EView extends View implements IRecord {
     }
 
     /** 设置扩展 */
-    protected insertExt(pkgName: string, resName: string, clas: any) {
+    protected insertExt(pkgName: string, resName: string, clas: new () => GComponent) {
         this.insertExtUrl("//" + pkgName + "/" + resName, clas)
     }
 
     /** 设置扩展 */
-    protected insertExtUrl(url: string, clas: any) {
+    protected insertExtUrl(url: string, clas: new () => GComponent) {
         UIObjectFactory.setPackageItemExtension(url, clas)
     }
 
