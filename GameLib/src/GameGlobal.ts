@@ -23,7 +23,8 @@ function bindView(url: string, type: { new(): fgui.GComponent }, isUnique = fals
         // @ts-ignore
         const simpleName = gameLib.Player.inst.simpleName
         if (!simpleName) {
-            throw new Error("无法解析简单名称对应的包名，gameLib.Player.inst.simpleName 未定义")
+            throw new Error("Failed to resolve package name from simple name, gameLib.Player.inst.simpleName is undefined");
+
         }
         url = `//${simpleName}/${url}`
     }
