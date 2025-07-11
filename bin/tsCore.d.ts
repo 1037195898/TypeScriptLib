@@ -249,7 +249,7 @@ declare function Component<T extends {
  * // 使用 Resource 注入 MyService
  *  @Component
  *  class MyComponent {
- *      @Resource() // 使用默认属性名 "myService" 查找 Bean
+ *      @Resource // 使用默认属性名 "myService" 查找 Bean
  *      private myService: MyService;
  *      init() {
  *          this.myService.sayHello(); // 输出：Hello from MyService
@@ -311,7 +311,7 @@ declare function Actions(action: number | string, group?: string, order?: number
  * @param childName 子节点名称，可选
  * @param args 附加参数，可选
  */
-declare function ClickOn(childName?: string, args?: any[]): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
+declare function ClickOn(childName?: string, args?: any[]): void;
 /**
  * 通用事件监听装饰器
  *
@@ -4101,7 +4101,7 @@ declare type ISkeletonPlay = {
     /**
      * 当前播放动画的进度
      *
-     * 默认是播放结束， 可以设置 before 播放之前和 after之后 会带参数  nameOrIndex: string | number
+     * 默认是播放结束， 可以设置 before 播放之前和 after之后 会带传入的`nameOrIndex: string | number`参数，默认播放传入的是0
      */
     progress?: ParamHandler | { before?: ParamHandler, after?: ParamHandler }
     /**

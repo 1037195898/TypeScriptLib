@@ -733,7 +733,7 @@ function Component(value = "") {
  * // 使用 Resource 注入 MyService
  *  @Component
  *  class MyComponent {
- *      @Resource() // 使用默认属性名 "myService" 查找 Bean
+ *      @Resource // 使用默认属性名 "myService" 查找 Bean
  *      private myService: MyService;
  *      init() {
  *          this.myService.sayHello(); // 输出：Hello from MyService
@@ -870,7 +870,16 @@ function Actions(action, group, order) {
  * @param args 附加参数，可选
  */
 function ClickOn(childName, args) {
-    return EventOn(Laya.Event.CLICK, childName, args);
+    // 作为装饰器工厂调用 @ClickOn("name") 或者  @ClickOn("name", [1,2])
+    if ((arguments.length == 1 && typeof arguments[0] === 'string') || (arguments.length == 2 && typeof arguments[0] === 'string' && Array.isArray(arguments[1]))) {
+        EventOn(Laya.Event.CLICK, childName, args);
+        return;
+    }
+    // 作为直接装饰器调用 @ClickOn
+    if (arguments.length > 2 && typeof arguments[0] === 'object' && typeof arguments[1] === 'string') {
+        const [target, propertyKey, descriptor] = arguments;
+        _eventOn(target, propertyKey, descriptor, Laya.Event.CLICK);
+    }
 }
 /**
  * 通用事件监听装饰器
@@ -884,24 +893,30 @@ function ClickOn(childName, args) {
  */
 function EventOn(eventName, childName, args) {
     return function (target, propertyKey, descriptor) {
-        if (!descriptor || (typeof descriptor.value !== 'function')) {
-            throw new TypeError(`Only methods can be decorated with @EventOn. <${propertyKey}> is not a method!`);
-        }
-        // 确保目标是一个FGUI的GObject实例
-        if (target instanceof fgui.GObject) {
-            const className = target.constructor.name;
-            const paramtypes = Reflect.getMetadata("design:paramtypes", target, propertyKey);
-            const fun = descriptor.value;
-            // 将事件处理信息推送到全局列表中
-            // @ts-ignore
-            tsCore.App.beanEventFunction.push({ target, className, fun, eventName, childName, args });
-        }
-        else {
-            // 如果目标不是FGUI的GObject实例，输出调试日志
-            // @ts-ignore
-            tsCore.Log.debug("[click] Can only be used in fgui.GObject = " + target);
-        }
+        _eventOn(target, propertyKey, descriptor, eventName, childName, args);
     };
+}
+/**
+ * @internal
+ */
+function _eventOn(target, propertyKey, descriptor, eventName, childName, args) {
+    if (!descriptor || (typeof descriptor.value !== 'function')) {
+        throw new TypeError(`Only methods can be decorated with @EventOn. <${propertyKey}> is not a method!`);
+    }
+    // 确保目标是一个FGUI的GObject实例
+    if (target instanceof fgui.GObject) {
+        const className = target.constructor.name;
+        const paramtypes = Reflect.getMetadata("design:paramtypes", target, propertyKey);
+        const fun = descriptor.value;
+        // 将事件处理信息推送到全局列表中
+        // @ts-ignore
+        tsCore.App.beanEventFunction.push({ target, className, fun, eventName, childName, args });
+    }
+    else {
+        // 如果目标不是FGUI的GObject实例，输出调试日志
+        // @ts-ignore
+        tsCore.Log.debug("[click] Can only be used in fgui.GObject = " + target);
+    }
 }
 /**
  * @internal
