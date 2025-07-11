@@ -359,8 +359,8 @@ export class SceneManager extends EProxy {
 
         // todo 兼容旧版本 后面删除
 
-        if (obj.startClass) {
-            this._starter = new obj.startClass()
+        if (obj.startClass && obj.startClass instanceof BaseStarter) {
+            this._starter = runApplication(obj.startClass)
         } else this._starter = obj.completeFun()
 
         AnalyticsManager.openGame()

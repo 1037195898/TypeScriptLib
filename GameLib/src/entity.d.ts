@@ -8,12 +8,15 @@ declare type ResConfig = {
     js: string
     /**
      * 执行启动函数
-     * @deprecated
      * @see startClass
      */
     completeFun: Function
     /**
      * 启动类
+     *
+     * 会使用 {@link runApplication} 启动`startClass`,并创建相应的bean
+     * @see completeFun
+     * @see runApplication
      */
     startClass: { new(): gameLib.BaseStarter }
     /** 要加载的额外库 */
