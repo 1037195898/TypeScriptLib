@@ -666,6 +666,14 @@ function CallLater(target, propertyKey, descriptor) {
     };
     return descriptor;
 }
+function TimerFrameLoop() {
+}
+function TimerDelay() {
+}
+function AppMain(value) {
+    // @ts-ignore
+    tsCore.App.appMainClass = value;
+}
 /**
  * 组件装饰器函数，用于创建和配置组件类
  * @template T 限制为构造函数类型
@@ -1020,11 +1028,18 @@ function runApplication(classTarget) {
             });
         }
     });
-    const app = new classTarget();
     // @ts-ignore
-    if (!tsCore.App.inst.hasBean(classTarget.name)) {
+    const mainClass = classTarget !== null && classTarget !== void 0 ? classTarget : tsCore.App.appMainClass;
+    if (!mainClass) {
+        // 应用程序的主类未定义，请使用 @AppMain 装饰器指定主类
+        throw new Error("Application main class is not defined. Please use @AppMain to specify the main class.");
+    }
+    const app = new mainClass();
+    const mainName = Reflect.getMetadata("class:name", mainClass) || mainClass.name;
+    // @ts-ignore
+    if (!tsCore.App.inst.hasBean(mainName)) {
         // @ts-ignore
-        tsCore.App.inst.addBean(classTarget.name.firstLowerCase(), app);
+        tsCore.App.inst.addBean(mainName.firstLowerCase(), app);
     }
     // @ts-ignore
     tsCore.App.beanClassFunction.forEach((value, key) => {
@@ -1057,7 +1072,7 @@ function runApplication(classTarget) {
             initBean(target, classTargetName);
         }
     });
-    initBean(app, classTarget.name);
+    initBean(app, mainName);
     if (typeof app["start"] == "function") {
         app["start"]();
     }

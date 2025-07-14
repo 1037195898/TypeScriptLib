@@ -357,12 +357,9 @@ export class SceneManager extends EProxy {
         }
         let obj = GameConfigKit.gameRes()
 
-        // todo 兼容旧版本 后面删除
-
-        if (obj.startClass && obj.startClass instanceof BaseStarter) {
-            this._starter = runApplication(obj.startClass)
-        } else this._starter = obj.completeFun()
-
+        if (obj.completeFun) {
+            this._starter = obj.completeFun()
+        } else this._starter = runApplication(obj.startClass)
         AnalyticsManager.openGame()
         Player.inst.status = 1
         // 如果是游客模式

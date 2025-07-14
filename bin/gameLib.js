@@ -5277,12 +5277,11 @@ function _FguiBindView(classTarget, url) {
                 return;
             }
             let obj = GameConfigKit.gameRes();
-            // todo 兼容旧版本 后面删除
-            if (obj.startClass && obj.startClass instanceof BaseStarter) {
-                this._starter = runApplication(obj.startClass);
+            if (obj.completeFun) {
+                this._starter = obj.completeFun();
             }
             else
-                this._starter = obj.completeFun();
+                this._starter = runApplication(obj.startClass);
             AnalyticsManager.openGame();
             Player.inst.status = 1;
             // 如果是游客模式

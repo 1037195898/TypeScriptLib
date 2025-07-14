@@ -28,6 +28,11 @@ export class App implements IAction {
      *  游戏公用组
      */
     static GAME_GROUP = "game_group"
+    /**
+     * 程序运行主类
+     * @type {{new(...args: any[]): IRunApplication}}
+     */
+    static appMainClass: { new(...args: any[]): IRunApplication }
 
     static initEngine?: IInitEngine
     options: InitApp

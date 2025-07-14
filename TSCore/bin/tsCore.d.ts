@@ -210,6 +210,11 @@ declare function Lazy<T>(callback: () => T): (target: any, propertyKey: string) 
  * @param descriptor 方法的属性描述符
  */
 declare function CallLater(target: any, propertyKey: string, descriptor: PropertyDescriptor): PropertyDescriptor;
+declare function TimerFrameLoop(): void;
+declare function TimerDelay(): void;
+declare function AppMain(value: {
+    new (...args: any[]): IRunApplication;
+}): void;
 /**
  * 组件装饰器函数，用于创建和配置组件类
  * @template T 限制为构造函数类型
@@ -327,7 +332,7 @@ declare function EventOn(eventName: string, childName?: string, args?: any[]): (
  * 运行应用程序，并初始化所有Bean实例。
  * @param classTarget - 应用程序主类的构造函数。
  */
-declare function runApplication<T>(classTarget: {
+declare function runApplication<T>(classTarget?: {
     new (...args: any[]): T;
 }): T;
 /**
@@ -401,6 +406,13 @@ declare namespace tsCore {
          *  游戏公用组
          */
         static GAME_GROUP: string;
+        /**
+         * 程序运行主类
+         * @type {{new(...args: any[]): IRunApplication}}
+         */
+        static appMainClass: {
+            new (...args: any[]): IRunApplication;
+        };
         static initEngine?: IInitEngine;
         options: InitApp;
         private _controller;
