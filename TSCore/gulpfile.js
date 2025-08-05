@@ -16,7 +16,7 @@ gulp.task("clean", () => {
     ])
 })
 
-gulp.task('build', gulp.series("clean", (done) => {
+function buildLib(done) {
     buildLibrary({
         src: {
             globs: ["src/**/*.ts", "!**/*.d.ts"],
@@ -28,7 +28,12 @@ gulp.task('build', gulp.series("clean", (done) => {
         dts: {
             globalDtsFile: ["./src/define.d.ts", "./src/entity.d.ts"]
         }
-    }, done)
-}))
+    }, function () {
+        done()
+    })
+}
+
+
+gulp.task('build', gulp.series("clean", buildLib))
 
 gulp.task('default', gulp.series("build"))

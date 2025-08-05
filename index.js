@@ -3,6 +3,7 @@ const path = require('path')
 
 const streamNode = require("node:stream")
 const gulp = require("gulp")
+const log = require("gulplog")
 const terser = require("gulp-terser")
 const inject = require("gulp-inject-string")
 const concat = require('gulp-concat')
@@ -16,7 +17,6 @@ const through2 = require("through2").obj
 const webp = require("./webp/ToWebp")
 const {Settings} = require("gulp-typescript")
 const {MinifyOptions} = require("terser")
-const merge = require('merge2')
 const concatSource = require("./ConcatSource");
 
 const ts = require('typescript')
@@ -28,8 +28,8 @@ const {globSync} = require('glob');
 const glsl = require('rollup-plugin-glsl')
 const typescriptRollup = require('@rollup/plugin-typescript')
 const rollupTerser = require("@rollup/plugin-terser")
-const {dts} = require("rollup-plugin-dts")
 const {SrcOptions} = require("vinyl-fs")
+
 /***************************** 公共逻辑方法 *****************************/
 
 function createNamespaceTransformer() {
@@ -182,13 +182,26 @@ function addMetadata() {
 }
 
 /**
+ *
+ * @param {LeftHandSideExpression} exp
+ * @return IdentifierObject
+ */
+function getExpression(exp) {
+    if (ts.isCallExpression(exp) &&
+        ts.isIdentifier(exp.expression)) {
+        return getExpression(exp.expression)
+    }
+    return exp
+}
+
+/**
  * 条件执行gulp流中的插件
  * @param condition {boolean|function} 条件，如果为true则执行插件流
  * @param plugins {Array} gulp插件数组
  * @return {NodeJS.ReadWriteStream}
  */
 function ifelse(condition, plugins) {
-    return through2(function (chunk, encoding, callback) {
+    return through2({objectMode: true}, function (chunk, encoding, callback) {
         // 判断condition类型并计算实际的布尔值
         let result = false;
         if (typeof condition === "boolean") {
@@ -197,31 +210,50 @@ function ifelse(condition, plugins) {
             // 当condition是函数时，传递chunk和encoding参数进行判断
             result = condition.apply(this, [chunk, encoding]);
         } else {
-            callback(new Error("condition must be a boolean or function"));
-            return;
+            return callback(new Error("condition must be a boolean or function"));
         }
 
         // 如果条件为真且提供了插件数组，则执行这些插件
         if (result && Array.isArray(plugins) && plugins.length > 0) {
-            // 创建一个流来顺序执行所有插件
-            let stream = through2();
-            // 将当前chunk传递到插件流中
-            stream.write(chunk);
-            // 监听最终结果并回调
-            stream.on('data', (resultChunk) => {
-                callback(null, resultChunk);
-            });
-            stream.on('error', (err) => {
-                callback(err);
-            });
-            // 依次通过所有插件
+            // 创建初始流
+            let stream = through2({objectMode: true});
+            stream.myName = "stream name"
+            // 构建插件管道
+            let pipeline = stream;
             for (let plugin of plugins) {
                 if (typeof plugin === 'function') {
-                    stream = stream.pipe(plugin());
+                    pipeline = pipeline.pipe(plugin());
                 } else {
-                    stream = stream.pipe(plugin);
+                    pipeline = pipeline.pipe(plugin);
                 }
             }
+
+            // 跟踪是否已经回调，防止多次调用callback
+            let hasCallback = false;
+            const safeCallback = (err, data) => {
+                if (!hasCallback) {
+                    hasCallback = true;
+                    callback(err, data);// 完成本次处理
+                }
+            };
+
+            // 监听管道的结果
+            pipeline.on('data', (resultChunk) => {
+                safeCallback(null, resultChunk);
+            });
+
+            pipeline.on('error', (err) => {
+                safeCallback(err);
+            });
+
+            // 监听结束事件，确保即使没有数据也完成回调
+            pipeline.on('end', () => {
+                safeCallback(null, chunk);
+            });
+
+            // 写入数据并结束流以触发处理
+            stream.write(chunk);
+            stream.end();
         } else {
             // 条件为假或没有插件，直接传递数据
             callback(null, chunk);
@@ -351,31 +383,21 @@ function createDirectory(filePath) {
 }
 
 /**
- * 一个通过流传输的打印，每次都会调用操作
- * @param prefix {string}
- * @param [end=null] {function(()=>{}):{}} 结束流 参数方法需要回调不然会阻塞
- */
-function print(prefix, end) {
-    return run(function (prefix, chunk, encoding) {
-        console.log(prefix, chunk.path)
-    }, end, prefix)
-}
-
-/**
  *
  * @type
  *
  * 配合gulp pipe 流执行，必须有返回非 undefined 的值 否则阻塞
  * @param func {function(chunk: Buffer | File, encoding: string, callback: function(Error|null, chunk: Buffer)): boolean}
- *        返回值不是 undefined 将会立即结束流，否则等待调用 callback
- * @param [end=null] {function(): void} 结束流的方法，需要回调否则会阻塞
+ *        返回值不是 undefined 将会立即执行流传递，否则等待调用 callback
+ * @param [end=null] {function(): void} 回调执行结束的方法，需要回调否则会阻塞
  * @param args {any} 附带的参数 会放在开头
  */
 function runStream(func, end, ...args) {
     return through2(function (chunk, encoding, callback) {
         if (func) {
             let result = func.apply(this, [...args, chunk, encoding, callback])
-            if (result !== undefined) callback(null, chunk)
+            if (result !== undefined)
+                callback(null, chunk)
         } else callback(null, chunk)
     }, end)
 }
@@ -383,7 +405,7 @@ function runStream(func, end, ...args) {
 /**
  * 运行一次流处理 function中不要执行异步数据处理，否则执行顺序会混乱
  * @param func {({chunk},{enc})=>{}} 处理方法
- * @param [end=null] {function(()=>{}):{}} 结束流 参数方法需要回调不然会阻塞
+ * @param [end=null] {function(()=>{}):{}} 回调流 参数方法需要回调不然会阻塞
  * @param args {any} 附带的参数  会放在开头
  * @return {*}
  */
@@ -486,25 +508,34 @@ function createCompileStream(globs, opt) {
  */
 function buildLibrary(v, done) {
     const tsResult = createCompileStream(v.src.globs, v.src.opt)
-    const jsStream = buildJs(tsResult, v.outName, v.dist, v.js.isMinify, v.namespace)
-    const dtsStream = buildDts(tsResult, v.outName, v.dist, v.dts.globalDtsFile, v.namespace)
-    merge(
-        jsStream,
-        dtsStream
-    ).on("finish", done);
+    const jsStream = function (done) {
+        buildJs(tsResult, v.outName, v.dist, v.js.isMinify, v.namespace)
+            .pipe(run(function () {
+                done()
+            }))
+    }
+    const dtsStream = function (done) {
+        buildDts(tsResult, v.outName, v.dist, v.dts.globalDtsFile, v.namespace)
+            .pipe(run(function () {
+                done()
+            }))
+    }
+    gulp.parallel(jsStream, dtsStream)(done)
 }
 
 /**
- *
- * @param tsResult {gulpTs.CompileStream} createCompileStream
- * @param outName {string} 输出文件名字 不带文件后缀
- * @param dist {string} 输出目录
- * @param [isMinify=false] {boolean}
- * @param [namespace=null] {string|null}
- *
- * 获取tsResult可看 {@link createCompileStream}
+ * 构建JavaScript文件的函数
+ * @param {Object} tsResult - TypeScript编译流或是其生成需要的包含globs和opt的属性
+ * @param {string} outName - 输出文件的名称（不包含扩展名）
+ * @param {string} dist - 输出目录路径
+ * @param {boolean} isMinify - 是否压缩文件，默认为false
+ * @param {string|null} namespace - 命名空间，默认为null
+ * @returns {Stream} 返回 gulp 流对象，用于链式操作
  */
 function buildJs(tsResult, outName, dist, isMinify = false, namespace = null) {
+    if (tsResult.globs) {
+        tsResult = createCompileStream(tsResult.globs, tsResult.opt)
+    }
     return tsResult
         .js
         .pipe(concatSource(`${outName}.js`, {namespace: namespace}))
@@ -519,16 +550,18 @@ function buildJs(tsResult, outName, dist, isMinify = false, namespace = null) {
 }
 
 /**
- *
- * @param tsResult {gulpTs.CompileStream} createCompileStream
- * @param outName {string} 输出文件名字 不带文件后缀
- * @param dist {string} 输出目录
- * @param [globalFile=[]] {string[]}
- * @param [namespace=null] {string|null}
- *
- * 获取tsResult可看 {@link createCompileStream}
+ * 构建 TypeScript 声明文件(.d.ts)
+ * @param {Object} tsResult - TypeScript编译流或是其生成需要的包含globs和opt的属性
+ * @param {string} outName - 输出文件的名称（不包含扩展名）
+ * @param {string} dist - 输出目录路径
+ * @param {Array} globalFile - 需要追加的全局文件列表，默认为空数组
+ * @param {string|null} namespace - 命名空间名称，默认为 null
+ * @returns {Stream} 返回 gulp 流对象，用于链式操作
  */
 function buildDts(tsResult, outName, dist, globalFile = [], namespace = null) {
+    if (tsResult.globs) {
+        tsResult = createCompileStream(tsResult.globs, tsResult.opt)
+    }
     return tsResult
         .dts
         .pipe(concatSource(`${outName}.d.ts`, {
@@ -536,16 +569,7 @@ function buildDts(tsResult, outName, dist, globalFile = [], namespace = null) {
             appendFile: globalFile
         }))
         .pipe(gulp.dest(dist))
-
 }
-
-
-
-
-
-
-
-
 
 
 /**
@@ -562,138 +586,6 @@ const outSource = function (outPath) {
                 map: null // 可选项，如果需要源映射，则可以提供映射文件
             }
         }
-    };
-}
-
-
-/**
- * @param input {string}
- * @param outName {string}
- * @param outDir
- * @return {string}
- */
-function createIndexTs(input, outName, outDir = "./") {
-    const files = globSync(input, {
-        nodir: true,
-        ignore: [
-            "**/*.d.ts",
-            "**/*.fs", "**/*.vs"],
-        posix: true
-    })
-    let entryContent = files
-        .map(file => {
-            const modulePath = "../src/" + path.posix.relative('src', file.slice(0, -path.extname(file).length))
-            const className = modulePath.substring(modulePath.lastIndexOf("/") + 1)
-            return `export * from '${modulePath}';`
-        })
-        .join('\n');
-    const dir = outDir
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, {recursive: true});
-    const entryFilePath = path.join(dir, "index.ts")
-    fs.writeFileSync(entryFilePath, entryContent);
-    return entryFilePath
-}
-
-/**
- *
- * @param {LeftHandSideExpression} exp
- * @return IdentifierObject
- */
-function getExpression(exp) {
-    if (ts.isCallExpression(exp) &&
-        ts.isIdentifier(exp.expression)) {
-        return getExpression(exp.expression)
-    }
-    return exp
-}
-
-// 修改 dtsFix 函数
-function dtsFix(name) {
-    return (context) => {
-        const visitor = (node) => {
-            // 收集全局声明用于 .d.ts 文件
-            if (ts.isSourceFile(node) && (node.fileName.includes('/global/') || node.fileName.includes('\\global\\'))) {
-                const globalDeclarations = [];
-
-                // 收集全局函数和变量声明
-                for (const statement of node.locals) {
-                    if (ts.isFunctionDeclaration(statement) && statement.name) {
-                        globalDeclarations.push({
-                            type: 'function',
-                            name: statement.name.text,
-                            parameters: statement.parameters,
-                            returnType: statement.type
-                        });
-                    } else if (ts.isVariableStatement(statement)) {
-                        for (const declaration of statement.declarationList.declarations) {
-                            if (ts.isIdentifier(declaration.name)) {
-                                globalDeclarations.push({
-                                    name: declaration.name.text,
-                                    type: declaration.type
-                                });
-                            }
-                        }
-                    }
-                }
-
-                // 添加 declare global 块到 .d.ts
-                if (globalDeclarations.length > 0) {
-                    const globalMembers = globalDeclarations.map(decl => {
-                        if (decl.type === 'function') {
-                            return ts.factory.createFunctionDeclaration(
-                                [ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword)],
-                                undefined,
-                                decl.name,
-                                undefined,
-                                decl.parameters || [],
-                                decl.returnType || ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-                                undefined
-                            );
-                        } else if (decl.type === 'variable') {
-                            return ts.factory.createVariableStatement(
-                                [ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword)],
-                                ts.factory.createVariableDeclarationList([
-                                    ts.factory.createVariableDeclaration(
-                                        decl.name,
-                                        undefined,
-                                        decl.type || ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
-                                    )
-                                ])
-                            );
-                        }
-                    });
-
-                    const globalBlock = ts.factory.createModuleDeclaration(
-                        [ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword)],
-                        ts.factory.createIdentifier("global"),
-                        ts.factory.createModuleBlock(globalMembers),
-                        ts.NodeFlags.GlobalAugmentation
-                    );
-
-                    // 添加 export {} 确保文件被视为模块
-                    const exportStatement = ts.factory.createExportDeclaration(
-                        undefined,
-                        false,
-                        ts.factory.createNamedExports([])
-                    );
-
-                    return ts.factory.updateSourceFile(
-                        node,
-                        [
-                            ...node.statements,
-                            globalBlock,
-                            exportStatement
-                        ]
-                    );
-                }
-            }
-
-            return ts.visitEachChild(node, visitor, context);
-        };
-
-        return (sourceFile) => {
-            return ts.visitNode(sourceFile, visitor);
-        };
     };
 }
 
@@ -784,109 +676,17 @@ function rollupStream(...options) {
     return result;
 }
 
-function rollupPluginAddNameSpace(outName) {
-    const globals = []
-    const contents = []
-    return {
-        name: "add-namespace",
-        renderChunk(inputCode, chunk, options) {
-            const modules = chunk.modules
-            for (const chunkKey in modules) {
-                const module = modules[chunkKey]
-                const paths = chunkKey.split("/")
-                let code = module.code
-                if (code) {
-                    if (paths.includes("global")) {
-                        globals.push(code)
-                    } else {
-                        code = code.replace(/declare\s/g, "export ")
-                        // code = code.replace(/export\s*{(?:\s*\w+\s*,)*\s*.*\s*(?:,\s*\w+\s*)*}\s*;?/g, "")
-                        contents.push(code)
-                    }
-                }
-            }
-            const code = `declare namespace ${outName} {\n\n${contents.map(value => {
-                // value = value.replace("declare", "export")
-                const ns = value.split("\n")
-                return "\t" + ns.join("\n\t")
-            }).join("\n\n")}\n\n}\n${globals.join("\n")}`
-            // console.log(code)
-            return code
-        }
-    }
-}
-
-function rollupPluginGlobal() {
-    return {
-        name: "global",
-        /**
-         * @param code {string}
-         * @param id {string}
-         */
-        transform(code, id) {
-            if (id.includes("/global/")) {
-                const module = this.getModuleInfo(id)
-                return code
-            }
-        }
-    }
-}
-
-function rollupPluginAppedDts(...extendedLibrary) {
-    const outPath = "bin/types"
-    return {
-        name: 'append-define-dts',
-        /**
-         * @param code {string}
-         * @param id {string}
-         */
-        transform(code, id) {
-            console.log("id->" + id)
-            // if (!id.includes("index.ts")) {
-            //     const declarationId = id.replace(/((\.d)?\.([cm])?([tj])sx?|\.json)$/, ".d.ts")
-            //     const name = path.basename(declarationId)
-            //     if (!fs.existsSync(outPath)) {
-            //         fs.mkdirSync(outPath)
-            //     }
-            //     const file = path.join(outPath, name)
-            //     // console.log(declarationId + "->" + file)
-            //     fs.writeFileSync(file, Buffer.from(code))
-            // }
-            // return code
-        },
-        generateBundle(options, bundle) {
-            if (extendedLibrary.length) {
-                const fileName = path.basename(options.file)
-                const dtsFile = bundle[fileName];
-                if (dtsFile && dtsFile.type === 'chunk') {
-                    extendedLibrary.forEach(value => {
-                        const defineDts = fs.readFileSync(value, 'utf-8');
-                        dtsFile.code += `\n\n// From ${path.basename(value)}\n${defineDts}`;
-                    })
-                }
-            }
-        }
-    }
-}
-
-
 /**
  *
  *
- * @param pattern {string | string[]} Synchronous form of {@link glob}
+ * @param inputFile {string} 入口文件
  * @param outName {string} 输出文件名字
  * @param outDir {string} 输出目录
  * @param [options=null] {{tsconfig?: string}} 可选配置
  */
-function rollupPack(pattern, outName, outDir, options) {
+function rollupPack(inputFile, outName, outDir, options) {
     const localPath = process.cwd()
     outDir = path.resolve(localPath, outDir)
-    const inputFile = createIndexTs(pattern, outName, outDir)
-    const extendedLibrary = [
-        // path.resolve(localPath, "src/define.d.ts"),
-        // path.resolve(localPath, "src/entity.d.ts")
-    ]
-    // const inputFile = "D:\\WorkSpace\\LayaBox\\TypeScriptLib\\TSCore\\bin\\index.ts"
     options = defaults(options, {
         tsconfig: "tsconfig.json"
     })
@@ -942,46 +742,7 @@ function rollupPack(pattern, outName, outDir, options) {
                         // },
                         //         toplevel: false
                     }
-                }),
-                // {
-                //     name: 'write-ts-debug',
-                //     renderStart(outputOptions, inputOptions) {
-                //         // 创建调试目录
-                //         const debugDir = path.join(outDir, 'debug');
-                //         if (!fs.existsSync(debugDir)) fs.mkdirSync(debugDir, {recursive: true});
-                //     },
-                //     generateBundle(options, bundle, isWrite) {
-                //         for (const key in bundle) {
-                //             const chunk = bundle[key];
-                //             if (chunk.type === 'chunk') {
-                //                 //
-                //                 //         const debugPath = path.join(outDir, 'debug', chunk.fileName.replace('.js', '.ts'));
-                //                 //         fs.writeFileSync(debugPath, chunk.code, 'utf8');
-                //                 //         console.log(`已写入调试 TS 文件: ${debugPath}`);
-                //             }
-                //         }
-                //     }
-                // },
-            ]
-        },
-        {
-            input: inputFile,
-            treeshake: false,// 删除无调用代码
-            external: ["tslib"],// 排除 tslib，不将其打包进最终文件
-            output: {
-                file: `${outDir}/${outName}.d.ts`,
-                format: 'es',
-                name: outName,
-                extend: true,
-                sourcemap: false,
-            },
-            plugins: [
-                // rollupPluginGlobal(),
-                rollupPluginAddNameSpace(outName),
-                dts({
-                    // transformers: dtsFix(outName)
-                }),
-                rollupPluginAppedDts(...extendedLibrary)
+                })
             ]
         }
     ).on('end', () => {
@@ -996,7 +757,6 @@ const _webp = new webp.Webp()
 
 exports = {
     webp: _webp,
-    print,
     clean,
     defaults,
     createDirectory,
@@ -1005,14 +765,18 @@ exports = {
     run,
     mJs,
 
+    log,
+
     findFiles,
     findFilesSync,
     addMetadata,
     createNamespaceTransformer,
     buildLibrary,
     ifelse,
+    buildJs,
+    buildDts,
 
-
-    rollupStream
+    rollupStream,
+    rollupPack
 }
 module.exports = exports
