@@ -31,6 +31,7 @@
     "version_info.txt",
     "index.js",
     "gulp-concat-source.js",
+    "gulp-ts-sort-declaration.js",
     "reserved.js",
     "types.js",
     "monkey-path.js",

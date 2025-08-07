@@ -708,6 +708,127 @@ declare namespace tsCore {
 	    static changeType(value: any, type: string): any;
 	}
 	
+	export class DateUtils {
+	    /** 星期 默认英文 */
+	    static weekday: string[];
+	    /**
+	     * 格式化时间
+	     * @param date 时间
+	     * @param fmt 格式
+	     * @param isUTC 使用国际时间
+	     * @example
+	     * fmt:
+	     * yyyy：年
+	     * MM：月
+	     * dd：
+	     * hh：1~12小时制(1-12)
+	     * HH：24小时制(0-23)
+	     * mm：分
+	     * ss：秒
+	     * S：毫秒
+	     * E：星期几
+	     * @return
+	     */
+	    static formatDate(date: number | Date, fmt: string, isUTC?: boolean): string;
+	    /**
+	     * 比较时间大小
+	     * time1>time2 return 1
+	     * time1<time2 return -1
+	     * time1==time2 return 0
+	     * @param time1
+	     * @param time2
+	     */
+	    static compareTime(time1: any, time2: any): 1 | 0 | -1;
+	    /**
+	     * 是否闰年
+	     * @param year 年份
+	     */
+	    static isLeapYear(year: number): boolean;
+	    /**
+	     * 获取某个月的天数，从0开始
+	     * @param year 年份
+	     * @param month 月份
+	     */
+	    static getDaysOfMonth(year: number, month: number): number;
+	    /**
+	     * 将天置为0，获取其上个月的最后一天
+	     * @param year 年份 如 1992
+	     * @param monthIndex 月份索引 0开始
+	     */
+	    static getDaysOfMonth2(year: number, monthIndex: number): number;
+	    /**
+	     * 距离现在几天的日期：
+	     * @param days 负数表示今天之前的日期，0表示今天，整数表示未来的日期。 如-1表示昨天的日期，0表示今天，2表示后天
+	     */
+	    static fromToday(days: number): string;
+	    /**
+	     * 计算一个日期是当年的第几天
+	     * @param date ms | 2023-09-01 12:00:00 | Date
+	     */
+	    static dayOfTheYear(date: number | string | Date): number;
+	    /**
+	     * 获得时区名和值
+	     * @param time ms | 2023-09-01 12:00:00 | Date
+	     */
+	    static getZoneNameValue(time: number | string | Date): {
+	        name: string;
+	        value: string;
+	    };
+	    /**
+	     * 判断是否是同一天
+	     * @param date1 ms | 2023-09-01 12:00:00 | Date
+	     * @param date2 ms | 2023-09-01 12:00:00 | Date
+	     * @return
+	     */
+	    static isSameDay(date1: number | string | Date, date2: number | string | Date): boolean;
+	    /**
+	     * 判断传入的时间小于今天
+	     * @param time ms | 2023-09-01 12:00:00 | Date
+	     */
+	    static notTomorrow(time: number | string | Date): boolean;
+	    /**
+	     * 获取距离传入的时间还剩的时间
+	     *
+	     * @example
+	     *  const targetDate = new Date('2023-09-01 12:00:00')
+	     *  const timeDifference = calculateTimeDifference(targetDate)
+	     *  console.log(timeDifference)
+	     *
+	     *  是timeDifference 总时间差 毫秒
+	     * @param time ms | Date
+	     */
+	    static calculateTimeDifference(time: number | Date): {
+	        days: number;
+	        hours: number;
+	        minutes: number;
+	        seconds: number;
+	        timeDifference?: undefined;
+	    } | {
+	        days: number;
+	        hours: number;
+	        minutes: number;
+	        seconds: number;
+	        timeDifference: number;
+	    };
+	    /**
+	     * 根据剩余毫秒 计算具体时间
+	     * @param time
+	     */
+	    static calculateTimeByMillisecond(time: number): {
+	        days: number;
+	        hours: number;
+	        minutes: number;
+	        seconds: number;
+	        timeDifference?: undefined;
+	    } | {
+	        days: number;
+	        hours: number;
+	        minutes: number;
+	        seconds: number;
+	        timeDifference: number;
+	    };
+	}
+	
 	export class ELoader {
 	    /** 加载域名备用 */
 	    baseUrls: string[];
@@ -844,127 +965,6 @@ declare namespace tsCore {
 	    static findEnv(value: string): EnvType;
 	}
 	
-	export class DateUtils {
-	    /** 星期 默认英文 */
-	    static weekday: string[];
-	    /**
-	     * 格式化时间
-	     * @param date 时间
-	     * @param fmt 格式
-	     * @param isUTC 使用国际时间
-	     * @example
-	     * fmt:
-	     * yyyy：年
-	     * MM：月
-	     * dd：
-	     * hh：1~12小时制(1-12)
-	     * HH：24小时制(0-23)
-	     * mm：分
-	     * ss：秒
-	     * S：毫秒
-	     * E：星期几
-	     * @return
-	     */
-	    static formatDate(date: number | Date, fmt: string, isUTC?: boolean): string;
-	    /**
-	     * 比较时间大小
-	     * time1>time2 return 1
-	     * time1<time2 return -1
-	     * time1==time2 return 0
-	     * @param time1
-	     * @param time2
-	     */
-	    static compareTime(time1: any, time2: any): 1 | 0 | -1;
-	    /**
-	     * 是否闰年
-	     * @param year 年份
-	     */
-	    static isLeapYear(year: number): boolean;
-	    /**
-	     * 获取某个月的天数，从0开始
-	     * @param year 年份
-	     * @param month 月份
-	     */
-	    static getDaysOfMonth(year: number, month: number): number;
-	    /**
-	     * 将天置为0，获取其上个月的最后一天
-	     * @param year 年份 如 1992
-	     * @param monthIndex 月份索引 0开始
-	     */
-	    static getDaysOfMonth2(year: number, monthIndex: number): number;
-	    /**
-	     * 距离现在几天的日期：
-	     * @param days 负数表示今天之前的日期，0表示今天，整数表示未来的日期。 如-1表示昨天的日期，0表示今天，2表示后天
-	     */
-	    static fromToday(days: number): string;
-	    /**
-	     * 计算一个日期是当年的第几天
-	     * @param date ms | 2023-09-01 12:00:00 | Date
-	     */
-	    static dayOfTheYear(date: number | string | Date): number;
-	    /**
-	     * 获得时区名和值
-	     * @param time ms | 2023-09-01 12:00:00 | Date
-	     */
-	    static getZoneNameValue(time: number | string | Date): {
-	        name: string;
-	        value: string;
-	    };
-	    /**
-	     * 判断是否是同一天
-	     * @param date1 ms | 2023-09-01 12:00:00 | Date
-	     * @param date2 ms | 2023-09-01 12:00:00 | Date
-	     * @return
-	     */
-	    static isSameDay(date1: number | string | Date, date2: number | string | Date): boolean;
-	    /**
-	     * 判断传入的时间小于今天
-	     * @param time ms | 2023-09-01 12:00:00 | Date
-	     */
-	    static notTomorrow(time: number | string | Date): boolean;
-	    /**
-	     * 获取距离传入的时间还剩的时间
-	     *
-	     * @example
-	     *  const targetDate = new Date('2023-09-01 12:00:00')
-	     *  const timeDifference = calculateTimeDifference(targetDate)
-	     *  console.log(timeDifference)
-	     *
-	     *  是timeDifference 总时间差 毫秒
-	     * @param time ms | Date
-	     */
-	    static calculateTimeDifference(time: number | Date): {
-	        days: number;
-	        hours: number;
-	        minutes: number;
-	        seconds: number;
-	        timeDifference?: undefined;
-	    } | {
-	        days: number;
-	        hours: number;
-	        minutes: number;
-	        seconds: number;
-	        timeDifference: number;
-	    };
-	    /**
-	     * 根据剩余毫秒 计算具体时间
-	     * @param time
-	     */
-	    static calculateTimeByMillisecond(time: number): {
-	        days: number;
-	        hours: number;
-	        minutes: number;
-	        seconds: number;
-	        timeDifference?: undefined;
-	    } | {
-	        days: number;
-	        hours: number;
-	        minutes: number;
-	        seconds: number;
-	        timeDifference: number;
-	    };
-	}
-	
 	export enum LogLevel {
 	    ALL = 0,
 	    /**
@@ -1037,271 +1037,6 @@ declare namespace tsCore {
 	    recover(): void;
 	}
 	
-	export class ActionEvent implements IAction {
-	    regAction(action: string | number, caller: any, method: Function, group?: string, order?: number): void;
-	    regActionHandler(action: string | number, handler: Laya.Handler, group?: string): void;
-	    /** 注册游戏数据 */
-	    regGameAction(action: string | number, caller: any, method: Function, order?: number): void;
-	    removeAllAction(...args: string[]): void;
-	    removeGroup(group: string): void;
-	    removeGroupActions(group: string, ...args: string[]): void;
-	    removeActionHandler(action: string | number, method: Function, group?: string): void;
-	    removeFunction(groupObj: any, action: string | number, method: Function): void;
-	    removeTargetAll(caller: any): void;
-	    removeTarget(groupObj: any, caller: any): void;
-	    sendAction(action: string | number, ...args: any[]): void;
-	    sendGroupAction(group: string, action: string | number, ...args: any[]): void;
-	}
-	
-	export class GSpineSkeleton extends ESkeleton {
-	    ver: Laya.SpineVersion;
-	    template: Laya.SpineTemplet;
-	    constructor(ver?: Laya.SpineVersion);
-	    protected createDisplayObject(): void;
-	    get asSkeleton(): Laya.SpineSkeleton;
-	    /**
-	     * 获取spine的Skeleton对象
-	     */
-	    getSkeletonNative(): spine.Skeleton;
-	    /**
-	     * 加载json 或 skel格式的骨骼文件
-	     * @param jsonOrSkelUrl
-	     * @param handler 回调方法
-	     * @param ver
-	     */
-	    load(jsonOrSkelUrl: string, handler: ParamHandler, ver?: Laya.SpineVersion): void;
-	    private onError;
-	    private onComplete;
-	    set touchable(value: boolean);
-	    get touchable(): boolean;
-	    /**
-	     * 通过名字显示一套皮肤
-	     * @param    name    皮肤的名字
-	     */
-	    showSkinByName(name: string): void;
-	    /**
-	     * 通过索引显示一套皮肤
-	     * @param    skinIndex    皮肤索引
-	     */
-	    showSkinByIndex(skinIndex: number): void;
-	    getAniIndexByName(aniName: string): number;
-	    getAllAnimation(): spine.Animation[];
-	    getAllSkin(): any;
-	    getAnimation(aniIndex: number | string): spine.Animation;
-	    /**
-	     * 获取动画时长 秒
-	     * @param aniIndex
-	     */
-	    getAnimDuration(aniIndex: number | string | (number | string)[]): number;
-	    getAnimFrame(aniIndex: number | string): any;
-	    get currAniIndex(): number;
-	    set hitArea(rec: Laya.Rectangle);
-	    on(type: string, thisObject: any, listener: Function, args?: any[]): void;
-	    off(type: string, thisObject: any, listener: Function): void;
-	    offAll(type?: string): void;
-	    dispose(): void;
-	}
-	
-	declare const ESkeleton_base: Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>>;
-	export abstract class ESkeleton extends ESkeleton_base implements ISkeleton {
-	    /** 播放动画数组的索引 */
-	    protected playGroupIndex: number;
-	    /** 缓存每次播放的名字或下标 */
-	    nameOrIndex: string | number;
-	    /** 播放结束执行函数 */
-	    protected stoppedHandler: Laya.Handler[];
-	    /**
-	     * 动画播放速率 1为标准速率
-	     * @default 1
-	     */
-	    playbackRate: number;
-	    /**
-	     * 播放数据
-	     */
-	    protected skeletonPlay: ISkeletonPlay;
-	    /** 加载路径 */
-	    protected _aniPath: string;
-	    /**
-	     * 当前spine正在使用的资源路径
-	     */
-	    protected _spineResPath: string;
-	    protected _complete: ParamHandler;
-	    /**
-	     * 播放循环次数
-	     * @private
-	     */
-	    private _loopCount;
-	    get aniPath(): string;
-	    get spineResPath(): string;
-	    /**
-	     * 播放动画
-	     *
-	     * @param    nameOrIndex    动画名字或者索引 如果此值是ISkeletonPlay对象，后面设置的全部将失效
-	     * @param    [loop=true]        是否循环播放
-	     * @param    [force=true]        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-	     * @param    [start=0]        起始时间 毫秒
-	     * @param    [end=0]            结束时间 毫秒
-	     * @param    [freshSkin=true]    是否刷新皮肤数据
-	     * @param    [playAudio=true]    是否播放音频
-	     */
-	    play(nameOrIndex: string | number | (string | number | PlaySkeletonFrame)[] | ISkeletonPlay, loop?: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
-	    /**
-	     * 播放动画
-	     * @param skeletonPlay 播放数据
-	     * @param [playGroupIndex=-1] 如果是播放数组动画 需要要播放动画的位置
-	     */
-	    playAni(skeletonPlay: ISkeletonPlay, playGroupIndex?: number): void;
-	    private _play;
-	    /**
-	     * 当动画停止时的回调函数 或 使用 skeleton.stop()
-	     */
-	    protected onPlayStopped(): void;
-	    paused(): void;
-	    resume(): void;
-	    stop(): void;
-	    getAniNameByIndex(index: number): string;
-	    getSkeletonPlay(): ISkeletonPlay;
-	    /**
-	     * 获取实例 Skeleton
-	     */
-	    abstract get asSkeleton(): Laya.Skeleton | Laya.SpineSkeleton;
-	    abstract getAniIndexByName(name: string): number;
-	    abstract getAnimDuration(aniIndex: number | string | (number | string)[]): number;
-	    abstract getAnimFrame(aniIndex: number | string): number;
-	    abstract getAnimation(aniIndex: number | string): AnimationContent | spine.Animation;
-	    abstract get currAniIndex(): number;
-	}
-	
-	export class GSkeleton extends ESkeleton {
-	    /**
-	     * 骨骼更新
-	     * ````
-	     * GSkeleton cmd:DrawTextureCmd
-	     * GSpineSkeleton spine.Slot
-	     * ````
-	     */
-	    static readonly UPDATE_BONE_SLOT = "update_bone_slot";
-	    /**
-	     * 骨骼更新
-	     * ````
-	     * GSkeleton cmd:DrawTextureCmd
-	     * GSpineSkeleton spine.Bone
-	     * ````
-	     */
-	    static readonly UPDATE_BONE_RENDER = "update_bone_render";
-	    /**
-	     * 插槽更新
-	     * ````
-	     * GSkeleton cmd:DrawTextureCmd
-	     * GSpineSkeleton spine.Slot
-	     * ````
-	     */
-	    static readonly UPDATE_SLOT_RENDER = "update_slot_render";
-	    /** 是否使用混合模式 */
-	    isBlendModeAdd: boolean;
-	    /** 使用混合模式的插槽 */
-	    blendBoneSlotNames: string[];
-	    /** 指定的骨骼忽略XY偏移量 */
-	    readonly clearBoneSlotOffset: string[];
-	    /** 指定的骨骼忽略X偏移量 */
-	    readonly clearBoneSlotOffsetX: string[];
-	    /** 指定的骨骼忽略Y偏移量 */
-	    readonly clearBoneSlotOffsetY: string[];
-	    aniMode: number;
-	    private _loadAniMode;
-	    /** 自定义缓存的Templet名字 */
-	    cacheName: string;
-	    constructor(aniMode?: number);
-	    protected createDisplayObject(): void;
-	    get asSkeleton(): Laya.Skeleton;
-	    /**
-	     * 通过加载直接创建动画
-	     * @param    url        要加载的动画文件路径
-	     * @param    handler    加载完成的回调函数
-	     * @param    aniMode        与<code>Skeleton.init</code>的<code>aniMode</code>作用一致
-	     */
-	    load(url: string, handler: ParamHandler, aniMode?: number): void;
-	    /**
-	     * 加载完成
-	     */
-	    private _onLoaded;
-	    /**
-	     * 解析完成
-	     */
-	    private _parseComplete;
-	    /**
-	     * 解析失败
-	     */
-	    private _parseFail;
-	    /**
-	     * 延迟播放动画
-	     * @param    playDelay    延迟时间
-	     * @param    nameOrIndex    动画名字或者索引
-	     * @param    loop        是否循环播放
-	     * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
-	     * @param    start        起始时间
-	     * @param    end            结束时间
-	     * @param    freshSkin    是否刷新皮肤数据
-	     */
-	    playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
-	    /**
-	     * 通过名字显示一套皮肤
-	     * @param    name    皮肤的名字
-	     * @param    freshSlotIndex    是否将插槽纹理重置到初始化状态
-	     */
-	    showSkinByName(name: string, freshSlotIndex?: boolean): void;
-	    /**
-	     * 通过索引显示一套皮肤
-	     * @param    skinIndex    皮肤索引
-	     * @param    freshSlotIndex    是否将插槽纹理重置到初始化状态
-	     */
-	    showSkinByIndex(skinIndex: number, freshSlotIndex?: boolean): void;
-	    getAniIndexByName(name: string): any;
-	    getAllAnimation(): any;
-	    getAllSkin(): SkinData[];
-	    getAnimation(aniIndex: number | string): AnimationContent;
-	    /**
-	     * 获取动画时长 毫秒
-	     * @param aniIndex
-	     */
-	    getAnimDuration(aniIndex: number | string | (number | string)[]): any;
-	    getAnimFrame(aniIndex: number | string): any;
-	    get currAniIndex(): number;
-	    /**
-	     * 根据动作名和插槽骨骼名,来获取该骨骼在该动作播放时,每一帧该骨骼坐标位置,返回所有帧数骨骼坐标位置组成的列表
-	     * @param nameOrIndex
-	     * @param boneName
-	     */
-	    getBoneCoords(nameOrIndex: string | number, boneName: string): number[];
-	    getSlotXByName(name: string): number;
-	    getSlotYByName(name: string): number;
-	    getSlotPointByName(name: string): Laya.Point;
-	    getBoneSlotByName(name: string): Laya.BoneSlot;
-	    private static _emptyTexture;
-	    static get emptyTexture(): Laya.Texture;
-	    /**
-	     * 设置插槽的某个皮肤
-	     * @param slotName 插槽名字
-	     * @param skin Texture 或 fairy gui 的路径  如：//package/skin
-	     */
-	    setSlotSkin(slotName: string, skin?: Laya.Texture | string): void;
-	    /**
-	     * 换装的时候，需要清一下缓冲区
-	     */
-	    private clearCache;
-	    on(type: string, thisObject: any, listener: Function, args?: any[]): void;
-	    off(type: string, thisObject: any, listener: Function): void;
-	    offAll(type?: string): void;
-	    dispose(): void;
-	}
-	
-	export class GGraphicsAni extends Laya.GraphicsAni {
-	    boneSlotName: string;
-	    static create(): GGraphicsAni;
-	    drawTexture(texture: Laya.Texture | null, x?: number, y?: number, width?: number, height?: number, matrix?: Laya.Matrix | null, alpha?: number, color?: string | null, blendMode?: string | null, uv?: number[]): Laya.DrawTextureCmd | null;
-	    clear(recoverCmds?: boolean): void;
-	}
-	
 	export class EDrawTextureCmd extends Laya.DrawTextureCmd {
 	    /** 骨骼名字
 	     * @default null */
@@ -1367,16 +1102,6 @@ declare namespace tsCore {
 	     * 停止播放背景音乐（不包括音效）。
 	     */
 	    static stopMusic(): void;
-	}
-	
-	export class DefineConfig {
-	    static init(): void;
-	    private static defineLaya;
-	    private static defineFairy;
-	    private static defineText;
-	    private static defineTimer;
-	    private static defineSkeleton;
-	    private static defineSpineSkeleton;
 	}
 	
 	export enum Method {
@@ -1509,6 +1234,53 @@ declare namespace tsCore {
 	    hideRecord(): void;
 	}
 	
+	export class Path {
+	    private path;
+	    /** 路径格式化 */
+	    static formatPath: IFormatPath[];
+	    constructor(base: string, ...subpaths: string[]);
+	    /**
+	     * 格式化路径
+	     * ```
+	     * 1.当ELoader.isWebp为true的时候，自动将后缀为png/jpg的路径 添加.webp
+	     * 2.在未使用加速器的环境中，将启用version控制 会自动在url后面添加版本号
+	     * 3.执行顺序是先执行全路径格式 path()方法，在执行version()版本号方法，最后兼容执行call()方法。
+	     * ```
+	     * @param url 要格式化的路径
+	     * @return 格式化后可直接使用的路径
+	     */
+	    static formatUrl(url: string): string;
+	    static of(base: string, ...subpaths: string[]): Path;
+	    string(): string;
+	}
+	
+	export class TimerKit {
+	    static NAME: string;
+	    private static tasks;
+	    isPause: boolean;
+	    static REG_TASK: TaskHandler[];
+	    start(): this;
+	    stop(): this;
+	    pause(): void;
+	    resume(): void;
+	    static getHandler(target: fgui.GObject, fun: ParamHandler): TaskHandler;
+	    static remove(target: fgui.GObject, fun: ParamHandler): void;
+	    static addTask(task: TaskHandler): void;
+	    static getNewTask(): TaskHandler;
+	    static addHandler(target: fgui.GObject, fun: (...args: any[]) => any, interval?: number, custom?: () => boolean): void;
+	    private onUpdate;
+	}
+	class TaskHandler {
+	    target: fgui.GObject;
+	    customConditions: () => boolean;
+	    handler: (...args: any[]) => any;
+	    interval: number;
+	    targetClassProperty: any;
+	    lastRunTime: number;
+	    initData(target: fgui.GObject, fun: (...args: any[]) => any, interval?: number, custom?: () => boolean): this;
+	    setTargetClass(targetClassProperty: any): this;
+	}
+	
 	export class EventController implements IController {
 	    /** 事件缓存的所有组 组名字->组object */
 	    private eventGroup;
@@ -1574,51 +1346,279 @@ declare namespace tsCore {
 	    private _getClassSign;
 	}
 	
-	export class Path {
-	    private path;
-	    /** 路径格式化 */
-	    static formatPath: IFormatPath[];
-	    constructor(base: string, ...subpaths: string[]);
+	declare const ESkeleton_base: Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>>;
+	export abstract class ESkeleton extends ESkeleton_base implements ISkeleton {
+	    /** 播放动画数组的索引 */
+	    protected playGroupIndex: number;
+	    /** 缓存每次播放的名字或下标 */
+	    nameOrIndex: string | number;
+	    /** 播放结束执行函数 */
+	    protected stoppedHandler: Laya.Handler[];
 	    /**
-	     * 格式化路径
-	     * ```
-	     * 1.当ELoader.isWebp为true的时候，自动将后缀为png/jpg的路径 添加.webp
-	     * 2.在未使用加速器的环境中，将启用version控制 会自动在url后面添加版本号
-	     * 3.执行顺序是先执行全路径格式 path()方法，在执行version()版本号方法，最后兼容执行call()方法。
-	     * ```
-	     * @param url 要格式化的路径
-	     * @return 格式化后可直接使用的路径
+	     * 动画播放速率 1为标准速率
+	     * @default 1
 	     */
-	    static formatUrl(url: string): string;
-	    static of(base: string, ...subpaths: string[]): Path;
-	    string(): string;
+	    playbackRate: number;
+	    /**
+	     * 播放数据
+	     */
+	    protected skeletonPlay: ISkeletonPlay;
+	    /** 加载路径 */
+	    protected _aniPath: string;
+	    /**
+	     * 当前spine正在使用的资源路径
+	     */
+	    protected _spineResPath: string;
+	    protected _complete: ParamHandler;
+	    /**
+	     * 播放循环次数
+	     * @private
+	     */
+	    private _loopCount;
+	    get aniPath(): string;
+	    get spineResPath(): string;
+	    /**
+	     * 播放动画
+	     *
+	     * @param    nameOrIndex    动画名字或者索引 如果此值是ISkeletonPlay对象，后面设置的全部将失效
+	     * @param    [loop=true]        是否循环播放
+	     * @param    [force=true]        false,如果要播的动画跟上一个相同就不生效,true,强制生效
+	     * @param    [start=0]        起始时间 毫秒
+	     * @param    [end=0]            结束时间 毫秒
+	     * @param    [freshSkin=true]    是否刷新皮肤数据
+	     * @param    [playAudio=true]    是否播放音频
+	     */
+	    play(nameOrIndex: string | number | (string | number | PlaySkeletonFrame)[] | ISkeletonPlay, loop?: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean, playAudio?: boolean): void;
+	    /**
+	     * 播放动画
+	     * @param skeletonPlay 播放数据
+	     * @param [playGroupIndex=-1] 如果是播放数组动画 需要要播放动画的位置
+	     */
+	    playAni(skeletonPlay: ISkeletonPlay, playGroupIndex?: number): void;
+	    private _play;
+	    /**
+	     * 当动画停止时的回调函数 或 使用 skeleton.stop()
+	     */
+	    protected onPlayStopped(): void;
+	    paused(): void;
+	    resume(): void;
+	    stop(): void;
+	    getAniNameByIndex(index: number): string;
+	    getSkeletonPlay(): ISkeletonPlay;
+	    /**
+	     * 获取实例 Skeleton
+	     */
+	    abstract get asSkeleton(): Laya.Skeleton | Laya.SpineSkeleton;
+	    abstract getAniIndexByName(name: string): number;
+	    abstract getAnimDuration(aniIndex: number | string | (number | string)[]): number;
+	    abstract getAnimFrame(aniIndex: number | string): number;
+	    abstract getAnimation(aniIndex: number | string): AnimationContent | spine.Animation;
+	    abstract get currAniIndex(): number;
 	}
 	
-	export class TimerKit {
-	    static NAME: string;
-	    private static tasks;
-	    isPause: boolean;
-	    static REG_TASK: TaskHandler[];
-	    start(): this;
-	    stop(): this;
-	    pause(): void;
-	    resume(): void;
-	    static getHandler(target: fgui.GObject, fun: ParamHandler): TaskHandler;
-	    static remove(target: fgui.GObject, fun: ParamHandler): void;
-	    static addTask(task: TaskHandler): void;
-	    static getNewTask(): TaskHandler;
-	    static addHandler(target: fgui.GObject, fun: (...args: any[]) => any, interval?: number, custom?: () => boolean): void;
-	    private onUpdate;
+	export class GSpineSkeleton extends ESkeleton {
+	    ver: Laya.SpineVersion;
+	    template: Laya.SpineTemplet;
+	    constructor(ver?: Laya.SpineVersion);
+	    protected createDisplayObject(): void;
+	    get asSkeleton(): Laya.SpineSkeleton;
+	    /**
+	     * 获取spine的Skeleton对象
+	     */
+	    getSkeletonNative(): spine.Skeleton;
+	    /**
+	     * 加载json 或 skel格式的骨骼文件
+	     * @param jsonOrSkelUrl
+	     * @param handler 回调方法
+	     * @param ver
+	     */
+	    load(jsonOrSkelUrl: string, handler: ParamHandler, ver?: Laya.SpineVersion): void;
+	    private onError;
+	    private onComplete;
+	    set touchable(value: boolean);
+	    get touchable(): boolean;
+	    /**
+	     * 通过名字显示一套皮肤
+	     * @param    name    皮肤的名字
+	     */
+	    showSkinByName(name: string): void;
+	    /**
+	     * 通过索引显示一套皮肤
+	     * @param    skinIndex    皮肤索引
+	     */
+	    showSkinByIndex(skinIndex: number): void;
+	    getAniIndexByName(aniName: string): number;
+	    getAllAnimation(): spine.Animation[];
+	    getAllSkin(): any;
+	    getAnimation(aniIndex: number | string): spine.Animation;
+	    /**
+	     * 获取动画时长 秒
+	     * @param aniIndex
+	     */
+	    getAnimDuration(aniIndex: number | string | (number | string)[]): number;
+	    getAnimFrame(aniIndex: number | string): any;
+	    get currAniIndex(): number;
+	    set hitArea(rec: Laya.Rectangle);
+	    on(type: string, thisObject: any, listener: Function, args?: any[]): void;
+	    off(type: string, thisObject: any, listener: Function): void;
+	    offAll(type?: string): void;
+	    dispose(): void;
 	}
-	class TaskHandler {
-	    target: fgui.GObject;
-	    customConditions: () => boolean;
-	    handler: (...args: any[]) => any;
-	    interval: number;
-	    targetClassProperty: any;
-	    lastRunTime: number;
-	    initData(target: fgui.GObject, fun: (...args: any[]) => any, interval?: number, custom?: () => boolean): this;
-	    setTargetClass(targetClassProperty: any): this;
+	
+	export class ActionEvent implements IAction {
+	    regAction(action: string | number, caller: any, method: Function, group?: string, order?: number): void;
+	    regActionHandler(action: string | number, handler: Laya.Handler, group?: string): void;
+	    /** 注册游戏数据 */
+	    regGameAction(action: string | number, caller: any, method: Function, order?: number): void;
+	    removeAllAction(...args: string[]): void;
+	    removeGroup(group: string): void;
+	    removeGroupActions(group: string, ...args: string[]): void;
+	    removeActionHandler(action: string | number, method: Function, group?: string): void;
+	    removeFunction(groupObj: any, action: string | number, method: Function): void;
+	    removeTargetAll(caller: any): void;
+	    removeTarget(groupObj: any, caller: any): void;
+	    sendAction(action: string | number, ...args: any[]): void;
+	    sendGroupAction(group: string, action: string | number, ...args: any[]): void;
+	}
+	
+	export class GSkeleton extends ESkeleton {
+	    /**
+	     * 骨骼更新
+	     * ````
+	     * GSkeleton cmd:DrawTextureCmd
+	     * GSpineSkeleton spine.Slot
+	     * ````
+	     */
+	    static readonly UPDATE_BONE_SLOT = "update_bone_slot";
+	    /**
+	     * 骨骼更新
+	     * ````
+	     * GSkeleton cmd:DrawTextureCmd
+	     * GSpineSkeleton spine.Bone
+	     * ````
+	     */
+	    static readonly UPDATE_BONE_RENDER = "update_bone_render";
+	    /**
+	     * 插槽更新
+	     * ````
+	     * GSkeleton cmd:DrawTextureCmd
+	     * GSpineSkeleton spine.Slot
+	     * ````
+	     */
+	    static readonly UPDATE_SLOT_RENDER = "update_slot_render";
+	    /** 是否使用混合模式 */
+	    isBlendModeAdd: boolean;
+	    /** 使用混合模式的插槽 */
+	    blendBoneSlotNames: string[];
+	    /** 指定的骨骼忽略XY偏移量 */
+	    readonly clearBoneSlotOffset: string[];
+	    /** 指定的骨骼忽略X偏移量 */
+	    readonly clearBoneSlotOffsetX: string[];
+	    /** 指定的骨骼忽略Y偏移量 */
+	    readonly clearBoneSlotOffsetY: string[];
+	    aniMode: number;
+	    private _loadAniMode;
+	    /** 自定义缓存的Templet名字 */
+	    cacheName: string;
+	    constructor(aniMode?: number);
+	    protected createDisplayObject(): void;
+	    get asSkeleton(): Laya.Skeleton;
+	    /**
+	     * 通过加载直接创建动画
+	     * @param    url        要加载的动画文件路径
+	     * @param    handler    加载完成的回调函数
+	     * @param    aniMode        与<code>Skeleton.init</code>的<code>aniMode</code>作用一致
+	     */
+	    load(url: string, handler: ParamHandler, aniMode?: number): void;
+	    /**
+	     * 加载完成
+	     */
+	    private _onLoaded;
+	    /**
+	     * 解析完成
+	     */
+	    private _parseComplete;
+	    /**
+	     * 解析失败
+	     */
+	    private _parseFail;
+	    /**
+	     * 延迟播放动画
+	     * @param    playDelay    延迟时间
+	     * @param    nameOrIndex    动画名字或者索引
+	     * @param    loop        是否循环播放
+	     * @param    force        false,如果要播的动画跟上一个相同就不生效,true,强制生效
+	     * @param    start        起始时间
+	     * @param    end            结束时间
+	     * @param    freshSkin    是否刷新皮肤数据
+	     */
+	    playDelay(playDelay: number, nameOrIndex: string | number | (string | number)[] | ISkeletonPlay, loop: boolean, force?: boolean, start?: number, end?: number, freshSkin?: boolean): void;
+	    /**
+	     * 通过名字显示一套皮肤
+	     * @param    name    皮肤的名字
+	     * @param    freshSlotIndex    是否将插槽纹理重置到初始化状态
+	     */
+	    showSkinByName(name: string, freshSlotIndex?: boolean): void;
+	    /**
+	     * 通过索引显示一套皮肤
+	     * @param    skinIndex    皮肤索引
+	     * @param    freshSlotIndex    是否将插槽纹理重置到初始化状态
+	     */
+	    showSkinByIndex(skinIndex: number, freshSlotIndex?: boolean): void;
+	    getAniIndexByName(name: string): any;
+	    getAllAnimation(): any;
+	    getAllSkin(): SkinData[];
+	    getAnimation(aniIndex: number | string): AnimationContent;
+	    /**
+	     * 获取动画时长 毫秒
+	     * @param aniIndex
+	     */
+	    getAnimDuration(aniIndex: number | string | (number | string)[]): any;
+	    getAnimFrame(aniIndex: number | string): any;
+	    get currAniIndex(): number;
+	    /**
+	     * 根据动作名和插槽骨骼名,来获取该骨骼在该动作播放时,每一帧该骨骼坐标位置,返回所有帧数骨骼坐标位置组成的列表
+	     * @param nameOrIndex
+	     * @param boneName
+	     */
+	    getBoneCoords(nameOrIndex: string | number, boneName: string): number[];
+	    getSlotXByName(name: string): number;
+	    getSlotYByName(name: string): number;
+	    getSlotPointByName(name: string): Laya.Point;
+	    getBoneSlotByName(name: string): Laya.BoneSlot;
+	    private static _emptyTexture;
+	    static get emptyTexture(): Laya.Texture;
+	    /**
+	     * 设置插槽的某个皮肤
+	     * @param slotName 插槽名字
+	     * @param skin Texture 或 fairy gui 的路径  如：//package/skin
+	     */
+	    setSlotSkin(slotName: string, skin?: Laya.Texture | string): void;
+	    /**
+	     * 换装的时候，需要清一下缓冲区
+	     */
+	    private clearCache;
+	    on(type: string, thisObject: any, listener: Function, args?: any[]): void;
+	    off(type: string, thisObject: any, listener: Function): void;
+	    offAll(type?: string): void;
+	    dispose(): void;
+	}
+	
+	export class GGraphicsAni extends Laya.GraphicsAni {
+	    boneSlotName: string;
+	    static create(): GGraphicsAni;
+	    drawTexture(texture: Laya.Texture | null, x?: number, y?: number, width?: number, height?: number, matrix?: Laya.Matrix | null, alpha?: number, color?: string | null, blendMode?: string | null, uv?: number[]): Laya.DrawTextureCmd | null;
+	    clear(recoverCmds?: boolean): void;
+	}
+	
+	export class DefineConfig {
+	    static init(): void;
+	    private static defineLaya;
+	    private static defineFairy;
+	    private static defineText;
+	    private static defineTimer;
+	    private static defineSkeleton;
+	    private static defineSpineSkeleton;
 	}
 	
 	export class App implements IAction {

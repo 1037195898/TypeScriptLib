@@ -1764,6 +1764,219 @@ function TimerLoop(interval, custom) {
 	
 	tsCore.StringUtil = StringUtil
 	
+	class DateUtils {
+	    /**
+	     * 格式化时间
+	     * @param date 时间
+	     * @param fmt 格式
+	     * @param isUTC 使用国际时间
+	     * @example
+	     * fmt:
+	     * yyyy：年
+	     * MM：月
+	     * dd：
+	     * hh：1~12小时制(1-12)
+	     * HH：24小时制(0-23)
+	     * mm：分
+	     * ss：秒
+	     * S：毫秒
+	     * E：星期几
+	     * @return
+	     */
+	    static formatDate(date, fmt, isUTC = false) {
+	        if (!(date instanceof Date)) {
+	            let date2 = new Date();
+	            date2.setTime(date);
+	            date = date2;
+	        }
+	        // 时区
+	        //		var localOffset:number = date.getTimezoneOffset() * 60000
+	        //		Log.debug(localOffset)
+	        let tempStr = "";
+	        let match = fmt.match(/(y+)/);
+	        if ((match === null || match === void 0 ? void 0 : match.length) > 0) {
+	            tempStr = match[0];
+	            if (isUTC) {
+	                fmt = fmt.replace(tempStr, (date.getUTCFullYear() + '').substring(4 - tempStr.length));
+	            }
+	            else {
+	                fmt = fmt.replace(tempStr, (date.getFullYear() + '').substring(4 - tempStr.length));
+	            }
+	        }
+	        let o = {
+	            'M+': (isUTC ? date.getUTCMonth() : date.getMonth()) + 1,
+	            'd+': (isUTC ? date.getUTCDate() : date.getDate()),
+	            'h+': ((isUTC ? date.getUTCHours() : date.getHours()) % 12),
+	            'H+': (isUTC ? date.getUTCHours() : date.getHours()),
+	            'm+': (isUTC ? date.getUTCMinutes() : date.getMinutes()),
+	            's+': (isUTC ? date.getUTCSeconds() : date.getSeconds()),
+	            'S+': (isUTC ? date.getUTCMilliseconds() : date.getMilliseconds()),
+	            "E+": DateUtils.weekday[(isUTC ? date.getUTCDay() : date.getDay())]
+	        };
+	        //		Log.debug(o)
+	        // 遍历这个对象
+	        for (let k in o) {
+	            match = fmt.match(new RegExp("(" + k + ")"));
+	            if ((match === null || match === void 0 ? void 0 : match.length) > 0) {
+	                //				 Log.debug('${k}')
+	                tempStr = match[0];
+	                fmt = fmt.replace(tempStr, tempStr.length == 1 ? o[k] : ("00" + o[k]).substring(("" + o[k]).length));
+	            }
+	        }
+	        return fmt;
+	    }
+	    /**
+	     * 比较时间大小
+	     * time1>time2 return 1
+	     * time1<time2 return -1
+	     * time1==time2 return 0
+	     * @param time1
+	     * @param time2
+	     */
+	    static compareTime(time1, time2) {
+	        if (Date.parse(time1.replace(/-/g, "/")) > Date.parse(time2.replace(/-/g, "/"))) {
+	            return 1;
+	        }
+	        else if (Date.parse(time1.replace(/-/g, "/")) < Date.parse(time2.replace(/-/g, "/"))) {
+	            return -1;
+	        }
+	        else if (Date.parse(time1.replace(/-/g, "/")) == Date.parse(time2.replace(/-/g, "/"))) {
+	            return 0;
+	        }
+	    }
+	    /**
+	     * 是否闰年
+	     * @param year 年份
+	     */
+	    static isLeapYear(year) {
+	        return ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0);
+	    }
+	    /**
+	     * 获取某个月的天数，从0开始
+	     * @param year 年份
+	     * @param month 月份
+	     */
+	    static getDaysOfMonth(year, month) {
+	        return [31, (this.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+	    }
+	    /**
+	     * 将天置为0，获取其上个月的最后一天
+	     * @param year 年份 如 1992
+	     * @param monthIndex 月份索引 0开始
+	     */
+	    static getDaysOfMonth2(year, monthIndex) {
+	        let date = new Date(year, monthIndex + 1, 0);
+	        return date.getDate();
+	    }
+	    /**
+	     * 距离现在几天的日期：
+	     * @param days 负数表示今天之前的日期，0表示今天，整数表示未来的日期。 如-1表示昨天的日期，0表示今天，2表示后天
+	     */
+	    static fromToday(days) {
+	        let today = new Date();
+	        today.setDate(today.getDate() + days);
+	        return today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+	    }
+	    /**
+	     * 计算一个日期是当年的第几天
+	     * @param date ms | 2023-09-01 12:00:00 | Date
+	     */
+	    static dayOfTheYear(date) {
+	        let obj = new Date(date);
+	        let year = obj.getFullYear();
+	        let month = obj.getMonth(); //从0开始
+	        let days = obj.getDate();
+	        let daysArr = [31, (this.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+	        for (let i = 0; i < month; i++) {
+	            days += daysArr[i];
+	        }
+	        return days;
+	    }
+	    /**
+	     * 获得时区名和值
+	     * @param time ms | 2023-09-01 12:00:00 | Date
+	     */
+	    static getZoneNameValue(time) {
+	        let date = new Date(time);
+	        date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+	        let arr = date.toString().match(/([A-Z]+)([-+]\d+:?\d+)/);
+	        return { 'name': arr[1], 'value': arr[2] };
+	    }
+	    /**
+	     * 判断是否是同一天
+	     * @param date1 ms | 2023-09-01 12:00:00 | Date
+	     * @param date2 ms | 2023-09-01 12:00:00 | Date
+	     * @return
+	     */
+	    static isSameDay(date1, date2) {
+	        let _date1 = new Date(date1);
+	        let _date2 = new Date(date2);
+	        return (_date1.getFullYear() == _date2.getFullYear() &&
+	            _date1.getMonth() == _date2.getMonth() &&
+	            _date1.getDate() == _date2.getDate());
+	    }
+	    /**
+	     * 判断传入的时间小于今天
+	     * @param time ms | 2023-09-01 12:00:00 | Date
+	     */
+	    static notTomorrow(time) {
+	        let timeDate = new Date(time);
+	        let today = new Date();
+	        if (timeDate.getFullYear() < today.getFullYear()) {
+	            return true;
+	        }
+	        else if (timeDate.getFullYear() == today.getFullYear()) { // 年份一样
+	            if (timeDate.getMonth() < today.getMonth()) { // 小于今天的月份
+	                return true;
+	            }
+	            else if (timeDate.getMonth() == today.getMonth()) { // 月份一样
+	                if (timeDate.getDate() < today.getDate()) { // 日期小于今天
+	                    return true;
+	                }
+	            }
+	        }
+	        return false;
+	    }
+	    /**
+	     * 获取距离传入的时间还剩的时间
+	     *
+	     * @example
+	     *  const targetDate = new Date('2023-09-01 12:00:00')
+	     *  const timeDifference = calculateTimeDifference(targetDate)
+	     *  console.log(timeDifference)
+	     *
+	     *  是timeDifference 总时间差 毫秒
+	     * @param time ms | Date
+	     */
+	    static calculateTimeDifference(time) {
+	        if (time instanceof Date)
+	            time = time.getTime();
+	        // 计算时间差（毫秒）
+	        const diff = time - Date.now();
+	        return DateUtils.calculateTimeByMillisecond(diff);
+	    }
+	    /**
+	     * 根据剩余毫秒 计算具体时间
+	     * @param time
+	     */
+	    static calculateTimeByMillisecond(time) {
+	        // 如果diff已经是负数，意味着时间已经过去，这里假设我们只处理未来的时间
+	        if (time <= 0) {
+	            return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+	        }
+	        // 计算剩余的天数、小时数、分钟数和秒数
+	        const days = Math.floor(time / (1000 * 60 * 60 * 24));
+	        const hours = Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+	        const minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
+	        const seconds = Math.floor((time % (1000 * 60)) / 1000);
+	        return { days, hours, minutes, seconds, timeDifference: time };
+	    }
+	}
+	/** 星期 默认英文 */
+	DateUtils.weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+	
+	tsCore.DateUtils = DateUtils
+	
 	class ELoader {
 	    constructor() {
 	        /** 加载域名备用 */
@@ -2128,219 +2341,6 @@ function TimerLoop(interval, custom) {
 	
 	tsCore.Environment = Environment
 	
-	class DateUtils {
-	    /**
-	     * 格式化时间
-	     * @param date 时间
-	     * @param fmt 格式
-	     * @param isUTC 使用国际时间
-	     * @example
-	     * fmt:
-	     * yyyy：年
-	     * MM：月
-	     * dd：
-	     * hh：1~12小时制(1-12)
-	     * HH：24小时制(0-23)
-	     * mm：分
-	     * ss：秒
-	     * S：毫秒
-	     * E：星期几
-	     * @return
-	     */
-	    static formatDate(date, fmt, isUTC = false) {
-	        if (!(date instanceof Date)) {
-	            let date2 = new Date();
-	            date2.setTime(date);
-	            date = date2;
-	        }
-	        // 时区
-	        //		var localOffset:number = date.getTimezoneOffset() * 60000
-	        //		Log.debug(localOffset)
-	        let tempStr = "";
-	        let match = fmt.match(/(y+)/);
-	        if ((match === null || match === void 0 ? void 0 : match.length) > 0) {
-	            tempStr = match[0];
-	            if (isUTC) {
-	                fmt = fmt.replace(tempStr, (date.getUTCFullYear() + '').substring(4 - tempStr.length));
-	            }
-	            else {
-	                fmt = fmt.replace(tempStr, (date.getFullYear() + '').substring(4 - tempStr.length));
-	            }
-	        }
-	        let o = {
-	            'M+': (isUTC ? date.getUTCMonth() : date.getMonth()) + 1,
-	            'd+': (isUTC ? date.getUTCDate() : date.getDate()),
-	            'h+': ((isUTC ? date.getUTCHours() : date.getHours()) % 12),
-	            'H+': (isUTC ? date.getUTCHours() : date.getHours()),
-	            'm+': (isUTC ? date.getUTCMinutes() : date.getMinutes()),
-	            's+': (isUTC ? date.getUTCSeconds() : date.getSeconds()),
-	            'S+': (isUTC ? date.getUTCMilliseconds() : date.getMilliseconds()),
-	            "E+": DateUtils.weekday[(isUTC ? date.getUTCDay() : date.getDay())]
-	        };
-	        //		Log.debug(o)
-	        // 遍历这个对象
-	        for (let k in o) {
-	            match = fmt.match(new RegExp("(" + k + ")"));
-	            if ((match === null || match === void 0 ? void 0 : match.length) > 0) {
-	                //				 Log.debug('${k}')
-	                tempStr = match[0];
-	                fmt = fmt.replace(tempStr, tempStr.length == 1 ? o[k] : ("00" + o[k]).substring(("" + o[k]).length));
-	            }
-	        }
-	        return fmt;
-	    }
-	    /**
-	     * 比较时间大小
-	     * time1>time2 return 1
-	     * time1<time2 return -1
-	     * time1==time2 return 0
-	     * @param time1
-	     * @param time2
-	     */
-	    static compareTime(time1, time2) {
-	        if (Date.parse(time1.replace(/-/g, "/")) > Date.parse(time2.replace(/-/g, "/"))) {
-	            return 1;
-	        }
-	        else if (Date.parse(time1.replace(/-/g, "/")) < Date.parse(time2.replace(/-/g, "/"))) {
-	            return -1;
-	        }
-	        else if (Date.parse(time1.replace(/-/g, "/")) == Date.parse(time2.replace(/-/g, "/"))) {
-	            return 0;
-	        }
-	    }
-	    /**
-	     * 是否闰年
-	     * @param year 年份
-	     */
-	    static isLeapYear(year) {
-	        return ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0);
-	    }
-	    /**
-	     * 获取某个月的天数，从0开始
-	     * @param year 年份
-	     * @param month 月份
-	     */
-	    static getDaysOfMonth(year, month) {
-	        return [31, (this.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
-	    }
-	    /**
-	     * 将天置为0，获取其上个月的最后一天
-	     * @param year 年份 如 1992
-	     * @param monthIndex 月份索引 0开始
-	     */
-	    static getDaysOfMonth2(year, monthIndex) {
-	        let date = new Date(year, monthIndex + 1, 0);
-	        return date.getDate();
-	    }
-	    /**
-	     * 距离现在几天的日期：
-	     * @param days 负数表示今天之前的日期，0表示今天，整数表示未来的日期。 如-1表示昨天的日期，0表示今天，2表示后天
-	     */
-	    static fromToday(days) {
-	        let today = new Date();
-	        today.setDate(today.getDate() + days);
-	        return today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-	    }
-	    /**
-	     * 计算一个日期是当年的第几天
-	     * @param date ms | 2023-09-01 12:00:00 | Date
-	     */
-	    static dayOfTheYear(date) {
-	        let obj = new Date(date);
-	        let year = obj.getFullYear();
-	        let month = obj.getMonth(); //从0开始
-	        let days = obj.getDate();
-	        let daysArr = [31, (this.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-	        for (let i = 0; i < month; i++) {
-	            days += daysArr[i];
-	        }
-	        return days;
-	    }
-	    /**
-	     * 获得时区名和值
-	     * @param time ms | 2023-09-01 12:00:00 | Date
-	     */
-	    static getZoneNameValue(time) {
-	        let date = new Date(time);
-	        date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-	        let arr = date.toString().match(/([A-Z]+)([-+]\d+:?\d+)/);
-	        return { 'name': arr[1], 'value': arr[2] };
-	    }
-	    /**
-	     * 判断是否是同一天
-	     * @param date1 ms | 2023-09-01 12:00:00 | Date
-	     * @param date2 ms | 2023-09-01 12:00:00 | Date
-	     * @return
-	     */
-	    static isSameDay(date1, date2) {
-	        let _date1 = new Date(date1);
-	        let _date2 = new Date(date2);
-	        return (_date1.getFullYear() == _date2.getFullYear() &&
-	            _date1.getMonth() == _date2.getMonth() &&
-	            _date1.getDate() == _date2.getDate());
-	    }
-	    /**
-	     * 判断传入的时间小于今天
-	     * @param time ms | 2023-09-01 12:00:00 | Date
-	     */
-	    static notTomorrow(time) {
-	        let timeDate = new Date(time);
-	        let today = new Date();
-	        if (timeDate.getFullYear() < today.getFullYear()) {
-	            return true;
-	        }
-	        else if (timeDate.getFullYear() == today.getFullYear()) { // 年份一样
-	            if (timeDate.getMonth() < today.getMonth()) { // 小于今天的月份
-	                return true;
-	            }
-	            else if (timeDate.getMonth() == today.getMonth()) { // 月份一样
-	                if (timeDate.getDate() < today.getDate()) { // 日期小于今天
-	                    return true;
-	                }
-	            }
-	        }
-	        return false;
-	    }
-	    /**
-	     * 获取距离传入的时间还剩的时间
-	     *
-	     * @example
-	     *  const targetDate = new Date('2023-09-01 12:00:00')
-	     *  const timeDifference = calculateTimeDifference(targetDate)
-	     *  console.log(timeDifference)
-	     *
-	     *  是timeDifference 总时间差 毫秒
-	     * @param time ms | Date
-	     */
-	    static calculateTimeDifference(time) {
-	        if (time instanceof Date)
-	            time = time.getTime();
-	        // 计算时间差（毫秒）
-	        const diff = time - Date.now();
-	        return DateUtils.calculateTimeByMillisecond(diff);
-	    }
-	    /**
-	     * 根据剩余毫秒 计算具体时间
-	     * @param time
-	     */
-	    static calculateTimeByMillisecond(time) {
-	        // 如果diff已经是负数，意味着时间已经过去，这里假设我们只处理未来的时间
-	        if (time <= 0) {
-	            return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-	        }
-	        // 计算剩余的天数、小时数、分钟数和秒数
-	        const days = Math.floor(time / (1000 * 60 * 60 * 24));
-	        const hours = Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-	        const minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
-	        const seconds = Math.floor((time % (1000 * 60)) / 1000);
-	        return { days, hours, minutes, seconds, timeDifference: time };
-	    }
-	}
-	/** 星期 默认英文 */
-	DateUtils.weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-	
-	tsCore.DateUtils = DateUtils
-	
 	var LogLevel;
 	(function (LogLevel) {
 	    LogLevel[LogLevel["ALL"] = 0] = "ALL";
@@ -2502,241 +2502,532 @@ function TimerLoop(interval, custom) {
 	
 	tsCore.BezierCurves = BezierCurves
 	
-	class ActionEvent {
-	    regAction(action, caller, method, group, order) {
-	        App.inst.regAction(action, caller, method, group, order);
+	class EDrawTextureCmd extends Laya.DrawTextureCmd {
+	    recover() {
+	        this.colorFlt = null; // 自己修改的 Laya Bug
+	        super.recover();
+	    }
+	}
+	
+	tsCore.EDrawTextureCmd = EDrawTextureCmd
+	
+	class SoundUtils {
+	    /**
+	     * 添加需要使用 SoundUtils.load() 加载的资源文件
+	     * @param res
+	     * @see SoundUtils.load
+	     */
+	    static addRes(res) {
+	        Laya.SoundManager.autoReleaseSound = false;
+	        SoundUtils.loadAsset = Array.isArray(res) ? res : [res];
+	    }
+	    /**
+	     * 执行加载音频文件
+	     * @param url 加载文件地址  默认使用 SoundUtils.loadAsset
+	     * @see SoundUtils.loadAsset
+	     */
+	    static load(url) {
+	        Laya.loader.load(url !== null && url !== void 0 ? url : SoundUtils.loadAsset, Laya.Handler.create(null, SoundUtils.onLoader));
+	    }
+	    static onLoader() {
+	        for (let i = 0; i < SoundUtils.autoPlay.length; i++) {
+	            let url = SoundUtils.autoPlay[i];
+	            if (SoundUtils.autoPlayUrl == url) {
+	                SoundUtils.playMusic(url, SoundUtils.bgMusicLoop, SoundUtils.bgComplete, SoundUtils.bgVolume, SoundUtils.bgStartTime);
+	                Log.info("auto play = " + url);
+	                SoundUtils.autoPlayUrl = null;
+	            }
+	        }
+	        SoundUtils.autoPlay.length = 0;
+	    }
+	    /**
+	     *
+	     * @param url 声音文件地址
+	     * @param [loops=0] 循环次数,0表示无限循环
+	     * @param complete 声音播放完成回调 Handler对象。
+	     * @param [volume=-1] 音量范围从 0（静音）至 1（最大音量）。 -1表示不调整
+	     * @param [startTime=0] 声音播放起始时间 单位秒
+	     * @param [coverBefore=false] 地址相同，是否覆盖正在播放的音乐
+	     */
+	    static playMusic(url, loops = 0, complete, volume = -1, startTime = 0, coverBefore = false) {
+	        if (SoundManager["_bgMusic"] == Laya.URL.formatURL(url) && SoundManager["_musicChannel"] && !coverBefore) {
+	            if (SoundManager["_musicChannel"].isStopped) {
+	                SoundManager["_musicChannel"].resume();
+	                return SoundManager["_musicChannel"];
+	            }
+	            return null;
+	        }
+	        let sound = Laya.loader.getRes(url);
+	        SoundUtils.bgMusicLoop = loops;
+	        SoundUtils.bgVolume = volume;
+	        SoundUtils.bgComplete = complete;
+	        SoundUtils.bgStartTime = startTime;
+	        if (sound) {
+	            let channel = Laya.SoundManager.playMusic(url, loops, (loops > 0 && complete) ? Laya.Handler.create(this, this.onPlayMusicEnd, [complete]) : null, startTime);
+	            if (!channel)
+	                return null;
+	            if (volume > -1)
+	                channel.volume = volume;
+	            return channel;
+	        }
+	        else {
+	            Log.info("sound not load " + url);
+	            this.autoPlayUrl = url;
+	            if (SoundUtils.autoPlay.indexOf(url) == -1)
+	                SoundUtils.autoPlay.push(url);
+	            const index = SoundUtils.loadAsset.findIndex(function (value) {
+	                return value.url == url;
+	            });
+	            if (index < 0) {
+	                SoundUtils.load(url);
+	            }
+	        }
+	        return null;
+	    }
+	    static onPlayMusicEnd(complete) {
+	        SoundManager["_bgMusic"] = null;
+	        complete === null || complete === void 0 ? void 0 : complete.run();
+	    }
+	    /**
+	     *
+	     * @param url 声音文件地址。
+	     * @param [loops=1] 循环次数,0表示无限循环
+	     * @param complete 声音播放完成回调 Handler对象。
+	     * @param [volume=1] 音量范围从 0（静音）至 1（最大音量）。
+	     * @param [startTime=0] 声音播放起始时间。 单位秒
+	     */
+	    static playSound(url, loops = 1, complete, volume = 1, startTime = 0) {
+	        let sound = Laya.loader.getRes(url);
+	        if (sound) {
+	            let channel = Laya.SoundManager.playSound(url, loops, complete, null, startTime);
+	            if (!channel)
+	                return null;
+	            if (volume > -1)
+	                channel.volume = volume;
+	            return channel;
+	        }
+	        else {
+	            let index = SoundUtils.loadAsset.findIndex(function (value) {
+	                return value.url == url;
+	            });
+	            if (index < 0) {
+	                SoundUtils.load(url);
+	            }
+	            Log.info("sound not load " + url);
+	        }
+	        return null;
+	    }
+	    static clear() {
+	        SoundUtils.autoPlay.length = 0;
+	        while (SoundUtils.loadAsset.length > 0) {
+	            let loadRes = SoundUtils.loadAsset.shift();
+	            Laya.loader.cancelLoadByUrl(loadRes.url);
+	            Laya.SoundManager.destroySound(loadRes.url);
+	        }
+	        Log.info("clear sound");
+	        SoundUtils.loadAsset.length = 0;
+	    }
+	    static stopSound(url) {
+	        Laya.SoundManager.stopSound(url);
+	    }
+	    /**
+	     * 停止播放所有音效（不包括背景音乐）。
+	     */
+	    static stopAllSound() {
+	        Laya.SoundManager.stopAllSound();
+	    }
+	    /**
+	     * 停止播放所有声音（包括背景音乐和音效）。
+	     */
+	    static stopAll() {
+	        Laya.SoundManager.stopAll();
+	    }
+	    /**
+	     * 停止播放背景音乐（不包括音效）。
+	     */
+	    static stopMusic() {
+	        Laya.SoundManager.stopMusic();
+	    }
+	}
+	/** 需要立即播放的 */
+	SoundUtils.autoPlay = [];
+	/** 需要使用load加载的资源 */
+	SoundUtils.loadAsset = [];
+	SoundUtils.bgMusicLoop = 0;
+	SoundUtils.bgVolume = 1;
+	SoundUtils.bgStartTime = 0;
+	
+	tsCore.SoundUtils = SoundUtils
+	
+	var Method;
+	(function (Method) {
+	    Method["GET"] = "get";
+	    Method["POST"] = "post";
+	})(Method || (Method = {}));
+	
+	class Path {
+	    constructor(base, ...subpaths) {
+	        this.path = base;
+	        subpaths.forEach((value) => {
+	            if (value.startsWith("/")) {
+	                this.path += value;
+	            }
+	            else
+	                this.path += `/${value}`;
+	        });
+	    }
+	    /**
+	     * 格式化路径
+	     * ```
+	     * 1.当ELoader.isWebp为true的时候，自动将后缀为png/jpg的路径 添加.webp
+	     * 2.在未使用加速器的环境中，将启用version控制 会自动在url后面添加版本号
+	     * 3.执行顺序是先执行全路径格式 path()方法，在执行version()版本号方法，最后兼容执行call()方法。
+	     * ```
+	     * @param url 要格式化的路径
+	     * @return 格式化后可直接使用的路径
+	     */
+	    static formatUrl(url) {
+	        var _a, _b, _c, _d, _e, _f;
+	        url = url.split("?")[0];
+	        let version = Laya.URL.version[url];
+	        Path.formatPath.sort((a, b) => a.order - a.order);
+	        for (const format of Path.formatPath) {
+	            url = (_b = (_a = format.path) === null || _a === void 0 ? void 0 : _a.call(format, url)) !== null && _b !== void 0 ? _b : url;
+	            version = (_d = (_c = format.version) === null || _c === void 0 ? void 0 : _c.call(format, url, version)) !== null && _d !== void 0 ? _d : version;
+	            version = (_f = (_e = format.call) === null || _e === void 0 ? void 0 : _e.call(format, url, version)) !== null && _f !== void 0 ? _f : version;
+	        }
+	        if (ELoader.isWebp && url.endsWithAny("png", "jpg"))
+	            url += ".webp";
+	        if (!Laya.Browser.onLayaRuntime && version)
+	            url = `${url}?v=${version}`;
+	        return url;
+	    }
+	    static of(base, ...subpaths) {
+	        return new Path(base, ...subpaths);
+	    }
+	    string() {
+	        return this.path;
+	    }
+	}
+	/** 路径格式化 */
+	Path.formatPath = [];
+	
+	tsCore.Path = Path
+	
+	class TimerKit {
+	    constructor() {
+	        this.isPause = false;
+	    }
+	    start() {
+	        this.stop();
+	        Laya.timer.frameLoop(1, this, this.onUpdate);
+	        return this;
+	    }
+	    stop() {
+	        Laya.timer.clear(this, this.onUpdate);
+	        return this;
+	    }
+	    pause() {
+	        this.isPause = true;
+	    }
+	    resume() {
+	        this.isPause = false;
+	    }
+	    static getHandler(target, fun) {
+	        const index = TimerKit.tasks.findIndex(value => value.target == target && value.handler == fun);
+	        return TimerKit.tasks[index];
+	    }
+	    static remove(target, fun) {
+	        const index = TimerKit.tasks.findIndex(value => value.target == target && value.handler == fun);
+	        if (index > -1) {
+	            const handlers = TimerKit.tasks.splice(index, 1);
+	            handlers.forEach(value => Laya.Pool.recover(TimerKit.NAME, value));
+	        }
+	    }
+	    static addTask(task) {
+	        TimerKit.tasks.push(task);
+	    }
+	    static getNewTask() {
+	        return Laya.Pool.getItemByClass(TimerKit.NAME, TaskHandler);
+	    }
+	    static addHandler(target, fun, interval = 0, custom) {
+	        if (!target || !fun)
+	            return;
+	        let handler = this.getHandler(target, fun);
+	        if (handler) {
+	            handler.initData(target, fun, interval, custom);
+	        }
+	        handler = this.getNewTask();
+	        handler.initData(target, fun, interval, custom);
+	        this.addTask(handler);
+	    }
+	    onUpdate() {
+	        if (this.isPause)
+	            return;
+	        const time = Laya.Browser.now();
+	        for (let i = 0; i < TimerKit.tasks.length; i++) {
+	            const task = TimerKit.tasks[i];
+	            if ((task.customConditions && task.customConditions()) ||
+	                (!task.target.isDisposed
+	                    && task.target.parent
+	                    && task.target.alpha > 0
+	                    && task.target.internalVisible2
+	                    && task.lastRunTime + task.interval < time)) {
+	                task.lastRunTime = time;
+	                task.handler.call(task.target);
+	            }
+	        }
+	    }
+	}
+	TimerKit.NAME = "TimerDecorators";
+	TimerKit.tasks = [];
+	TimerKit.REG_TASK = [];
+	class TaskHandler {
+	    initData(target, fun, interval = 0, custom) {
+	        this.target = target;
+	        this.handler = fun;
+	        this.customConditions = custom;
+	        this.interval = interval;
+	        this.lastRunTime = 0;
+	        return this;
+	    }
+	    setTargetClass(targetClassProperty) {
+	        this.targetClassProperty = targetClassProperty;
+	        return this;
+	    }
+	}
+	
+	tsCore.TimerKit = TimerKit
+	
+	class EventController {
+	    constructor() {
+	        /** 事件缓存的所有组 组名字->组object */
+	        this.eventGroup = new Map();
+	        /**
+	         * 缓存key -> 实例
+	         */
+	        this.cacheTarget = new Map();
+	        /**
+	         * 缓存类名 -> 实例
+	         */
+	        this.cacheClassTarget = new Map();
 	    }
 	    regActionHandler(action, handler, group) {
-	        App.inst.regActionHandler(action, handler, group);
+	        let groupObj = this.getGroup(group);
+	        // 获取此分组下  action 的执行函数存储数组
+	        groupObj.getOrPut(action, () => []).push(handler);
 	    }
-	    /** 注册游戏数据 */
-	    regGameAction(action, caller, method, order) {
-	        this.regAction(action, caller, method, App.GAME_GROUP, order);
+	    /**
+	     * 分组存储对象
+	     * @param groupKey 分组key
+	     * @return
+	     */
+	    getGroup(groupKey) {
+	        if (StringUtil.isEmpty(groupKey)) {
+	            groupKey = App.DEFAULT_GROUP;
+	        }
+	        return this.eventGroup.getOrPut(groupKey, () => new Map());
+	    }
+	    regAction(action, caller, method, group, order) {
+	        const handler = new Laya.Handler(caller, method);
+	        handler.order = order;
+	        this.regActionHandler(action, handler, group);
+	    }
+	    clearView() {
+	        this.cacheTarget.clear();
+	        EventController._CLSID = 0;
+	    }
+	    clearGroup() {
+	        this.eventGroup.clear();
+	        Log.debug("clear eventGroup");
 	    }
 	    removeAllAction(...args) {
-	        App.inst.removeAllAction.apply(App.inst, args);
+	        for (const key of this.eventGroup.keys()) { // 获取key
+	            this.removeGroupActions.apply(this, [key, ...args]);
+	        }
 	    }
-	    removeGroup(group) {
-	        App.inst.removeGroup(group);
+	    removeGroup(groupKey) {
+	        Log.debug(`removeGroup ${groupKey}`);
+	        this.eventGroup.delete(groupKey);
 	    }
-	    removeGroupActions(group, ...args) {
-	        args.unshift(group);
-	        App.inst.removeGroupActions.apply(App.inst, args);
+	    removeGroupActions(groupKey, ...args) {
+	        let groupObj = this.getGroup(groupKey);
+	        args.forEach(value => groupObj.delete(value));
 	    }
 	    removeActionHandler(action, method, group) {
-	        App.inst.removeActionHandler(action, method, group);
+	        if (!group) {
+	            for (let groupKey of this.eventGroup.values()) {
+	                this.removeFunction(groupKey, action, method);
+	            }
+	            return;
+	        }
+	        let groupObj = this.getGroup(group);
+	        this.removeFunction(groupObj, action, method);
 	    }
 	    removeFunction(groupObj, action, method) {
-	        App.inst.removeFunction(groupObj, action, method);
-	    }
-	    removeTargetAll(caller) {
-	        App.inst.removeTargetAll(caller);
-	    }
-	    removeTarget(groupObj, caller) {
-	        App.inst.removeTarget(groupObj, caller);
-	    }
-	    sendAction(action, ...args) {
-	        args.unshift(action);
-	        App.inst.sendAction.apply(App.inst, args);
-	    }
-	    sendGroupAction(group, action, ...args) {
-	        args.unshift(action);
-	        args.unshift(group);
-	        App.inst.sendGroupAction.apply(App.inst, args);
-	    }
-	}
-	
-	tsCore.ActionEvent = ActionEvent
-	
-	class GSpineSkeleton extends ESkeleton {
-	    constructor(ver = Laya.SpineVersion.v3_8) {
-	        super();
-	        this.ver = ver;
-	    }
-	    createDisplayObject() {
-	        super.createDisplayObject();
-	        this._displayObject = new Laya.SpineSkeleton();
-	        this._displayObject["$owner"] = this;
-	        this["_touchable"] = this._displayObject.mouseEnabled = this._displayObject.mouseThrough = false;
-	        this._displayObject.on(Laya.Event.STOPPED, this, this.onPlayStopped);
-	        this._container = this._displayObject;
-	    }
-	    get asSkeleton() {
-	        return this._displayObject;
-	    }
-	    /**
-	     * 获取spine的Skeleton对象
-	     */
-	    getSkeletonNative() {
-	        // @ts-ignore
-	        return this.asSkeleton.getSkeleton();
-	    }
-	    /**
-	     * 加载json 或 skel格式的骨骼文件
-	     * @param jsonOrSkelUrl
-	     * @param handler 回调方法
-	     * @param ver
-	     */
-	    load(jsonOrSkelUrl, handler, ver) {
-	        this._complete = handler;
-	        this._aniPath = jsonOrSkelUrl;
-	        if (!this.template || (ver && this.ver != ver)) {
-	            this.template = new Laya.SpineTemplet(this.ver);
-	            this.template.on(Laya.Event.COMPLETE, this, this.onComplete);
-	            this.template.on(Laya.Event.ERROR, this, this.onError);
-	        }
-	        this.template.loadAni(jsonOrSkelUrl);
-	    }
-	    onError() {
-	        this._spineResPath = null;
-	    }
-	    onComplete(spine) {
-	        if (spine.loadResUrl != this.aniPath)
-	            return;
-	        this._spineResPath = spine.loadResUrl;
-	        const template = spine !== null && spine !== void 0 ? spine : this.template;
-	        this.asSkeleton.init(template);
-	        // 销毁已有的动画
-	        // for (let i = this.displayObject.numChildren - 1; i >= 0; i--) {
-	        //     let temp = this.displayObject.getChildAt(i)
-	        //     if (temp instanceof SpineSkeleton) {
-	        //         temp.destroy(true)
-	        //     }
-	        // }
-	        // if (this.spineSkeleton) {
-	        //     this.spineSkeleton.hitArea = this.displayObject.hitArea
-	        // }
-	        // this.spineSkeleton.mouseEnabled = this.spineSkeleton.mouseThrough = this.touchable
-	        // this.displayObject.addChild(this.spineSkeleton)
-	        runFun(this._complete, this);
-	    }
-	    set touchable(value) {
-	        // if (this.spineSkeleton) this.spineSkeleton.mouseEnabled = this.spineSkeleton.mouseThrough = this.touchable
-	        super.touchable = value;
-	    }
-	    get touchable() {
-	        return super.touchable;
-	    }
-	    /**
-	     * 通过名字显示一套皮肤
-	     * @param    name    皮肤的名字
-	     */
-	    showSkinByName(name) {
-	        this.asSkeleton.showSkinByName(name);
-	    }
-	    /**
-	     * 通过索引显示一套皮肤
-	     * @param    skinIndex    皮肤索引
-	     */
-	    showSkinByIndex(skinIndex) {
-	        this.asSkeleton.showSkinByIndex(skinIndex);
-	    }
-	    getAniIndexByName(aniName) {
-	        let animations = this.asSkeleton.templet.skeletonData.animations;
-	        let index = -1;
-	        for (let i = 0, n = animations.length; i < n; i++) {
-	            let animation = animations[i];
-	            if (animation && aniName == animation.name) {
-	                index = i;
-	                break;
-	            }
-	        }
-	        return index;
-	    }
-	    getAllAnimation() {
-	        var _a, _b;
-	        return (_b = (_a = this.getSkeletonNative()) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.animations;
-	    }
-	    getAllSkin() {
-	        var _a, _b;
-	        return (_b = (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.skeletonData) === null || _b === void 0 ? void 0 : _b.skins;
-	    }
-	    getAnimation(aniIndex) {
-	        let animation;
-	        if (typeof aniIndex === "string") {
-	            animation = this.getAllAnimation().find(value => value.name === aniIndex);
-	        }
-	        else
-	            animation = this.getAllAnimation()[aniIndex];
-	        return animation;
-	    }
-	    /**
-	     * 获取动画时长 秒
-	     * @param aniIndex
-	     */
-	    getAnimDuration(aniIndex) {
-	        var _a;
-	        let duration = 0;
-	        if (Array.isArray(aniIndex)) {
-	            for (let i = 0; i < aniIndex.length; i++) {
-	                duration += this.getAnimDuration(aniIndex[i]);
-	            }
-	        }
-	        else
-	            duration = ((_a = this.getAnimation(aniIndex)) === null || _a === void 0 ? void 0 : _a.duration) || 0;
-	        return duration;
-	    }
-	    getAnimFrame(aniIndex) {
-	        return this.getAnimation(aniIndex).timelines.length;
-	    }
-	    get currAniIndex() {
-	        let _currAniName = this.asSkeleton["_currAniName"];
-	        if (!_currAniName)
-	            return -1;
-	        return this.getAniIndexByName(_currAniName);
-	    }
-	    set hitArea(rec) {
-	        // if (this.spineSkeleton) {
-	        //     this.spineSkeleton.hitArea = rec
-	        //     return
-	        // }
-	        this.displayObject.hitArea = rec;
-	    }
-	    on(type, thisObject, listener, args = null) {
-	        if (type == Laya.Event.STOPPED) {
-	            this.stoppedHandler.push(new Laya.Handler(thisObject, listener, args));
-	            return;
-	        }
-	        if (this.asSkeleton) {
-	            this.asSkeleton.on(type, thisObject, listener, args);
-	            return;
-	        }
-	        super.on(type, thisObject, listener, args);
-	    }
-	    off(type, thisObject, listener) {
-	        if (type == Laya.Event.STOPPED) {
-	            for (let i = this.stoppedHandler.length - 1; i > -1; i--) {
-	                const handler = this.stoppedHandler[i];
-	                if (handler.caller == thisObject && handler.method == listener) {
-	                    handler.clear();
-	                    this.stoppedHandler.splice(i, 1);
+	        let arr = groupObj.get(action);
+	        if (arr) {
+	            for (let i = 0; i < arr.length; i++) {
+	                let h = arr[i];
+	                if (h.method == method) {
+	                    arr.splice(i, 1);
+	                    i--;
 	                }
 	            }
-	            return;
+	            if (arr.length == 0)
+	                groupObj.delete(action);
 	        }
-	        if (this.asSkeleton) {
-	            this.asSkeleton.off(type, thisObject, listener);
-	            return;
-	        }
-	        super.off(type, thisObject, listener);
 	    }
-	    offAll(type = null) {
-	        if (type == Laya.Event.STOPPED) {
-	            this.stoppedHandler.length = 0;
-	            return;
+	    removeTargetAll(caller) {
+	        for (let groupObj of this.eventGroup.keys()) {
+	            this.removeTarget(this.eventGroup.get(groupObj), caller);
 	        }
-	        if (this.asSkeleton) {
-	            this.asSkeleton.offAll(type);
-	            return;
-	        }
-	        this.displayObject.offAll(type);
 	    }
-	    dispose() {
-	        super.dispose();
+	    removeTarget(groupObj, caller) {
+	        for (const [key, value] of groupObj.entries()) {
+	            for (let i = 0; i < value.length; i++) {
+	                let h = value[i];
+	                if (h.caller == caller) {
+	                    value.splice(i, 1);
+	                    i--;
+	                }
+	            }
+	            if (value.length == 0)
+	                groupObj.delete(key);
+	        }
+	    }
+	    sendGroupAction(group, action, ...args) {
+	        let result = this.sendActionEvent.apply(this, [group, action, ...args]);
+	        if (!result) {
+	            Log.debug("group[" + group + "], action [" + action + "] not exist! Call failure");
+	        }
+	    }
+	    sendAction(action, ...args) {
+	        let result;
+	        for (const groupName of this.eventGroup.keys()) {
+	            let tempResult = this.sendActionEvent.apply(this, [groupName, action, ...args]);
+	            if (tempResult)
+	                result = true;
+	        }
+	        if (!result)
+	            Log.debug("action [" + action + "] not exist! Call failure");
+	    }
+	    sendActionEvent(group, action, ...args) {
+	        let groupObj = this.getGroup(group);
+	        let arr = groupObj.get(action);
+	        if (arr) {
+	            arr.sort((a, b) => a.order || 100 - b.order || 100)
+	                .forEach(value => value.runWith(args));
+	            return true;
+	        }
+	        return false;
+	    }
+	    addBean(key, bean, saveClassName = true) {
+	        if (typeof key !== "string") {
+	            key = this._getClassSign(key);
+	        }
+	        if (StringUtil.isEmpty(key)) {
+	            Log.warn("cannot be empty, key = " + key);
+	            return false;
+	        }
+	        if (this.getView(key)) {
+	            Log.warn("already exist key = " + key + ", add failure!");
+	            return false;
+	        }
+	        this.cacheTarget.set(key, bean);
+	        if (saveClassName) {
+	            this.cacheClassTarget.set(bean.constructor.name, bean);
+	        }
+	        return true;
+	    }
+	    removeBean(key) {
+	        if (!key)
+	            return;
+	        if (typeof key !== "string") {
+	            key = this._getClassSign(key, false);
+	        }
+	        if (StringUtil.isEmpty(key))
+	            return;
+	        this.cacheTarget.delete(key);
+	        this.cacheClassTarget.delete(key.charAt(0).toUpperCase() + key.slice(1));
+	    }
+	    getBean(key) {
+	        var _a;
+	        if (!key)
+	            return;
+	        if (typeof key !== "string") {
+	            key = this._getClassSign(key, false);
+	        }
+	        return (_a = this.cacheTarget.get(key)) !== null && _a !== void 0 ? _a : this.cacheClassTarget.get(key);
+	    }
+	    hasBean(key) {
+	        if (typeof key !== "string") {
+	            key = this._getClassSign(key, false);
+	        }
+	        if (!key)
+	            return false;
+	        return this.cacheTarget.has(key) || this.cacheClassTarget.has(key);
+	    }
+	    addView(key, view) {
+	        if (this.addBean(key, view)) {
+	            if (typeof key !== "string") {
+	                key = this._getClassSign(key);
+	            }
+	            view.setKey(key);
+	            return true;
+	        }
+	        return false;
+	    }
+	    removeView(key) {
+	        if (!key)
+	            return;
+	        if (typeof key !== "string") {
+	            key = key.getKey();
+	        }
+	        this.removeBean(key);
+	    }
+	    getView(key) {
+	        return this.getBean(key);
+	    }
+	    addProxy(key, proxy) {
+	        if (this.addBean(key, proxy)) {
+	            if (typeof key !== "string") {
+	                key = this._getClassSign(key);
+	            }
+	            proxy.setKey(key);
+	            return true;
+	        }
+	        return false;
+	    }
+	    removeProxy(key) {
+	        if (!key)
+	            return;
+	        if (typeof key !== "string") {
+	            key = key.getKey();
+	        }
+	        this.removeBean(key);
+	    }
+	    getProxy(name) {
+	        return this.getBean(name);
+	    }
+	    getMap() {
+	        return this.cacheTarget;
+	    }
+	    /**
+	     * 返回类的唯一标识
+	     */
+	    _getClassSign(cla, create = true) {
+	        let className = cla.name || cla["__className"] || cla["_cacheId"];
+	        if (!className && create) {
+	            cla["_cacheId"] = className = `${App.DEFAULT_CACHE_HEAD}_${EventController._CLSID}`;
+	            EventController._CLSID++;
+	        }
+	        return className;
 	    }
 	}
+	EventController._CLSID = 0;
 	
-	tsCore.GSpineSkeleton = GSpineSkeleton
+	tsCore.EventController = EventController
 	
 	class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GComponent) {
 	    constructor() {
@@ -2962,6 +3253,242 @@ function TimerLoop(interval, custom) {
 	}
 	
 	tsCore.ESkeleton = ESkeleton
+	
+	class GSpineSkeleton extends ESkeleton {
+	    constructor(ver = Laya.SpineVersion.v3_8) {
+	        super();
+	        this.ver = ver;
+	    }
+	    createDisplayObject() {
+	        super.createDisplayObject();
+	        this._displayObject = new Laya.SpineSkeleton();
+	        this._displayObject["$owner"] = this;
+	        this["_touchable"] = this._displayObject.mouseEnabled = this._displayObject.mouseThrough = false;
+	        this._displayObject.on(Laya.Event.STOPPED, this, this.onPlayStopped);
+	        this._container = this._displayObject;
+	    }
+	    get asSkeleton() {
+	        return this._displayObject;
+	    }
+	    /**
+	     * 获取spine的Skeleton对象
+	     */
+	    getSkeletonNative() {
+	        // @ts-ignore
+	        return this.asSkeleton.getSkeleton();
+	    }
+	    /**
+	     * 加载json 或 skel格式的骨骼文件
+	     * @param jsonOrSkelUrl
+	     * @param handler 回调方法
+	     * @param ver
+	     */
+	    load(jsonOrSkelUrl, handler, ver) {
+	        this._complete = handler;
+	        this._aniPath = jsonOrSkelUrl;
+	        if (!this.template || (ver && this.ver != ver)) {
+	            this.template = new Laya.SpineTemplet(this.ver);
+	            this.template.on(Laya.Event.COMPLETE, this, this.onComplete);
+	            this.template.on(Laya.Event.ERROR, this, this.onError);
+	        }
+	        this.template.loadAni(jsonOrSkelUrl);
+	    }
+	    onError() {
+	        this._spineResPath = null;
+	    }
+	    onComplete(spine) {
+	        if (spine.loadResUrl != this.aniPath)
+	            return;
+	        this._spineResPath = spine.loadResUrl;
+	        const template = spine !== null && spine !== void 0 ? spine : this.template;
+	        this.asSkeleton.init(template);
+	        // 销毁已有的动画
+	        // for (let i = this.displayObject.numChildren - 1; i >= 0; i--) {
+	        //     let temp = this.displayObject.getChildAt(i)
+	        //     if (temp instanceof SpineSkeleton) {
+	        //         temp.destroy(true)
+	        //     }
+	        // }
+	        // if (this.spineSkeleton) {
+	        //     this.spineSkeleton.hitArea = this.displayObject.hitArea
+	        // }
+	        // this.spineSkeleton.mouseEnabled = this.spineSkeleton.mouseThrough = this.touchable
+	        // this.displayObject.addChild(this.spineSkeleton)
+	        runFun(this._complete, this);
+	    }
+	    set touchable(value) {
+	        // if (this.spineSkeleton) this.spineSkeleton.mouseEnabled = this.spineSkeleton.mouseThrough = this.touchable
+	        super.touchable = value;
+	    }
+	    get touchable() {
+	        return super.touchable;
+	    }
+	    /**
+	     * 通过名字显示一套皮肤
+	     * @param    name    皮肤的名字
+	     */
+	    showSkinByName(name) {
+	        this.asSkeleton.showSkinByName(name);
+	    }
+	    /**
+	     * 通过索引显示一套皮肤
+	     * @param    skinIndex    皮肤索引
+	     */
+	    showSkinByIndex(skinIndex) {
+	        this.asSkeleton.showSkinByIndex(skinIndex);
+	    }
+	    getAniIndexByName(aniName) {
+	        let animations = this.asSkeleton.templet.skeletonData.animations;
+	        let index = -1;
+	        for (let i = 0, n = animations.length; i < n; i++) {
+	            let animation = animations[i];
+	            if (animation && aniName == animation.name) {
+	                index = i;
+	                break;
+	            }
+	        }
+	        return index;
+	    }
+	    getAllAnimation() {
+	        var _a, _b;
+	        return (_b = (_a = this.getSkeletonNative()) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.animations;
+	    }
+	    getAllSkin() {
+	        var _a, _b;
+	        return (_b = (_a = this.asSkeleton.templet) === null || _a === void 0 ? void 0 : _a.skeletonData) === null || _b === void 0 ? void 0 : _b.skins;
+	    }
+	    getAnimation(aniIndex) {
+	        let animation;
+	        if (typeof aniIndex === "string") {
+	            animation = this.getAllAnimation().find(value => value.name === aniIndex);
+	        }
+	        else
+	            animation = this.getAllAnimation()[aniIndex];
+	        return animation;
+	    }
+	    /**
+	     * 获取动画时长 秒
+	     * @param aniIndex
+	     */
+	    getAnimDuration(aniIndex) {
+	        var _a;
+	        let duration = 0;
+	        if (Array.isArray(aniIndex)) {
+	            for (let i = 0; i < aniIndex.length; i++) {
+	                duration += this.getAnimDuration(aniIndex[i]);
+	            }
+	        }
+	        else
+	            duration = ((_a = this.getAnimation(aniIndex)) === null || _a === void 0 ? void 0 : _a.duration) || 0;
+	        return duration;
+	    }
+	    getAnimFrame(aniIndex) {
+	        return this.getAnimation(aniIndex).timelines.length;
+	    }
+	    get currAniIndex() {
+	        let _currAniName = this.asSkeleton["_currAniName"];
+	        if (!_currAniName)
+	            return -1;
+	        return this.getAniIndexByName(_currAniName);
+	    }
+	    set hitArea(rec) {
+	        // if (this.spineSkeleton) {
+	        //     this.spineSkeleton.hitArea = rec
+	        //     return
+	        // }
+	        this.displayObject.hitArea = rec;
+	    }
+	    on(type, thisObject, listener, args = null) {
+	        if (type == Laya.Event.STOPPED) {
+	            this.stoppedHandler.push(new Laya.Handler(thisObject, listener, args));
+	            return;
+	        }
+	        if (this.asSkeleton) {
+	            this.asSkeleton.on(type, thisObject, listener, args);
+	            return;
+	        }
+	        super.on(type, thisObject, listener, args);
+	    }
+	    off(type, thisObject, listener) {
+	        if (type == Laya.Event.STOPPED) {
+	            for (let i = this.stoppedHandler.length - 1; i > -1; i--) {
+	                const handler = this.stoppedHandler[i];
+	                if (handler.caller == thisObject && handler.method == listener) {
+	                    handler.clear();
+	                    this.stoppedHandler.splice(i, 1);
+	                }
+	            }
+	            return;
+	        }
+	        if (this.asSkeleton) {
+	            this.asSkeleton.off(type, thisObject, listener);
+	            return;
+	        }
+	        super.off(type, thisObject, listener);
+	    }
+	    offAll(type = null) {
+	        if (type == Laya.Event.STOPPED) {
+	            this.stoppedHandler.length = 0;
+	            return;
+	        }
+	        if (this.asSkeleton) {
+	            this.asSkeleton.offAll(type);
+	            return;
+	        }
+	        this.displayObject.offAll(type);
+	    }
+	    dispose() {
+	        super.dispose();
+	    }
+	}
+	
+	tsCore.GSpineSkeleton = GSpineSkeleton
+	
+	class ActionEvent {
+	    regAction(action, caller, method, group, order) {
+	        App.inst.regAction(action, caller, method, group, order);
+	    }
+	    regActionHandler(action, handler, group) {
+	        App.inst.regActionHandler(action, handler, group);
+	    }
+	    /** 注册游戏数据 */
+	    regGameAction(action, caller, method, order) {
+	        this.regAction(action, caller, method, App.GAME_GROUP, order);
+	    }
+	    removeAllAction(...args) {
+	        App.inst.removeAllAction.apply(App.inst, args);
+	    }
+	    removeGroup(group) {
+	        App.inst.removeGroup(group);
+	    }
+	    removeGroupActions(group, ...args) {
+	        args.unshift(group);
+	        App.inst.removeGroupActions.apply(App.inst, args);
+	    }
+	    removeActionHandler(action, method, group) {
+	        App.inst.removeActionHandler(action, method, group);
+	    }
+	    removeFunction(groupObj, action, method) {
+	        App.inst.removeFunction(groupObj, action, method);
+	    }
+	    removeTargetAll(caller) {
+	        App.inst.removeTargetAll(caller);
+	    }
+	    removeTarget(groupObj, caller) {
+	        App.inst.removeTarget(groupObj, caller);
+	    }
+	    sendAction(action, ...args) {
+	        args.unshift(action);
+	        App.inst.sendAction.apply(App.inst, args);
+	    }
+	    sendGroupAction(group, action, ...args) {
+	        args.unshift(action);
+	        args.unshift(group);
+	        App.inst.sendGroupAction.apply(App.inst, args);
+	    }
+	}
+	
+	tsCore.ActionEvent = ActionEvent
 	
 	class GSkeleton extends ESkeleton {
 	    constructor(aniMode = 0) {
@@ -3326,163 +3853,6 @@ function TimerLoop(interval, custom) {
 	}
 	
 	tsCore.GGraphicsAni = GGraphicsAni
-	
-	class EDrawTextureCmd extends Laya.DrawTextureCmd {
-	    recover() {
-	        this.colorFlt = null; // 自己修改的 Laya Bug
-	        super.recover();
-	    }
-	}
-	
-	tsCore.EDrawTextureCmd = EDrawTextureCmd
-	
-	class SoundUtils {
-	    /**
-	     * 添加需要使用 SoundUtils.load() 加载的资源文件
-	     * @param res
-	     * @see SoundUtils.load
-	     */
-	    static addRes(res) {
-	        Laya.SoundManager.autoReleaseSound = false;
-	        SoundUtils.loadAsset = Array.isArray(res) ? res : [res];
-	    }
-	    /**
-	     * 执行加载音频文件
-	     * @param url 加载文件地址  默认使用 SoundUtils.loadAsset
-	     * @see SoundUtils.loadAsset
-	     */
-	    static load(url) {
-	        Laya.loader.load(url !== null && url !== void 0 ? url : SoundUtils.loadAsset, Laya.Handler.create(null, SoundUtils.onLoader));
-	    }
-	    static onLoader() {
-	        for (let i = 0; i < SoundUtils.autoPlay.length; i++) {
-	            let url = SoundUtils.autoPlay[i];
-	            if (SoundUtils.autoPlayUrl == url) {
-	                SoundUtils.playMusic(url, SoundUtils.bgMusicLoop, SoundUtils.bgComplete, SoundUtils.bgVolume, SoundUtils.bgStartTime);
-	                Log.info("auto play = " + url);
-	                SoundUtils.autoPlayUrl = null;
-	            }
-	        }
-	        SoundUtils.autoPlay.length = 0;
-	    }
-	    /**
-	     *
-	     * @param url 声音文件地址
-	     * @param [loops=0] 循环次数,0表示无限循环
-	     * @param complete 声音播放完成回调 Handler对象。
-	     * @param [volume=-1] 音量范围从 0（静音）至 1（最大音量）。 -1表示不调整
-	     * @param [startTime=0] 声音播放起始时间 单位秒
-	     * @param [coverBefore=false] 地址相同，是否覆盖正在播放的音乐
-	     */
-	    static playMusic(url, loops = 0, complete, volume = -1, startTime = 0, coverBefore = false) {
-	        if (SoundManager["_bgMusic"] == Laya.URL.formatURL(url) && SoundManager["_musicChannel"] && !coverBefore) {
-	            if (SoundManager["_musicChannel"].isStopped) {
-	                SoundManager["_musicChannel"].resume();
-	                return SoundManager["_musicChannel"];
-	            }
-	            return null;
-	        }
-	        let sound = Laya.loader.getRes(url);
-	        SoundUtils.bgMusicLoop = loops;
-	        SoundUtils.bgVolume = volume;
-	        SoundUtils.bgComplete = complete;
-	        SoundUtils.bgStartTime = startTime;
-	        if (sound) {
-	            let channel = Laya.SoundManager.playMusic(url, loops, (loops > 0 && complete) ? Laya.Handler.create(this, this.onPlayMusicEnd, [complete]) : null, startTime);
-	            if (!channel)
-	                return null;
-	            if (volume > -1)
-	                channel.volume = volume;
-	            return channel;
-	        }
-	        else {
-	            Log.info("sound not load " + url);
-	            this.autoPlayUrl = url;
-	            if (SoundUtils.autoPlay.indexOf(url) == -1)
-	                SoundUtils.autoPlay.push(url);
-	            const index = SoundUtils.loadAsset.findIndex(function (value) {
-	                return value.url == url;
-	            });
-	            if (index < 0) {
-	                SoundUtils.load(url);
-	            }
-	        }
-	        return null;
-	    }
-	    static onPlayMusicEnd(complete) {
-	        SoundManager["_bgMusic"] = null;
-	        complete === null || complete === void 0 ? void 0 : complete.run();
-	    }
-	    /**
-	     *
-	     * @param url 声音文件地址。
-	     * @param [loops=1] 循环次数,0表示无限循环
-	     * @param complete 声音播放完成回调 Handler对象。
-	     * @param [volume=1] 音量范围从 0（静音）至 1（最大音量）。
-	     * @param [startTime=0] 声音播放起始时间。 单位秒
-	     */
-	    static playSound(url, loops = 1, complete, volume = 1, startTime = 0) {
-	        let sound = Laya.loader.getRes(url);
-	        if (sound) {
-	            let channel = Laya.SoundManager.playSound(url, loops, complete, null, startTime);
-	            if (!channel)
-	                return null;
-	            if (volume > -1)
-	                channel.volume = volume;
-	            return channel;
-	        }
-	        else {
-	            let index = SoundUtils.loadAsset.findIndex(function (value) {
-	                return value.url == url;
-	            });
-	            if (index < 0) {
-	                SoundUtils.load(url);
-	            }
-	            Log.info("sound not load " + url);
-	        }
-	        return null;
-	    }
-	    static clear() {
-	        SoundUtils.autoPlay.length = 0;
-	        while (SoundUtils.loadAsset.length > 0) {
-	            let loadRes = SoundUtils.loadAsset.shift();
-	            Laya.loader.cancelLoadByUrl(loadRes.url);
-	            Laya.SoundManager.destroySound(loadRes.url);
-	        }
-	        Log.info("clear sound");
-	        SoundUtils.loadAsset.length = 0;
-	    }
-	    static stopSound(url) {
-	        Laya.SoundManager.stopSound(url);
-	    }
-	    /**
-	     * 停止播放所有音效（不包括背景音乐）。
-	     */
-	    static stopAllSound() {
-	        Laya.SoundManager.stopAllSound();
-	    }
-	    /**
-	     * 停止播放所有声音（包括背景音乐和音效）。
-	     */
-	    static stopAll() {
-	        Laya.SoundManager.stopAll();
-	    }
-	    /**
-	     * 停止播放背景音乐（不包括音效）。
-	     */
-	    static stopMusic() {
-	        Laya.SoundManager.stopMusic();
-	    }
-	}
-	/** 需要立即播放的 */
-	SoundUtils.autoPlay = [];
-	/** 需要使用load加载的资源 */
-	SoundUtils.loadAsset = [];
-	SoundUtils.bgMusicLoop = 0;
-	SoundUtils.bgVolume = 1;
-	SoundUtils.bgStartTime = 0;
-	
-	tsCore.SoundUtils = SoundUtils
 	
 	class DefineConfig {
 	    static init() {
@@ -4292,376 +4662,6 @@ function TimerLoop(interval, custom) {
 	}
 	
 	tsCore.DefineConfig = DefineConfig
-	
-	var Method;
-	(function (Method) {
-	    Method["GET"] = "get";
-	    Method["POST"] = "post";
-	})(Method || (Method = {}));
-	
-	class EventController {
-	    constructor() {
-	        /** 事件缓存的所有组 组名字->组object */
-	        this.eventGroup = new Map();
-	        /**
-	         * 缓存key -> 实例
-	         */
-	        this.cacheTarget = new Map();
-	        /**
-	         * 缓存类名 -> 实例
-	         */
-	        this.cacheClassTarget = new Map();
-	    }
-	    regActionHandler(action, handler, group) {
-	        let groupObj = this.getGroup(group);
-	        // 获取此分组下  action 的执行函数存储数组
-	        groupObj.getOrPut(action, () => []).push(handler);
-	    }
-	    /**
-	     * 分组存储对象
-	     * @param groupKey 分组key
-	     * @return
-	     */
-	    getGroup(groupKey) {
-	        if (StringUtil.isEmpty(groupKey)) {
-	            groupKey = App.DEFAULT_GROUP;
-	        }
-	        return this.eventGroup.getOrPut(groupKey, () => new Map());
-	    }
-	    regAction(action, caller, method, group, order) {
-	        const handler = new Laya.Handler(caller, method);
-	        handler.order = order;
-	        this.regActionHandler(action, handler, group);
-	    }
-	    clearView() {
-	        this.cacheTarget.clear();
-	        EventController._CLSID = 0;
-	    }
-	    clearGroup() {
-	        this.eventGroup.clear();
-	        Log.debug("clear eventGroup");
-	    }
-	    removeAllAction(...args) {
-	        for (const key of this.eventGroup.keys()) { // 获取key
-	            this.removeGroupActions.apply(this, [key, ...args]);
-	        }
-	    }
-	    removeGroup(groupKey) {
-	        Log.debug(`removeGroup ${groupKey}`);
-	        this.eventGroup.delete(groupKey);
-	    }
-	    removeGroupActions(groupKey, ...args) {
-	        let groupObj = this.getGroup(groupKey);
-	        args.forEach(value => groupObj.delete(value));
-	    }
-	    removeActionHandler(action, method, group) {
-	        if (!group) {
-	            for (let groupKey of this.eventGroup.values()) {
-	                this.removeFunction(groupKey, action, method);
-	            }
-	            return;
-	        }
-	        let groupObj = this.getGroup(group);
-	        this.removeFunction(groupObj, action, method);
-	    }
-	    removeFunction(groupObj, action, method) {
-	        let arr = groupObj.get(action);
-	        if (arr) {
-	            for (let i = 0; i < arr.length; i++) {
-	                let h = arr[i];
-	                if (h.method == method) {
-	                    arr.splice(i, 1);
-	                    i--;
-	                }
-	            }
-	            if (arr.length == 0)
-	                groupObj.delete(action);
-	        }
-	    }
-	    removeTargetAll(caller) {
-	        for (let groupObj of this.eventGroup.keys()) {
-	            this.removeTarget(this.eventGroup.get(groupObj), caller);
-	        }
-	    }
-	    removeTarget(groupObj, caller) {
-	        for (const [key, value] of groupObj.entries()) {
-	            for (let i = 0; i < value.length; i++) {
-	                let h = value[i];
-	                if (h.caller == caller) {
-	                    value.splice(i, 1);
-	                    i--;
-	                }
-	            }
-	            if (value.length == 0)
-	                groupObj.delete(key);
-	        }
-	    }
-	    sendGroupAction(group, action, ...args) {
-	        let result = this.sendActionEvent.apply(this, [group, action, ...args]);
-	        if (!result) {
-	            Log.debug("group[" + group + "], action [" + action + "] not exist! Call failure");
-	        }
-	    }
-	    sendAction(action, ...args) {
-	        let result;
-	        for (const groupName of this.eventGroup.keys()) {
-	            let tempResult = this.sendActionEvent.apply(this, [groupName, action, ...args]);
-	            if (tempResult)
-	                result = true;
-	        }
-	        if (!result)
-	            Log.debug("action [" + action + "] not exist! Call failure");
-	    }
-	    sendActionEvent(group, action, ...args) {
-	        let groupObj = this.getGroup(group);
-	        let arr = groupObj.get(action);
-	        if (arr) {
-	            arr.sort((a, b) => a.order || 100 - b.order || 100)
-	                .forEach(value => value.runWith(args));
-	            return true;
-	        }
-	        return false;
-	    }
-	    addBean(key, bean, saveClassName = true) {
-	        if (typeof key !== "string") {
-	            key = this._getClassSign(key);
-	        }
-	        if (StringUtil.isEmpty(key)) {
-	            Log.warn("cannot be empty, key = " + key);
-	            return false;
-	        }
-	        if (this.getView(key)) {
-	            Log.warn("already exist key = " + key + ", add failure!");
-	            return false;
-	        }
-	        this.cacheTarget.set(key, bean);
-	        if (saveClassName) {
-	            this.cacheClassTarget.set(bean.constructor.name, bean);
-	        }
-	        return true;
-	    }
-	    removeBean(key) {
-	        if (!key)
-	            return;
-	        if (typeof key !== "string") {
-	            key = this._getClassSign(key, false);
-	        }
-	        if (StringUtil.isEmpty(key))
-	            return;
-	        this.cacheTarget.delete(key);
-	        this.cacheClassTarget.delete(key.charAt(0).toUpperCase() + key.slice(1));
-	    }
-	    getBean(key) {
-	        var _a;
-	        if (!key)
-	            return;
-	        if (typeof key !== "string") {
-	            key = this._getClassSign(key, false);
-	        }
-	        return (_a = this.cacheTarget.get(key)) !== null && _a !== void 0 ? _a : this.cacheClassTarget.get(key);
-	    }
-	    hasBean(key) {
-	        if (typeof key !== "string") {
-	            key = this._getClassSign(key, false);
-	        }
-	        if (!key)
-	            return false;
-	        return this.cacheTarget.has(key) || this.cacheClassTarget.has(key);
-	    }
-	    addView(key, view) {
-	        if (this.addBean(key, view)) {
-	            if (typeof key !== "string") {
-	                key = this._getClassSign(key);
-	            }
-	            view.setKey(key);
-	            return true;
-	        }
-	        return false;
-	    }
-	    removeView(key) {
-	        if (!key)
-	            return;
-	        if (typeof key !== "string") {
-	            key = key.getKey();
-	        }
-	        this.removeBean(key);
-	    }
-	    getView(key) {
-	        return this.getBean(key);
-	    }
-	    addProxy(key, proxy) {
-	        if (this.addBean(key, proxy)) {
-	            if (typeof key !== "string") {
-	                key = this._getClassSign(key);
-	            }
-	            proxy.setKey(key);
-	            return true;
-	        }
-	        return false;
-	    }
-	    removeProxy(key) {
-	        if (!key)
-	            return;
-	        if (typeof key !== "string") {
-	            key = key.getKey();
-	        }
-	        this.removeBean(key);
-	    }
-	    getProxy(name) {
-	        return this.getBean(name);
-	    }
-	    getMap() {
-	        return this.cacheTarget;
-	    }
-	    /**
-	     * 返回类的唯一标识
-	     */
-	    _getClassSign(cla, create = true) {
-	        let className = cla.name || cla["__className"] || cla["_cacheId"];
-	        if (!className && create) {
-	            cla["_cacheId"] = className = `${App.DEFAULT_CACHE_HEAD}_${EventController._CLSID}`;
-	            EventController._CLSID++;
-	        }
-	        return className;
-	    }
-	}
-	EventController._CLSID = 0;
-	
-	tsCore.EventController = EventController
-	
-	class Path {
-	    constructor(base, ...subpaths) {
-	        this.path = base;
-	        subpaths.forEach((value) => {
-	            if (value.startsWith("/")) {
-	                this.path += value;
-	            }
-	            else
-	                this.path += `/${value}`;
-	        });
-	    }
-	    /**
-	     * 格式化路径
-	     * ```
-	     * 1.当ELoader.isWebp为true的时候，自动将后缀为png/jpg的路径 添加.webp
-	     * 2.在未使用加速器的环境中，将启用version控制 会自动在url后面添加版本号
-	     * 3.执行顺序是先执行全路径格式 path()方法，在执行version()版本号方法，最后兼容执行call()方法。
-	     * ```
-	     * @param url 要格式化的路径
-	     * @return 格式化后可直接使用的路径
-	     */
-	    static formatUrl(url) {
-	        var _a, _b, _c, _d, _e, _f;
-	        url = url.split("?")[0];
-	        let version = Laya.URL.version[url];
-	        Path.formatPath.sort((a, b) => a.order - a.order);
-	        for (const format of Path.formatPath) {
-	            url = (_b = (_a = format.path) === null || _a === void 0 ? void 0 : _a.call(format, url)) !== null && _b !== void 0 ? _b : url;
-	            version = (_d = (_c = format.version) === null || _c === void 0 ? void 0 : _c.call(format, url, version)) !== null && _d !== void 0 ? _d : version;
-	            version = (_f = (_e = format.call) === null || _e === void 0 ? void 0 : _e.call(format, url, version)) !== null && _f !== void 0 ? _f : version;
-	        }
-	        if (ELoader.isWebp && url.endsWithAny("png", "jpg"))
-	            url += ".webp";
-	        if (!Laya.Browser.onLayaRuntime && version)
-	            url = `${url}?v=${version}`;
-	        return url;
-	    }
-	    static of(base, ...subpaths) {
-	        return new Path(base, ...subpaths);
-	    }
-	    string() {
-	        return this.path;
-	    }
-	}
-	/** 路径格式化 */
-	Path.formatPath = [];
-	
-	tsCore.Path = Path
-	
-	class TimerKit {
-	    constructor() {
-	        this.isPause = false;
-	    }
-	    start() {
-	        this.stop();
-	        Laya.timer.frameLoop(1, this, this.onUpdate);
-	        return this;
-	    }
-	    stop() {
-	        Laya.timer.clear(this, this.onUpdate);
-	        return this;
-	    }
-	    pause() {
-	        this.isPause = true;
-	    }
-	    resume() {
-	        this.isPause = false;
-	    }
-	    static getHandler(target, fun) {
-	        const index = TimerKit.tasks.findIndex(value => value.target == target && value.handler == fun);
-	        return TimerKit.tasks[index];
-	    }
-	    static remove(target, fun) {
-	        const index = TimerKit.tasks.findIndex(value => value.target == target && value.handler == fun);
-	        if (index > -1) {
-	            const handlers = TimerKit.tasks.splice(index, 1);
-	            handlers.forEach(value => Laya.Pool.recover(TimerKit.NAME, value));
-	        }
-	    }
-	    static addTask(task) {
-	        TimerKit.tasks.push(task);
-	    }
-	    static getNewTask() {
-	        return Laya.Pool.getItemByClass(TimerKit.NAME, TaskHandler);
-	    }
-	    static addHandler(target, fun, interval = 0, custom) {
-	        if (!target || !fun)
-	            return;
-	        let handler = this.getHandler(target, fun);
-	        if (handler) {
-	            handler.initData(target, fun, interval, custom);
-	        }
-	        handler = this.getNewTask();
-	        handler.initData(target, fun, interval, custom);
-	        this.addTask(handler);
-	    }
-	    onUpdate() {
-	        if (this.isPause)
-	            return;
-	        const time = Laya.Browser.now();
-	        for (let i = 0; i < TimerKit.tasks.length; i++) {
-	            const task = TimerKit.tasks[i];
-	            if ((task.customConditions && task.customConditions()) ||
-	                (!task.target.isDisposed
-	                    && task.target.parent
-	                    && task.target.alpha > 0
-	                    && task.target.internalVisible2
-	                    && task.lastRunTime + task.interval < time)) {
-	                task.lastRunTime = time;
-	                task.handler.call(task.target);
-	            }
-	        }
-	    }
-	}
-	TimerKit.NAME = "TimerDecorators";
-	TimerKit.tasks = [];
-	TimerKit.REG_TASK = [];
-	class TaskHandler {
-	    initData(target, fun, interval = 0, custom) {
-	        this.target = target;
-	        this.handler = fun;
-	        this.customConditions = custom;
-	        this.interval = interval;
-	        this.lastRunTime = 0;
-	        return this;
-	    }
-	    setTargetClass(targetClassProperty) {
-	        this.targetClassProperty = targetClassProperty;
-	        return this;
-	    }
-	}
-	
-	tsCore.TimerKit = TimerKit
 	
 	class App {
 	    static get inst() {
