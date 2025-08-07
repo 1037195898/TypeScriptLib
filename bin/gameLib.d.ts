@@ -28,7 +28,7 @@ declare function bindView(url: string, type: {
 declare function createView<T extends fgui.GObject>(url: string, userClass?: {
     new (): T;
 }): T;
-declare const ofNewObject: typeof fairygui.UIObjectFactory.newObject;
+const ofNewObject: typeof fairygui.UIObjectFactory.newObject;
 
 /**
  * FguiBindView装饰器用于将一个类绑定到特定的FGUI视图资源
@@ -594,7 +594,7 @@ declare namespace gameLib {
 	    static callIOS(method: string, data?: any, printDebug?: boolean): boolean;
 	}
 	
-	export declare const enum LibStr {
+	export const enum LibStr {
 	    /** 等待处理 */
 	    WAITING = 1000,
 	    /** 进入游戏中 */
@@ -3387,7 +3387,7 @@ declare namespace gameLib {
 	    dispose(): void;
 	}
 	
-	declare const GoldLoader_base: any;
+	const GoldLoader_base: any;
 	/**
 	 * 具有贝塞尔曲线运动的loader
 	 */

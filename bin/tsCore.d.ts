@@ -109,7 +109,7 @@ declare function getPropertyNames(obj: any, containsSuperClasses?: boolean): (st
 /**
  * 包装一个 windowMy
  */
-declare const windowMy: Window;
+const windowMy: Window;
 /** 随机数  最小值  最大值(不包括)  */
 declare function random(minNum: number, maxNum: number): number;
 /**
@@ -610,7 +610,7 @@ declare namespace tsCore {
 	     * @deprecated
 	     * @see String.startsWithAny
 	     */
-	    static beginsWithAny(input: string, ...prefix: string[]): any;
+	    static beginsWithAny(input: string, ...prefix: string[]): boolean;
 	    /**
 	     * 确定是否按指定字符串结束。
 	     * @param input 要被处理的字符串
@@ -626,7 +626,7 @@ declare namespace tsCore {
 	     * @deprecated
 	     * @see String.endsWithAny
 	     */
-	    static endsWithAny(input: string, ...prefix: string[]): any;
+	    static endsWithAny(input: string, ...prefix: string[]): boolean;
 	    /**
 	     * 删除在输入字符串中删除字符串的所有实例。
 	     * @param input 要被处理的字符串
@@ -692,7 +692,7 @@ declare namespace tsCore {
 	     * @deprecated
 	     * @see String.contains
 	     */
-	    static contains(value: string, ...arge: any[]): any;
+	    static contains(value: string, ...arge: any[]): boolean;
 	    /**
 	     * 将 Uint8Array 转换成16进制颜色值  至少保证3个值
 	     * @param value 数据
@@ -1299,7 +1299,7 @@ declare namespace tsCore {
 	     * @param groupKey 分组key
 	     * @return
 	     */
-	    getGroup(groupKey: string): any;
+	    getGroup(groupKey: string): Map<string | number, Laya.Handler[]>;
 	    regAction(action: string | number, caller: any, method: Function, group?: string, order?: number): void;
 	    clearView(): void;
 	    clearGroup(): void;
@@ -1346,7 +1346,23 @@ declare namespace tsCore {
 	    private _getClassSign;
 	}
 	
-	declare const ESkeleton_base: Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>>;
+	export class ActionEvent implements IAction {
+	    regAction(action: string | number, caller: any, method: Function, group?: string, order?: number): void;
+	    regActionHandler(action: string | number, handler: Laya.Handler, group?: string): void;
+	    /** 注册游戏数据 */
+	    regGameAction(action: string | number, caller: any, method: Function, order?: number): void;
+	    removeAllAction(...args: string[]): void;
+	    removeGroup(group: string): void;
+	    removeGroupActions(group: string, ...args: string[]): void;
+	    removeActionHandler(action: string | number, method: Function, group?: string): void;
+	    removeFunction(groupObj: any, action: string | number, method: Function): void;
+	    removeTargetAll(caller: any): void;
+	    removeTarget(groupObj: any, caller: any): void;
+	    sendAction(action: string | number, ...args: any[]): void;
+	    sendGroupAction(group: string, action: string | number, ...args: any[]): void;
+	}
+	
+	const ESkeleton_base: Constructor<BezierCurves & ActionEvent & fgui.GComponent>;
 	export abstract class ESkeleton extends ESkeleton_base implements ISkeleton {
 	    /** 播放动画数组的索引 */
 	    protected playGroupIndex: number;
@@ -1465,22 +1481,6 @@ declare namespace tsCore {
 	    dispose(): void;
 	}
 	
-	export class ActionEvent implements IAction {
-	    regAction(action: string | number, caller: any, method: Function, group?: string, order?: number): void;
-	    regActionHandler(action: string | number, handler: Laya.Handler, group?: string): void;
-	    /** 注册游戏数据 */
-	    regGameAction(action: string | number, caller: any, method: Function, order?: number): void;
-	    removeAllAction(...args: string[]): void;
-	    removeGroup(group: string): void;
-	    removeGroupActions(group: string, ...args: string[]): void;
-	    removeActionHandler(action: string | number, method: Function, group?: string): void;
-	    removeFunction(groupObj: any, action: string | number, method: Function): void;
-	    removeTargetAll(caller: any): void;
-	    removeTarget(groupObj: any, caller: any): void;
-	    sendAction(action: string | number, ...args: any[]): void;
-	    sendGroupAction(group: string, action: string | number, ...args: any[]): void;
-	}
-	
 	export class GSkeleton extends ESkeleton {
 	    /**
 	     * 骨骼更新
@@ -1565,16 +1565,16 @@ declare namespace tsCore {
 	     * @param    freshSlotIndex    是否将插槽纹理重置到初始化状态
 	     */
 	    showSkinByIndex(skinIndex: number, freshSlotIndex?: boolean): void;
-	    getAniIndexByName(name: string): any;
-	    getAllAnimation(): any;
+	    getAniIndexByName(name: string): number;
+	    getAllAnimation(): AnimationContent[];
 	    getAllSkin(): SkinData[];
 	    getAnimation(aniIndex: number | string): AnimationContent;
 	    /**
 	     * 获取动画时长 毫秒
 	     * @param aniIndex
 	     */
-	    getAnimDuration(aniIndex: number | string | (number | string)[]): any;
-	    getAnimFrame(aniIndex: number | string): any;
+	    getAnimDuration(aniIndex: number | string | (number | string)[]): number;
+	    getAnimFrame(aniIndex: number | string): number;
 	    get currAniIndex(): number;
 	    /**
 	     * 根据动作名和插槽骨骼名,来获取该骨骼在该动作播放时,每一帧该骨骼坐标位置,返回所有帧数骨骼坐标位置组成的列表
@@ -1963,9 +1963,9 @@ declare namespace tsCore {
 	 * @deprecated
 	 * @see MathKit
 	 */
-	export declare const Cast: typeof MathKit;
+	export const Cast: typeof MathKit;
 	
-	declare const View_base: Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>>;
+	const View_base: Constructor<ActionEvent & fairygui.GComponent & StringBlock & ViewBlock>;
 	export class View extends View_base implements IView, IKey {
 	    protected key: string;
 	    /**
@@ -2022,7 +2022,7 @@ declare namespace tsCore {
 	    dot(v: Vector2): number;
 	}
 	
-	declare const Proxys_base: Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>>;
+	const Proxys_base: Constructor<ActionEvent & StringBlock & ProxyBlock>;
 	export class Proxys extends Proxys_base implements IProxy, IKey {
 	    /** 独有的名字 */
 	    protected key: string;
@@ -2038,7 +2038,7 @@ declare namespace tsCore {
 	    dispose(): void;
 	}
 	
-	declare const EButton_base: Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>>;
+	const EButton_base: Constructor<ActionEvent & StringBlock & ViewBlock & fairygui.GButton>;
 	export class EButton extends EButton_base {
 	    protected onConstruct(): void;
 	    protected onInit(): void;
@@ -2049,7 +2049,7 @@ declare namespace tsCore {
 	    getChild<T = fgui.GObject>(...name: string[]): T;
 	}
 	
-	declare const EComboBox_base: Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>>;
+	const EComboBox_base: Constructor<ActionEvent & StringBlock & ViewBlock & fairygui.GComboBox>;
 	export class EComboBox extends EComboBox_base {
 	    /**
 	     * 是否根据选择数据改变 icon  text
@@ -2069,7 +2069,7 @@ declare namespace tsCore {
 	    getChild<T = fgui.GObject>(...name: string[]): T;
 	}
 	
-	declare const ELabel_base: Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>>;
+	const ELabel_base: Constructor<ActionEvent & ViewBlock & fgui.GLabel>;
 	export class ELabel extends ELabel_base {
 	    protected onConstruct(): void;
 	    protected onInit(): void;
@@ -2196,7 +2196,7 @@ declare namespace tsCore {
 	    regGameAction(action: string | number, caller: any, method: Function): void;
 	}
 	
-	declare const EWindow_base: Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>>;
+	const EWindow_base: Constructor<ActionEvent & StringBlock & ViewProxy & fairygui.Window>;
 	/**
 	 * 实现了 fgui.Window 的窗口
 	 * 默认会添加新的路由到历史中，可通过 joinRecord 处理
@@ -2372,8 +2372,8 @@ declare namespace tsCore {
 	        width: number;
 	        height: number;
 	    }): {
-	        x: any;
-	        y: any;
+	        x: number;
+	        y: number;
 	    };
 	}
 	
@@ -2536,7 +2536,7 @@ declare namespace tsCore {
 	 * @deprecated
 	 * @see UtilKit
 	 */
-	export declare const UtilsTool: typeof UtilKit;
+	export const UtilsTool: typeof UtilKit;
 	
 	export interface IMarket {
 	    /**
@@ -3354,7 +3354,7 @@ declare namespace tsCore {
 	    setCorner(value: number): void;
 	}
 	
-	declare const ProgressBar_base: Constructor<UnionToIntersection<InstanceTypeOfConstructor<T[number]>>>;
+	const ProgressBar_base: Constructor<ActionEvent & ViewBlock & fgui.GProgressBar>;
 	export class ProgressBar extends ProgressBar_base {
 	    tweenValue2(value: number, duration: number, complete?: ParamHandler): fgui.GTweener;
 	    update(newValue: number): void;

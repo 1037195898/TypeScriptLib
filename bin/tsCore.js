@@ -3029,7 +3029,53 @@ function TimerLoop(interval, custom) {
 	
 	tsCore.EventController = EventController
 	
-	class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GComponent) {
+	class ActionEvent {
+	    regAction(action, caller, method, group, order) {
+	        App.inst.regAction(action, caller, method, group, order);
+	    }
+	    regActionHandler(action, handler, group) {
+	        App.inst.regActionHandler(action, handler, group);
+	    }
+	    /** 注册游戏数据 */
+	    regGameAction(action, caller, method, order) {
+	        this.regAction(action, caller, method, App.GAME_GROUP, order);
+	    }
+	    removeAllAction(...args) {
+	        App.inst.removeAllAction.apply(App.inst, args);
+	    }
+	    removeGroup(group) {
+	        App.inst.removeGroup(group);
+	    }
+	    removeGroupActions(group, ...args) {
+	        args.unshift(group);
+	        App.inst.removeGroupActions.apply(App.inst, args);
+	    }
+	    removeActionHandler(action, method, group) {
+	        App.inst.removeActionHandler(action, method, group);
+	    }
+	    removeFunction(groupObj, action, method) {
+	        App.inst.removeFunction(groupObj, action, method);
+	    }
+	    removeTargetAll(caller) {
+	        App.inst.removeTargetAll(caller);
+	    }
+	    removeTarget(groupObj, caller) {
+	        App.inst.removeTarget(groupObj, caller);
+	    }
+	    sendAction(action, ...args) {
+	        args.unshift(action);
+	        App.inst.sendAction.apply(App.inst, args);
+	    }
+	    sendGroupAction(group, action, ...args) {
+	        args.unshift(action);
+	        args.unshift(group);
+	        App.inst.sendGroupAction.apply(App.inst, args);
+	    }
+	}
+	
+	tsCore.ActionEvent = ActionEvent
+	
+	class ESkeleton extends mixinExt(BezierCurves, ActionEvent, fgui.GComponent) {
 	    constructor() {
 	        super(...arguments);
 	        /** 播放动画数组的索引 */
@@ -3443,52 +3489,6 @@ function TimerLoop(interval, custom) {
 	}
 	
 	tsCore.GSpineSkeleton = GSpineSkeleton
-	
-	class ActionEvent {
-	    regAction(action, caller, method, group, order) {
-	        App.inst.regAction(action, caller, method, group, order);
-	    }
-	    regActionHandler(action, handler, group) {
-	        App.inst.regActionHandler(action, handler, group);
-	    }
-	    /** 注册游戏数据 */
-	    regGameAction(action, caller, method, order) {
-	        this.regAction(action, caller, method, App.GAME_GROUP, order);
-	    }
-	    removeAllAction(...args) {
-	        App.inst.removeAllAction.apply(App.inst, args);
-	    }
-	    removeGroup(group) {
-	        App.inst.removeGroup(group);
-	    }
-	    removeGroupActions(group, ...args) {
-	        args.unshift(group);
-	        App.inst.removeGroupActions.apply(App.inst, args);
-	    }
-	    removeActionHandler(action, method, group) {
-	        App.inst.removeActionHandler(action, method, group);
-	    }
-	    removeFunction(groupObj, action, method) {
-	        App.inst.removeFunction(groupObj, action, method);
-	    }
-	    removeTargetAll(caller) {
-	        App.inst.removeTargetAll(caller);
-	    }
-	    removeTarget(groupObj, caller) {
-	        App.inst.removeTarget(groupObj, caller);
-	    }
-	    sendAction(action, ...args) {
-	        args.unshift(action);
-	        App.inst.sendAction.apply(App.inst, args);
-	    }
-	    sendGroupAction(group, action, ...args) {
-	        args.unshift(action);
-	        args.unshift(group);
-	        App.inst.sendGroupAction.apply(App.inst, args);
-	    }
-	}
-	
-	tsCore.ActionEvent = ActionEvent
 	
 	class GSkeleton extends ESkeleton {
 	    constructor(aniMode = 0) {
@@ -5502,7 +5502,7 @@ function TimerLoop(interval, custom) {
 	
 	tsCore.EComboBox = EComboBox
 	
-	class ELabel extends mixinExt(ViewBlock, ActionEvent, GLabel) {
+	class ELabel extends mixinExt(ViewBlock, ActionEvent, fgui.GLabel) {
 	    onConstruct() {
 	        super.onConstruct();
 	        this.onInit();
@@ -8620,7 +8620,7 @@ function TimerLoop(interval, custom) {
 	
 	tsCore.NumButton = NumButton
 	
-	class ProgressBar extends mixinExt(ActionEvent, ViewBlock, GProgressBar) {
+	class ProgressBar extends mixinExt(ActionEvent, ViewBlock, fgui.GProgressBar) {
 	    tweenValue2(value, duration, complete) {
 	        let oldValule;
 	        let tweener = fgui.GTween.getTween(this, this.update);

@@ -111,8 +111,10 @@ function createNamespaceTransformer() {
                         // 括号类型: class UI extends (Pool) {}
                         ts.isParenthesizedTypeNode(parent) && parent.type === node ||
                         // 索引访问类型: class UI extends Lib['BaseClass'] {}
-                        ts.isIndexedAccessTypeNode(parent) && parent.objectType === node
-                    ) {
+                        ts.isIndexedAccessTypeNode(parent) && parent.objectType === node ||
+                        // 函数调用参数: mixinExt(Pool, OtherClass)
+                        ts.isCallExpression(parent) && parent.arguments.includes(node)
+                ) {
                         const fullName = namespaceMap.get(node.text);
                         return createQualifiedNameExpression(fullName);
                     }
@@ -601,7 +603,10 @@ function buildLibrary(config, done) {
                 done()
             }))
     }
-    gulp.parallel(jsStream, dtsStream)(done)
+    gulp.parallel(
+        jsStream,
+        dtsStream
+    )(done)
 }
 
 /**

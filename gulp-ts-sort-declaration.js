@@ -352,11 +352,36 @@ function analyzeInheritance(sourceFile, allFiles) {
             node.heritageClauses.forEach(clause => {
                 if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
                     clause.types.forEach(type => {
-                        if (ts.isExpressionWithTypeArguments(type) && ts.isIdentifier(type.expression)) {
-                            const className = type.expression.text;
-                            // 尝试从导入中解析完整路径
-                            if (map.has(className)) {
-                                inheritance.push(map.get(className));
+                        if (ts.isExpressionWithTypeArguments(type)) {
+                            // 处理标准继承: class A extends B
+                            if (ts.isIdentifier(type.expression)) {
+                                const className = type.expression.text;
+                                // 尝试从导入中解析完整路径
+                                if (map.has(className)) {
+                                    inheritance.push(map.get(className));
+                                }
+                            }
+                            // 处理 mixin 模式: class A extends mixin(B, C)
+                            else if (ts.isCallExpression(type.expression)) {
+                                const callExpr = type.expression;
+                                // 获取函数名，例如 mixinExt
+                                if (ts.isIdentifier(callExpr.expression)) {
+                                    const functionName = callExpr.expression.text;
+                                    // 如果 mixin 函数本身也在导入中，则添加为依赖
+                                    if (map.has(functionName)) {
+                                        inheritance.push(map.get(functionName));
+                                    }
+                                }
+
+                                // 处理函数参数中的类名
+                                callExpr.arguments.forEach(arg => {
+                                    if (ts.isIdentifier(arg)) {
+                                        const className = arg.text;
+                                        if (map.has(className)) {
+                                            inheritance.push(map.get(className));
+                                        }
+                                    }
+                                });
                             }
                         }
                     });
@@ -370,6 +395,5 @@ function analyzeInheritance(sourceFile, allFiles) {
     visit(sourceFile);
     return inheritance;
 }
-
 
 module.exports = create

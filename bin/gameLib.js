@@ -7059,7 +7059,7 @@ function _FguiBindView(classTarget, url) {
 	/**
 	 * 具有贝塞尔曲线运动的loader
 	 */
-	class GoldLoader extends mixinExt(BezierCurves, GLoader) {
+	class GoldLoader extends mixinExt(tsCore.BezierCurves, fgui.GLoader) {
 	    /**
 	     * 从对象池获取一个 GoldLoader
 	     */
