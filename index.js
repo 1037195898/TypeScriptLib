@@ -137,7 +137,31 @@ function createNamespaceTransformer() {
                         // 对象字面量属性值: { prop: Pool }
                         (ts.isPropertyAssignment(parent) && parent.initializer === node) ||
                         // 数组字面量元素: [Pool, OtherClass]
-                        (ts.isArrayLiteralExpression(parent) && parent.elements.includes(node))
+                        (ts.isArrayLiteralExpression(parent) && parent.elements.includes(node)) ||
+                        // 元素访问表达式: Pool["property"] 或 Pool[variable]
+                        (ts.isElementAccessExpression(parent) && parent.expression === node) ||
+                        // 一元表达式: !Pool, +Pool, -Pool, ~Pool, ++Pool, --Pool
+                        (ts.isPrefixUnaryExpression(parent) && parent.operand === node) ||
+                        (ts.isPostfixUnaryExpression(parent) && parent.operand === node) ||
+                        // 逻辑表达式: Pool && other, Pool || other
+                        (ts.isBinaryExpression(parent) &&
+                            (parent.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken ||
+                                parent.operatorToken.kind === ts.SyntaxKind.BarBarToken) &&
+                            (parent.left === node || parent.right === node)) ||
+                        // Await表达式: await Pool
+                        (ts.isAwaitExpression(parent) && parent.expression === node) ||
+                        // Yield表达式: yield Pool
+                        (ts.isYieldExpression(parent) && parent.expression === node) ||
+                        // Spread表达式: ...Pool
+                        (ts.isSpreadElement(parent) && parent.expression === node) ||
+                        // Void表达式: void Pool
+                        (ts.isVoidExpression(parent) && parent.expression === node) ||
+                        // Delete表达式: delete Pool (虽然不常见，但语法上可能)
+                        (ts.isDeleteExpression(parent) && parent.expression === node) ||
+                        // in 表达式: prop in Pool
+                        (ts.isBinaryExpression(parent) &&
+                            parent.operatorToken.kind === ts.SyntaxKind.InKeyword &&
+                            parent.right === node)
                     ) {
                         const fullName = namespaceMap.get(node.text);
                         return createQualifiedNameExpression(fullName);

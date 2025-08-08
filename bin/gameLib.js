@@ -4981,7 +4981,7 @@ function _FguiBindView(classTarget, url) {
 	        if (tsCore.ELoader.checkBaseUrl)
 	            Laya.URL.basePath = tsCore.ELoader.checkBaseUrl()[0];
 	        AppManager.onProfileSignOff();
-	        Templet["TEMPLET_DICTIONARY"] = {};
+	        Laya.Templet["TEMPLET_DICTIONARY"] = {};
 	        this.removeGroup(tsCore.App.GAME_GROUP);
 	    }
 	    /**

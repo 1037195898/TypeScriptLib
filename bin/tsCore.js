@@ -2554,10 +2554,10 @@ function TimerLoop(interval, custom) {
 	     * @param [coverBefore=false] 地址相同，是否覆盖正在播放的音乐
 	     */
 	    static playMusic(url, loops = 0, complete, volume = -1, startTime = 0, coverBefore = false) {
-	        if (SoundManager["_bgMusic"] == Laya.URL.formatURL(url) && SoundManager["_musicChannel"] && !coverBefore) {
-	            if (SoundManager["_musicChannel"].isStopped) {
-	                SoundManager["_musicChannel"].resume();
-	                return SoundManager["_musicChannel"];
+	        if (Laya.SoundManager["_bgMusic"] == Laya.URL.formatURL(url) && Laya.SoundManager["_musicChannel"] && !coverBefore) {
+	            if (Laya.SoundManager["_musicChannel"].isStopped) {
+	                Laya.SoundManager["_musicChannel"].resume();
+	                return Laya.SoundManager["_musicChannel"];
 	            }
 	            return null;
 	        }
@@ -2589,7 +2589,7 @@ function TimerLoop(interval, custom) {
 	        return null;
 	    }
 	    static onPlayMusicEnd(complete) {
-	        SoundManager["_bgMusic"] = null;
+	        Laya.SoundManager["_bgMusic"] = null;
 	        complete === null || complete === void 0 ? void 0 : complete.run();
 	    }
 	    /**
@@ -3553,6 +3553,7 @@ function TimerLoop(interval, custom) {
 	     */
 	    _onLoaded(url) {
 	        var _a;
+	        var _b;
 	        if (url) {
 	            this._spineResPath = url;
 	        }
@@ -3561,9 +3562,9 @@ function TimerLoop(interval, custom) {
 	            this._spineResPath = this._aniPath = null;
 	            return;
 	        }
-	        (_a = Templet["TEMPLET_DICTIONARY"]) !== null && _a !== void 0 ? _a : (Templet["TEMPLET_DICTIONARY"] = {});
+	        (_a = (_b = Laya.Templet)["TEMPLET_DICTIONARY"]) !== null && _a !== void 0 ? _a : (_b["TEMPLET_DICTIONARY"] = {});
 	        let tFactory;
-	        tFactory = Templet["TEMPLET_DICTIONARY"][this._aniPath + this.cacheName];
+	        tFactory = Laya.Templet["TEMPLET_DICTIONARY"][this._aniPath + this.cacheName];
 	        if (tFactory) {
 	            if (tFactory.isParseFail) {
 	                this._parseFail();
@@ -3581,7 +3582,7 @@ function TimerLoop(interval, custom) {
 	        else {
 	            tFactory = new Laya.Templet();
 	            tFactory._setCreateURL(this._aniPath);
-	            Templet["TEMPLET_DICTIONARY"][this._aniPath + this.cacheName] = tFactory;
+	            Laya.Templet["TEMPLET_DICTIONARY"][this._aniPath + this.cacheName] = tFactory;
 	            tFactory.on(Laya.Event.COMPLETE, this, this._parseComplete);
 	            tFactory.on(Laya.Event.ERROR, this, this._parseFail);
 	            tFactory.isParserComplete = false;
@@ -3595,7 +3596,7 @@ function TimerLoop(interval, custom) {
 	        var _a;
 	        if (this.isDisposed)
 	            return;
-	        const tTemple = (_a = Templet["TEMPLET_DICTIONARY"]) === null || _a === void 0 ? void 0 : _a[this._aniPath + this.cacheName];
+	        const tTemple = (_a = Laya.Templet["TEMPLET_DICTIONARY"]) === null || _a === void 0 ? void 0 : _a[this._aniPath + this.cacheName];
 	        if (tTemple) {
 	            this.asSkeleton.init(tTemple, this._loadAniMode);
 	            // this.play(0, true)
@@ -3791,7 +3792,7 @@ function TimerLoop(interval, custom) {
 	        this.displayObject.offAll(type);
 	    }
 	    dispose() {
-	        const obj = Templet["TEMPLET_DICTIONARY"];
+	        const obj = Laya.Templet["TEMPLET_DICTIONARY"];
 	        if (obj) {
 	            const tTemple = obj[this._aniPath + this.cacheName];
 	            if (tTemple)
@@ -3839,7 +3840,7 @@ function TimerLoop(interval, custom) {
 	    }
 	    static create() {
 	        // 这里处理缓存动画
-	        let rs = GraphicsAni["_caches"].pop();
+	        let rs = Laya.GraphicsAni["_caches"].pop();
 	        return rs || new GGraphicsAni();
 	    }
 	    drawTexture(texture, x, y, width, height, matrix, alpha, color, blendMode, uv) {
