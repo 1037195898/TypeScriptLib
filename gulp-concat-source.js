@@ -99,11 +99,16 @@ module.exports = function (file, opt) {
             }
         } else {
             if (namespace) {
-                const results = content.matchAll(/export\s+(class|interface|enum|abstract|var)\s+(\w+)(?=\s|\{|;)/g)
+                let results = content.matchAll(/export\s+(class|interface|enum|abstract|var)\s+(\w+)(?=\s|\{|;)/g)
                 results.forEach(result => {
                     content += `\n${namespace}.${result[2]} = ${result[2]}\n`
                 })
+                results = content.matchAll(/export\s*\{\s*(\w+)\s*}\s*(;?)/g)
+                results.forEach(result => {
+                    content += `\n${namespace}.${result[1]} = ${result[1]}\n`
+                })
             }
+            content = content.replace(/export\s*\{\s*\w*\s*}\s*(;?)/g, "")
             content = content.replace(/export\s*/g, "")
         }
 

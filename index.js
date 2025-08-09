@@ -276,12 +276,13 @@ function createNamespaceTransformer() {
  * @returns {ts.TransformerFactory<ts.SourceFile>} 返回一个接收转换上下文 context 的函数，该函数返回实际的 AST 转换函数。
  */
 function addMetadata() {
-    const decoratorName = ["Component", "FguiBindView", "AppMain"]
-    const printer = ts.createPrinter({
-        removeComments: false,
-        newLine: ts.NewLineKind.LineFeed
-    });
     return (context) => {
+        const decoratorName = ["Component", "FguiBindView", "AppMain"]
+        const printer = ts.createPrinter({
+            removeComments: false,
+            newLine: ts.NewLineKind.LineFeed
+        });
+
         /**
          * 遍历 AST 节点的访问器函数。
          * 主要处理类声明节点，为其添加元数据装饰器并重新排序装饰器。
@@ -354,6 +355,10 @@ function addMetadata() {
 
             }
             return ts.visitEachChild(node, visitor, context)
+        }
+
+        function isNewNode(node) {
+            return !node.getSourceFile() || node.pos === -1 || node.end === -1 || (node.getFullStart() === 0 && node.getEnd() === 0)
         }
 
         function setParent(node, parent) {
