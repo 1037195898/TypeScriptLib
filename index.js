@@ -89,35 +89,46 @@ function createNamespaceTransformer() {
                         ts.isParameter(parent) && parent.type === node ||
                         // 返回值类型: function test(): Pool
                         ts.isFunctionDeclaration(parent) && parent.type === node ||
+                        // 返回值类型: method test(): Pool (类中的方法)
                         ts.isMethodDeclaration(parent) && parent.type === node ||
-                        // 新建实例: new Pool()
-                        ts.isNewExpression(parent) && parent.expression === node ||
-                        // 静态方法调用: Pool.method()
-                        ts.isPropertyAccessExpression(parent) && parent.expression === node ||
                         // 泛型约束: <T extends Pool>
                         ts.isTypeReferenceNode(parent) && parent.typeArguments?.includes(node) ||
                         // 类型断言: obj as Pool
                         ts.isAsExpression(parent) && parent.type === node ||
                         // 数组类型等: Pool[]
                         ts.isArrayTypeNode(parent) && parent.elementType === node ||
-                        // 类继承: class UI extends Pool {}
-                        ts.isHeritageClause(parent) && parent.types?.some(type => type.expression === node) ||
-                        // 类继承中的类型参数: class UI extends Pool {}
-                        ts.isExpressionWithTypeArguments(parent) && parent.expression === node ||
-                        // 交叉类型: class UI extends A & B {}
-                        ts.isIntersectionTypeNode(parent) && parent.types?.includes(node) ||
-                        // 联合类型: 虽然不常用于继承，但可能出现在类型定义中
-                        ts.isUnionTypeNode(parent) && parent.types?.includes(node) ||
-                        // 括号类型: class UI extends (Pool) {}
-                        ts.isParenthesizedTypeNode(parent) && parent.type === node ||
-                        // 索引访问类型: class UI extends Lib['BaseClass'] {}
-                        ts.isIndexedAccessTypeNode(parent) && parent.objectType === node ||
+                        // 联合类型: type MyType = A | Pool 虽然不常用于继承，但可能出现在类型定义中
+                        ts.isUnionTypeNode(parent) && parent.types?.includes(node)
+
+                    ) {
+                        const fullName = namespaceMap.get(node.text);
+                        const qualifiedName = createQualifiedNameEntityName(fullName);
+                        setParentRecursive(qualifiedName, parent);
+                        return qualifiedName;
+                    }
+
+                    // 其他表达式上下文使用 PropertyAccessExpression
+                    if (
+                        // 新建实例: new Pool()
+                        ts.isNewExpression(parent) && parent.expression === node ||
+                        // 静态方法调用: Pool.method()
+                        ts.isPropertyAccessExpression(parent) && parent.expression === node ||
                         // 函数调用参数: mixinExt(Pool, OtherClass)
                         ts.isCallExpression(parent) && parent.arguments.includes(node) ||
                         // 属性初始化器: static Pool = Pool
                         (ts.isPropertyDeclaration(parent) && parent.initializer === node) ||
                         // 变量赋值: let Pool = Pool
                         (ts.isVariableDeclaration(parent) && parent.initializer === node) ||
+                        // 类继承: class UI extends Pool {}
+                        ts.isHeritageClause(parent) && parent.types?.some(type => type.expression === node) ||
+                        // 类继承中的类型参数: class UI extends Pool {}
+                        ts.isExpressionWithTypeArguments(parent) && parent.expression === node ||
+                        // 交叉继承类型: class UI extends A & B {}
+                        ts.isIntersectionTypeNode(parent) && parent.types?.includes(node) ||
+                        // 括号类型: class UI extends (Pool) {}
+                        ts.isParenthesizedTypeNode(parent) && parent.type === node ||
+                        // 索引访问继承类型: class UI extends Lib['BaseClass'] {}
+                        ts.isIndexedAccessTypeNode(parent) && parent.objectType === node ||
                         // instanceof 表达式: t instanceof Pool
                         (ts.isBinaryExpression(parent) && parent.operatorToken.kind === ts.SyntaxKind.InstanceOfKeyword && parent.right === node) ||
                         // typeof 表达式: typeof Pool
@@ -164,24 +175,36 @@ function createNamespaceTransformer() {
                             parent.right === node)
                     ) {
                         const fullName = namespaceMap.get(node.text);
-                        return createQualifiedNameExpression(fullName);
+                        const qualifiedName = createQualifiedNameExpression(fullName);
+                        setParentRecursive(qualifiedName, parent);
+                        return qualifiedName;
                     }
                 }
 
                 // 处理类型引用节点，将简写的类型名替换为完整限定名
                 if (ts.isTypeReferenceNode(node) && ts.isIdentifier(node.typeName) && namespaceMap.has(node.typeName.text)) {
                     const fullName = namespaceMap.get(node.typeName.text);
-                    return ts.factory.createTypeReferenceNode(
-                        createQualifiedNameExpression(fullName),
+                    const qualifiedName = createQualifiedNameEntityName(fullName);
+                    const typeReferenceNode = ts.factory.createTypeReferenceNode(
+                        qualifiedName,
                         node.typeArguments
                     );
+                    setParentRecursive(typeReferenceNode, node.parent);
+                    if (node.typeArguments) {
+                        node.typeArguments.forEach(arg => setParentRecursive(arg, typeReferenceNode));
+                    }
+                    return typeReferenceNode;
                 }
 
                 return ts.visitEachChild(node, visitSecondPass, context);
             }
 
+
             // 应用第二次遍历，完成命名空间路径的替换
-            return ts.visitNode(sourceFile, visitSecondPass);
+            /** @type ts.SourceFile */
+            const newNode = ts.visitNode(sourceFile, visitSecondPass);
+            // newNode.text = ts.createPrinter().printFile(newNode)
+            return newNode
         };
 
         /**
@@ -192,6 +215,9 @@ function createNamespaceTransformer() {
          */
         function createQualifiedNameExpression(fullName) {
             const parts = fullName.split('.');
+            if (parts.length === 1) return ts.factory.createIdentifier(parts[0]);
+
+            // 默认使用 PropertyAccessExpression，因为它在大多数上下文中都有效
             let result = ts.factory.createIdentifier(parts[0]);
             for (let i = 1; i < parts.length; i++) {
                 result = ts.factory.createPropertyAccessExpression(
@@ -201,6 +227,43 @@ function createNamespaceTransformer() {
             }
             return result;
         }
+
+        /**
+         * 根据完整名称创建限定名实体名称（如 a.b.c），用于类型引用上下文。
+         *
+         * @param fullName 完整的命名空间路径字符串，以点号分隔
+         * @returns {ts.Identifier} 实体名称节点，表示该限定名
+         */
+        function createQualifiedNameEntityName(fullName) {
+            const parts = fullName.split('.');
+            if (parts.length === 1) return ts.factory.createIdentifier(parts[0]);
+
+            // 在类型上下文中使用 QualifiedName
+            let result = ts.factory.createIdentifier(parts[0]);
+            for (let i = 1; i < parts.length; i++) {
+                result = ts.factory.createQualifiedName(
+                    result,
+                    ts.factory.createIdentifier(parts[i])
+                );
+            }
+            return result;
+        }
+
+
+        /**
+         * 递归设置节点的 parent 属性
+         * @param node 要设置 parent 的节点
+         * @param parent 父节点
+         */
+        function setParentRecursive(node, parent) {
+            if (node) {
+                node.parent = parent;
+                ts.forEachChild(node, child => {
+                    setParentRecursive(child, node);
+                });
+            }
+        }
+
     };
 }
 
@@ -214,6 +277,10 @@ function createNamespaceTransformer() {
  */
 function addMetadata() {
     const decoratorName = ["Component", "FguiBindView", "AppMain"]
+    const printer = ts.createPrinter({
+        removeComments: false,
+        newLine: ts.NewLineKind.LineFeed
+    });
     return (context) => {
         /**
          * 遍历 AST 节点的访问器函数。
@@ -227,6 +294,8 @@ function addMetadata() {
             if (ts.isClassDeclaration(node)) {
                 const name = node.name.text
                 const decorators = ts.getDecorators(node)
+
+
                 // 查看装饰器中是否有目标装饰器之一
                 const hasTargetDecorator = decorators?.some(modifier => {
                     // 获取装饰器表达式
@@ -249,21 +318,29 @@ function addMetadata() {
                             ]
                         )
                     );
-                    // 重新排列装饰器，把 Component 放到最后
-                    let newModifiers = (node.modifiers || []).toSorted((a, b) => {
+                    setParent(metadataDecorator, node)
+                    const modifiers = (node.modifiers || [])
+                    modifiers.unshift(metadataDecorator)
+                    // 添加 metadata 装饰器到 modifiers 列表中
+                    const newModifiers = ts.canHaveDecorators(node) ? modifiers.toSorted((a, b) => {
                         if (a.kind === b.kind && a.kind === ts.SyntaxKind.Decorator) {
-                            const aName = getExpression(a.expression)
-                            const bName = getExpression(b.expression)
-                            if (aName.text === "Component") {
+                            const aName = isNewNode(a) ?
+                                printer.printNode(ts.EmitHint.Unspecified, a, a.getSourceFile()) :
+                                a.getText()
+                            const bName = isNewNode(b) ?
+                                printer.printNode(ts.EmitHint.Unspecified, b, b.getSourceFile()) :
+                                b.getText()
+                            if (aName.startsWith("@Reflect.metadata") && !bName.startsWith("@Reflect.metadata"))
                                 return 1
-                            } else if (bName.text === "Component") {
+                            if (!aName.startsWith("@Reflect.metadata") && bName.startsWith("@Reflect.metadata"))
                                 return -1
-                            }
+                            if (aName.startsWith("@Component") && !bName.startsWith("@Component"))
+                                return 1
+                            if (!aName.startsWith("@Component") && bName.startsWith("@Component"))
+                                return -1
                         }
                         return 0
-                    })
-                    // 添加 metadata 装饰器到 modifiers 列表中
-                    newModifiers = ts.canHaveDecorators(node) ? [...newModifiers, metadataDecorator] : [metadataDecorator];
+                    }) : [metadataDecorator];
                     // 返回修改后的类节点
                     return ts.factory.updateClassDeclaration(
                         node,
@@ -279,6 +356,25 @@ function addMetadata() {
             return ts.visitEachChild(node, visitor, context)
         }
 
+        function setParent(node, parent) {
+            node.parent = parent
+            ts.forEachChild(node, (child) => {
+                setParent(child, node)
+            })
+        }
+
+        /**
+         *
+         * @param {LeftHandSideExpression} exp
+         * @return IdentifierObject
+         */
+        function getExpression(exp) {
+            if (ts.isCallExpression(exp) && ts.isIdentifier(exp.expression)) {
+                return getExpression(exp.expression)
+            }
+            return exp
+        }
+
         /**
          * 实际执行 AST 转换的函数。
          * 接收源文件节点，使用 visitor 遍历并返回转换后的节点。
@@ -287,22 +383,12 @@ function addMetadata() {
          * @returns {ts.Node} 转换后的节点
          */
         return (sourceFile) => {
-            return ts.visitNode(sourceFile, visitor)
+            /** @type ts.SourceFile */
+            const newNode = ts.visitNode(sourceFile, visitor);
+            // newNode.text = ts.createPrinter().printFile(newNode)
+            return newNode
         }
     }
-}
-
-
-/**
- *
- * @param {LeftHandSideExpression} exp
- * @return IdentifierObject
- */
-function getExpression(exp) {
-    if (ts.isCallExpression(exp) && ts.isIdentifier(exp.expression)) {
-        return getExpression(exp.expression)
-    }
-    return exp
 }
 
 /**
@@ -619,7 +705,7 @@ function createCompileStream(globs, opt) {
 /**
  * @typedef GlobsConfig
  * @property {string|string[]} globs - 文件匹配模式，可以是字符串或字符串数组
- * @property {SrcOptions} opt - gulp.src的选项配置对象
+ * @property {SrcOptions} [opt] - gulp.src的选项配置对象
  */
 
 /**

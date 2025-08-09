@@ -23,7 +23,8 @@
     "emitDecoratorMetadata": true, //  输出针对装饰器的额外元数据。
     "types": [
       "LayaAir",
-      "fairygui"
+      "fairygui",
+      "reflect"
     ],
     "typeRoots": [
       "./libs"
@@ -38,6 +39,7 @@
     "dist",
     "bin",
     "GameLib",
-    "TSCore"
+    "TSCore",
+    "game-lib"
   ]
 }
