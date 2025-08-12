@@ -61,35 +61,55 @@ webp.cwebp('temp/img/a.jpg', 'temp/img/a.jpg.webp', '-q 60')
 ```
 
 
-### 使用 GenerateModule ###
+### 使用 Gulp 生成 ###
 ```js
 
 const gulp = require("gulp")
-const merge = require('merge2')
-const pack = require("game-lib")
-
-pack.tsProject = 'tsconfig.json'
-pack.beforeTs = []
-pack.libs = ["../node_modules/game-lib/**/*.d.ts", "src/**/*.d.ts"]
-pack.namespace = "game"
-pack.project = "common"
-pack.saveTempPath = "dist"
-pack.saveTempTs = "code.ts"
+const {buildLibrary, clean} = require("game-lib")
 
 gulp.task("clean", () => {
-    return pack.clean(["dist"])
+    return clean(["dist"])
 })
 
-gulp.task("createTs", () => pack.createTS(["src/**/*.ts", "!src/**/*.d.ts"]))
-gulp.task("createJs", () => merge(pack.createJs(), pack.createDTs()))
+function buildLib(done) {
+    buildLibrary({
+        src: {
+            globs: ["src/**/*.ts"],
+        },
+        outName: project,
+        dist: "./bin",
+        namespace: project,
+        js: {isMinify: true},
+        dts: {
+            globalDtsFile: ["./src/define.d.ts", "./src/entity.d.ts"]
+        }
+    }, function () {
+        done()
+    })
+}
+gulp.task('build', gulp.series("clean", buildLib))
 
-gulp.task('build', gulp.series("createTs", "createJs", () => {
-    return merge(
-        gulp.src(["dist/common.d.ts"]).pipe(gulp.dest("../libs")),
-        gulp.src(["dist/common.min.js"]).pipe(gulp.dest("../html-template"))
-            .pipe(gulp.dest('../bin/')).pipe(pack.print(files => "完成"))
-    )
-}))
+```
+
+
+### 使用 rollup 生成 ###
+```js
+
+const gulp = require("gulp")
+const {rollupPack, clean} = require("game-lib")
+
+gulp.task("clean", () => {
+    return clean(["dist"])
+})
+
+function buildLib(done) {
+    rollupPack("src/com/Main.ts", "main.min.js", {
+        outDir: "./dest",
+        minify: true
+    })
+}
+gulp.task('build', gulp.series("clean", buildLib))
 
 
 ```
+
