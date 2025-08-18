@@ -35,5 +35,9 @@
     "types.js",
     "monkey-path.js",
     "rollup-rename-plugin.js"
-  ]
+  ],
+  "peerDependencies": {
+    "gulp": "5.0.1",
+    "adm-zip": "^0.5.16"
+  }
 }

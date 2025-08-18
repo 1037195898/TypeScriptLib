@@ -90,10 +90,17 @@ function CallDelayByFrame(num: number) {
 }
 
 
+/**
+ * 设置应用程序的主类
+ *
+ * @param value - 一个构造函数类型，用于创建实现IRunApplication接口的应用实例
+ *                该构造函数可以接受任意数量和类型的参数
+ */
 function AppMain(value: { new(...args: any[]): IRunApplication }) {
     // @ts-ignore
     tsCore.App.appMainClass = value
 }
+
 
 /**
  * 组件装饰器函数，用于创建和配置组件类

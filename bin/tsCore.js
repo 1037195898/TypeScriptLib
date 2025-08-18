@@ -733,6 +733,12 @@ function CallDelayByFrame(num) {
         return descriptor;
     };
 }
+/**
+ * 设置应用程序的主类
+ *
+ * @param value - 一个构造函数类型，用于创建实现IRunApplication接口的应用实例
+ *                该构造函数可以接受任意数量和类型的参数
+ */
 function AppMain(value) {
     // @ts-ignore
     tsCore.App.appMainClass = value;
@@ -1243,9 +1249,23 @@ function Fgui(name) {
 }
 /**
  * @internal
+ * 递归查找FGUI组件的子对象
+ * @param target - 要查找的目标FGUI组件
+ * @param childs - 子对象名称数组，按层级顺序排列
+ * @returns GObject - 返回找到的最深层子对象，如果查找失败则返回null
+ *
+ * @example
+ * // 假设有一个FGUI组件结构: panel > container > button
+ * const panel = fgui.UIPackage.createObject("package", "panel") as fgui.GComponent;
+ * const button = fguiFindChild(panel, ["container", "button"]);
+ * if (button) {
+ *     // 找到了button对象，可以进行操作
+ *     button.onClick(() => console.log("Button clicked"));
+ * }
  */
 function fguiFindChild(target, childs) {
     let obj;
+    // 遍历子对象名称数组，逐层查找子对象
     for (const child of childs) {
         if (target instanceof fgui.GComponent) {
             obj = target.getChild(child);
@@ -1257,6 +1277,31 @@ function fguiFindChild(target, childs) {
     }
     return obj;
 }
+/**
+ * 定时循环执行装饰器
+ * 用于装饰类方法，使其按照指定间隔循环执行
+ * @param interval - 执行间隔时间(毫秒)
+ * @param custom - 自定义条件函数，返回true时继续执行，false时停止执行
+ * @returns function - 装饰器函数
+ *
+ * ```
+ * class GameLoop {
+ *     private isRunning = true;
+ *
+ *     // 每1000毫秒执行一次update方法
+ *     @TimerLoop(1000)
+ *     update() {
+ *         console.log("Game update");
+ *     }
+ *
+ *     // 每500毫秒执行一次，当isRunning为true时才执行
+ *     @TimerLoop(500, () => this.isRunning)
+ *     render() {
+ *         console.log("Game render");
+ *     }
+ * }
+ * ```
+ */
 function TimerLoop(interval, custom) {
     return function (targetProperty, propertyKey, descriptor) {
         // @ts-ignore
