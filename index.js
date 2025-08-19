@@ -418,6 +418,7 @@ function ifelse(condition, plugins) {
 
         // 如果条件为真且提供了插件数组，则执行这些插件
         if (result && Array.isArray(plugins) && plugins.length > 0) {
+            const resultFile = []
             // 创建初始流
             let stream = through2({objectMode: true});
             stream.myName = "stream name"
@@ -442,7 +443,7 @@ function ifelse(condition, plugins) {
 
             // 监听管道的结果
             pipeline.on('data', (resultChunk) => {
-                safeCallback(null, resultChunk);
+                resultFile.push(resultChunk)
             });
 
             pipeline.on('error', (err) => {
@@ -451,9 +452,10 @@ function ifelse(condition, plugins) {
 
             // 监听结束事件，确保即使没有数据也完成回调
             pipeline.on('end', () => {
-                safeCallback(null, chunk);
+                resultFile.forEach(value => {
+                    safeCallback(null, value)
+                })
             });
-
             // 写入数据并结束流以触发处理
             stream.write(chunk);
             stream.end();
@@ -745,7 +747,7 @@ function buildLibrary(config, done) {
                 done()
             }))
     }
-    gulp.series(
+    gulp.parallel(
         jsStream,
         dtsStream
     )(done)
