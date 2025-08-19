@@ -99,7 +99,27 @@ function createNamespaceTransformer() {
                         // 数组类型等: Pool[]
                         ts.isArrayTypeNode(parent) && parent.elementType === node ||
                         // 联合类型: type MyType = A | Pool 虽然不常用于继承，但可能出现在类型定义中
-                        ts.isUnionTypeNode(parent) && parent.types?.includes(node)
+                        ts.isUnionTypeNode(parent) && parent.types?.includes(node) ||
+                        // 元组类型: let a: [Pool, OtherType]
+                        ts.isTupleTypeNode(parent) && parent.elements?.includes(node) ||
+                        // 条件类型: type A = Pool extends infer P ? P : never
+                        (ts.isConditionalTypeNode(parent) &&
+                            (parent.checkType === node || parent.extendsType === node)) ||
+                        // 映射类型: type A = { [K in Pool]: OtherType }
+                        (ts.isMappedTypeNode(parent) && parent.typeParameter?.constraint === node) ||
+                        // 索引签名: { [key: Pool]: OtherType }
+                        (ts.isIndexSignatureDeclaration(parent) && parent.parameters?.[0]?.type === node) ||
+                        // 模板字面量类型: type A = `Hello ${Pool}`
+                        (ts.isTemplateLiteralTypeNode(parent) && parent.types?.some(type => type === node)) ||
+                        // 函数参数默认值中的类型: function test(skeleton: {new(): Pool} = PoolImpl)
+                        (ts.isParameter(parent) && parent.type && ts.isTypeLiteralNode(parent.type) &&
+                            parent.type.members?.some(member =>
+                                ts.isConstructSignatureDeclaration(member) &&
+                                member.type === node)) ||
+                        // 构造签名返回类型: { new(): Pool }
+                        (ts.isConstructSignatureDeclaration(parent) && parent.type === node) ||
+                        // 函数参数默认值: function test(a = Pool)
+                        (ts.isParameter(parent) && parent.initializer === node)
 
                     ) {
                         const fullName = namespaceMap.get(node.text);
@@ -132,7 +152,7 @@ function createNamespaceTransformer() {
                         ts.isIndexedAccessTypeNode(parent) && parent.objectType === node ||
                         // instanceof 表达式: t instanceof Pool
                         (ts.isBinaryExpression(parent) && parent.operatorToken.kind === ts.SyntaxKind.InstanceOfKeyword && parent.right === node) ||
-                        // typeof 表达式: typeof Pool
+                        // typeof 表达式: if (typeof obj === "object")
                         (ts.isTypeOfExpression(parent) && parent.expression === node) ||
                         // 等于比较表达式: value == Pool 或 value === Pool
                         (ts.isBinaryExpression(parent) &&
@@ -173,7 +193,14 @@ function createNamespaceTransformer() {
                         // in 表达式: prop in Pool
                         (ts.isBinaryExpression(parent) &&
                             parent.operatorToken.kind === ts.SyntaxKind.InKeyword &&
-                            parent.right === node)
+                            parent.right === node) ||
+                        // 非空断言: Pool!
+                        (ts.isNonNullExpression(parent) && parent.expression === node) ||
+                        // 可选链: Pool?.method()
+                        (ts.isPropertyAccessExpression(parent) && parent.expression === node && parent.questionDotToken) ||
+                        // 装饰器参数: @Decorator(Pool)
+                        (ts.isDecorator(parent) && parent.expression.arguments?.includes(node))
+
                     ) {
                         const fullName = namespaceMap.get(node.text);
                         const qualifiedName = createQualifiedNameExpression(fullName);
