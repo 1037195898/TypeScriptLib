@@ -1,4 +1,4 @@
-export const enum LibStr {
+export enum LibStr {
 
     /** 等待处理 */
     WAITING = 1000,

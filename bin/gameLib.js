@@ -926,6 +926,148 @@ function _FguiBindView(classTarget, url) {
 	
 	gameLib.AppManager = AppManager
 	
+	var LibStr;
+	(function (LibStr) {
+	    /** 等待处理 */
+	    LibStr[LibStr["WAITING"] = 1000] = "WAITING";
+	    /** 进入游戏中 */
+	    LibStr[LibStr["LOADING"] = 1001] = "LOADING";
+	    /** 游戏暂停中 */
+	    LibStr[LibStr["GAME_OFF"] = 1002] = "GAME_OFF";
+	    /** 投注金币大于最大值 */
+	    LibStr[LibStr["ANTE_MAX_MONEY"] = 1003] = "ANTE_MAX_MONEY";
+	    /** 还需XX秒才可以再次发言 */
+	    LibStr[LibStr["SEND_CHAT_TIMER_ERROR"] = 1004] = "SEND_CHAT_TIMER_ERROR";
+	    /** 网络访问失败，请检查网络 */
+	    LibStr[LibStr["NET_ERROR"] = 1005] = "NET_ERROR";
+	    /** 当前不可投注 */
+	    LibStr[LibStr["CANNOT_BET"] = 1006] = "CANNOT_BET";
+	    /** 未登陆，请先登陆 */
+	    LibStr[LibStr["FIRST_LOG"] = 1007] = "FIRST_LOG";
+	    /** 中奖结果正在计算中 */
+	    LibStr[LibStr["WINING_RESULTS"] = 1008] = "WINING_RESULTS";
+	    /** 游戏错误 退出游戏 */
+	    LibStr[LibStr["GAME_ERROR"] = 1009] = "GAME_ERROR";
+	    /** 押注失败 */
+	    LibStr[LibStr["BET_FAIL"] = 1010] = "BET_FAIL";
+	    /** 获取游戏开奖超时 */
+	    LibStr[LibStr["GET_GAME_RESULTS_TIME_OUT"] = 1011] = "GET_GAME_RESULTS_TIME_OUT";
+	    /** 你离开游戏太久了，将你剔除游戏 */
+	    LibStr[LibStr["SYSTEM_BACK_LOBBY"] = 1012] = "SYSTEM_BACK_LOBBY";
+	    /** demo 游戏币无法提现  提示 */
+	    LibStr[LibStr["PROMPT_GUEST"] = 1013] = "PROMPT_GUEST";
+	    /** 当前版本过低 */
+	    LibStr[LibStr["APP_VERSION_TOO_LOW"] = 1014] = "APP_VERSION_TOO_LOW";
+	    /** 提示玩家玩真钱场 */
+	    LibStr[LibStr["SHOW_INVITE_REAL_MONEY"] = 1015] = "SHOW_INVITE_REAL_MONEY";
+	    /** 提示玩家没有满足使用优惠券的需要 */
+	    LibStr[LibStr["REQUIREMENT_STAKE"] = 1016] = "REQUIREMENT_STAKE";
+	    /** 未找到游戏 */
+	    LibStr[LibStr["GAME_NOT_FOUND"] = 1017] = "GAME_NOT_FOUND";
+	    /** 充值成功提示语 */
+	    LibStr[LibStr["RECHARGE_SUCCESS"] = 1018] = "RECHARGE_SUCCESS";
+	    /** 需要押注的最大钱 */
+	    LibStr[LibStr["NEED_BET_BONUS"] = 1019] = "NEED_BET_BONUS";
+	    /** 错误 */
+	    LibStr[LibStr["ERR"] = 1020] = "ERR";
+	    /** 钱不够了 快充值 */
+	    LibStr[LibStr["RECHARGE"] = 1021] = "RECHARGE";
+	    /** 余额不足 */
+	    LibStr[LibStr["INSUFFICIENT"] = 1022] = "INSUFFICIENT";
+	    /** 登录 */
+	    LibStr[LibStr["LOGIN"] = 1023] = "LOGIN";
+	    /** 踢出游戏 */
+	    LibStr[LibStr["OUT_GAME"] = 1024] = "OUT_GAME";
+	    /** 提示玩法 */
+	    LibStr[LibStr["TIPS_FOR_PLAYING"] = 1025] = "TIPS_FOR_PLAYING";
+	    /** 赢钱数 */
+	    LibStr[LibStr["WON_MONEY"] = 1026] = "WON_MONEY";
+	    /** coins 赢钱数 */
+	    LibStr[LibStr["WON_COINS"] = 1027] = "WON_COINS";
+	    /** 输钱了 */
+	    LibStr[LibStr["LOST"] = 1028] = "LOST";
+	    /** 硬币不足 */
+	    LibStr[LibStr["INSUFFICIENT_COINS"] = 1029] = "INSUFFICIENT_COINS";
+	    /** 输入 PIN 继续充值 */
+	    LibStr[LibStr["ENTER_PIN_CONTINUE"] = 1030] = "ENTER_PIN_CONTINUE";
+	    /** 下载app提示 */
+	    LibStr[LibStr["DOWNLOAD_MSG"] = 1031] = "DOWNLOAD_MSG";
+	    /** 礼包不可用 */
+	    LibStr[LibStr["GIFT_NOT_AVAILABLE"] = 1032] = "GIFT_NOT_AVAILABLE";
+	    /** 提供可用礼包 */
+	    LibStr[LibStr["CASH_GIFTS_AVAILABLE"] = 1033] = "CASH_GIFTS_AVAILABLE";
+	    /** 退出app */
+	    LibStr[LibStr["EXIT_APP"] = 1034] = "EXIT_APP";
+	    /** 存款玩游戏 */
+	    LibStr[LibStr["DEPOSIT_PLAY"] = 1035] = "DEPOSIT_PLAY";
+	    /** 登录玩游戏 */
+	    LibStr[LibStr["LOGIN_PLAY"] = 1036] = "LOGIN_PLAY";
+	    /** 当前投注额 */
+	    LibStr[LibStr["CURRENT_BET_AMOUNT"] = 1037] = "CURRENT_BET_AMOUNT";
+	    /** gift投注提示 */
+	    LibStr[LibStr["GIFT_BET_TIP"] = 1038] = "GIFT_BET_TIP";
+	    /** 中奖通告 */
+	    LibStr[LibStr["WIN_NOTICE"] = 1039] = "WIN_NOTICE";
+	    /** 当前没有可用gift */
+	    LibStr[LibStr["NOT_GIFT"] = 1040] = "NOT_GIFT";
+	    /** 正在使用的劵 */
+	    LibStr[LibStr["USE_IN_GIFT"] = 1041] = "USE_IN_GIFT";
+	    /** gift消费提示 */
+	    LibStr[LibStr["DEDUCT_TIP"] = 1042] = "DEDUCT_TIP";
+	    /** gift拒绝消费提示 */
+	    LibStr[LibStr["DEDUCT_REFUSE_TIP"] = 1043] = "DEDUCT_REFUSE_TIP";
+	    /** 赌注限制 */
+	    LibStr[LibStr["STAKES_RESTRICT"] = 1044] = "STAKES_RESTRICT";
+	    /** 赌注需求 */
+	    LibStr[LibStr["STAKES_NEEDS"] = 1045] = "STAKES_NEEDS";
+	    /** 获得更多礼包 */
+	    LibStr[LibStr["GET_MORE_GIFT"] = 1046] = "GET_MORE_GIFT";
+	    LibStr[LibStr["HOW_TO_PLAY"] = 1047] = "HOW_TO_PLAY";
+	    /** 点击按钮 */
+	    LibStr[LibStr["PRESS_BET_BUTTONS"] = 1048] = "PRESS_BET_BUTTONS";
+	    LibStr[LibStr["GIFT_HELP"] = 1049] = "GIFT_HELP";
+	    LibStr[LibStr["FREE_SPIN"] = 1050] = "FREE_SPIN";
+	    LibStr[LibStr["WILD_RESPIN"] = 1051] = "WILD_RESPIN";
+	    /** bonus 游戏 */
+	    LibStr[LibStr["BONUS_GAME"] = 1052] = "BONUS_GAME";
+	    /** 总赢 */
+	    LibStr[LibStr["TOTAL_WIN"] = 1053] = "TOTAL_WIN";
+	    /** 需要支付 */
+	    LibStr[LibStr["ABOUT_TO_PAY"] = 1054] = "ABOUT_TO_PAY";
+	    /** 欢迎提示 */
+	    LibStr[LibStr["WELCOME_TO_GAME"] = 1055] = "WELCOME_TO_GAME";
+	    /** 赢的线 */
+	    LibStr[LibStr["WON_LINE"] = 1056] = "WON_LINE";
+	    /** 自动spin */
+	    LibStr[LibStr["AUTO_SPINS"] = 1057] = "AUTO_SPINS";
+	    /** 充值 */
+	    LibStr[LibStr["DEPOSIT"] = 1058] = "DEPOSIT";
+	    /** 提示切换余额会导致倍数归零 */
+	    LibStr[LibStr["CHANGE_BET_PROMPT"] = 1059] = "CHANGE_BET_PROMPT";
+	    /** 再来一次 */
+	    LibStr[LibStr["TRY_AGAIN"] = 1060] = "TRY_AGAIN";
+	    /** 货币单位 */
+	    LibStr[LibStr["UNIT"] = 1061] = "UNIT";
+	    /** 金币单位 */
+	    LibStr[LibStr["COINS"] = 1062] = "COINS";
+	    /** stop */
+	    LibStr[LibStr["STOP"] = 1063] = "STOP";
+	    /** Confirm Use */
+	    LibStr[LibStr["CONFIRM_USE"] = 1064] = "CONFIRM_USE";
+	    /** 继续 */
+	    LibStr[LibStr["CONTINUE"] = 1065] = "CONTINUE";
+	    /** OK */
+	    LibStr[LibStr["OK"] = 1066] = "OK";
+	    /** 取消 */
+	    LibStr[LibStr["CANCEL"] = 1067] = "CANCEL";
+	    /** 重发 */
+	    LibStr[LibStr["RESEND"] = 1068] = "RESEND";
+	    /** 赢钱展示 */
+	    LibStr[LibStr["WINS"] = 1069] = "WINS";
+	})(LibStr || (LibStr = {}));
+	
+	gameLib.LibStr = LibStr
+	
 	/** socket管理 */
 	class SocketManager extends tsCore.ESocket {
 	    constructor() {
@@ -1301,7 +1443,7 @@ function _FguiBindView(classTarget, url) {
 	            tsCore.ELoader.loader.clearUnLoaded();
 	            AnalyticsManager.sendGameAnalysis("loader_main_res_error");
 	            if (!Laya.Render.isConchApp)
-	                JSUtils.alert(getString(1005 /* LibStr.NET_ERROR */));
+	                JSUtils.alert(getString(LibStr.NET_ERROR));
 	            JSUtils.gameClose();
 	            AppManager.gameRestart();
 	        };
@@ -1347,7 +1489,7 @@ function _FguiBindView(classTarget, url) {
 	        function loadCommonErrorHandler() {
 	            tsCore.ELoader.loader.clearUnLoaded();
 	            if (!Laya.Render.isConchApp)
-	                JSUtils.alert(getString(1005 /* LibStr.NET_ERROR */));
+	                JSUtils.alert(getString(LibStr.NET_ERROR));
 	            JSUtils.gameClose();
 	            AppManager.gameRestart();
 	        }
@@ -1830,7 +1972,7 @@ function _FguiBindView(classTarget, url) {
 	        else {
 	            msg = this.gameData.noticeData[0];
 	        }
-	        this.richText.text = getString(1039 /* LibStr.WIN_NOTICE */, msg.mobile, msg.win, GameConfigKit.gameName());
+	        this.richText.text = getString(LibStr.WIN_NOTICE, msg.mobile, msg.win, GameConfigKit.gameName());
 	    }
 	    stopRun() {
 	        this.resetMsgPosition();
@@ -1909,7 +2051,7 @@ function _FguiBindView(classTarget, url) {
 	                case Cmd.SOCKET_TOP_UP_CHANGE:
 	                    Player.inst.money = obj.balance;
 	                    this.sendAction(ActionLib.GAME_UPDATE_MONEY);
-	                    PromptWindow.inst.showTip([1018 /* LibStr.RECHARGE_SUCCESS */,
+	                    PromptWindow.inst.showTip([LibStr.RECHARGE_SUCCESS,
 	                        Player.inst.getCurrencyUnit() + " " + obj.amount]);
 	                    break;
 	                default:
@@ -2233,17 +2375,17 @@ function _FguiBindView(classTarget, url) {
 	        }
 	        else {
 	            if (code == 0) {
-	                this.okBtn.text = getString(1066 /* LibStr.OK */);
+	                this.okBtn.text = getString(LibStr.OK);
 	            }
 	            else if (code == 1) {
-	                this.okBtn.text = getString(1068 /* LibStr.RESEND */);
+	                this.okBtn.text = getString(LibStr.RESEND);
 	            }
 	        }
 	        if (obj === null || obj === void 0 ? void 0 : obj.cancelName) {
 	            this.cancelBtn.text = obj.cancelName;
 	        }
 	        else {
-	            this.cancelBtn.text = getString(1067 /* LibStr.CANCEL */);
+	            this.cancelBtn.text = getString(LibStr.CANCEL);
 	        }
 	        this.message.text = content;
 	    }
@@ -2488,7 +2630,7 @@ function _FguiBindView(classTarget, url) {
 	    static getShowMessage(data) {
 	        var _a, _b;
 	        if (!data)
-	            return getString(1005 /* LibStr.NET_ERROR */);
+	            return getString(LibStr.NET_ERROR);
 	        if (((_a = data.message) === null || _a === void 0 ? void 0 : _a.length) > 0) {
 	            return data.message;
 	        }
@@ -2505,22 +2647,22 @@ function _FguiBindView(classTarget, url) {
 	        let content;
 	        switch (code) {
 	            case HttpCode.LOGIN_INVALIDITY: // 未登陆，请先登陆
-	                content = getString(1007 /* LibStr.FIRST_LOG */);
+	                content = getString(LibStr.FIRST_LOG);
 	                break;
 	            case HttpCode.GAME_INSUFFICIENT_BALANCE: // 资金不足
-	                content = getString(1021 /* LibStr.RECHARGE */);
+	                content = getString(LibStr.RECHARGE);
 	                break;
 	            case HttpCode.GAME_CANNOT_BET: // 当前游戏状态不属于投注状态
-	                content = getString(1006 /* LibStr.CANNOT_BET */);
+	                content = getString(LibStr.CANNOT_BET);
 	                break;
 	            case HttpCode.GAME_OFF: // 游戏暂停中
-	                content = getString(1002 /* LibStr.GAME_OFF */);
+	                content = getString(LibStr.GAME_OFF);
 	                break;
 	            case HttpCode.GAME_BET_FAIL: // 投注失败
-	                content = getString(1010 /* LibStr.BET_FAIL */);
+	                content = getString(LibStr.BET_FAIL);
 	                break;
 	            default:
-	                content = getString(1005 /* LibStr.NET_ERROR */) + ". code:" + code;
+	                content = getString(LibStr.NET_ERROR) + ". code:" + code;
 	                break;
 	        }
 	        return content;
@@ -2545,7 +2687,7 @@ function _FguiBindView(classTarget, url) {
 	                HtmlWindow.inst.hide();
 	                if (typeof msg === "object")
 	                    msg = this.getShowMessage(msg);
-	                msg = msg ? msg : getString(1007 /* LibStr.FIRST_LOG */);
+	                msg = msg ? msg : getString(LibStr.FIRST_LOG);
 	                if (fgui.UIPackage.getByName("gameCommon"))
 	                    WaitResult.inst.hide();
 	                HomePrompt.instance.showTip(0, msg, function () {
@@ -2563,7 +2705,7 @@ function _FguiBindView(classTarget, url) {
 	                    else {
 	                        SceneManager.inst.logout();
 	                    }
-	                }, null, { cancelName: getString(1066 /* LibStr.OK */) });
+	                }, null, { cancelName: getString(LibStr.OK) });
 	                return true;
 	            case HttpCode.GAME_PAUSE: // 游戏暂停中
 	                tsCore.Log.debug("StateCode.execute() 8003");
@@ -2572,14 +2714,14 @@ function _FguiBindView(classTarget, url) {
 	            default:
 	                if (typeof msg !== "string")
 	                    msg = StateCode.getShowMessage(msg);
-	                msg = msg ? msg : getString(1005 /* LibStr.NET_ERROR */);
+	                msg = msg ? msg : getString(LibStr.NET_ERROR);
 	                PromptWindow.inst.showTip(msg);
 	                return true;
 	        }
 	    }
 	    /** 游戏暂停中，返回大厅 */
 	    static showGameOff() {
-	        JSUtils.alert(getString(1002 /* LibStr.GAME_OFF */));
+	        JSUtils.alert(getString(LibStr.GAME_OFF));
 	        JSUtils.gameClose();
 	    }
 	}
@@ -2622,7 +2764,7 @@ function _FguiBindView(classTarget, url) {
 	     * @param headText 使用头文本
 	     */
 	    changeView(index = 0, headText) {
-	        headText !== null && headText !== void 0 ? headText : (headText = getString(1001 /* LibStr.LOADING */).split(".").join(""));
+	        headText !== null && headText !== void 0 ? headText : (headText = getString(LibStr.LOADING).split(".").join(""));
 	        this.headText = headText;
 	        this.controller.selectedIndex = index;
 	        this.mesText.text = "";
@@ -2849,10 +2991,10 @@ function _FguiBindView(classTarget, url) {
 	        Player.inst.gameId = CommonCmd.GAME_HOME;
 	        fgui.GRoot.inst.closeModalWait();
 	        LoadingWindow.inst.hide();
-	        JSUtils.alert(message ? message : getString(1002 /* LibStr.GAME_OFF */));
+	        JSUtils.alert(message ? message : getString(LibStr.GAME_OFF));
 	        JSUtils.gameClose();
 	        if (isTip)
-	            tsCore.MessageTip.showTip(message ? message : 1002 /* LibStr.GAME_OFF */);
+	            tsCore.MessageTip.showTip(message ? message : LibStr.GAME_OFF);
 	        this.sendAction(ActionLib.GAME_UPDATE_DEFAULT_SCREEN);
 	    }
 	    init(handler) {
@@ -2881,7 +3023,7 @@ function _FguiBindView(classTarget, url) {
 	        SocketManager.inst.connect(Player.inst.gameId, Player.inst.token, Player.inst.userId);
 	    }
 	    userDataErrorHandler(data) {
-	        this.enterFail(true, getString(1005 /* LibStr.NET_ERROR */));
+	        this.enterFail(true, getString(LibStr.NET_ERROR));
 	    }
 	    /** 用户数据 */
 	    userDataHandler(response) {
@@ -3059,7 +3201,7 @@ function _FguiBindView(classTarget, url) {
 	     */
 	    onSendBetError() {
 	        WaitResult.inst.hide();
-	        SceneManager.inst.gameErrorExit(1005 /* LibStr.NET_ERROR */);
+	        SceneManager.inst.gameErrorExit(LibStr.NET_ERROR);
 	    }
 	    // /**
 	    //  * 当请求不通过的时候  发出提示信息并重置bet
@@ -3109,7 +3251,7 @@ function _FguiBindView(classTarget, url) {
 	    showNotResult(data, closeGame = true) {
 	        let str = StateCode.getShowMessage(data);
 	        if (tsCore.StringUtil.isEmpty(str)) {
-	            str = getString(1005 /* LibStr.NET_ERROR */);
+	            str = getString(LibStr.NET_ERROR);
 	        }
 	        if (closeGame) {
 	            JSUtils.alert(str);
@@ -3656,7 +3798,7 @@ function _FguiBindView(classTarget, url) {
 	            msg = {
 	                msg: msg,
 	                callback: callback,
-	                obj: { cancelName: getString(1066 /* LibStr.OK */) },
+	                obj: { cancelName: getString(LibStr.OK) },
 	                isAction: isAction
 	            };
 	        this._show(msg);
@@ -3702,9 +3844,9 @@ function _FguiBindView(classTarget, url) {
 	        //     AnalyticsManager.sendGameAnalysis("NoBalance_Pop")
 	        // }
 	        let obj = data.obj;
-	        obj !== null && obj !== void 0 ? obj : (obj = { okName: getString(1065 /* LibStr.CONTINUE */), cancelName: getString(1067 /* LibStr.CANCEL */) });
-	        (_a = obj.okName) !== null && _a !== void 0 ? _a : (obj.okName = getString(1065 /* LibStr.CONTINUE */));
-	        (_b = obj.cancelName) !== null && _b !== void 0 ? _b : (obj.cancelName = getString(1067 /* LibStr.CANCEL */));
+	        obj !== null && obj !== void 0 ? obj : (obj = { okName: getString(LibStr.CONTINUE), cancelName: getString(LibStr.CANCEL) });
+	        (_a = obj.okName) !== null && _a !== void 0 ? _a : (obj.okName = getString(LibStr.CONTINUE));
+	        (_b = obj.cancelName) !== null && _b !== void 0 ? _b : (obj.cancelName = getString(LibStr.CANCEL));
 	        this.isAction = data.isAction || true;
 	        this.show();
 	        if (this.continueBtn)
@@ -3749,7 +3891,7 @@ function _FguiBindView(classTarget, url) {
 	    onInit() {
 	        super.onInit();
 	        this.touchable = false;
-	        this.text = getString(1033 /* LibStr.CASH_GIFTS_AVAILABLE */);
+	        this.text = getString(LibStr.CASH_GIFTS_AVAILABLE);
 	    }
 	    static createPromptTip() {
 	        return fgui.UIPackage.createObjectFromURL("//gameCommon/PromptTip", PromptTip);
@@ -3901,10 +4043,10 @@ function _FguiBindView(classTarget, url) {
 	    setCorner(value) {
 	        this.tempValue = value;
 	        if (value > 0) {
-	            this.contentText.text = getString(1041 /* LibStr.USE_IN_GIFT */, value);
+	            this.contentText.text = getString(LibStr.USE_IN_GIFT, value);
 	        }
 	        else {
-	            this.contentText.text = getString(1040 /* LibStr.NOT_GIFT */);
+	            this.contentText.text = getString(LibStr.NOT_GIFT);
 	        }
 	        if (this.isAutoHide)
 	            this.visible = value > 0;
@@ -4288,7 +4430,7 @@ function _FguiBindView(classTarget, url) {
 	            runFun(callback);
 	            return;
 	        }
-	        fgui.GRoot.inst.showModalWait(getString(1000 /* LibStr.WAITING */));
+	        fgui.GRoot.inst.showModalWait(getString(LibStr.WAITING));
 	        tsCore.HistoryManager.pauseHistory = true;
 	        // 同步用户金额
 	        PromptWindow.inst.clearCache();
@@ -4338,11 +4480,11 @@ function _FguiBindView(classTarget, url) {
 	                WaitResult.inst.hide();
 	                if (data.code == HttpCode.OK && data.data) {
 	                    if (data.data.balance == 0) {
-	                        obj.okName = getString(1035 /* LibStr.DEPOSIT_PLAY */);
+	                        obj.okName = getString(LibStr.DEPOSIT_PLAY);
 	                    }
 	                }
-	                PromptWindow.inst.showCancelTip(1015 /* LibStr.SHOW_INVITE_REAL_MONEY */, obj, handler, () => {
-	                    if (obj.okName == getString(1035 /* LibStr.DEPOSIT_PLAY */)) {
+	                PromptWindow.inst.showCancelTip(LibStr.SHOW_INVITE_REAL_MONEY, obj, handler, () => {
+	                    if (obj.okName == getString(LibStr.DEPOSIT_PLAY)) {
 	                        JSUtils.gameClose(1);
 	                        JSUtils.deposit();
 	                    }
@@ -4352,17 +4494,17 @@ function _FguiBindView(classTarget, url) {
 	                });
 	            }, () => {
 	                WaitResult.inst.hide();
-	                PromptWindow.inst.showCancelTip(1015 /* LibStr.SHOW_INVITE_REAL_MONEY */, obj, handler, () => {
+	                PromptWindow.inst.showCancelTip(LibStr.SHOW_INVITE_REAL_MONEY, obj, handler, () => {
 	                    JSUtils.gameClose(1);
 	                });
 	            });
 	            return;
 	        }
 	        else {
-	            obj.okName = getString(1036 /* LibStr.LOGIN_PLAY */);
+	            obj.okName = getString(LibStr.LOGIN_PLAY);
 	        }
-	        PromptWindow.inst.showCancelTip(1015 /* LibStr.SHOW_INVITE_REAL_MONEY */, obj, handler, () => {
-	            if (obj.okName == getString(1036 /* LibStr.LOGIN_PLAY */)) {
+	        PromptWindow.inst.showCancelTip(LibStr.SHOW_INVITE_REAL_MONEY, obj, handler, () => {
+	            if (obj.okName == getString(LibStr.LOGIN_PLAY)) {
 	                JSUtils.login();
 	            }
 	            else {
@@ -4435,7 +4577,7 @@ function _FguiBindView(classTarget, url) {
 	        // let value: string = LocalStorage.getItem(Player.inst.gameId + "_demo")
 	        // if (Player.inst.isGuest && !value) {
 	        if (Player.inst.isGuest && !Player.inst.urlParam.debug) {
-	            PromptWindow.inst.showTip({ msg: 1013 /* LibStr.PROMPT_GUEST */, obj: { cancelName: getString(1066 /* LibStr.OK */) }, callback: this.runEvent.bind(this) });
+	            PromptWindow.inst.showTip({ msg: LibStr.PROMPT_GUEST, obj: { cancelName: getString(LibStr.OK) }, callback: this.runEvent.bind(this) });
 	            // LocalStorage.setItem(Player.inst.gameId + "_demo", "1")
 	        }
 	        else {
@@ -4671,7 +4813,7 @@ function _FguiBindView(classTarget, url) {
 	        var _a, _b, _c, _d, _e;
 	        if (Player.inst.isGuest)
 	            return;
-	        fgui.GRoot.inst.showModalWait(getString(1000 /* LibStr.WAITING */));
+	        fgui.GRoot.inst.showModalWait(getString(LibStr.WAITING));
 	        if (Player.inst.gameId != CommonCmd.GAME_HOME && Player.inst.gameId != CommonCmd.GAME_SCRATCHER) {
 	            // 告诉当前游戏进来了
 	            (_b = (_a = SceneManager.inst.starter) === null || _a === void 0 ? void 0 : _a.gameModel) === null || _b === void 0 ? void 0 : _b.focusGame();
@@ -4680,7 +4822,7 @@ function _FguiBindView(classTarget, url) {
 	                (_d = (_c = SceneManager.inst.starter) === null || _c === void 0 ? void 0 : _c.gameServlet) === null || _d === void 0 ? void 0 : _d.checkGamePeriod((sc) => {
 	                    fgui.GRoot.inst.closeModalWait();
 	                    if (!sc) {
-	                        PromptWindow.inst.showTip(1012 /* LibStr.SYSTEM_BACK_LOBBY */, Laya.Handler.create(this, JSUtils.gameClose));
+	                        PromptWindow.inst.showTip(LibStr.SYSTEM_BACK_LOBBY, Laya.Handler.create(this, JSUtils.gameClose));
 	                    }
 	                });
 	            }
@@ -4716,7 +4858,7 @@ function _FguiBindView(classTarget, url) {
 	     * 显示登录提示窗口
 	     */
 	    showLoginTip() {
-	        PromptWindow.inst.showTip(1023 /* LibStr.LOGIN */, () => JSUtils.login());
+	        PromptWindow.inst.showTip(LibStr.LOGIN, () => JSUtils.login());
 	    }
 	    /**
 	     * 开启游戏 两个参数二选一  如果使用id第一个必须设置null
@@ -4739,7 +4881,7 @@ function _FguiBindView(classTarget, url) {
 	        if (!config || code <= 0) {
 	            tsCore.Log.error("config = " + config, "code = " + code);
 	            LoadingWindow.inst.hide();
-	            JSUtils.alert(getString(1017 /* LibStr.GAME_NOT_FOUND */));
+	            JSUtils.alert(getString(LibStr.GAME_NOT_FOUND));
 	            JSUtils.gameClose();
 	            return;
 	        }
@@ -4753,7 +4895,7 @@ function _FguiBindView(classTarget, url) {
 	        //			return
 	        //		}
 	        if (!Player.inst.urlParam.isJumpPage())
-	            fgui.GRoot.inst.showModalWait(getString(1000 /* LibStr.WAITING */));
+	            fgui.GRoot.inst.showModalWait(getString(LibStr.WAITING));
 	        Player.inst.gameId = code;
 	        this.runLoadResJs(() => this.loadGameJs(), content => this.loadGameResComplete(content));
 	    }
@@ -4820,7 +4962,7 @@ function _FguiBindView(classTarget, url) {
 	        // 已经加载的游戏代码
 	        if (!Player.inst.urlParam.isJumpPage())
 	            fgui.GRoot.inst.closeModalWait();
-	        LoadingWindow.inst.changeView(1, getString(1001 /* LibStr.LOADING */));
+	        LoadingWindow.inst.changeView(1, getString(LibStr.LOADING));
 	        AssetsLoader.inst.loadRes(obj, Laya.Handler.create(this, this.loadResComplete), Laya.Handler.create(this, this.loadResErrorHandler));
 	    }
 	    /**
@@ -4928,13 +5070,13 @@ function _FguiBindView(classTarget, url) {
 	        fgui.GRoot.inst.closeModalWait();
 	        if (Player.inst.urlParam.isJumpPage()) {
 	            if (!Laya.Render.isConchApp)
-	                JSUtils.alert(getString(1005 /* LibStr.NET_ERROR */));
+	                JSUtils.alert(getString(LibStr.NET_ERROR));
 	            JSUtils.gameClose();
 	            AppManager.gameRestart();
 	            Player.inst.gameId = CommonCmd.GAME_HOME;
 	            return;
 	        }
-	        PromptWindow.inst.showTip(1005 /* LibStr.NET_ERROR */, Laya.Handler.create(this, function () {
+	        PromptWindow.inst.showTip(LibStr.NET_ERROR, Laya.Handler.create(this, function () {
 	            LoadingWindow.inst.hide();
 	            JSUtils.gameClose();
 	            Player.inst.gameId = CommonCmd.GAME_HOME;
@@ -5038,9 +5180,9 @@ function _FguiBindView(classTarget, url) {
 	     * */
 	    gameGameTimeOutExit() {
 	        const promptData = {
-	            msg: 1011 /* LibStr.GET_GAME_RESULTS_TIME_OUT */,
+	            msg: LibStr.GET_GAME_RESULTS_TIME_OUT,
 	            obj: {
-	                cancelName: getString(1066 /* LibStr.OK */)
+	                cancelName: getString(LibStr.OK)
 	            },
 	            callback: () => {
 	                this.sendAction(ActionLib.GAME_RECONNECTION_NET, Laya.Handler.create(this, function () {
@@ -5056,11 +5198,11 @@ function _FguiBindView(classTarget, url) {
 	        PromptWindow.inst.showTip(promptData);
 	    }
 	    /** 游戏报错 退出游戏 */
-	    gameErrorExit(msg = 1009 /* LibStr.GAME_ERROR */) {
+	    gameErrorExit(msg = LibStr.GAME_ERROR) {
 	        const promptData = {
 	            msg: msg,
 	            obj: {
-	                cancelName: getString(1066 /* LibStr.OK */)
+	                cancelName: getString(LibStr.OK)
 	            },
 	            callback: () => {
 	                Laya.timer.callLater(this, function () {
@@ -5079,7 +5221,7 @@ function _FguiBindView(classTarget, url) {
 	     * @param callback
 	     */
 	    unexpectedExitGame(msg, callback) {
-	        msg !== null && msg !== void 0 ? msg : (msg = getString(1009 /* LibStr.GAME_ERROR */));
+	        msg !== null && msg !== void 0 ? msg : (msg = getString(LibStr.GAME_ERROR));
 	        const promptData = {
 	            msg: msg,
 	            continue: () => {
@@ -5183,7 +5325,7 @@ function _FguiBindView(classTarget, url) {
 	                    return;
 	                }
 	                AppRecordManager.exitTimer = timer;
-	                AppManager.toast(getString(1034 /* LibStr.EXIT_APP */));
+	                AppManager.toast(getString(LibStr.EXIT_APP));
 	            }
 	            else {
 	                SceneManager.inst.backHandler();
@@ -6702,7 +6844,7 @@ function _FguiBindView(classTarget, url) {
 	    }
 	    addedHandler() {
 	        if (!this.isInit) {
-	            fgui.GRoot.inst.showModalWait(getString(1001 /* LibStr.LOADING */));
+	            fgui.GRoot.inst.showModalWait(getString(LibStr.LOADING));
 	            tsCore.ELoader.loader.load(this.loadArray, Laya.Handler.create(this, this.resLoaderComplete), Laya.Handler.create(this, this.progressHandler));
 	        }
 	        else {
@@ -6710,7 +6852,7 @@ function _FguiBindView(classTarget, url) {
 	        }
 	    }
 	    progressHandler(data) {
-	        fgui.GRoot.inst.showModalWait(getString(1001 /* LibStr.LOADING */) + " " + Math.floor(data * 100) + "%");
+	        fgui.GRoot.inst.showModalWait(getString(LibStr.LOADING) + " " + Math.floor(data * 100) + "%");
 	    }
 	    loadErrorHandler() {
 	        tsCore.ELoader.loader.clearUnLoaded();
@@ -8976,7 +9118,7 @@ function _FguiBindView(classTarget, url) {
 	        this.messageText = this.getChild("n2").asTextField;
 	    }
 	    set text(value) {
-	        value !== null && value !== void 0 ? value : (value = getString(1001 /* LibStr.LOADING */));
+	        value !== null && value !== void 0 ? value : (value = getString(LibStr.LOADING));
 	        this.messageText.text = value;
 	    }
 	}

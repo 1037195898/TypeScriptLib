@@ -594,7 +594,7 @@ declare namespace gameLib {
 	    static callIOS(method: string, data?: any, printDebug?: boolean): boolean;
 	}
 	
-	export const enum LibStr {
+	export enum LibStr {
 	    /** 等待处理 */
 	    WAITING = 1000,
 	    /** 进入游戏中 */
