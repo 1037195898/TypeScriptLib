@@ -274,19 +274,3 @@ function randomFloat(minNum: number, maxNum: number, p = NaN) {
     if (!isNaN(p)) temp = parseFloat(temp.toFixed(p))
     return temp
 }
-
-function gaSend(hitType: HitType, data: EventType | ExceptionType | TimingType) {
-    ga("send", hitType, data)
-}
-
-function gaEvent(data: EventType) {
-    gaSend("event", data)
-}
-
-function gaException(data: ExceptionType) {
-    gaSend("exception", data)// 老姐我
-}
-
-function gaTiming(data: TimingType) {
-    gaSend("timing", data)
-}

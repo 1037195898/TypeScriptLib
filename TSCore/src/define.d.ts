@@ -71,7 +71,7 @@ declare module Laya {
         /**
          * 当前正在使用纹理的加载url
          */
-        loadResUrl?:string
+        loadResUrl?: string
     }
 
     interface Templet {
@@ -126,10 +126,12 @@ declare interface String {
      * 首字母强制小写
      */
     firstLowerCase(): string
+
     /**
      * 首字母强制大写
      */
     firstUpperCase(): string
+
     /**
      * 确定是否按指定字符串开始.满足一个返回 true
      * @param search
@@ -339,7 +341,7 @@ declare interface Array<T> {
      * @param {Function} type - 一个构造函数，用于判断数组元素是否是这个类型的实例。
      * @returns {Array} 返回一个新的数组，其中包含了原数组中所有是传入类型实例的元素。
      */
-    filterIsInstance<C>(type: { new(): C }) : Array<C>
+    filterIsInstance<C>(type: { new(): C }): Array<C>
 
     /**
      * 通过提供一个回调函数来定义移除元素的条件。
@@ -394,12 +396,25 @@ declare interface Map<K, V> {
      * @returns 返回键对应的值，如果键不存在则返回默认值
      */
     getOrDefault(key: K, defaultValue: V): V
+
     /**
      * 为Map对象定义一个getOrPut方法，用于获取指定键对应的值，如果键不存在，则调用默认值生成函数，将生成的值设置到该键，并返回该值。
      * @param key 指定的键
      * @param defaultValue 一个函数，当键不存在时调用以生成默认值
      * @returns 返回键对应的值，如果键不存在则调用默认值生成函数并返回新设置的值
      */
-    getOrPut(key: K, defaultValue: () => V) :V
+    getOrPut(key: K, defaultValue: () => V): V
 
+}
+
+declare interface Number {
+    /**
+     * 判断当前值是否在指定范围内
+     * @param min 最小值
+     * @param max 最大值
+     * @param [includeMin=false] 是否包含最小值
+     * @param [includeMax=false] 是否包含最大值
+     * @returns 如果在范围内返回 true，否则返回 false
+     */
+    inRange(min: number, max: number, includeMin?: boolean, includeMax?: boolean): boolean;
 }

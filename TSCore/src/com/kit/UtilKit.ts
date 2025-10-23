@@ -170,7 +170,10 @@ export class UtilKit {
         return array.filter((value, index, arr) => arr.indexOf(value) == index)
     }
 
-    /** aes加密 */
+    /**
+     * aes加密
+     * @deprecated
+     */
     static encrypt(word, key = "abcdefgabcdefg12") {
         let keyWordArray = CryptoJS.enc.Utf8.parse(key)
         let srcs = CryptoJS.enc.Utf8.parse(word)
@@ -181,7 +184,10 @@ export class UtilKit {
         return encrypted.toString()
     }
 
-    /** aes解密 */
+    /**
+     *  aes解密
+     *  @deprecated
+     */
     static decrypt(word, key = "abcdefgabcdefg12") {
         let keyWordArray = CryptoJS.enc.Utf8.parse(key)
         let decrypt = CryptoJS.AES.decrypt(word, keyWordArray, {
@@ -190,6 +196,52 @@ export class UtilKit {
         })
         return CryptoJS.enc.Utf8.stringify(decrypt).toString()
     }
+
+    /**
+     * 使用AES-GCM算法加密字符串，每次加密都应生成新的随机IV，不重复使用相同IV和密钥的组合
+     * @param word 需要加密的明文字符串
+     * @param key 用于加密的CryptoKey对象
+     * @returns {{ArrayBuffer, Uint8Array<ArrayBuffer>}} 包含密文和初始化向量的对象
+     */
+    static encryptAesGCM(word: string, key: CryptoKey) {
+        const iv = crypto.getRandomValues(new Uint8Array(12)) // 12个uint 96位
+        const encodedText = new TextEncoder().encode(word)
+        const encrypted = await crypto.subtle.encrypt({
+            name: "AES-GCM",
+            iv,
+            tagLength: 128
+        }, key, encodedText)
+        return {ciphertext: encrypted, iv}
+    }
+
+    /**
+     * 生成AES-GCM加密算法所需的密钥
+     * @returns {CryptoKey} 生成的CryptoKey对象，可用于加密和解密操作
+     */
+    static generateKey() {
+        return await crypto.subtle.generateKey({
+            name: "AES-GCM",
+            length: 256
+        }, true, ["encrypt", "decrypt"])
+    }
+
+    /**
+     * 使用AES-GCM算法解密密文
+     * @param word 需要解密的密文数据
+     * @param key 用于解密的CryptoKey对象
+     * @param iv 初始化向量，必须与加密时使用的相同
+     * @return {string} 解密后的明文字符串
+     */
+    static decryptAesGCM(word: BufferSource, key: CryptoKey, iv: Uint8Array<ArrayBuffer>) {
+        const decrypted = await crypto.subtle.decrypt({
+                name: "AES-GCM",
+                iv,
+                tagLength: 128
+            },
+            key, word)
+        return new TextDecoder().decode(decrypted)
+    }
+
 
     /**
      * 文字长度省略
