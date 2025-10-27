@@ -62,8 +62,6 @@ export class AnalyticsManager {
      */
     static sendTiming(timingVar: string, timingValue: number) {
         this.isOpenAnalytics = ConfigKit.get("openAnalytics")
-        if (!Browser.onLayaRuntime && this.isOpenAnalytics && window.ga)
-            gaTiming({timingCategory: "game", timingVar: timingVar, timingValue: timingValue})
         if (Browser.onLayaRuntime && this.isOpenAnalytics)
             AppManager.enterInvite({eventName: timingVar, eventValue: timingValue}, AppManager.nullFun)
     }

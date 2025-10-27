@@ -3,11 +3,11 @@
     "../tsconfig.json"
   ],
   "compilerOptions": {
-    "outDir": "./bin",
-//    "rootDir": "../",
-//    "paths": {
-//      "tsCore/*": ["../TSCore/bin"]
-//    }
+    "outDir": "./bin"
+    //    "rootDir": "../",
+    //    "paths": {
+    //      "tsCore/*": ["../TSCore/bin"]
+    //    }
   },
   "include": [
     "../libs",
@@ -15,6 +15,7 @@
     "src"
   ],
   "exclude": [
-    "node_modules", "bin"
+    "node_modules",
+    "bin"
   ]
 }

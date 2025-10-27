@@ -36,16 +36,18 @@ export class HTTPUtils {
      */
     private headers: string[]
     /** 完成 */
-    private complete: ParamHandler
+    private complete: HttpOnComplete
     /** 错误 */
-    private error: ParamHandler
+    private error: HttpOnError
     /** 超时 */
-    private timeout: ParamHandler
+    private timeout: HttpOnTimeout
     private static https: HTTPUtils[] = []
 
     private async = true
-    /** 不管结果如何  执行完成后最后都会执行的方法 */
-    private finally: ParamHandler;
+    /**
+     * 不管结果如何  执行完成后最后都会执行的方法
+     */
+    private finally: HttpOnFinally
 
     constructor() {
         this.ghr = new AjaxRequest()
@@ -83,6 +85,7 @@ export class HTTPUtils {
     setData(data: any): HTTPUtils {
         this.data = data
         return this
+
     }
 
     setMethod(data: Method | string): HTTPUtils {
@@ -115,27 +118,27 @@ export class HTTPUtils {
         return this
     }
 
-    onFinally(handler: ParamHandler) {
+    onFinally(handler: HttpOnFinally) {
         this.finally = handler
         return this
     }
 
-    onComplete(handler: ParamHandler): HTTPUtils {
+    onComplete(handler: HttpOnComplete): HTTPUtils {
         this.complete = handler
         return this
     }
 
-    onError(handler: ParamHandler): HTTPUtils {
+    onError(handler: HttpOnError): HTTPUtils {
         this.error = handler
         return this
     }
 
-    onTimeout(handler: ParamHandler): HTTPUtils {
+    onTimeout(handler: HttpOnTimeout): HTTPUtils {
         this.timeout = handler
         return this
     }
 
-    onEvent(complete: (data: any) => void, error?: (err?: any) => void, finallyFun?: () => void): HTTPUtils {
+    onEvent(complete: (response: HttpResponse, request: AjaxRequest) => void, error?: (err: any, request: AjaxRequest) => void, finallyFun?: (request: AjaxRequest) => void): HTTPUtils {
         this.complete = complete
         this.error = error
         this.finally = finallyFun
@@ -173,17 +176,17 @@ export class HTTPUtils {
     private timeOutHandler() {
         Log.debug("HTTPUtils.timeOutHandler()")
         HTTPUtils.filter?.timeout(this.http)
-        if (this.timeout) runFun(this.timeout)
-        else if (this.error) runFun(this.error, "time out")
-        runFun(this.finally)
+        if (this.timeout) runFun(this.timeout, this.http)
+        else if (this.error) runFun(this.error, "time out", this.http)
+        runFun(this.finally, this.http)
         HTTPUtils.clear(this)
     }
 
     private errorHandler(e: any) {
         Log.debug("HTTPUtils.errorHandler()", e)
         HTTPUtils.filter?.errorResult(e, this.http)
-        runFun(this.error, e)
-        runFun(this.finally)
+        runFun(this.error, e, this.http)
+        runFun(this.finally, this.http)
         HTTPUtils.clear(this)
     }
 
@@ -199,8 +202,8 @@ export class HTTPUtils {
             Log.info(data)
             return
         }
-        runFun(this.complete, data)
-        runFun(this.finally)
+        runFun(this.complete, data, this.http)
+        runFun(this.finally, this.http)
         HTTPUtils.clear(this)
     }
 
@@ -233,6 +236,7 @@ export class HTTPUtils {
 //			Cast.timerFrom(parseInt((Browser.now()/1000)+"")))
             HTTPUtils.difference = Laya.Browser.now() - serverTime
         }
+
     }
 
     /** 获取差值 */

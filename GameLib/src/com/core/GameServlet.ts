@@ -21,6 +21,7 @@ import {CommonCmd, HttpCode, Urls} from "../net/Common";
 import {BaseGameData} from "./BaseGameData";
 import {StateCode} from "../utils/StateCode";
 import {PromptWindow} from "../view/PromptWindow";
+import AjaxRequest = tsCore.AjaxRequest;
 
 /**
  * 游戏基础类
@@ -97,23 +98,24 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
      * @param timeout
      * @param [overtime = 0] 超时时间设置 毫秒
      */
-    getData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, overtime = 0) {
+    getData(url: string, data: any, callback?: HttpOnComplete, error?: HttpOnError, timeout?: HttpOnTimeout, overtime = 0) {
         HTTPUtils.create()
             .setUrl(Player.inst.data.getGameUrl(url))
             .setData(data)
             .setOvertime(overtime)
-            .onComplete((data: HttpResponse) => {
-                if (Player.inst.gameId == this.gameModel?.gameCode) runFun(callback, data)
+            .onComplete((data, request) => {
+                if (Player.inst.gameId == this.gameModel?.gameCode) runFun(callback, data, request)
             })
-            .onError((data: any) => {
-                if (Player.inst.gameId == this.gameModel?.gameCode) runFun(error, data)
+            .onError((data, request) => {
+                if (Player.inst.gameId == this.gameModel?.gameCode) runFun(error, data, request)
             })
-            .onTimeout(() => {
+            .onTimeout((request) => {
                 if (Player.inst.gameId == this.gameModel?.gameCode) {
-                    if (timeout) runFun(timeout)
-                    else if (error) runFun(error)
+                    if (timeout) runFun(timeout, request)
+                    else if (error) runFun(error, null, request)
                 }
             }).call()
+
     }
 
     /**
@@ -146,31 +148,31 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
      * @param headers (default = null) HTTP 请求的头部信息。参数形如key-value数组：key是头部的名称，不应该包括空白、冒号或换行；value是头部的值，不应该包括换行。比如["Content-Type", "application/json"]。
      * @param [overtime = 0] 超时时间设置 毫秒
      */
-    postData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: string[], overtime = 0) {
+    postData(url: string, data: any, callback?: HttpOnComplete, error?: HttpOnError, timeout?: HttpOnTimeout, headers?: string[], overtime = 0) {
         HTTPUtils.create()
             .setMethod(Method.POST)
             .setUrl(Player.inst.data.getGameUrl(url))
             .setData(data)
             .setOvertime(overtime)
             .setHeaders(headers)
-            .onComplete((data: HttpResponse) => {
+            .onComplete((data, request) => {
                 if (Player.inst.gameId == this.gameModel?.gameCode) {
                     if (Player.inst.isGuest && data?.code == HttpCode.OK) {
                         Player.inst.guestModel.playAdd(url, data.data)
                     }
-                    if (!data) runFun(error, "data is null")
-                    else runFun(callback, data)
+                    if (!data) runFun(error, "data is null", request)
+                    else runFun(callback, data, request)
                 }
             })
-            .onError((data: any) => {
-                if (Player.inst.gameId == this.gameModel?.gameCode) runFun(error, data)
+            .onError((data, request) => {
+                if (Player.inst.gameId == this.gameModel?.gameCode) runFun(error, data, request)
             })
-            .onTimeout(() => {
+            .onTimeout((request) => {
                 if (Player.inst.gameId == this.gameModel?.gameCode) {
                     if (timeout)
-                        runFun(timeout)
+                        runFun(timeout, request)
                     else if (error)
-                        runFun(error)
+                        runFun(error, null, request)
                 }
             }).call()
     }
@@ -188,8 +190,9 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
      * 进入游戏失败 执行退出游戏
      * @param [isTip = true] 是否需要弹窗
      * @param message 弹窗内容
+     * @param request
      */
-    protected enterFail(isTip = true, message?: string) {
+    protected enterFail(isTip = true, message?: string, request?: AjaxRequest) {
         Player.inst.gameId = CommonCmd.GAME_HOME
         GRoot.inst.closeModalWait()
         LoadingWindow.inst.hide()
@@ -213,7 +216,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     /**
      * 请求初始化游戏
      */
-    postInit(succeed: ParamHandler, error: ParamHandler) {
+    postInit(succeed: HttpOnComplete, error: HttpOnError) {
         let obj: any = {}
         obj.token = Player.inst.token
         obj.game_id = Player.inst.gameId
@@ -227,15 +230,15 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
         SocketManager.inst.connect(Player.inst.gameId, Player.inst.token, Player.inst.userId)
     }
 
-    protected userDataErrorHandler(data: any) {
-        this.enterFail(true, getString(LibStr.NET_ERROR))
+    protected userDataErrorHandler(data: any, request: AjaxRequest) {
+        this.enterFail(true, getString(LibStr.NET_ERROR), request)
     }
 
     /** 用户数据 */
-    protected userDataHandler(response: HttpResponse) {
+    protected userDataHandler(response: HttpResponse, request: AjaxRequest) {
 //			trace("MainPanel.userDataHandlerr(data) 服务器拿到游戏房间数据")
         if (response.code != HttpCode.OK) {
-            this.enterFail(true, StateCode.getShowMessage(response))
+            this.enterFail(true, StateCode.getShowMessage(response), request)
             return
         }
         const data = response.data
@@ -266,11 +269,11 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
                 GameServlet.customInit.call(this, (result: CustomResult) => {
                     if (result.succeed) {
                         this.nextInit()
-                    } else this.enterFail(true, result.msg)
+                    } else this.enterFail(true, result.msg, request)
                 })
             } else this.nextInit()
         } else {
-            this.enterFail()
+            this.enterFail(true, null, request)
         }
     }
 
@@ -314,9 +317,9 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     }
 
     /** 收到投注劵数据 */
-    protected couponHandler(handler: ParamHandler, data: HttpResponse) {
+    protected couponHandler(handler: ParamHandler, data: HttpResponse, request?: AjaxRequest) {
         if (data.code != HttpCode.OK) {
-            this.enterFail(true, StateCode.getShowMessage(data))
+            this.enterFail(true, StateCode.getShowMessage(data), request)
             return
         }
         Player.inst.addCoupons(data.data)
@@ -446,7 +449,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
             })
     }
 
-    protected jackPotClaimHandler(handler: Handler | ((remove: boolean, win: number) => void), response: HttpResponse) {
+    protected jackPotClaimHandler(handler: Handler | ((remove: boolean, win: number) => void), response: HttpResponse, request?: AjaxRequest) {
         if (response.code != HttpCode.OK) {
             WaitResult.inst.hide()
             // this.showNotResult(data, false)

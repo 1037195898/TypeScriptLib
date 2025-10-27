@@ -13,7 +13,12 @@
  *
  * @see runFun
  */
-declare type ParamHandler = ((...args) => any) | Laya.Handler
+declare type ParamHandler = ((...args: any) => any) | Laya.Handler
+
+declare type HttpOnComplete = Laya.Handler | ((response: HttpResponse, request: tsCore.AjaxRequest) => void)
+declare type HttpOnError = Laya.Handler | ((msg: any, request: tsCore.AjaxRequest) => void)
+declare type HttpOnTimeout = Laya.Handler | ((request: tsCore.AjaxRequest) => void)
+declare type HttpOnFinally = Laya.Handler | ((request: tsCore.AjaxRequest) => void)
 
 declare type Constructor<T = {}> = new (...args: any[]) => T
 
@@ -501,16 +506,4 @@ declare type HttpResponse<T = any> = {
     data: T,
     message: string,
     [key: string]: any
-}
-
-/**
- * 自定义返回数据格式
- */
-declare type CustomResult<T = any> = {
-    /** 执行成功 */
-    succeed?: boolean,
-    /** 描述文案 */
-    msg?: string,
-    /** 附带属性 */
-    data?: T
 }

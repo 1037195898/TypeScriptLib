@@ -1492,14 +1492,14 @@ declare namespace tsCore {
 	    showSkinByIndex(skinIndex: number): void;
 	    getAniIndexByName(aniName: string): number;
 	    getAllAnimation(): spine.Animation[];
-	    getAllSkin(): any;
+	    getAllSkin(): spine.Skin[];
 	    getAnimation(aniIndex: number | string): spine.Animation;
 	    /**
 	     * 获取动画时长 秒
 	     * @param aniIndex
 	     */
 	    getAnimDuration(aniIndex: number | string | (number | string)[]): number;
-	    getAnimFrame(aniIndex: number | string): any;
+	    getAnimFrame(aniIndex: number | string): number;
 	    get currAniIndex(): number;
 	    set hitArea(rec: Laya.Rectangle);
 	    on(type: string, thisObject: any, listener: Function, args?: any[]): void;
@@ -2223,7 +2223,7 @@ declare namespace tsCore {
 	    regGameAction(action: string | number, caller: any, method: Function): void;
 	}
 	
-	const EWindow_base: Constructor<ActionEvent & StringBlock & ViewProxy & fairygui.Window>;
+	const EWindow_base: Constructor<ActionEvent & StringBlock & fairygui.Window & ViewProxy>;
 	/**
 	 * 实现了 fgui.Window 的窗口
 	 * 默认会添加新的路由到历史中，可通过 joinRecord 处理
@@ -2525,7 +2525,7 @@ declare namespace tsCore {
 	     *  aes解密
 	     *  @deprecated
 	     */
-	    static decrypt(word: any, key?: string): any;
+	    static decrypt(word: any, key?: string): string;
 	    /**
 	     * 使用AES-GCM算法加密字符串，每次加密都应生成新的随机IV，不重复使用相同IV和密钥的组合
 	     * @param word 需要加密的明文字符串
@@ -2955,7 +2955,9 @@ declare namespace tsCore {
 	    private timeout;
 	    private static https;
 	    private async;
-	    /** 不管结果如何  执行完成后最后都会执行的方法 */
+	    /**
+	     * 不管结果如何  执行完成后最后都会执行的方法
+	     */
 	    private finally;
 	    constructor();
 	    /**
@@ -2978,11 +2980,11 @@ declare namespace tsCore {
 	     * @default 0
 	     */
 	    setOvertime(value: number): HTTPUtils;
-	    onFinally(handler: ParamHandler): this;
-	    onComplete(handler: ParamHandler): HTTPUtils;
-	    onError(handler: ParamHandler): HTTPUtils;
-	    onTimeout(handler: ParamHandler): HTTPUtils;
-	    onEvent(complete: (data: any) => void, error?: (err?: any) => void, finallyFun?: () => void): HTTPUtils;
+	    onFinally(handler: HttpOnFinally): this;
+	    onComplete(handler: HttpOnComplete): HTTPUtils;
+	    onError(handler: HttpOnError): HTTPUtils;
+	    onTimeout(handler: HttpOnTimeout): HTTPUtils;
+	    onEvent(complete: (response: HttpResponse, request: AjaxRequest) => void, error?: (err: any, request: AjaxRequest) => void, finallyFun?: (request: AjaxRequest) => void): HTTPUtils;
 	    /**
 	     *
 	     */
@@ -3921,7 +3923,12 @@ declare interface Number {
  *
  * @see runFun
  */
-declare type ParamHandler = ((...args) => any) | Laya.Handler
+declare type ParamHandler = ((...args: any) => any) | Laya.Handler
+
+declare type HttpOnComplete = Laya.Handler | ((response: HttpResponse, request: tsCore.AjaxRequest) => void)
+declare type HttpOnError = Laya.Handler | ((msg: any, request: tsCore.AjaxRequest) => void)
+declare type HttpOnTimeout = Laya.Handler | ((request: tsCore.AjaxRequest) => void)
+declare type HttpOnFinally = Laya.Handler | ((request: tsCore.AjaxRequest) => void)
 
 declare type Constructor<T = {}> = new (...args: any[]) => T
 
@@ -4409,16 +4416,4 @@ declare type HttpResponse<T = any> = {
     data: T,
     message: string,
     [key: string]: any
-}
-
-/**
- * 自定义返回数据格式
- */
-declare type CustomResult<T = any> = {
-    /** 执行成功 */
-    succeed?: boolean,
-    /** 描述文案 */
-    msg?: string,
-    /** 附带属性 */
-    data?: T
 }

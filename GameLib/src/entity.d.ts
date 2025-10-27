@@ -157,6 +157,22 @@ declare type ExecuteData = {
     openGame?: number
 }
 
+/**
+ * 自定义返回数据格式
+ */
+declare type CustomResult<T = any> = {
+    /** 执行成功 */
+    succeed?: boolean,
+    /** 描述文案 */
+    msg?: string,
+    /**
+     * 如果是用于网络请求 可以带上
+     */
+    request?: tsCore.AjaxRequest,
+    /** 附带属性 */
+    data?: T
+}
+
 declare module tsCore.SoundUtils {
     /**
      *

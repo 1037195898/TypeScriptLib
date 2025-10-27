@@ -190,6 +190,7 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
                 if (this.skeletonPlay.loop && this.getAnimDuration(this.nameOrIndex ?? 0) > 0) {
                     let len = 0
                     if (this instanceof GSpineSkeleton) {
+                        // @ts-ignore
                         len = (this as GSpineSkeleton).getAnimation(this.nameOrIndex ?? 0).timelines[0].getFrameCount()
                     } else if (this instanceof GSkeleton) {
                         len = (this as GSkeleton).getAnimation(this.nameOrIndex ?? 0).totalKeyframeDatasLength

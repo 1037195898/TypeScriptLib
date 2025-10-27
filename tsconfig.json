@@ -16,7 +16,7 @@
     // 重写必须添加override
     "noImplicitOverride": true,
     // 禁用完整类型检查
-    "noCheck": true,
+//    "noCheck": true,
     // 禁用发出在其 JSDoc 注释中包含“@internal”的声明。
     "stripInternal": true,
     "experimentalDecorators": true, //  启用装饰器支持。
@@ -24,7 +24,10 @@
     "types": [
       "LayaAir",
       "fairygui",
-      "reflect"
+      "reflect",
+      "cryptojs",
+      "ga",
+      "spine-core-3.8"
     ],
     "typeRoots": [
       "./libs"

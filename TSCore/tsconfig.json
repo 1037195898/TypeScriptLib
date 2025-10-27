@@ -12,6 +12,7 @@
     //      ],
     //      "core/*": ["./bin"]
     //    }
+    "composite": true
   },
   "exclude": [
     "bin"

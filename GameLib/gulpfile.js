@@ -16,7 +16,7 @@ gulp.task("clean", () => {
 function buildLib(done) {
     buildLibrary({
         src: {
-            globs: ["src/**/*.ts", "!**/*.d.ts"],
+            globs: ["src/**/*.ts", "**/*.d.ts", "../TsCore/bin/*.d.ts"],
         },
         outName: project,
         dist: "./bin",
