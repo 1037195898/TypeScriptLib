@@ -1661,7 +1661,7 @@ declare namespace gameLib {
 	    /**
 	     * 处理发送bet请求时的错误。
 	     */
-	    protected onSendBetError(): void;
+	    protected onSendBetError(msg: any, request: tsCore.AjaxRequest): void;
 	    /**
 	     * 领取奖金池
 	     * @param id
@@ -1673,8 +1673,9 @@ declare namespace gameLib {
 	     * 显示获取的非200的结果显示弹窗
 	     * @param data 服务器返回的完整数据
 	     * @param [closeGame=true] 是否关闭游戏
+	     * @param request
 	     */
-	    protected showNotResult(data: any, closeGame?: boolean): void;
+	    protected showNotResult(data: any, closeGame?: boolean, request?: tsCore.AjaxRequest): void;
 	    get gameModel(): IGameModel;
 	    set gameModel(value: IGameModel);
 	    dispose(): void;

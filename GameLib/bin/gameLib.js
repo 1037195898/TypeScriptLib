@@ -3201,7 +3201,7 @@ function _FguiBindView(classTarget, url) {
 	    /**
 	     * 处理发送bet请求时的错误。
 	     */
-	    onSendBetError() {
+	    onSendBetError(msg, request) {
 	        WaitResult.inst.hide();
 	        SceneManager.inst.gameErrorExit(LibStr.NET_ERROR);
 	    }
@@ -3249,8 +3249,9 @@ function _FguiBindView(classTarget, url) {
 	     * 显示获取的非200的结果显示弹窗
 	     * @param data 服务器返回的完整数据
 	     * @param [closeGame=true] 是否关闭游戏
+	     * @param request
 	     */
-	    showNotResult(data, closeGame = true) {
+	    showNotResult(data, closeGame = true, request) {
 	        let str = StateCode.getShowMessage(data);
 	        if (tsCore.StringUtil.isEmpty(str)) {
 	            str = getString(LibStr.NET_ERROR);

@@ -3303,6 +3303,7 @@ function TimerLoop(interval, custom) {
 	                if (this.skeletonPlay.loop && this.getAnimDuration((_b = this.nameOrIndex) !== null && _b !== void 0 ? _b : 0) > 0) {
 	                    let len = 0;
 	                    if (this instanceof GSpineSkeleton) {
+	                        // @ts-ignore
 	                        len = this.getAnimation((_c = this.nameOrIndex) !== null && _c !== void 0 ? _c : 0).timelines[0].getFrameCount();
 	                    }
 	                    else if (this instanceof GSkeleton) {
@@ -7307,18 +7308,18 @@ function TimerLoop(interval, custom) {
 	        Log.debug("HTTPUtils.timeOutHandler()");
 	        (_a = HTTPUtils.filter) === null || _a === void 0 ? void 0 : _a.timeout(this.http);
 	        if (this.timeout)
-	            runFun(this.timeout);
+	            runFun(this.timeout, this.http);
 	        else if (this.error)
-	            runFun(this.error, "time out");
-	        runFun(this.finally);
+	            runFun(this.error, "time out", this.http);
+	        runFun(this.finally, this.http);
 	        HTTPUtils.clear(this);
 	    }
 	    errorHandler(e) {
 	        var _a;
 	        Log.debug("HTTPUtils.errorHandler()", e);
 	        (_a = HTTPUtils.filter) === null || _a === void 0 ? void 0 : _a.errorResult(e, this.http);
-	        runFun(this.error, e);
-	        runFun(this.finally);
+	        runFun(this.error, e, this.http);
+	        runFun(this.finally, this.http);
 	        HTTPUtils.clear(this);
 	    }
 	    completeHandler(data) {
@@ -7332,8 +7333,8 @@ function TimerLoop(interval, custom) {
 	            Log.info(data);
 	            return;
 	        }
-	        runFun(this.complete, data);
-	        runFun(this.finally);
+	        runFun(this.complete, data, this.http);
+	        runFun(this.finally, this.http);
 	        HTTPUtils.clear(this);
 	    }
 	    /**

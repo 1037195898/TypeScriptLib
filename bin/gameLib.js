@@ -1313,8 +1313,6 @@ function _FguiBindView(classTarget, url) {
 	     */
 	    static sendTiming(timingVar, timingValue) {
 	        this.isOpenAnalytics = tsCore.ConfigKit.get("openAnalytics");
-	        if (!Laya.Browser.onLayaRuntime && this.isOpenAnalytics && window.ga)
-	            gaTiming({ timingCategory: "game", timingVar: timingVar, timingValue: timingValue });
 	        if (Laya.Browser.onLayaRuntime && this.isOpenAnalytics)
 	            AppManager.enterInvite({ eventName: timingVar, eventValue: timingValue }, AppManager.nullFun);
 	    }
@@ -2895,23 +2893,23 @@ function _FguiBindView(classTarget, url) {
 	            .setUrl(Player.inst.data.getGameUrl(url))
 	            .setData(data)
 	            .setOvertime(overtime)
-	            .onComplete((data) => {
+	            .onComplete((data, request) => {
 	            var _a;
 	            if (Player.inst.gameId == ((_a = this.gameModel) === null || _a === void 0 ? void 0 : _a.gameCode))
-	                runFun(callback, data);
+	                runFun(callback, data, request);
 	        })
-	            .onError((data) => {
+	            .onError((data, request) => {
 	            var _a;
 	            if (Player.inst.gameId == ((_a = this.gameModel) === null || _a === void 0 ? void 0 : _a.gameCode))
-	                runFun(error, data);
+	                runFun(error, data, request);
 	        })
-	            .onTimeout(() => {
+	            .onTimeout((request) => {
 	            var _a;
 	            if (Player.inst.gameId == ((_a = this.gameModel) === null || _a === void 0 ? void 0 : _a.gameCode)) {
 	                if (timeout)
-	                    runFun(timeout);
+	                    runFun(timeout, request);
 	                else if (error)
-	                    runFun(error);
+	                    runFun(error, null, request);
 	            }
 	        }).call();
 	    }
@@ -2951,30 +2949,30 @@ function _FguiBindView(classTarget, url) {
 	            .setData(data)
 	            .setOvertime(overtime)
 	            .setHeaders(headers)
-	            .onComplete((data) => {
+	            .onComplete((data, request) => {
 	            var _a;
 	            if (Player.inst.gameId == ((_a = this.gameModel) === null || _a === void 0 ? void 0 : _a.gameCode)) {
 	                if (Player.inst.isGuest && (data === null || data === void 0 ? void 0 : data.code) == HttpCode.OK) {
 	                    Player.inst.guestModel.playAdd(url, data.data);
 	                }
 	                if (!data)
-	                    runFun(error, "data is null");
+	                    runFun(error, "data is null", request);
 	                else
-	                    runFun(callback, data);
+	                    runFun(callback, data, request);
 	            }
 	        })
-	            .onError((data) => {
+	            .onError((data, request) => {
 	            var _a;
 	            if (Player.inst.gameId == ((_a = this.gameModel) === null || _a === void 0 ? void 0 : _a.gameCode))
-	                runFun(error, data);
+	                runFun(error, data, request);
 	        })
-	            .onTimeout(() => {
+	            .onTimeout((request) => {
 	            var _a;
 	            if (Player.inst.gameId == ((_a = this.gameModel) === null || _a === void 0 ? void 0 : _a.gameCode)) {
 	                if (timeout)
-	                    runFun(timeout);
+	                    runFun(timeout, request);
 	                else if (error)
-	                    runFun(error);
+	                    runFun(error, null, request);
 	            }
 	        }).call();
 	    }
@@ -2989,8 +2987,9 @@ function _FguiBindView(classTarget, url) {
 	     * 进入游戏失败 执行退出游戏
 	     * @param [isTip = true] 是否需要弹窗
 	     * @param message 弹窗内容
+	     * @param request
 	     */
-	    enterFail(isTip = true, message) {
+	    enterFail(isTip = true, message, request) {
 	        Player.inst.gameId = CommonCmd.GAME_HOME;
 	        fgui.GRoot.inst.closeModalWait();
 	        LoadingWindow.inst.hide();
@@ -3025,15 +3024,15 @@ function _FguiBindView(classTarget, url) {
 	        // 链接服务器socket
 	        SocketManager.inst.connect(Player.inst.gameId, Player.inst.token, Player.inst.userId);
 	    }
-	    userDataErrorHandler(data) {
-	        this.enterFail(true, getString(LibStr.NET_ERROR));
+	    userDataErrorHandler(data, request) {
+	        this.enterFail(true, getString(LibStr.NET_ERROR), request);
 	    }
 	    /** 用户数据 */
-	    userDataHandler(response) {
+	    userDataHandler(response, request) {
 	        var _a;
 	        //			trace("MainPanel.userDataHandlerr(data) 服务器拿到游戏房间数据")
 	        if (response.code != HttpCode.OK) {
-	            this.enterFail(true, StateCode.getShowMessage(response));
+	            this.enterFail(true, StateCode.getShowMessage(response), request);
 	            return;
 	        }
 	        const data = response.data;
@@ -3064,14 +3063,14 @@ function _FguiBindView(classTarget, url) {
 	                        this.nextInit();
 	                    }
 	                    else
-	                        this.enterFail(true, result.msg);
+	                        this.enterFail(true, result.msg, request);
 	                });
 	            }
 	            else
 	                this.nextInit();
 	        }
 	        else {
-	            this.enterFail();
+	            this.enterFail(true, null, request);
 	        }
 	    }
 	    nextInit() {
@@ -3114,9 +3113,9 @@ function _FguiBindView(classTarget, url) {
 	        this.getData(Urls.URL_GAME_ALL_COUPON + "?" + Player.inst.getRequestToken(), null, Laya.Handler.create(this, this.couponHandler, [onComplete]), error !== null && error !== void 0 ? error : this.userDataErrorHandler.bind(this));
 	    }
 	    /** 收到投注劵数据 */
-	    couponHandler(handler, data) {
+	    couponHandler(handler, data, request) {
 	        if (data.code != HttpCode.OK) {
-	            this.enterFail(true, StateCode.getShowMessage(data));
+	            this.enterFail(true, StateCode.getShowMessage(data), request);
 	            return;
 	        }
 	        Player.inst.addCoupons(data.data);
@@ -3202,7 +3201,7 @@ function _FguiBindView(classTarget, url) {
 	    /**
 	     * 处理发送bet请求时的错误。
 	     */
-	    onSendBetError() {
+	    onSendBetError(msg, request) {
 	        WaitResult.inst.hide();
 	        SceneManager.inst.gameErrorExit(LibStr.NET_ERROR);
 	    }
@@ -3231,7 +3230,7 @@ function _FguiBindView(classTarget, url) {
 	            runFun(handler, false);
 	        });
 	    }
-	    jackPotClaimHandler(handler, response) {
+	    jackPotClaimHandler(handler, response, request) {
 	        if (response.code != HttpCode.OK) {
 	            WaitResult.inst.hide();
 	            // this.showNotResult(data, false)
@@ -3250,8 +3249,9 @@ function _FguiBindView(classTarget, url) {
 	     * 显示获取的非200的结果显示弹窗
 	     * @param data 服务器返回的完整数据
 	     * @param [closeGame=true] 是否关闭游戏
+	     * @param request
 	     */
-	    showNotResult(data, closeGame = true) {
+	    showNotResult(data, closeGame = true, request) {
 	        let str = StateCode.getShowMessage(data);
 	        if (tsCore.StringUtil.isEmpty(str)) {
 	            str = getString(LibStr.NET_ERROR);

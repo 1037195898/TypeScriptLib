@@ -742,7 +742,7 @@ declare namespace gameLib {
 	    /** 接受到的消息 */
 	    private receiveData;
 	    private _client;
-	    static SocketClass: any;
+	    static SocketClass: typeof SocketClient;
 	    /**
 	     * 自定义socket url
 	     * @example
@@ -1092,13 +1092,13 @@ declare namespace gameLib {
 	     * @deprecated
 	     * @see Path.formatPath
 	     */
-	    static loadPathFormat: any;
+	    static loadPathFormat: tsCore.IFormatPath[];
 	    constructor();
 	    /**
 	     * @deprecated
 	     * @see Path.formatPath
 	     */
-	    static formatUrl: any;
+	    static formatUrl: typeof Path.formatUrl;
 	    version(url: string, version: string | number): string | number;
 	    /**
 	     * 加载版本控制文件
@@ -1563,7 +1563,7 @@ declare namespace gameLib {
 	     * @param timeout
 	     * @param [overtime = 0] 超时时间设置 毫秒
 	     */
-	    getData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, overtime?: number): void;
+	    getData(url: string, data: any, callback?: HttpOnComplete, error?: HttpOnError, timeout?: HttpOnTimeout, overtime?: number): void;
 	    /**
 	     * post 请求
 	     *
@@ -1591,7 +1591,7 @@ declare namespace gameLib {
 	     * @param headers (default = null) HTTP 请求的头部信息。参数形如key-value数组：key是头部的名称，不应该包括空白、冒号或换行；value是头部的值，不应该包括换行。比如["Content-Type", "application/json"]。
 	     * @param [overtime = 0] 超时时间设置 毫秒
 	     */
-	    postData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: string[], overtime?: number): void;
+	    postData(url: string, data: any, callback?: HttpOnComplete, error?: HttpOnError, timeout?: HttpOnTimeout, headers?: string[], overtime?: number): void;
 	    /**
 	     *
 	     * @param handler
@@ -1601,18 +1601,19 @@ declare namespace gameLib {
 	     * 进入游戏失败 执行退出游戏
 	     * @param [isTip = true] 是否需要弹窗
 	     * @param message 弹窗内容
+	     * @param request
 	     */
-	    protected enterFail(isTip?: boolean, message?: string): void;
+	    protected enterFail(isTip?: boolean, message?: string, request?: tsCore.AjaxRequest): void;
 	    init(handler: ParamHandler): void;
 	    /**
 	     * 请求初始化游戏
 	     */
-	    postInit(succeed: ParamHandler, error: ParamHandler): void;
+	    postInit(succeed: HttpOnComplete, error: HttpOnError): void;
 	    /** 连接该游戏的socket */
 	    protected connectSocket(): void;
-	    protected userDataErrorHandler(data: any): void;
+	    protected userDataErrorHandler(data: any, request: tsCore.AjaxRequest): void;
 	    /** 用户数据 */
-	    protected userDataHandler(response: HttpResponse): void;
+	    protected userDataHandler(response: HttpResponse, request: tsCore.AjaxRequest): void;
 	    nextInit(): void;
 	    /**
 	     * 用户信息初始化完成 返回false表示 出现错误
@@ -1630,7 +1631,7 @@ declare namespace gameLib {
 	     */
 	    getCoupon(onComplete?: ParamHandler, error?: ((data: any) => void)): void;
 	    /** 收到投注劵数据 */
-	    protected couponHandler(handler: ParamHandler, data: HttpResponse): void;
+	    protected couponHandler(handler: ParamHandler, data: HttpResponse, request?: tsCore.AjaxRequest): void;
 	    initComplete(): void;
 	    /**
 	     * 解析初始化数据
@@ -1660,20 +1661,21 @@ declare namespace gameLib {
 	    /**
 	     * 处理发送bet请求时的错误。
 	     */
-	    protected onSendBetError(): void;
+	    protected onSendBetError(msg: any, request: tsCore.AjaxRequest): void;
 	    /**
 	     * 领取奖金池
 	     * @param id
 	     * @param handler
 	     */
 	    jackPotClaim(id: string, handler: Laya.Handler | ((remove: boolean, win: number) => void)): void;
-	    protected jackPotClaimHandler(handler: Laya.Handler | ((remove: boolean, win: number) => void), response: HttpResponse): void;
+	    protected jackPotClaimHandler(handler: Laya.Handler | ((remove: boolean, win: number) => void), response: HttpResponse, request?: tsCore.AjaxRequest): void;
 	    /**
 	     * 显示获取的非200的结果显示弹窗
 	     * @param data 服务器返回的完整数据
 	     * @param [closeGame=true] 是否关闭游戏
+	     * @param request
 	     */
-	    protected showNotResult(data: any, closeGame?: boolean): void;
+	    protected showNotResult(data: any, closeGame?: boolean, request?: tsCore.AjaxRequest): void;
 	    get gameModel(): IGameModel;
 	    set gameModel(value: IGameModel);
 	    dispose(): void;
@@ -2495,7 +2497,7 @@ declare namespace gameLib {
 	    /** 每次投注达到多少 就可以获得刮刮卡 */
 	    getTicketIncBet: number;
 	    /** 当前游戏的奖金池 */
-	    gamePool: any;
+	    gamePool: number;
 	    /** 获得奖励的次数 */
 	    jackpotCount: number;
 	    private playCountCache;
@@ -3388,7 +3390,7 @@ declare namespace gameLib {
 	    dispose(): void;
 	}
 	
-	const GoldLoader_base: any;
+	const GoldLoader_base: Constructor<fgui.GLoader & tsCore.BezierCurves>;
 	/**
 	 * 具有贝塞尔曲线运动的loader
 	 */
@@ -4030,7 +4032,7 @@ declare namespace gameLib {
 	     * @param x x坐标 或 point对象 和 Sprite
 	     * @param y y坐标 默认-1
 	     */
-	    static getPixel(texture: Laya.Sprite | Laya.Texture, x?: number | Laya.Point, y?: number): any;
+	    static getPixel(texture: Laya.Sprite | Laya.Texture, x?: number | Laya.Point, y?: number): string;
 	    /**
 	     * 根据类名获取对象 如 com.test.Test可获取Test对象
 	     * @param classStr
@@ -4396,6 +4398,22 @@ declare type ExecuteData = {
     gameName?: string
     /** 打开游戏id */
     openGame?: number
+}
+
+/**
+ * 自定义返回数据格式
+ */
+declare type CustomResult<T = any> = {
+    /** 执行成功 */
+    succeed?: boolean,
+    /** 描述文案 */
+    msg?: string,
+    /**
+     * 如果是用于网络请求 可以带上
+     */
+    request?: tsCore.AjaxRequest,
+    /** 附带属性 */
+    data?: T
 }
 
 declare module tsCore.SoundUtils {

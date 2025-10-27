@@ -415,7 +415,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     /**
      * 处理发送bet请求时的错误。
      */
-    protected onSendBetError() {
+    protected onSendBetError(msg: any, request: AjaxRequest) {
         WaitResult.inst.hide()
         SceneManager.inst.gameErrorExit(LibStr.NET_ERROR)
     }
@@ -469,8 +469,9 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
      * 显示获取的非200的结果显示弹窗
      * @param data 服务器返回的完整数据
      * @param [closeGame=true] 是否关闭游戏
+     * @param request
      */
-    protected showNotResult(data: any, closeGame = true) {
+    protected showNotResult(data: any, closeGame = true, request?: AjaxRequest) {
         let str = StateCode.getShowMessage(data)
         if (StringUtil.isEmpty(str)) {
             str = getString(LibStr.NET_ERROR)
