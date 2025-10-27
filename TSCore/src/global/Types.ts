@@ -255,7 +255,6 @@ function getPropertyNames(obj, containsSuperClasses = false) {
  */
 const windowMy = window.self !== window.top ? window.top : window
 
-
 /** 随机数  最小值  最大值(不包括)  */
 function random(minNum: number, maxNum: number) {
     return (Math.floor(Math.random() * (maxNum - minNum)) + minNum)

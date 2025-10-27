@@ -71,6 +71,9 @@ Object.defineProperty(tsCore.SoundUtils, "stopGameSound", {
         return tsCore.SoundUtils.stopSound(url);
     }
 });
+/**
+ * @internal
+ */
 const ofNewObject = fgui.UIObjectFactory.newObject;
 Object.defineProperty(fgui.UIObjectFactory, "newObject", {
     value: function (type, userClass) {

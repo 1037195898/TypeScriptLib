@@ -92,9 +92,9 @@ module.exports = function (file, opt) {
 
         if (fileName.endsWith(".d.ts")) {
             if (namespace) {
-                const results = content.matchAll(/declare\s+(class|interface|enum|abstract|const)\s+(\w+)(?=\s|\{|:)/g)
+                const results = content.matchAll(/export\s+declare\s+(class|interface|enum|abstract|const)\s+(\w+)(?=\s|\{|:)/g)
                 results.forEach(result => {
-                    content = content.replace(result[0], `${result[1]} ${result[2]}`)
+                    content = content.replace(result[0], `export ${result[1]} ${result[2]}`)
                 })
             }
         } else {

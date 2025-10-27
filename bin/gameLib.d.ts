@@ -28,7 +28,6 @@ declare function bindView(url: string, type: {
 declare function createView<T extends fgui.GObject>(url: string, userClass?: {
     new (): T;
 }): T;
-const ofNewObject: typeof fairygui.UIObjectFactory.newObject;
 
 /**
  * FguiBindView装饰器用于将一个类绑定到特定的FGUI视图资源
@@ -3390,7 +3389,7 @@ declare namespace gameLib {
 	    dispose(): void;
 	}
 	
-	const GoldLoader_base: Constructor<fgui.GLoader & tsCore.BezierCurves>;
+	declare const GoldLoader_base: Constructor<fgui.GLoader & tsCore.BezierCurves>;
 	/**
 	 * 具有贝塞尔曲线运动的loader
 	 */
@@ -3816,7 +3815,7 @@ declare namespace gameLib {
 	export class CounterUtils {
 	    static create(total: number, complete: ParamHandler): Counter;
 	}
-	class Counter {
+	declare class Counter {
 	    /** 执行玩所有次数调用 */
 	    complete: ParamHandler;
 	    total: number;

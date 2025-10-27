@@ -294,7 +294,6 @@ function createNamespaceTransformer() {
     };
 }
 
-
 /**
  * 生成一个用于添加元数据的 TypeScript AST 转换器工厂函数。
  * 该函数会遍历 AST 中的类声明节点，如果类使用了指定装饰器（如 Component、FguiBindView、AppMain），
