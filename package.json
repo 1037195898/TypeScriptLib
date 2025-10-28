@@ -1,12 +1,14 @@
 {
   "name": "game-lib",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm pack && for /f %i in ('dir /b *.tgz') do npm install -g %i",
-    "buildOnDel": "npm pack && for /f %i in ('dir /b *.tgz') do npm install -g %i && del *.tgz",
-    "pack": "npm pack"
+    "pack-install": "npm pack && for /f %i in ('dir /b *.tgz') do npm install -g %i",
+    "buildOnDel": "npm run pack-install && del *.tgz",
+    "pack": "npm pack",
+    "build-with-pack": "node packNpmLib.js packResources && npm run pack-install && node packNpmLib.js removeTemp",
+    "build": "npm run build-with-pack"
   },
   "repository": {
     "type": "git",

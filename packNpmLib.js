@@ -30,6 +30,7 @@ function removeDirectory(dirPath) {
             }
         });
         fs.rmdirSync(dirPath);
+        console.log("删除文件：" + dirPath)
     }
 }
 
@@ -98,10 +99,10 @@ function copyDirectory(source, destination, excludeFiles = []) {
 
 // 主函数：执行复制操作
 function packResources() {
+    console.log("打包资源")
     try {
-        // 先删除 dist 目录
-        removeDirectory(distDir);
-        removeDirectory(binDir);
+        // 先删除目录
+        removeTemp();
         // 确保 dist 目录存在
         ensureDirectoryExistence(distDir);
         // 检查源目录是否存在
@@ -112,11 +113,39 @@ function packResources() {
         copyFiles(gameLibDir, binDir, "gameLib.d.ts");
         copyDirectory(libsDir, binDir);
         copyDirectory(templateDir, distDir);
-
+        console.log("打包完成")
     } catch (error) {
         console.error('复制文件时出错:', error);
     }
 }
 
+
+function removeTemp() {
+    console.log("删除打包资源...");
+    // 先删除 dist 目录
+    removeDirectory(distDir);
+    removeDirectory(binDir);
+}
+
 // 执行打包资源函数
-packResources();
+// packResources();
+
+module.exports = {
+    packResources,
+    removeTemp
+}
+
+if (require.main === module) {
+    const methodName = process.argv[2];
+    if (methodName && typeof module.exports[methodName] === 'function') {
+        console.log(`执行方法: ${methodName}`);
+        module.exports[methodName]();
+    } else if (!methodName) {
+        // 如果没有指定方法名，执行默认方法
+        console.log('执行默认方法: packResources');
+        packResources();
+    } else {
+        console.error(`方法 '${methodName}' 不存在或不是函数`);
+    }
+}
+

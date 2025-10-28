@@ -680,7 +680,7 @@ function findFiles(url) {
 /**
  * 收集指定路径下的所有文件路径
  * @param url {string} 相对路径或绝对路径
- * @return string[] 完整路径数据
+ * @return {string[]} 完整路径数据
  */
 function findFilesSync(url) {
     const files = []
