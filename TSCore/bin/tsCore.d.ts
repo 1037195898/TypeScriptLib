@@ -2117,9 +2117,9 @@ declare namespace tsCore {
 	    /** 注册游戏数据 */
 	    regGameAction(action: string | number, caller: any, method: Function): void;
 	    /** 设置扩展 */
-	    protected insertExt(pkgName: string, resName: string, clas: new () => fgui.GComponent): void;
+	    protected insertExt<T extends fgui.GComponent>(pkgName: string, resName: string, clas: new () => T): void;
 	    /** 设置扩展 */
-	    protected insertExtUrl(url: string, clas: new () => fgui.GComponent): void;
+	    protected insertExtUrl<T extends fgui.GComponent>(url: string, clas: new () => T): void;
 	}
 	
 	export class ESocket {
@@ -2216,9 +2216,9 @@ declare namespace tsCore {
 	    showRecord(): void;
 	    dispose(): void;
 	    /** 设置扩展 */
-	    protected insertExt(pkgName: string, resName: string, clas: new () => fgui.GComponent): void;
+	    protected insertExt<T extends fgui.GComponent>(pkgName: string, resName: string, clas: new () => T): void;
 	    /** 设置扩展 */
-	    protected insertExtUrl(url: string, clas: new () => fgui.GComponent): void;
+	    protected insertExtUrl<T extends fgui.GComponent>(url: string, clas: new () => T): void;
 	    /** 注册游戏数据 */
 	    regGameAction(action: string | number, caller: any, method: Function): void;
 	}

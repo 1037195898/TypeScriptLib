@@ -18,12 +18,12 @@ export class EProxy extends Proxys {
     }
 
     /** 设置扩展 */
-    protected insertExt(pkgName: string, resName: string, clas: new () => GComponent) {
+    protected insertExt<T extends GComponent>(pkgName: string, resName: string, clas: new () => T) {
         this.insertExtUrl("//" + pkgName + "/" + resName, clas)
     }
 
     /** 设置扩展 */
-    protected insertExtUrl(url: string, clas: new () => GComponent) {
+    protected insertExtUrl<T extends GComponent>(url: string, clas: new () => T) {
         UIObjectFactory.setPackageItemExtension(url, clas)
     }
 
