@@ -403,7 +403,7 @@ export class BaseScene<T extends BaseGameData = BaseGameData> extends BaseView i
         if (Player.inst.token) {
             WaitResult.inst.show()
             this.gameModel.gameServlet.postData(Player.inst.data.getWapUrl(Urls.URL_USER_ACCOUNT_ASSET),
-                {token: Player.inst.token}, (data) => {
+                {token: Player.inst.token}, (data, request) => {
                     WaitResult.inst.hide()
                     if (data.code == HttpCode.OK && data.data) {
                         if (data.data.balance == 0) {

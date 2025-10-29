@@ -402,13 +402,13 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
      * @param callback
      */
     sendBet(url: string, data: any, callback: ParamHandler) {
-        this.postData(url, data, (data: HttpResponse) => {
+        this.postData(url, data, (data, request) => {
             if (data.code == HttpCode.OK) {
                 Player.inst.gameData.playCount++
                 Player.inst.playCount++
                 if (Player.inst.isGuest) Player.inst.guestModel.guestPlayCount++
             }
-            runFun(callback, data)
+            runFun(callback, data, request)
         }, this.onSendBetError.bind(this))
     }
 
@@ -452,7 +452,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
     protected jackPotClaimHandler(handler: Handler | ((remove: boolean, win: number) => void), response: HttpResponse, request?: AjaxRequest) {
         if (response.code != HttpCode.OK) {
             WaitResult.inst.hide()
-            // this.showNotResult(data, false)
+            // this.showNotResult(response.data, false, request)
             StateCode.execute(response.code, response)
             runFun(handler, false)
             return

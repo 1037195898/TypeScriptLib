@@ -57,7 +57,7 @@ export interface IGameServlet {
      * @param timeout
      * @param [overtime=0] 超时时间设置 毫秒
      */
-    getData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, overtime?: number): void
+    getData(url: string, data: any, callback?: HttpOnComplete, error?: HttpOnError, timeout?: HttpOnTimeout, overtime?: number): void
 
     /**
      * post 请求数据
@@ -85,7 +85,7 @@ export interface IGameServlet {
      * @param headers (default = null) HTTP 请求的头部信息。参数形如key-value数组：key是头部的名称，不应该包括空白、冒号或换行；value是头部的值，不应该包括换行。比如["Content-Type", "application/json"]。
      * @param [overtime=0]
      */
-    postData(url: string, data: any, callback?: ParamHandler, error?: ParamHandler, timeout?: ParamHandler, headers?: any[], overtime?: number): void
+    postData(url: string, data: any, callback?: HttpOnComplete, error?: HttpOnError, timeout?: HttpOnTimeout, headers?: any[], overtime?: number): void
 
     /**
      *

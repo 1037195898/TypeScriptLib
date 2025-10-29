@@ -3191,14 +3191,14 @@ function _FguiBindView(classTarget, url) {
 	     * @param callback
 	     */
 	    sendBet(url, data, callback) {
-	        this.postData(url, data, (data) => {
+	        this.postData(url, data, (data, request) => {
 	            if (data.code == HttpCode.OK) {
 	                Player.inst.gameData.playCount++;
 	                Player.inst.playCount++;
 	                if (Player.inst.isGuest)
 	                    Player.inst.guestModel.guestPlayCount++;
 	            }
-	            runFun(callback, data);
+	            runFun(callback, data, request);
 	        }, this.onSendBetError.bind(this));
 	    }
 	    /**
@@ -3236,7 +3236,7 @@ function _FguiBindView(classTarget, url) {
 	    jackPotClaimHandler(handler, response, request) {
 	        if (response.code != HttpCode.OK) {
 	            WaitResult.inst.hide();
-	            // this.showNotResult(data, false)
+	            // this.showNotResult(response.data, false, request)
 	            StateCode.execute(response.code, response);
 	            runFun(handler, false);
 	            return;
@@ -4482,7 +4482,7 @@ function _FguiBindView(classTarget, url) {
 	        let obj = { okName: "Ok" };
 	        if (Player.inst.token) {
 	            WaitResult.inst.show();
-	            this.gameModel.gameServlet.postData(Player.inst.data.getWapUrl(Urls.URL_USER_ACCOUNT_ASSET), { token: Player.inst.token }, (data) => {
+	            this.gameModel.gameServlet.postData(Player.inst.data.getWapUrl(Urls.URL_USER_ACCOUNT_ASSET), { token: Player.inst.token }, (data, request) => {
 	                WaitResult.inst.hide();
 	                if (data.code == HttpCode.OK && data.data) {
 	                    if (data.data.balance == 0) {
