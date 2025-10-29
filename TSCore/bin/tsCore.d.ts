@@ -226,7 +226,7 @@ declare function Component<T extends {
  * ```
  * @param args
  */
-declare function Resource(...args: any[]): PropertyDescriptor | ((target: any, propertyKey: string) => PropertyDescriptor);
+declare function Resource(...args: any[]): any;
 /**
  * @BindThis 装饰器，用于自动绑定类方法中的this上下文
  *

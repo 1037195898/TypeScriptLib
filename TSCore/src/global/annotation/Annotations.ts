@@ -185,7 +185,7 @@ function Component<T extends { new(...args: any[]): {} }>(value: string | T | Co
  * ```
  * @param args
  */
-function Resource(...args: any[]) {
+function Resource(...args: any[]): any {
     // 作为装饰器工厂调用 @Resource("name")
     if (args.length === 1 && typeof args[0] === 'string') {
         const name = args[0];

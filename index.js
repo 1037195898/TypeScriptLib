@@ -36,6 +36,7 @@ const {SrcOptions} = require("vinyl-fs")
 /***************************** 公共逻辑方法 *****************************/
 
 /**
+ * https://astexplorer.net/
  * 创建一个命名空间转换器，用于处理 TypeScript 中的 import = 声明，
  * 并将简写的命名空间引用替换为完整的限定名路径。
  *
