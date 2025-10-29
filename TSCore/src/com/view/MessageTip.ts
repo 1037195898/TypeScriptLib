@@ -170,7 +170,7 @@ export class MessageTip extends fgui.GComponent {
         }
     }
 
-    getParent() {
+    getParent(): fgui.GComponent {
         return this.rootParent || fgui.GRoot.inst
     }
 

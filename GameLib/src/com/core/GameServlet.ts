@@ -401,7 +401,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
      * @param data
      * @param callback
      */
-    sendBet(url: string, data: any, callback: ParamHandler) {
+    sendBet(url: string, data: any, callback: HttpOnComplete) {
         this.postData(url, data, (data, request) => {
             if (data.code == HttpCode.OK) {
                 Player.inst.gameData.playCount++

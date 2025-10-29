@@ -1992,7 +1992,7 @@ declare namespace tsCore {
 	 */
 	export const Cast: typeof MathKit;
 	
-	const View_base: Constructor<ActionEvent & fairygui.GComponent & StringBlock & ViewBlock>;
+	const View_base: Constructor<ActionEvent & fgui.GComponent & StringBlock & ViewBlock>;
 	export class View extends View_base implements IView, IKey {
 	    protected key: string;
 	    /**
@@ -2065,7 +2065,7 @@ declare namespace tsCore {
 	    dispose(): void;
 	}
 	
-	const EButton_base: Constructor<ActionEvent & StringBlock & ViewBlock & fairygui.GButton>;
+	const EButton_base: Constructor<ActionEvent & StringBlock & ViewBlock & fgui.GButton>;
 	export class EButton extends EButton_base {
 	    protected onConstruct(): void;
 	    protected onInit(): void;
@@ -2076,7 +2076,7 @@ declare namespace tsCore {
 	    getChild<T = fgui.GObject>(...name: string[]): T;
 	}
 	
-	const EComboBox_base: Constructor<ActionEvent & StringBlock & ViewBlock & fairygui.GComboBox>;
+	const EComboBox_base: Constructor<ActionEvent & StringBlock & ViewBlock & fgui.GComboBox>;
 	export class EComboBox extends EComboBox_base {
 	    /**
 	     * 是否根据选择数据改变 icon  text
@@ -2223,7 +2223,7 @@ declare namespace tsCore {
 	    regGameAction(action: string | number, caller: any, method: Function): void;
 	}
 	
-	const EWindow_base: Constructor<ActionEvent & StringBlock & fairygui.Window & ViewProxy>;
+	const EWindow_base: Constructor<ActionEvent & StringBlock & fgui.Window & ViewProxy>;
 	/**
 	 * 实现了 fgui.Window 的窗口
 	 * 默认会添加新的路由到历史中，可通过 joinRecord 处理
@@ -3388,7 +3388,7 @@ declare namespace tsCore {
 	    private hideEnd;
 	    /** 清楚所有提示 */
 	    static clearAll(): void;
-	    getParent(): fairygui.GComponent;
+	    getParent(): fgui.GComponent;
 	}
 	
 	export class NumButton extends EButton {

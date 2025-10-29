@@ -2,8 +2,10 @@ import {IKey, IView} from "../interfaces/ICommon";
 import {StringBlock} from "../block/StringBlock";
 import {ViewBlock} from "../block/ViewBlock";
 import {ActionEvent} from "../block/ActionEvent";
+import GComponent = fgui.GComponent;
+import GObject = fgui.GObject;
 
-export class View extends mixinExt(ActionEvent, StringBlock, ViewBlock, fgui.GComponent) implements IView, IKey {
+export class View extends mixinExt(ActionEvent, StringBlock, ViewBlock, GComponent) implements IView, IKey {
 
     protected key: string
 
@@ -11,7 +13,7 @@ export class View extends mixinExt(ActionEvent, StringBlock, ViewBlock, fgui.GCo
      * 获取子组件
      * @param name 传入子组件多种命名方式
      */
-    override getChild<T = fgui.GObject>(...name: string[]): T {
+    override getChild<T = GObject>(...name: string[]): T {
         let child = null
         for (const key of name) {
             child = super.getChild(key)

@@ -106,7 +106,7 @@ function Fgui(name: string) {
  * }
  */
 function fguiFindChild(target: fgui.GComponent, childs: string[]) {
-    let obj: fairygui.GObject
+    let obj: fgui.GObject
     // 遍历子对象名称数组，逐层查找子对象
     for (const child of childs) {
         if (target instanceof fgui.GComponent) {

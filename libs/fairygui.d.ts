@@ -2822,4 +2822,3 @@ declare namespace fgui {
         parse(text: string, remove?: boolean): string;
     }
 }
-import fairygui = fgui;

@@ -1656,7 +1656,7 @@ declare namespace gameLib {
 	     * @param data
 	     * @param callback
 	     */
-	    sendBet(url: string, data: any, callback: ParamHandler): void;
+	    sendBet(url: string, data: any, callback: HttpOnComplete): void;
 	    /**
 	     * 处理发送bet请求时的错误。
 	     */
