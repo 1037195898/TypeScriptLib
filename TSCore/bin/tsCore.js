@@ -944,7 +944,8 @@ function Actions(action, group, order) {
  */
 function ClickOn(childName, args) {
     // 作为装饰器工厂调用 @ClickOn("name") 或者  @ClickOn("name", [1,2])
-    if ((arguments.length == 1 && typeof arguments[0] === 'string') || (arguments.length == 2 && typeof arguments[0] === 'string' && Array.isArray(arguments[1]))) {
+    if ((arguments.length == 1 && typeof arguments[0] === 'string') ||
+        (arguments.length == 2 && typeof arguments[0] === 'string' && Array.isArray(arguments[1]))) {
         return EventOn(Laya.Event.CLICK, childName, args);
     }
     // 作为直接装饰器调用 @ClickOn

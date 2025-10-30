@@ -43,7 +43,7 @@
  * }
  * ```
  */
-function Fgui(name: string) {
+function Fgui(name: string): any {
     return function (targetPrototype: any, propertyKey: string) {
         return {
             configurable: true,

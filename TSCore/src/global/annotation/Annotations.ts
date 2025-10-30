@@ -17,7 +17,7 @@ function getBean<T>(name: string | { new(): T }): T {
  *
  * @param {() => T} callback 一个无参数的回调函数，用于生成属性的值
  */
-function Lazy<T>(callback: () => T) {
+function Lazy<T>(callback: () => T): any {
     return function (targetPrototype: any, propertyKey: string): PropertyDescriptor {
         return {
             configurable: false,
@@ -302,10 +302,13 @@ function Actions(action: number | string, group?: string, order?: number) {
  * @param childName 子节点名称，可选
  * @param args 附加参数，可选
  */
-function ClickOn(childName?: string, args?: any[]) {
+function ClickOn(childName?: string | any, args?: string | any[]) {
     // 作为装饰器工厂调用 @ClickOn("name") 或者  @ClickOn("name", [1,2])
-    if ((arguments.length == 1 && typeof arguments[0] === 'string') || (arguments.length == 2 && typeof arguments[0] === 'string' && Array.isArray(arguments[1]))) {
-        return EventOn(Laya.Event.CLICK, childName, args)
+    if (
+        (arguments.length == 1 && typeof arguments[0] === 'string') ||
+        (arguments.length == 2 && typeof arguments[0] === 'string' && Array.isArray(arguments[1]))
+    ) {
+        return EventOn(Laya.Event.CLICK, childName, args as any[])
     }
     // 作为直接装饰器调用 @ClickOn
     if (arguments.length > 2 && typeof arguments[0] === 'object' && typeof arguments[1] === 'string') {
@@ -324,7 +327,7 @@ function ClickOn(childName?: string, args?: any[]) {
  * @param childName 子节点名称，可选
  * @param args 附加参数，可选
  */
-function EventOn(eventName: string, childName?: string, args?: any[]) {
+function EventOn(eventName: string, childName?: string, args?: any[]): any {
     return function (targetPrototype: any, propertyKey: string, descriptor: PropertyDescriptor) {
         _eventOn(targetPrototype, propertyKey, descriptor, eventName, childName, args)
     }

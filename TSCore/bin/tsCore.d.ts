@@ -135,7 +135,7 @@ declare function getBean<T>(name: string | {
  *
  * @param {() => T} callback 一个无参数的回调函数，用于生成属性的值
  */
-declare function Lazy<T>(callback: () => T): (targetPrototype: any, propertyKey: string) => PropertyDescriptor;
+declare function Lazy<T>(callback: () => T): any;
 /**
  * 使用CallLater装饰器来延迟执行方法
  * 这个装饰器会修改方法的执行方式，使其在当前逻辑帧结束后执行
@@ -262,7 +262,7 @@ declare function Actions(action: number | string, group?: string, order?: number
  * @param childName 子节点名称，可选
  * @param args 附加参数，可选
  */
-declare function ClickOn(childName?: string, args?: any[]): (targetPrototype: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
+declare function ClickOn(childName?: string | any, args?: string | any[]): any;
 /**
  * 通用事件监听装饰器
  *
@@ -273,7 +273,7 @@ declare function ClickOn(childName?: string, args?: any[]): (targetPrototype: an
  * @param childName 子节点名称，可选
  * @param args 附加参数，可选
  */
-declare function EventOn(eventName: string, childName?: string, args?: any[]): (targetPrototype: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
+declare function EventOn(eventName: string, childName?: string, args?: any[]): any;
 /**
  * 运行应用程序，并初始化所有Bean实例。
  * @param classTarget - 应用程序主类的构造函数。
@@ -327,10 +327,7 @@ declare function runApplication<T>(classTarget?: {
  * }
  * ```
  */
-declare function Fgui(name: string): (targetPrototype: any, propertyKey: string) => {
-    configurable: boolean;
-    get(this: fgui.GComponent): any;
-};
+declare function Fgui(name: string): any;
 /**
  * 定时循环执行装饰器
  * 用于装饰类方法，使其按照指定间隔循环执行

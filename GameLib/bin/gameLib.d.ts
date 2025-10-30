@@ -56,7 +56,7 @@ declare function createView<T extends fgui.GObject>(url: string, userClass?: {
  */
 declare function FguiBindView<T extends {
     new (...args: any[]): fgui.GComponent;
-}>(target: string | any): (classTarget: T) => void;
+}>(target: string | any): any;
 
 declare namespace gameLib {
 

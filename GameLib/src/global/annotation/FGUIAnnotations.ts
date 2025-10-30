@@ -23,7 +23,7 @@
  * @param target - 可选参数，FGUI视图资源路径(url) 或被装饰的类本身
  * @see {@link bindView}
  */
-function FguiBindView<T extends { new(...args: any[]): fgui.GComponent }>(target: string | any) {
+function FguiBindView<T extends { new(...args: any[]): fgui.GComponent }>(target: string | any): any {
     if (typeof target === 'string') {
         let url = target;
         // 这个内部函数是实际的类装饰器

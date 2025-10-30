@@ -962,10 +962,13 @@ function rollupStream(...options) {
 /**
  * @typedef {Object} RollupOptions
  * @property {string} [outDir] - 输出目录路径
- * @property {string} [tsconfig="tsconfig.json"] - TypeScript 配置文件路径
+ * @property {string|false} [tsconfig="tsconfig.json"] - TypeScript 配置文件路径 当设置为 false 时，忽略配置文件中指定的任何选项。如果设置为与文件路径相对应的字符串，则指定的文件将用作配置文件。
+ * @property {string|false} [filterRoot="false"] - 设置编译的根目录
  * @property {boolean} [sourcemap=false] - 是否生成 sourcemap 文件
  * @property {boolean|Options} [minify=false] - 是否压缩代码，若为对象则作为 terser 压缩配置
  * @property {rollup.InputPluginOption} [plugins=[]] - rollup 插件
+ * @property {ReadonlyArray<string | RegExp> | string | RegExp | null} [include=undefined] - include 包括的文件 默认是 {,**\/*}.(cts|mts|ts|tsx)
+ * @property {ReadonlyArray<string | RegExp> | string | RegExp | null} [exclude=undefined] - exclude 排除的文件
  */
 
 /**
@@ -980,6 +983,7 @@ function rollupPack(inputFile, outName, options) {
     options = defaults(options, {
         tsconfig: "tsconfig.json",
         sourcemap: false,
+        filterRoot: false,
         minify: false,
         plugins: []
     })
@@ -993,6 +997,9 @@ function rollupPack(inputFile, outName, options) {
             compress: false
         }),
         typescriptRollup({
+            include: options.include,
+            exclude: options.exclude,
+            filterRoot: options.filterRoot,
             transformers: {
                 before: [
                     addMetadata(),
