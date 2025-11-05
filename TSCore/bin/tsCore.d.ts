@@ -3011,17 +3011,51 @@ declare namespace tsCore {
 	     */
 	    static parseDate(data: HttpResponse): void;
 	    /**
-	     * 同步服务器时间
-	     * @param {HttpResponse} data
+	     * 同步服务器时间，计算本地与服务器的时间差以及检测时间加速情况
+	     *
+	     * 此方法的主要功能包括：
+	     * 1. 从HTTP响应中提取服务器时间戳
+	     * 2. 计算本地时间和服务器时间的基准差值
+	     * 3. 检测是否存在时间加速现象（本地时间流逝速度与服务器不同）
+	     * 4. 更新时间同步相关的时间记录点
+	     *
+	     * @param data 服务器返回的HTTP响应数据，应包含服务器时间信息
+	     *
+	     * 实现原理：
+	     * - 首先通过HTTP过滤器提取服务器时间戳
+	     * - 调用castDifference记录基础时间差
+	     * - 对比本次和上次的时间同步点，计算本地和服务器的时间流逝速率差异
+	     * - 如果发现显著的时间加速（超过10%偏差），则输出警告日志
+	     * - 更新_lastLocalTime和_lastServerTime作为下次计算的基准点
 	     */
 	    static syncServerTime(data: HttpResponse): void;
-	    static castDifference(serverTime: number): void;
-	    /** 获取差值 */
-	    static getDifference(): number;
-	    /** 当前时间  毫秒 */
+	    /**
+	     * 获取经过时间加速调整后的当前时间戳（毫秒级）
+	     *
+	     * 此方法提供了一个统一的时间获取接口，能够自动补偿以下情况：
+	     * 1. 服务器与客户端的基础时间差
+	     * 2. 本地时间流逝速率与服务器不一致的情况（时间加速）
+	     *
+	     * 工作机制：
+	     * - 如果尚未进行过时间同步（_lastServerTime为0），则直接返回本地时间
+	     * - 否则基于最后一次同步的时间点进行推算：
+	     *   a) 计算自上次同步以来本地经过的时间
+	     *   b) 根据_timeAccelerationRatio调整这段时间（补偿时间加速影响）
+	     *   c) 在服务器时间基础上加上调整后的时间增量
+	     *
+	     * 使用场景：
+	     * - 游戏中的定时逻辑
+	     * - 需要精确服务器时间的功能模块
+	     * - 跨设备时间一致性要求较高的业务逻辑
+	     *
+	     * @returns {number} 经过校准的当前时间戳（毫秒）
+	     */
 	    static getTimer(): number;
 	    /** 当前时间  秒 */
 	    static getTimerSecond(): number;
+	    static castDifference(serverTime: number): void;
+	    /** 获取差值 */
+	    static getDifference(): number;
 	    /** 解析json数据格式 */
 	    static parseJson(data?: any): string;
 	    /**
