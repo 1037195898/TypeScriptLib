@@ -2108,7 +2108,7 @@ declare namespace gameLib {
 	     * @default 200 ms
 	     */
 	    protected delayNextRound: number;
-	    protected constructor();
+	    constructor();
 	    initModel(): void;
 	    initSocketEvent(): void;
 	    private onNotice;

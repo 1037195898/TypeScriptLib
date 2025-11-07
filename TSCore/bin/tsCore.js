@@ -1131,7 +1131,7 @@ function runApplication(classTarget) {
             const classTargetName = value.classTarget.name;
             let target;
             if (value.createUi) {
-                target = fgui.UIPackage.createObjectFromURL(this.createUi, this.classTarget);
+                target = fgui.UIPackage.createObjectFromURL(value.createUi, value.classTarget);
             }
             else
                 target = new value.classTarget();

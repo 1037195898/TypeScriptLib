@@ -58,7 +58,7 @@ export class GameModel<T extends IGameData = BaseGameData> extends EProxy implem
      */
     protected delayNextRound = 200
 
-    protected constructor() {
+    constructor() {
         super()
         this.regGameAction(ActionLib.GAME_CLEAR_RES, this, this.clearRes)
         this.regGameAction(ActionLib.GAME_INIT_SOCKET_EVENT, this, this.initSocketEvent)

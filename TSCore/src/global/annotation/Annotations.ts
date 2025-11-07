@@ -501,7 +501,7 @@ function runApplication<T>(classTarget?: { new(...args: any[]): T }): T {
             const classTargetName = value.classTarget.name
             let target: any
             if (value.createUi) {
-                target = fgui.UIPackage.createObjectFromURL(this.createUi, this.classTarget)
+                target = fgui.UIPackage.createObjectFromURL(value.createUi, value.classTarget)
             } else target = new value.classTarget()
             if (/^[A-Z]/.test(value.key.charAt(0)) && value.key.toLowerCase() == classTargetName.toLowerCase()) {
                 // @ts-ignore
