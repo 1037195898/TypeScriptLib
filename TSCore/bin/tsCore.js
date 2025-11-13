@@ -2933,12 +2933,19 @@ function TimerLoop(interval, custom) {
 	     * @param    [playAudio=true]    是否播放音频
 	     */
 	    play(nameOrIndex, loop = true, force = true, start = 0, end = 0, freshSkin = true, playAudio = true) {
+	        var _a, _b, _c, _d, _e, _f;
 	        if (!this.asSkeleton.templet)
 	            return;
 	        // 如果不是数组 而是一个 object
 	        if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
 	            if (nameOrIndex.nameOrIndex && (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0))
 	                return;
+	            (_a = nameOrIndex.loop) !== null && _a !== void 0 ? _a : (nameOrIndex.loop = loop);
+	            (_b = nameOrIndex.force) !== null && _b !== void 0 ? _b : (nameOrIndex.force = force);
+	            (_c = nameOrIndex.start) !== null && _c !== void 0 ? _c : (nameOrIndex.start = start);
+	            (_d = nameOrIndex.end) !== null && _d !== void 0 ? _d : (nameOrIndex.end = end);
+	            (_e = nameOrIndex.freshSkin) !== null && _e !== void 0 ? _e : (nameOrIndex.freshSkin = freshSkin);
+	            (_f = nameOrIndex.playAudio) !== null && _f !== void 0 ? _f : (nameOrIndex.playAudio = playAudio);
 	            this.playAni(nameOrIndex, 0);
 	            return;
 	        }

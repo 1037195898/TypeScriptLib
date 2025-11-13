@@ -61,6 +61,12 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
         // 如果不是数组 而是一个 object
         if (!Array.isArray(nameOrIndex) && typeof nameOrIndex === "object") {
             if (nameOrIndex.nameOrIndex && (typeof nameOrIndex.nameOrIndex === "number" && nameOrIndex.nameOrIndex < 0)) return
+            nameOrIndex.loop ??= loop
+            nameOrIndex.force ??= force
+            nameOrIndex.start ??= start
+            nameOrIndex.end ??= end
+            nameOrIndex.freshSkin ??= freshSkin
+            nameOrIndex.playAudio ??= playAudio
             this.playAni(nameOrIndex, 0)
             return
         }
