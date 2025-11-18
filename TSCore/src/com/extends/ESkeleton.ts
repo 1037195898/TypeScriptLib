@@ -105,7 +105,7 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
         } else {
             this.nameOrIndex = this.skeletonPlay.nameOrIndex ?? 0
         }
-
+        Laya.timer.clear(this, this._play)
         if (delayPlay && delayPlay > 0) {
             Laya.timer.once(delayPlay, this, this._play)
         } else {

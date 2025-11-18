@@ -2988,6 +2988,7 @@ function TimerLoop(interval, custom) {
 	        else {
 	            this.nameOrIndex = (_b = this.skeletonPlay.nameOrIndex) !== null && _b !== void 0 ? _b : 0;
 	        }
+	        Laya.timer.clear(this, this._play);
 	        if (delayPlay && delayPlay > 0) {
 	            Laya.timer.once(delayPlay, this, this._play);
 	        }
