@@ -103,6 +103,10 @@ Object.defineProperty(fgui.UIObjectFactory, "newObject", {
  *    class ExampleView extends fgui.GComponent {
  *        // 类实现
  *    }
+ *    @FguiBindView(["ExampleView","ExampleView2"])
+ *    class ExampleView extends fgui.GComponent {
+ *        // 类实现
+ *    }
  *    ```
  * 2. 绑定已命名类（若未提供URL，则优先从类元数据获取，否则使用类名）
  *    示例:
@@ -121,6 +125,14 @@ function FguiBindView(target) {
         // 这个内部函数是实际的类装饰器
         return function (classTarget) {
             _FguiBindView(classTarget, url);
+        };
+    }
+    else if (Array.isArray(target)) {
+        const urls = target;
+        return function (classTarget) {
+            for (const url of urls) {
+                _FguiBindView(classTarget, url);
+            }
         };
     }
     else {

@@ -11,6 +11,10 @@
  *    class ExampleView extends fgui.GComponent {
  *        // 类实现
  *    }
+ *    @FguiBindView(["ExampleView","ExampleView2"])
+ *    class ExampleView extends fgui.GComponent {
+ *        // 类实现
+ *    }
  *    ```
  * 2. 绑定已命名类（若未提供URL，则优先从类元数据获取，否则使用类名）
  *    示例:
@@ -23,12 +27,19 @@
  * @param target - 可选参数，FGUI视图资源路径(url) 或被装饰的类本身
  * @see {@link bindView}
  */
-function FguiBindView<T extends { new(...args: any[]): fgui.GComponent }>(target: string | any): any {
+function FguiBindView<T extends { new(...args: any[]): fgui.GComponent }>(target: string | any | string[]): any {
     if (typeof target === 'string') {
         let url = target;
         // 这个内部函数是实际的类装饰器
         return function (classTarget: T) {
             _FguiBindView(classTarget, url);
+        };
+    } else if (Array.isArray(target)) {
+        const urls = target
+        return function (classTarget: T) {
+            for (const url of urls) {
+                _FguiBindView(classTarget, url);
+            }
         };
     } else {
         _FguiBindView(target);

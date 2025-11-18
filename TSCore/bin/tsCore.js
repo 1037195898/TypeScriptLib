@@ -1003,12 +1003,18 @@ function initBean(target, name) {
         tsCore.App.inst.regAction(actionData.action, target, actionData.fun, actionData.group || tsCore.App.GAME_GROUP, actionData.order);
     });
     // @ts-ignore
-    tsCore.TimerKit.REG_TASK
-        .filter(value => value.targetClassProperty.constructor.name == name)
+    tsCore.TimerKit.REG_TASK.groupBy(value => value.handler)
+        .values()
         .forEach(value => {
-        value.target = target;
-        // @ts-ignore
-        tsCore.TimerKit.addTask(value);
+        const task = value.filter(value => value.targetClassProperty.constructor.name == name && value.target == null);
+        if (task.length > 0) {
+            task.forEach(t => {
+                const ta = t.copy();
+                ta.target = target;
+                // @ts-ignore
+                tsCore.TimerKit.addTask(ta);
+            });
+        }
     });
 }
 /**
@@ -2846,6 +2852,9 @@ function TimerLoop(interval, custom) {
 	    setTargetClass(targetClassProperty) {
 	        this.targetClassProperty = targetClassProperty;
 	        return this;
+	    }
+	    copy() {
+	        return TimerKit.getNewTask().initData(this.target, this.handler, this.interval, this.customConditions).setTargetClass(this.targetClassProperty);
 	    }
 	}
 	

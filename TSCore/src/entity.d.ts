@@ -436,11 +436,21 @@ declare type ISkeletonPlay = {
 
 declare type ISKRelation = {
 
-    /** 关联对象 单独设置此值  将自动上下左右关联 */
+    /**
+     * 关联对象 单独设置此值  将自动上下左右关联
+     * @see fgui.RelationType.Middle_Middle
+     * @see fgui.RelationType.Center_Center
+     */
     target?: fgui.GObject
-    /** 左右关联对象 */
+    /**
+     * 左右关联对象
+     * @see fgui.RelationType.Center_Center
+     */
     lr?: fgui.GObject
-    /** 上下关联对象 */
+    /**
+     * 上下关联对象
+     * @see fgui.RelationType.Middle_Middle
+     */
     ud?: fgui.GObject
     /** 是否使用百分比关联  默认true */
     usePercent?: boolean,

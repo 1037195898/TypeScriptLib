@@ -103,4 +103,8 @@ class TaskHandler {
         this.targetClassProperty = targetClassProperty
         return this
     }
+
+    copy() {
+        return TimerKit.getNewTask().initData(this.target, this.handler, this.interval, this.customConditions).setTargetClass(this.targetClassProperty)
+    }
 }

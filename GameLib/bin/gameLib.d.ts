@@ -42,6 +42,10 @@ declare function createView<T extends fgui.GObject>(url: string, userClass?: {
  *    class ExampleView extends fgui.GComponent {
  *        // 类实现
  *    }
+ *    @FguiBindView(["ExampleView","ExampleView2"])
+ *    class ExampleView extends fgui.GComponent {
+ *        // 类实现
+ *    }
  *    ```
  * 2. 绑定已命名类（若未提供URL，则优先从类元数据获取，否则使用类名）
  *    示例:
@@ -56,7 +60,7 @@ declare function createView<T extends fgui.GObject>(url: string, userClass?: {
  */
 declare function FguiBindView<T extends {
     new (...args: any[]): fgui.GComponent;
-}>(target: string | any): any;
+}>(target: string | any | string[]): any;
 
 declare namespace gameLib {
 
