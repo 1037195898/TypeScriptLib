@@ -1422,7 +1422,12 @@ function _FguiBindView(classTarget, url) {
 	        }
 	    }
 	    /**
-	     * 舞台显示
+	     * 舞台显示回调
+	     *
+	     * 默认实现了以下功能:
+	     * 1. 添加历史记录管理
+	     * 2. 更新当前房间ID
+	     * 3. 延迟注册事件(避免屏幕旋转时获取到错误的宽高信息)
 	     */
 	    addedHandler() {
 	        super.addedHandler();
@@ -1588,7 +1593,16 @@ function _FguiBindView(classTarget, url) {
 	            Laya.timer.once(1000, this, this.reconnectionNet, [callback, count]);
 	        });
 	    }
-	    /** 新游戏开始  这里可以处理一些逻辑 */
+	    /**
+	     * 新游戏开始时的逻辑处理
+	     *
+	     * 默认实现了以下功能:
+	     * 1. 检查是否需要邀请玩家进入真实金钱游戏场景（基于特定条件）
+	     * 2. 如果满足邀请条件，则标记游戏为推荐状态并显示邀请窗口
+	     * 3. 如果不满足邀请条件，则直接执行回调函数
+	     *
+	     * @param handler - 可选的回调函数，在逻辑处理完成后执行
+	     */
 	    newGameStartLogic(handler) {
 	        let gameData = Player.inst.gameData;
 	        if (BaseScene.inviteRealMoneyNeed()) {
@@ -1650,6 +1664,8 @@ function _FguiBindView(classTarget, url) {
 	    }
 	    /**
 	     * 新一轮游戏的开始
+	     *
+	     * 默认实现了清空已经用完的优惠卷
 	     */
 	    startGame() {
 	        // 当前没有在使用的优惠卷  并且界面还在优惠卷模式下

@@ -1,4 +1,3 @@
-
 // 通用装饰器类型定义
 // type PropertyDecorator = (target: any, propertyKey: string) => PropertyDescriptor | void;
 // type ClassDecorator = <T extends Function>(constructor: T) => T | void;
@@ -186,6 +185,7 @@ declare type EventData = {
 declare interface IRunApplication {
     start(): void
 }
+
 declare type PointType = { x?: number, y?: number }
 declare type RectangleType = { x?: number, y?: number, width?: number, height?: number }
 
@@ -352,6 +352,8 @@ declare type PlaySkeletonFrame = {
     playComplete?: ParamHandler
 }
 
+declare type ProgressHandler = Laya.Handler | ((nameOrIndex: string | number) => void)
+
 /**
  * skeleton 播放参数
  */
@@ -397,7 +399,7 @@ declare type ISkeletonPlay = {
      *
      * 默认是播放结束， 可以设置 before 播放之前和 after之后 会带传入的`nameOrIndex: string | number`参数，默认播放传入的是0
      */
-    progress?: ParamHandler | { before?: ParamHandler, after?: ParamHandler }
+    progress?: ProgressHandler | { before?: ProgressHandler, after?: ProgressHandler }
     /**
      *
      * false,如果要播的动画跟上一个相同就不生效
