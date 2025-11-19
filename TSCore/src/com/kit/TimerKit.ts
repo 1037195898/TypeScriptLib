@@ -132,20 +132,29 @@ export class TimerKit {
         for (let i = 0; i < TimerKit.tasks.length; i++) {
             const task = TimerKit.tasks[i]
 
-            // 如果有自定义条件且满足，或者组件未销毁、可见性正常并且到达执行周期，则执行任务
-            if ((task.customConditions && task.customConditions()) ||
-                (!task.target.isDisposed
-                    && task.target.parent
-                    && task.target.alpha > 0
-                    && task.target.internalVisible2
-                    && task.lastRunTime + task.interval < time
-                )
-            ) {
-                task.lastRunTime = time
-                task.handler.call(task.target)
+            if (task.customConditions && task.customConditions()) {
+                this.runTask(task, time)
+            } else if (task.frame > 0) {
+                task.frameDelta++
+                if (task.frameDelta >= task.frame) {
+                    this.runTask(task, time)
+                    task.frameDelta = 0
+                }
+            } else if (task.interval > 0 && task.lastRunTime + task.interval < time) {
+                this.runTask(task, time)
             }
         }
 
+    }
+
+    private runTask(task: TaskHandler, time: number = Laya.Browser.now()) {
+        if (!task.target.isDisposed
+            && task.target.parent
+            && task.target.alpha > 0
+            && task.target.internalVisible2) {
+            task.lastRunTime = time
+            task.handler.call(task.target)
+        }
     }
 
 }
@@ -174,6 +183,15 @@ class TaskHandler {
      * 执行间隔时间（毫秒）
      */
     interval: number
+    /**
+     * 执行帧间隔
+     */
+    frame = 0
+    /**
+     * 距离上次执行经过的帧数
+     * @internal
+     */
+    frameDelta = 0
 
     /**
      * 目标类属性（扩展用途）
@@ -202,6 +220,19 @@ class TaskHandler {
         return this
     }
 
+    setFrame(frame: number) {
+        this.frame = frame
+        this.frameDelta = 0
+        if (this.frame > 0) this.interval = 0
+        return this
+    }
+
+    setInterval(interval: number) {
+        this.interval = interval
+        if (this.interval > 0) this.frame = this.frameDelta = 0
+        return this
+    }
+
     /**
      * 设置目标类属性字段（可用于标识来源等）
      * @param targetClassProperty 属性值
@@ -217,6 +248,8 @@ class TaskHandler {
      * @returns 新的 TaskHandler 实例
      */
     copy() {
-        return TimerKit.getNewTask().initData(this.target, this.handler, this.interval, this.customConditions).setTargetClass(this.targetClassProperty)
+        return TimerKit.getNewTask().initData(this.target, this.handler, this.interval, this.customConditions)
+            .setFrame(this.frame)
+            .setTargetClass(this.targetClassProperty)
     }
 }

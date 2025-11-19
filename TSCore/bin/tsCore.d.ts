@@ -153,7 +153,7 @@ declare function CallLater(targetPrototype: any, propertyKey: string, descriptor
  * @param num 延迟的毫秒数
  * @returns 返回一个装饰器，用于装饰方法
  */
-declare function CallDelay(num: number): (targetPrototype: any, propertyKey: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
+declare function CallDelay(num: number | RandomTimer): (targetPrototype: any, propertyKey: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
 /**
  * 使用CallDelayByFrame装饰器来延迟执行方法
  * 这个装饰器会修改方法的执行方式，使其在指定的帧数后执行
@@ -161,7 +161,7 @@ declare function CallDelay(num: number): (targetPrototype: any, propertyKey: str
  * @param num 延迟的帧数
  * @returns 返回一个装饰器，用于装饰方法
  */
-declare function CallDelayByFrame(num: number): (targetPrototype: any, propertyKey: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
+declare function CallDelayByFrame(num: number | RandomTimer): (targetPrototype: any, propertyKey: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
 /**
  * 设置应用程序的主类
  *
@@ -354,6 +354,22 @@ declare function Fgui(name: string): any;
  * ```
  */
 declare function TimerLoop(interval: number, custom?: () => boolean): (targetProperty: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
+/**
+ * @borrows TimerLoop as TimerFrameLoop
+ */
+declare function TimerFrameLoop(frame: number, custom?: () => boolean): (targetProperty: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
+declare class RandomTimer {
+    protected min: number;
+    protected max: number;
+    static create(min?: number, max?: number): RandomTimer;
+    protected constructor(min?: number, max?: number);
+    getNumber(): number;
+}
+declare class RandomTimerSingle extends RandomTimer {
+    protected value: number;
+    static create(min?: number, max?: number): RandomTimerSingle;
+    getNumber(): number;
+}
 
 declare namespace tsCore {
 
@@ -1354,6 +1370,7 @@ declare namespace tsCore {
 	     * 判断每个任务是否满足运行条件，若满足则执行回调
 	     */
 	    private onUpdate;
+	    private runTask;
 	}
 	/**
 	 * TaskHandler 类表示一个具体的定时任务项，封装了任务的目标对象、回调函数及相关配置信息
@@ -1377,6 +1394,10 @@ declare namespace tsCore {
 	     */
 	    interval: number;
 	    /**
+	     * 执行帧间隔
+	     */
+	    frame: number;
+	    /**
 	     * 目标类属性（扩展用途）
 	     */
 	    targetClassProperty: any;
@@ -1393,6 +1414,8 @@ declare namespace tsCore {
 	     * @returns 返回自身实例以支持链式调用
 	     */
 	    initData(target: fgui.GObject, fun: (...args: any[]) => any, interval?: number, custom?: () => boolean): this;
+	    setFrame(frame: number): this;
+	    setInterval(interval: number): this;
 	    /**
 	     * 设置目标类属性字段（可用于标识来源等）
 	     * @param targetClassProperty 属性值

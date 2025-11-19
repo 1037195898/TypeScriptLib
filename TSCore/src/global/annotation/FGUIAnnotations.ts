@@ -155,3 +155,52 @@ function TimerLoop(interval: number, custom?: () => boolean) {
         ).setTargetClass(targetProperty))
     }
 }
+
+/**
+ * @borrows TimerLoop as TimerFrameLoop
+ */
+function TimerFrameLoop(frame: number, custom?: () => boolean) {
+    return function (targetProperty: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        // @ts-ignore
+        tsCore.TimerKit.REG_TASK.push(tsCore.TimerKit.getNewTask().initData(
+            null,
+            descriptor.value,
+            0,
+            custom
+        ).setTargetClass(targetProperty).setFrame(frame))
+    }
+}
+
+class RandomTimer {
+
+    protected min: number
+    protected max: number
+
+    static create(min: number = 0, max: number = 100) {
+        return new RandomTimer(min, max)
+    }
+
+    protected constructor(min: number = 0, max: number = 100) {
+        this.min = min
+        this.max = max
+    }
+
+    getNumber(): number {
+        return random(this.min, this.max)
+    }
+
+}
+
+class RandomTimerSingle extends RandomTimer {
+
+    protected value: number
+
+    static override create(min: number = 0, max: number = 100) {
+        return new RandomTimerSingle(min, max)
+    }
+
+    override getNumber(): number {
+        return this.value ? this.value : (this.value = super.getNumber())
+    }
+
+}

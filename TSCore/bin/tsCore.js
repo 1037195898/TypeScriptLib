@@ -711,8 +711,14 @@ function CallLater(targetPrototype, propertyKey, descriptor) {
 function CallDelay(num) {
     return function (targetPrototype, propertyKey, descriptor) {
         const originalMethod = descriptor.value;
+        let delay;
         descriptor.value = function (...args) {
-            Laya.timer.once(num, this, originalMethod, args);
+            if (typeof num !== "number") {
+                delay = num.getNumber();
+            }
+            else
+                delay = num;
+            Laya.timer.once(delay, this, originalMethod, args);
         };
         return descriptor;
     };
@@ -727,8 +733,14 @@ function CallDelay(num) {
 function CallDelayByFrame(num) {
     return function (targetPrototype, propertyKey, descriptor) {
         const originalMethod = descriptor.value;
+        let delay;
         descriptor.value = function (...args) {
-            Laya.timer.frameOnce(num, this, originalMethod, args);
+            if (typeof num !== "number") {
+                delay = num.getNumber();
+            }
+            else
+                delay = num;
+            Laya.timer.frameOnce(delay, this, originalMethod, args);
         };
         return descriptor;
     };
@@ -1314,6 +1326,35 @@ function TimerLoop(interval, custom) {
         // @ts-ignore
         tsCore.TimerKit.REG_TASK.push(tsCore.TimerKit.getNewTask().initData(null, descriptor.value, interval, custom).setTargetClass(targetProperty));
     };
+}
+/**
+ * @borrows TimerLoop as TimerFrameLoop
+ */
+function TimerFrameLoop(frame, custom) {
+    return function (targetProperty, propertyKey, descriptor) {
+        // @ts-ignore
+        tsCore.TimerKit.REG_TASK.push(tsCore.TimerKit.getNewTask().initData(null, descriptor.value, 0, custom).setTargetClass(targetProperty).setFrame(frame));
+    };
+}
+class RandomTimer {
+    static create(min = 0, max = 100) {
+        return new RandomTimer(min, max);
+    }
+    constructor(min = 0, max = 100) {
+        this.min = min;
+        this.max = max;
+    }
+    getNumber() {
+        return random(this.min, this.max);
+    }
+}
+class RandomTimerSingle extends RandomTimer {
+    static create(min = 0, max = 100) {
+        return new RandomTimerSingle(min, max);
+    }
+    getNumber() {
+        return this.value ? this.value : (this.value = super.getNumber());
+    }
 }
 
 (function (tsCore) {
@@ -2878,16 +2919,28 @@ function TimerLoop(interval, custom) {
 	        // 遍历所有任务进行判断和执行
 	        for (let i = 0; i < TimerKit.tasks.length; i++) {
 	            const task = TimerKit.tasks[i];
-	            // 如果有自定义条件且满足，或者组件未销毁、可见性正常并且到达执行周期，则执行任务
-	            if ((task.customConditions && task.customConditions()) ||
-	                (!task.target.isDisposed
-	                    && task.target.parent
-	                    && task.target.alpha > 0
-	                    && task.target.internalVisible2
-	                    && task.lastRunTime + task.interval < time)) {
-	                task.lastRunTime = time;
-	                task.handler.call(task.target);
+	            if (task.customConditions && task.customConditions()) {
+	                this.runTask(task, time);
 	            }
+	            else if (task.frame > 0) {
+	                task.frameDelta++;
+	                if (task.frameDelta >= task.frame) {
+	                    this.runTask(task, time);
+	                    task.frameDelta = 0;
+	                }
+	            }
+	            else if (task.interval > 0 && task.lastRunTime + task.interval < time) {
+	                this.runTask(task, time);
+	            }
+	        }
+	    }
+	    runTask(task, time = Laya.Browser.now()) {
+	        if (!task.target.isDisposed
+	            && task.target.parent
+	            && task.target.alpha > 0
+	            && task.target.internalVisible2) {
+	            task.lastRunTime = time;
+	            task.handler.call(task.target);
 	        }
 	    }
 	}
@@ -2907,6 +2960,17 @@ function TimerLoop(interval, custom) {
 	 * TaskHandler 类表示一个具体的定时任务项，封装了任务的目标对象、回调函数及相关配置信息
 	 */
 	class TaskHandler {
+	    constructor() {
+	        /**
+	         * 执行帧间隔
+	         */
+	        this.frame = 0;
+	        /**
+	         * 距离上次执行经过的帧数
+	         * @internal
+	         */
+	        this.frameDelta = 0;
+	    }
 	    /**
 	     * 初始化任务处理器的数据
 	     * @param target 目标对象
@@ -2923,6 +2987,19 @@ function TimerLoop(interval, custom) {
 	        this.lastRunTime = 0;
 	        return this;
 	    }
+	    setFrame(frame) {
+	        this.frame = frame;
+	        this.frameDelta = 0;
+	        if (this.frame > 0)
+	            this.interval = 0;
+	        return this;
+	    }
+	    setInterval(interval) {
+	        this.interval = interval;
+	        if (this.interval > 0)
+	            this.frame = this.frameDelta = 0;
+	        return this;
+	    }
 	    /**
 	     * 设置目标类属性字段（可用于标识来源等）
 	     * @param targetClassProperty 属性值
@@ -2937,7 +3014,9 @@ function TimerLoop(interval, custom) {
 	     * @returns 新的 TaskHandler 实例
 	     */
 	    copy() {
-	        return TimerKit.getNewTask().initData(this.target, this.handler, this.interval, this.customConditions).setTargetClass(this.targetClassProperty);
+	        return TimerKit.getNewTask().initData(this.target, this.handler, this.interval, this.customConditions)
+	            .setFrame(this.frame)
+	            .setTargetClass(this.targetClassProperty);
 	    }
 	}
 	

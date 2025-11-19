@@ -62,11 +62,15 @@ function CallLater(targetPrototype: any, propertyKey: string, descriptor: Proper
  * @param num 延迟的毫秒数
  * @returns 返回一个装饰器，用于装饰方法
  */
-function CallDelay(num: number) {
+function CallDelay(num: number | RandomTimer) {
     return function (targetPrototype: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
+        let delay: number
         descriptor.value = function (...args: any[]) {
-            Laya.timer.once(num, this, originalMethod, args)
+            if (typeof num !== "number") {
+                delay = num.getNumber()
+            } else delay = num
+            Laya.timer.once(delay, this, originalMethod, args)
         }
         return descriptor;
     }
@@ -79,11 +83,15 @@ function CallDelay(num: number) {
  * @param num 延迟的帧数
  * @returns 返回一个装饰器，用于装饰方法
  */
-function CallDelayByFrame(num: number) {
+function CallDelayByFrame(num: number | RandomTimer) {
     return function (targetPrototype: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
+        let delay: number
         descriptor.value = function (...args: any[]) {
-            Laya.timer.frameOnce(num, this, originalMethod, args)
+            if (typeof num !== "number") {
+                delay = num.getNumber()
+            } else delay = num
+            Laya.timer.frameOnce(delay, this, originalMethod, args)
         }
         return descriptor;
     }
