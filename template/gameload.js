@@ -1,17 +1,17 @@
 /**
  * @param value {number}
  */
-window.onProgress = null
+onProgress = null
 
 /**
  * @type {()=>void}
  */
-window.onError = null
+onError = null
 
 /**
  * @type {string|(()=>string)}
  */
-window.crashUrl = null
+crashUrl = null
 
 /**
  * 上传错误验证函数
@@ -20,7 +20,18 @@ window.crashUrl = null
  * @param url {string}
  * @return {boolean} false 验证失败 true 验证成功可以上传
  */
-window.sendErrorVerifies = null
+sendErrorVerifies = null
+
+/**
+ * 已经完成的加载数量
+ * @type {number}
+ */
+completeLoaderNum = 0
+/**
+ * 当前加载的总数
+ * @type {number}
+ */
+loaderTotalNum = 0
 
 /**
  * 获取路径名字的正则
@@ -49,12 +60,35 @@ function pathName(url) {
 }
 
 /**
- * 批量加载资源
- * @param url {{ key:string, v:number} | { key:string, v:number}[]}
- * @param parallel {boolean} 是否一起执行，false。顺序执行
- * @param onComplete {function} 全部执行完成
+ * 批量加载资源文件
+ *
+ * 此函数支持并行或顺序加载多种类型的资源文件，包括JavaScript文件和其他文本资源。
+ * 对于非JS资源，会将其内容存储到全局参数对象中；对于JS资源，则通过动态创建script标签加载。
+ *
+ * @param {{ key:string, v:number} | { key:string, v:number}[]} url - 要加载的资源URL或URL对象数组
+ *   - 当为字符串时，表示单一资源路径
+ *   - 当为对象时，格式应为{key: string, v: number}，其中key是资源路径，v是版本号
+ * @param {boolean} [parallel=true] - 是否并行加载JS文件
+ *   - true: 并行加载所有JS文件
+ *   - false: 顺序加载JS文件（仅对JS文件有效）
+ * @param {Function} [onComplete=null] - 所有资源加载完成后的回调函数
+ *   - 在所有资源都加载完毕后执行一次
+ * @param {(data: *, url: string)=> boolean} [customParse=null] - 自定义解析函数，用于处理非JS资源的数据
+ *   - 接收参数(data, url)，其中data是加载的资源内容，url是资源地址
+ *   - 返回false可中断当前资源的后续处理流程
+ *
+ * @example
+ * // 加载单个JS文件
+ * loadBatch({key: "script/main.js", v: 1}, true, () => console.log("加载完成"))
+ *
+ * @example
+ * // 并行加载多个资源
+ * loadBatch([
+ *   {key: "config/game.xml", v: 1},
+ *   {key: "data/level.json", v: 1}
+ * ], true, () => console.log("全部加载完成"))
  */
-function loadBatch(url, parallel = true, onComplete = null) {
+function loadBatch(url, parallel = true, onComplete = null, customParse = null) {
     if (!Array.isArray(url)) url = [url]
     const loadRes = url.map(value => getLoadUrl(value.key, value.v))
     let len = loadRes.length
@@ -63,7 +97,13 @@ function loadBatch(url, parallel = true, onComplete = null) {
     if (!check) { // 非js
         for (const key of loadRes) {
             loadContent(key, (data, url) => {
-
+                if (customParse) {
+                    const result = customParse(data, url)
+                    if (!result) {
+                        complete()
+                        return
+                    }
+                }
                 const name = pathName(url)
                 let parameter = window["$_parameter"]
                 if (!parameter) {
@@ -71,7 +111,6 @@ function loadBatch(url, parallel = true, onComplete = null) {
                     window["$_parameter"] = parameter
                 }
                 parameter[name] = [url, data]
-
                 if (url.endsWith(".xml")) {
                     window["$_crc"] = data
                 }
@@ -204,16 +243,16 @@ function getQueryString(name) {
         return null;
     let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
     let r = window.location.search.substring(1).match(reg);
-    if (r != null) return unescape(r[2]);
+    if (r != null) return decodeURIComponent(r[2]);
     return null;
 }
 
 /**
  *
  * @param url {string}
- * @param complete {(content)=>void}
+ * @param complete {(content:string, ...args:any[])=>void}
  * @param args {any[]}
- * @param error {(e)=>void}
+ * @param error {(...args:any[])=>void}
  */
 function loadContent(url, complete, args = [], error) {
     let http = new XMLHttpRequest()
@@ -237,7 +276,7 @@ function loadContent(url, complete, args = [], error) {
 }
 
 function loadError(e) {
-    onError && onError()
+    onError && onError(e)
 }
 
 /**

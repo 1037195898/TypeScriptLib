@@ -12,6 +12,7 @@ const each = require("gulp-each")
 const sort = require('gulp-sort')
 const rename = require('gulp-rename')
 const sourcemaps = require('gulp-sourcemaps')
+const {InitOptions, WriteOptions} = require("gulp-sourcemaps")
 const gulpTs = require("gulp-typescript")
 const through2 = require("through2").obj
 const {Settings} = require("gulp-typescript")
@@ -546,23 +547,24 @@ class DefaultsError extends Error {
 
 /**
  * 压缩js
- * @param files {string[] | chunk}
- * @param terserOpt {MinifyOptions}
- * @param [mapFile="."] {string} map保存位置
- * @return {*}
+ * @param files {string[] | File}
+ * @param [terserOpt=undefined] {MinifyOptions}
+ * @param [initMapsOpt=undefined] {InitOptions} map初始化
+ * @param [writeMapsOpt=undefined] {string|WriteOptions} map保存位置
+ * @return {NodeJS.ReadWriteStream}
  */
-function mJs(files, terserOpt, mapFile) {
+function mJs(files, terserOpt, initMapsOpt, writeMapsOpt) {
     let stream
     if (Array.isArray(files)) {
         stream = gulp.src(files)
     } else stream = gulp.src(files.path) // 重新获取流
-    if (!terserOpt.mangle) {
+    if (terserOpt && !terserOpt.mangle) {
         return stream.pipe(gulpTerser(terserOpt)).pipe(rename({extname: '.min.js', dirname: ""}))
     }
-    return stream.pipe(sourcemaps.init())
+    return stream.pipe(sourcemaps.init(initMapsOpt))
         .pipe(gulpTerser(terserOpt))
         .pipe(rename({extname: '.min.js', dirname: ""}))
-        .pipe(sourcemaps.write(mapFile ? mapFile : "."))
+        .pipe(sourcemaps.write(writeMapsOpt))
 }
 
 /**

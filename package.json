@@ -37,7 +37,5 @@
     "types.js",
     "monkey-path.js",
     "rollup-rename-plugin.js"
-  ],
-  "devDependencies": {
-  }
+  ]
 }

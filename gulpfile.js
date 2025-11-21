@@ -9,7 +9,7 @@ const gulp = require("gulp")
 
 const AdmZip = require('adm-zip')
 const {reserved} = require("./reserved")
-const {createDirectory, clean, runStream, cleanStream, print} = require("./index")
+const {createDirectory, clean, runStream, cleanStream, print, mJs} = require("./index")
 const {SourceMapConsumer, SourceNode} = require('source-map');
 
 gulp.task("resetSource", (f) => {
@@ -126,7 +126,12 @@ gulp.task('build-Temp', () => {
 })
 
 gulp.task("min-js", () => {
-    return generate.minifyJs(["./template/domparserinone.js", "./template/gameload.js", "./template/Reflect.js"], "./template")
+    return mJs(
+        ["./template/domparserinone.js", "./template/gameload.js", "./template/reflect.js"],
+        undefined, undefined, {
+            addComment: false
+        }
+    ).pipe(gulp.dest("./template"))
 })
 
 
