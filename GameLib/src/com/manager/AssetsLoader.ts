@@ -26,6 +26,7 @@ import {LibStr} from "../LibStr"
 import {GameConfigKit} from "../kit/GameConfigKit";
 import {ILoadSoundFilter} from "../interfaces/IGame";
 import {ResUtils} from "../utils/ResUtils";
+import UIConfig = fgui.UIConfig;
 
 /**
  * 资源管理类
@@ -42,6 +43,7 @@ export class AssetsLoader implements IFormatPath {
     static readonly ma = Browser.now()
     /** 资源配置文件名 */
     static CONFIG_RES_NAME = "resConfig.xml"
+
     /** 资源配置文件名 */
     static DEFAULT_INIT_RES_NAME = null
     /**
@@ -50,6 +52,31 @@ export class AssetsLoader implements IFormatPath {
      * https://res.game.co/assetsversion.json
      */
     static VERSION_RES_URL = null
+    /**
+     * 公共组件的配置信息
+     * @property packageName 包名字 UIPackage.getByName(commonRes.packageName) this.addPackage(commonRes.packageName)
+     * @property configName 获取公共配置信息的名字  ConfigKit.get(commonRes.configName)
+     *
+     * @example
+     *
+     * config.js
+     * common = [
+     *     {url: "", type:""},
+     *     {url: "", type:""},
+     *     {url: "", type:""}
+     * ]
+     *
+     * 要解析的数据
+     * commonRes = {
+     *     packageName: "game/common",
+     *     configName: "common"
+     * }
+     *
+     * 配置这个属性的时候 configName 必须有，而packageName 可以自动根据数组中的数据url的后缀等于 UIConfig.packageFileExtension 进行推断出来
+     *
+     */
+    commonRes: { packageName?: string, configName: string } = null
+
     /** 下载成功 */
     private handler: ParamHandler
     /** 下载失败 */
@@ -360,9 +387,16 @@ export class AssetsLoader implements IFormatPath {
             runFun(this.customLoaderRes, loadArray)
         }
 
-        if (!UIPackage.getByName("gameCommon/gameCommon")) {
-            let gameCommonRes: LoadRes[] = ConfigKit.get("gameCommon") || []
-            loadArray = loadArray.concat(gameCommonRes)
+        if (this.commonRes) {
+            let gameCommonRes: LoadRes[] = ConfigKit.get(this.commonRes.configName)
+            if (gameCommonRes) {
+                const exte = "." + UIConfig.packageFileExtension
+                const loadRes = gameCommonRes.find(value => value.url.endsWith(exte))
+                this.commonRes.packageName = loadRes?.url?.replace(exte, "")
+                if (this.commonRes.packageName && !UIPackage.getByName(this.commonRes.packageName)) {
+                    loadArray = loadArray.concat(gameCommonRes)
+                }
+            }
         }
 
         // 解析资源判断是否需要特殊处理的加载文件
@@ -509,6 +543,11 @@ export class AssetsLoader implements IFormatPath {
 
     private progressComplete(e: number) {
         let pro = parseInt(e * 100 + "")
+        if (LoadingWindow.inst == null) {
+            const tempValue = LoadingWindow.getProgress(pro, 4, 4)
+            JSUtils.getProgress(tempValue)
+            return
+        }
         if (Render.isConchApp) {
 //            AppManager.showLoadingPro(pro, 4, 4)
             LoadingWindow.inst.updateMsg(pro, 4, 4)
@@ -526,13 +565,16 @@ export class AssetsLoader implements IFormatPath {
             this.loadErrorHandler()
             return
         }
-        if (!UIPackage.getByName("gameCommon/gameCommon")) {
-            if (!this.addPackage("gameCommon/gameCommon")) {
-                this.loadErrorHandler()
-                return
+
+        if (this.commonRes?.packageName) {
+            if (!UIPackage.getByName(this.commonRes.packageName)) {
+                if (!this.addPackage(this.commonRes.packageName)) {
+                    this.loadErrorHandler()
+                    return
+                }
+                // 通知开始注册游戏公共类 事件
+                App.inst.sendAction(ActionLib.GAME_REG_GAME_COMMON_CLASS)
             }
-            // 通知开始注册游戏公共类 事件
-            App.inst.sendAction(ActionLib.GAME_REG_GAME_COMMON_CLASS)
         }
 
         if (!this.addPackages(this.loadObj.res)) {

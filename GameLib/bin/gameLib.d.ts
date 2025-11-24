@@ -1958,6 +1958,33 @@ declare namespace gameLib {
 	     * https://res.game.co/assetsversion.json
 	     */
 	    static VERSION_RES_URL: any;
+	    /**
+	     * 公共组件的配置信息
+	     * @property packageName 包名字 UIPackage.getByName(commonRes.packageName) this.addPackage(commonRes.packageName)
+	     * @property configName 获取公共配置信息的名字  ConfigKit.get(commonRes.configName)
+	     *
+	     * @example
+	     *
+	     * config.js
+	     * common = [
+	     *     {url: "", type:""},
+	     *     {url: "", type:""},
+	     *     {url: "", type:""}
+	     * ]
+	     *
+	     * 要解析的数据
+	     * commonRes = {
+	     *     packageName: "game/common",
+	     *     configName: "common"
+	     * }
+	     *
+	     * 配置这个属性的时候 configName 必须有，而packageName 可以自动根据数组中的数据url的后缀等于 UIConfig.packageFileExtension 进行推断出来
+	     *
+	     */
+	    commonRes: {
+	        packageName?: string;
+	        configName: string;
+	    };
 	    /** 下载成功 */
 	    private handler;
 	    /** 下载失败 */

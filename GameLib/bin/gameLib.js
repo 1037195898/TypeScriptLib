@@ -3531,6 +3531,30 @@ function _FguiBindView(classTarget, url) {
 	        return this._instance;
 	    }
 	    constructor() {
+	        /**
+	         * 公共组件的配置信息
+	         * @property packageName 包名字 UIPackage.getByName(commonRes.packageName) this.addPackage(commonRes.packageName)
+	         * @property configName 获取公共配置信息的名字  ConfigKit.get(commonRes.configName)
+	         *
+	         * @example
+	         *
+	         * config.js
+	         * common = [
+	         *     {url: "", type:""},
+	         *     {url: "", type:""},
+	         *     {url: "", type:""}
+	         * ]
+	         *
+	         * 要解析的数据
+	         * commonRes = {
+	         *     packageName: "game/common",
+	         *     configName: "common"
+	         * }
+	         *
+	         * 配置这个属性的时候 configName 必须有，而packageName 可以自动根据数组中的数据url的后缀等于 UIConfig.packageFileExtension 进行推断出来
+	         *
+	         */
+	        this.commonRes = null;
 	        /** 是否是http  */
 	        this.httpProtocol = Laya.Browser.window.location.protocol == "http:";
 	        this.runLoads = [];
@@ -3737,6 +3761,7 @@ function _FguiBindView(classTarget, url) {
 	     * @param errorHandler 加载失败
 	     */
 	    loadRes(obj, handler, errorHandler) {
+	        var _a;
 	        this.handler = handler;
 	        this.errorHandler = errorHandler;
 	        this.loadObj = obj;
@@ -3766,9 +3791,16 @@ function _FguiBindView(classTarget, url) {
 	        if (this.customLoaderRes) {
 	            runFun(this.customLoaderRes, loadArray);
 	        }
-	        if (!fgui.UIPackage.getByName("gameCommon/gameCommon")) {
-	            let gameCommonRes = tsCore.ConfigKit.get("gameCommon") || [];
-	            loadArray = loadArray.concat(gameCommonRes);
+	        if (this.commonRes) {
+	            let gameCommonRes = tsCore.ConfigKit.get(this.commonRes.configName);
+	            if (gameCommonRes) {
+	                const exte = "." + fgui.UIConfig.packageFileExtension;
+	                const loadRes = gameCommonRes.find(value => value.url.endsWith(exte));
+	                this.commonRes.packageName = (_a = loadRes === null || loadRes === void 0 ? void 0 : loadRes.url) === null || _a === void 0 ? void 0 : _a.replace(exte, "");
+	                if (this.commonRes.packageName && !fgui.UIPackage.getByName(this.commonRes.packageName)) {
+	                    loadArray = loadArray.concat(gameCommonRes);
+	                }
+	            }
 	        }
 	        // 解析资源判断是否需要特殊处理的加载文件
 	        loadArray = loadArray.concat(this.parseRes(res));
@@ -3910,6 +3942,11 @@ function _FguiBindView(classTarget, url) {
 	    }
 	    progressComplete(e) {
 	        let pro = parseInt(e * 100 + "");
+	        if (LoadingWindow.inst == null) {
+	            const tempValue = LoadingWindow.getProgress(pro, 4, 4);
+	            JSUtils.getProgress(tempValue);
+	            return;
+	        }
 	        if (Laya.Render.isConchApp) {
 	            //            AppManager.showLoadingPro(pro, 4, 4)
 	            LoadingWindow.inst.updateMsg(pro, 4, 4);
@@ -3924,17 +3961,20 @@ function _FguiBindView(classTarget, url) {
 	        }
 	    }
 	    loadComplete(success) {
+	        var _a;
 	        if (!success) {
 	            this.loadErrorHandler();
 	            return;
 	        }
-	        if (!fgui.UIPackage.getByName("gameCommon/gameCommon")) {
-	            if (!this.addPackage("gameCommon/gameCommon")) {
-	                this.loadErrorHandler();
-	                return;
+	        if ((_a = this.commonRes) === null || _a === void 0 ? void 0 : _a.packageName) {
+	            if (!fgui.UIPackage.getByName(this.commonRes.packageName)) {
+	                if (!this.addPackage(this.commonRes.packageName)) {
+	                    this.loadErrorHandler();
+	                    return;
+	                }
+	                // 通知开始注册游戏公共类 事件
+	                tsCore.App.inst.sendAction(ActionLib.GAME_REG_GAME_COMMON_CLASS);
 	            }
-	            // 通知开始注册游戏公共类 事件
-	            tsCore.App.inst.sendAction(ActionLib.GAME_REG_GAME_COMMON_CLASS);
 	        }
 	        if (!this.addPackages(this.loadObj.res)) {
 	            this.loadErrorHandler();
