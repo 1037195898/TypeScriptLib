@@ -4804,12 +4804,11 @@ class RandomTimerSingle extends RandomTimer {
 	        return this.eventGroup.getOrPut(groupKey, () => new Map());
 	    }
 	    regAction(action, caller, method, group, order) {
-	        let handler;
 	        if (!(method instanceof Laya.Handler)) {
-	            handler = new Laya.Handler(caller, method);
+	            method = new Laya.Handler(caller, method);
 	        }
-	        handler.order = order;
-	        this.regActionHandler(action, handler, group);
+	        method.order = order;
+	        this.regActionHandler(action, method, group);
 	    }
 	    clearView() {
 	        this.cacheTarget.clear();

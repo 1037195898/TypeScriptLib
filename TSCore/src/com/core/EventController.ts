@@ -37,12 +37,11 @@ export class EventController implements IController {
     }
 
     regAction(action: string | number, caller: any, method: ParamHandler, group?: string, order?: number) {
-        let handler: Laya.Handler
         if (!(method instanceof Laya.Handler)) {
-            handler = new Laya.Handler(caller, method)
+            method = new Laya.Handler(caller, method)
         }
-        handler.order = order
-        this.regActionHandler(action, handler, group)
+        method.order = order
+        this.regActionHandler(action, method, group)
     }
 
     clearView() {
