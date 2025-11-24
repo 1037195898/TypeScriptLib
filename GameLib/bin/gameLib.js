@@ -3767,7 +3767,7 @@ function _FguiBindView(classTarget, url) {
 	            runFun(this.customLoaderRes, loadArray);
 	        }
 	        if (!fgui.UIPackage.getByName("gameCommon/gameCommon")) {
-	            let gameCommonRes = tsCore.ConfigKit.get("gameCommon");
+	            let gameCommonRes = tsCore.ConfigKit.get("gameCommon") || [];
 	            loadArray = loadArray.concat(gameCommonRes);
 	        }
 	        // 解析资源判断是否需要特殊处理的加载文件

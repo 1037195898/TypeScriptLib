@@ -361,7 +361,7 @@ export class AssetsLoader implements IFormatPath {
         }
 
         if (!UIPackage.getByName("gameCommon/gameCommon")) {
-            let gameCommonRes: LoadRes[] = ConfigKit.get("gameCommon")
+            let gameCommonRes: LoadRes[] = ConfigKit.get("gameCommon") || []
             loadArray = loadArray.concat(gameCommonRes)
         }
 

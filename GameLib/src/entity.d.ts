@@ -10,7 +10,7 @@ declare type ResConfig = {
      * 执行启动函数
      * @see startClass
      */
-    completeFun: Function
+    completeFun?: Function
     /**
      * 启动类
      *
@@ -18,7 +18,7 @@ declare type ResConfig = {
      * @see completeFun
      * @see runApplication
      */
-    startClass: { new(): gameLib.BaseStarter }
+    startClass?: { new(): gameLib.BaseStarter }
     /** 要加载的额外库 */
     libs?: string[],
     /** 引导帮助文档 */
