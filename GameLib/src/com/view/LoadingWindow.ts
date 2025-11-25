@@ -27,7 +27,7 @@ export class LoadingWindow extends BaseView {
     }
 
     static hide() {
-        this.inst?.hide()
+        this._instance?.hide()
     }
 
     static show(index?: number, headText?: string) {

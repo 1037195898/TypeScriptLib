@@ -941,9 +941,12 @@ declare namespace gameLib {
 	export class WaitResult extends fgui.GComponent {
 	    private static _instance;
 	    static get inst(): WaitResult;
+	    static CREATE_FUI_URL: string;
 	    static defaultDelay: number;
 	    private img;
 	    private graph;
+	    static show(delay?: number): void;
+	    static hide(): void;
 	    protected onConstruct(): void;
 	    show(delay?: number): void;
 	    private showContent;
@@ -1629,6 +1632,8 @@ declare namespace gameLib {
 	    protected static _instance: PromptWindow;
 	    static get inst(): PromptWindow<BaseGameData>;
 	    static CREATE_FUI_URL: string;
+	    static show(msg: string | number | any[] | PromptData, callback?: ParamHandler, isAction?: boolean): void;
+	    static hide(): void;
 	    protected titleText?: fgui.GTextField;
 	    protected content?: fgui.GTextField;
 	    /** 确定取消 */
@@ -4208,6 +4213,7 @@ declare namespace gameLib {
 	    private load;
 	    /** 在数组中的位置 */
 	    pos: number;
+	    static CREATE_FUI_URL: string;
 	    protected onConstruct(): void;
 	    shuffle(func: ParamHandler): void;
 	    private plusMinus;
@@ -4229,6 +4235,8 @@ declare namespace gameLib {
 	    private static _instance;
 	    static CREATE_FUI_URL: string;
 	    static get inst(): ImageWindow;
+	    static show(url: string): void;
+	    static hide(): void;
 	    protected onInit(): void;
 	    showTip(url: string): void;
 	}
@@ -4244,6 +4252,8 @@ declare namespace gameLib {
 	    private continueBtn;
 	    /** 缓存的提示框 */
 	    private cacheMessage;
+	    static show(msg: string, callback?: ParamHandler, isAction?: boolean): void;
+	    static hide(): void;
 	    constructor();
 	    protected onInit(): void;
 	    private continueHandler;

@@ -15,6 +15,7 @@ export class CardDeck extends BaseView {
     private load: GLoader
     /** 在数组中的位置 */
     pos: number
+    static CREATE_FUI_URL = "//gameCommon/CardDeck"
 
     protected override onConstruct() {
         super.onConstruct();
@@ -58,7 +59,7 @@ export class CardDeck extends BaseView {
     }
 
     static create() {
-        return createView("//gameCommon/CardDeck", CardDeck)
+        return createView(this.CREATE_FUI_URL, CardDeck)
     }
 
 }

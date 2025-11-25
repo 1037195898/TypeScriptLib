@@ -22,6 +22,16 @@ export class RechargeSuccessWindow<T extends BaseGameData = BaseGameData> extend
     /** 缓存的提示框 */
     private cacheMessage: any[] = []
 
+    static show(msg: string,
+                callback?: ParamHandler,
+                isAction?: boolean) {
+        this.inst.showTip(msg, callback, isAction)
+    }
+
+    static hide() {
+        this._instance?.hide()
+    }
+
     constructor() {
         super()
         this.modal = true

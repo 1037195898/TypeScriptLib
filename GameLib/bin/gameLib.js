@@ -1201,8 +1201,15 @@ function _FguiBindView(classTarget, url) {
 	class WaitResult extends fgui.GComponent {
 	    static get inst() {
 	        var _a;
-	        (_a = this._instance) !== null && _a !== void 0 ? _a : (this._instance = createView("//gameCommon/WaitResult", WaitResult));
+	        (_a = this._instance) !== null && _a !== void 0 ? _a : (this._instance = createView(this.CREATE_FUI_URL, WaitResult));
 	        return this._instance;
+	    }
+	    static show(delay = WaitResult.defaultDelay) {
+	        this.inst.show(delay);
+	    }
+	    static hide() {
+	        var _a;
+	        (_a = this._instance) === null || _a === void 0 ? void 0 : _a.hide();
 	    }
 	    onConstruct() {
 	        super.onConstruct();
@@ -1224,6 +1231,7 @@ function _FguiBindView(classTarget, url) {
 	        this.removeFromParent();
 	    }
 	}
+	WaitResult.CREATE_FUI_URL = "//gameCommon/WaitResult";
 	WaitResult.defaultDelay = 1000;
 	
 	gameLib.WaitResult = WaitResult
@@ -1844,7 +1852,7 @@ function _FguiBindView(classTarget, url) {
 	    }
 	    static hide() {
 	        var _a;
-	        (_a = this.inst) === null || _a === void 0 ? void 0 : _a.hide();
+	        (_a = this._instance) === null || _a === void 0 ? void 0 : _a.hide();
 	    }
 	    static show(index, headText) {
 	        var _a;
@@ -2652,13 +2660,20 @@ function _FguiBindView(classTarget, url) {
 	        (_a = PromptWindow._instance) !== null && _a !== void 0 ? _a : (PromptWindow._instance = new PromptWindow());
 	        return PromptWindow._instance;
 	    }
+	    static show(msg, callback, isAction) {
+	        this.inst.showTip(msg, callback, isAction);
+	    }
+	    static hide() {
+	        var _a;
+	        (_a = this._instance) === null || _a === void 0 ? void 0 : _a.hide();
+	    }
 	    constructor() {
 	        var _a;
 	        super();
 	        /** 缓存的提示框 */
 	        this.cacheMessage = [];
-	        this.modal = true;
 	        (_a = PromptWindow._instance) !== null && _a !== void 0 ? _a : (PromptWindow._instance = this);
+	        this.modal = true;
 	        this.regAction(ActionLib.GAME_SHOW_PROMPT_CANCEL_WINDOW, this, this.showCancelTip);
 	        this.regAction(ActionLib.GAME_SHOW_PROMPT_WINDOW, this, this.showTip);
 	        this.regAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, this, this._showWindow);
@@ -9071,10 +9086,11 @@ function _FguiBindView(classTarget, url) {
 	        this.removeFromParent();
 	    }
 	    static create() {
-	        return createView("//gameCommon/CardDeck", CardDeck);
+	        return createView(this.CREATE_FUI_URL, CardDeck);
 	    }
 	}
 	CardDeck.NAME = "CardDeck";
+	CardDeck.CREATE_FUI_URL = "//gameCommon/CardDeck";
 	
 	gameLib.CardDeck = CardDeck
 	
@@ -9105,6 +9121,13 @@ function _FguiBindView(classTarget, url) {
 	        (_a = this._instance) !== null && _a !== void 0 ? _a : (this._instance = new ImageWindow);
 	        return this._instance;
 	    }
+	    static show(url) {
+	        this.inst.showTip(url);
+	    }
+	    static hide() {
+	        var _a;
+	        (_a = this._instance) === null || _a === void 0 ? void 0 : _a.hide();
+	    }
 	    onInit() {
 	        this.contentPane = createView(ImageWindow.CREATE_FUI_URL);
 	        super.onInit();
@@ -9124,6 +9147,13 @@ function _FguiBindView(classTarget, url) {
 	        var _a;
 	        (_a = RechargeSuccessWindow._instance) !== null && _a !== void 0 ? _a : (RechargeSuccessWindow._instance = new RechargeSuccessWindow());
 	        return RechargeSuccessWindow._instance;
+	    }
+	    static show(msg, callback, isAction) {
+	        this.inst.showTip(msg, callback, isAction);
+	    }
+	    static hide() {
+	        var _a;
+	        (_a = this._instance) === null || _a === void 0 ? void 0 : _a.hide();
 	    }
 	    constructor() {
 	        super();

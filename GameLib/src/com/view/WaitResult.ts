@@ -9,14 +9,22 @@ export class WaitResult extends GComponent {
 
     private static _instance: WaitResult
     static get inst() {
-        this._instance ??= createView("//gameCommon/WaitResult", WaitResult)
+        this._instance ??= createView(this.CREATE_FUI_URL, WaitResult)
         return this._instance
     }
-
+    static CREATE_FUI_URL = "//gameCommon/WaitResult"
     static defaultDelay = 1000
 
     private img: GImage
     private graph: GGraph
+
+    static show(delay = WaitResult.defaultDelay) {
+        this.inst.show(delay)
+    }
+
+    static hide() {
+        this._instance?.hide()
+    }
 
 
     protected override onConstruct() {

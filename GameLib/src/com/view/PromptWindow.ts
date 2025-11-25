@@ -18,6 +18,17 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
     }
 
     static CREATE_FUI_URL = "//common/PromptWindow"
+
+    static show(msg: string | number | any[] | PromptData,
+                callback?: ParamHandler,
+                isAction?: boolean) {
+        this.inst.showTip(msg, callback, isAction)
+    }
+
+    static hide() {
+        this._instance?.hide()
+    }
+
     protected titleText?: fgui.GTextField
     protected content?: GTextField
     /** 确定取消 */
@@ -41,8 +52,8 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
 
     constructor() {
         super()
-        this.modal = true
         PromptWindow._instance ??= this
+        this.modal = true
         this.regAction(ActionLib.GAME_SHOW_PROMPT_CANCEL_WINDOW, this, this.showCancelTip)
         this.regAction(ActionLib.GAME_SHOW_PROMPT_WINDOW, this, this.showTip)
         this.regAction(ActionLib.GAME_SHOW_PROMPT_NORMAL_WINDOW, this, this._showWindow)
