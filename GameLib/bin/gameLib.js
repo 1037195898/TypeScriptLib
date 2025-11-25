@@ -1837,7 +1837,7 @@ function _FguiBindView(classTarget, url) {
 	    }
 	    static get inst() {
 	        if (this._instance == null && !this.isInit) {
-	            this._instance = fgui.UIPackage.createObjectFromURL("//init/LoadingWindow", LoadingWindow);
+	            this._instance = createView(LoadingWindow.CREATE_FUI_URL, LoadingWindow);
 	            this.isInit = true;
 	        }
 	        return this._instance;
@@ -1952,6 +1952,7 @@ function _FguiBindView(classTarget, url) {
 	 * 用来判断是否已经初始化一次了
 	 */
 	LoadingWindow.isInit = false;
+	LoadingWindow.CREATE_FUI_URL = "//init/LoadingWindow";
 	
 	gameLib.LoadingWindow = LoadingWindow
 	
@@ -2312,7 +2313,7 @@ function _FguiBindView(classTarget, url) {
 	    }
 	    onInit() {
 	        this.modal = true;
-	        this.contentPane = fgui.UIPackage.createObject("common", "HtmlWindow").asCom;
+	        this.contentPane = createView(HtmlWindow.CREATE_FUI_URL);
 	        this.contentPane.addRelation(fgui.GRoot.inst, fgui.RelationType.Size);
 	        this.loadMovieClip = this.contentPane.getController("c1");
 	        this.btn = this.contentPane.getChild("n1").asButton;
@@ -2515,6 +2516,7 @@ function _FguiBindView(classTarget, url) {
 	    showRecord() {
 	    }
 	}
+	HtmlWindow.CREATE_FUI_URL = "//common/HtmlWindow";
 	
 	gameLib.HtmlWindow = HtmlWindow
 	
@@ -2568,7 +2570,7 @@ function _FguiBindView(classTarget, url) {
 	        this.isAction = false;
 	    }
 	    onInit() {
-	        this.contentPane = fgui.UIPackage.createObjectFromURL("//init/HomePrompt").asCom;
+	        this.contentPane = createView(HomePrompt.CREATE_FUI_URL);
 	        this.controller = this.contentPane.getController("c1");
 	        this.okBtn = this.contentPane.getChild("n15").asButton;
 	        this.cancelBtn = this.contentPane.getChild("n16").asButton;
@@ -2639,6 +2641,7 @@ function _FguiBindView(classTarget, url) {
 	        this.hide();
 	    }
 	}
+	HomePrompt.CREATE_FUI_URL = "//init/HomePrompt";
 	
 	gameLib.HomePrompt = HomePrompt
 	
@@ -2662,7 +2665,7 @@ function _FguiBindView(classTarget, url) {
 	    }
 	    onInit() {
 	        var _a, _b, _c, _d, _e, _f, _g, _h;
-	        this.contentPane = fgui.UIPackage.createObjectFromURL("//common/PromptWindow").asCom;
+	        this.contentPane = createView(PromptWindow.CREATE_FUI_URL);
 	        super.onInit();
 	        this.content = (_a = this.getChild("content")) === null || _a === void 0 ? void 0 : _a.asTextField;
 	        this.titleText = (_b = this.getChild("titleText")) === null || _b === void 0 ? void 0 : _b.asTextField;
@@ -2816,6 +2819,7 @@ function _FguiBindView(classTarget, url) {
 	        return typeof optional === "object" && ("msg" in optional);
 	    }
 	}
+	PromptWindow.CREATE_FUI_URL = "//common/PromptWindow";
 	
 	gameLib.PromptWindow = PromptWindow
 	
@@ -4449,7 +4453,7 @@ function _FguiBindView(classTarget, url) {
 	    createShowScene(url, cls) {
 	        // 部分手机太垃圾了  需要延迟点
 	        Laya.timer.callLater(this, () => {
-	            this.baseScene = fgui.UIPackage.createObjectFromURL(url, cls);
+	            this.baseScene = createView(url, cls);
 	            fgui.GRoot.inst.addChild(this.baseScene);
 	            runFun(this.callback);
 	        });
@@ -5782,7 +5786,7 @@ function _FguiBindView(classTarget, url) {
 	        this.text = getString(LibStr.CASH_GIFTS_AVAILABLE);
 	    }
 	    static createPromptTip() {
-	        return fgui.UIPackage.createObjectFromURL("//gameCommon/PromptTip", PromptTip);
+	        return createView(this.CREATE_FUI_URL, PromptTip);
 	    }
 	    /**
 	     * 显示提示文本
@@ -5875,6 +5879,7 @@ function _FguiBindView(classTarget, url) {
 	        super.dispose();
 	    }
 	}
+	PromptTip.CREATE_FUI_URL = "//gameCommon/PromptTip";
 	
 	gameLib.PromptTip = PromptTip
 	
@@ -9066,9 +9071,7 @@ function _FguiBindView(classTarget, url) {
 	        this.removeFromParent();
 	    }
 	    static create() {
-	        let cardDeck = fgui.UIPackage.createObject("gameCommon", "CardDeck", CardDeck);
-	        cardDeck.setUrl("ui://jiqs6fnqd9ai29");
-	        return cardDeck;
+	        return createView("//gameCommon/CardDeck", CardDeck);
 	    }
 	}
 	CardDeck.NAME = "CardDeck";
@@ -9103,7 +9106,7 @@ function _FguiBindView(classTarget, url) {
 	        return this._instance;
 	    }
 	    onInit() {
-	        this.contentPane = fgui.UIPackage.createObjectFromURL("//init/ImageWindow").asCom;
+	        this.contentPane = createView(ImageWindow.CREATE_FUI_URL);
 	        super.onInit();
 	    }
 	    showTip(url) {
@@ -9111,6 +9114,7 @@ function _FguiBindView(classTarget, url) {
 	        this.contentPane.getChild("icon").asLoader.icon = url;
 	    }
 	}
+	ImageWindow.CREATE_FUI_URL = "//init/ImageWindow";
 	
 	gameLib.ImageWindow = ImageWindow
 	
@@ -9128,7 +9132,7 @@ function _FguiBindView(classTarget, url) {
 	        this.modal = true;
 	    }
 	    onInit() {
-	        this.contentPane = fgui.UIPackage.createObjectFromURL("//common/RechargeSuccessWindow").asCom;
+	        this.contentPane = createView(RechargeSuccessWindow.CREATE_FUI_URL);
 	        super.onInit();
 	        this.content = this.contentPane.getChild("n2").asTextField;
 	        this.closeButton = this.contentPane.getChild("n3").asButton;
@@ -9184,6 +9188,7 @@ function _FguiBindView(classTarget, url) {
 	        super.dispose();
 	    }
 	}
+	RechargeSuccessWindow.CREATE_FUI_URL = "//common/RechargeSuccessWindow";
 	
 	gameLib.RechargeSuccessWindow = RechargeSuccessWindow
 	

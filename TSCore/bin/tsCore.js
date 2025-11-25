@@ -8897,7 +8897,7 @@ class RandomTimerSingle extends RandomTimer {
 	        }
 	    }
 	    static createHandler() {
-	        return fgui.UIPackage.createObjectFromURL("//common/MessageTip", MessageTip);
+	        return fgui.UIPackage.createObjectFromURL(this.CREATE_FUI_URL, MessageTip);
 	    }
 	    /**
 	     * 显示弹窗内容
@@ -8972,6 +8972,7 @@ class RandomTimerSingle extends RandomTimer {
 	 * @default 1800
 	 */
 	MessageTip.displayTime = 1800;
+	MessageTip.CREATE_FUI_URL = "//common/MessageTip";
 	
 	tsCore.MessageTip = MessageTip
 	

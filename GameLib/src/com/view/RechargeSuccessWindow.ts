@@ -1,6 +1,5 @@
 import GTextField = fgui.GTextField;
 import GButton = fgui.GButton;
-import UIPackage = fgui.UIPackage;
 import {BaseWindow} from "../core/BaseWindow"
 import {AppRecordManager} from "../manager/AppRecordManager"
 import {BaseGameData} from "../core/BaseGameData";
@@ -15,6 +14,7 @@ export class RechargeSuccessWindow<T extends BaseGameData = BaseGameData> extend
         return RechargeSuccessWindow._instance
     }
 
+    static CREATE_FUI_URL = "//common/RechargeSuccessWindow"
     private content: GTextField
     private callback: ParamHandler
     /** 确定 */
@@ -28,8 +28,7 @@ export class RechargeSuccessWindow<T extends BaseGameData = BaseGameData> extend
     }
 
     protected override onInit() {
-        this.contentPane = UIPackage.createObjectFromURL("//common/RechargeSuccessWindow").asCom
-
+        this.contentPane = createView(RechargeSuccessWindow.CREATE_FUI_URL)
         super.onInit()
         this.content = this.contentPane.getChild("n2").asTextField
         this.closeButton = this.contentPane.getChild("n3").asButton

@@ -3547,6 +3547,7 @@ declare namespace tsCore {
 	    private steps;
 	    /** 依附的父组件 默认 GRoot */
 	    rootParent: fgui.GComponent;
+	    static CREATE_FUI_URL: string;
 	    protected constructFromXML(xml: any): void;
 	    /**
 	     * 设置显示文本字体大小

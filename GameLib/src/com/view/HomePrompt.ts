@@ -1,7 +1,6 @@
-import Controller = fgui.Controller
-import GButton = fgui.GButton
-import GTextField = fgui.GTextField
-import UIPackage = fgui.UIPackage
+import Controller = fgui.Controller;
+import GButton = fgui.GButton;
+import GTextField = fgui.GTextField;
 import {AppRecordManager} from "../manager/AppRecordManager"
 import {LibStr} from "../LibStr"
 import {BaseGameData} from "../core/BaseGameData";
@@ -27,7 +26,7 @@ export class HomePrompt<T extends BaseGameData = BaseGameData> extends BaseWindo
 
     private callback: Function
     private cancelCallback: Function
-
+    static CREATE_FUI_URL = "//init/HomePrompt"
 
     constructor() {
         super()
@@ -37,7 +36,7 @@ export class HomePrompt<T extends BaseGameData = BaseGameData> extends BaseWindo
 
     protected override onInit() {
 
-        this.contentPane = UIPackage.createObjectFromURL("//init/HomePrompt").asCom
+        this.contentPane = createView(HomePrompt.CREATE_FUI_URL)
 
         this.controller = this.contentPane.getController("c1")
 

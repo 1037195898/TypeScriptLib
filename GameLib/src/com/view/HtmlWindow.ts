@@ -1,7 +1,6 @@
 import GTextField = fgui.GTextField;
 import GButton = fgui.GButton;
 import Controller = fgui.Controller;
-import UIPackage = fgui.UIPackage;
 import GRoot = fgui.GRoot;
 import RelationType = fgui.RelationType;
 import Browser = Laya.Browser;
@@ -21,7 +20,7 @@ import {CommonCmd} from "../net/Common";
 export class HtmlWindow extends fgui.Window implements IRecord {
 
     private static _instance: HtmlWindow
-
+    static CREATE_FUI_URL = "//common/HtmlWindow"
     static get inst() {
         this._instance ??= new HtmlWindow
         return this._instance
@@ -49,7 +48,7 @@ export class HtmlWindow extends fgui.Window implements IRecord {
     protected override onInit() {
 
         this.modal = true
-        this.contentPane = UIPackage.createObject("common", "HtmlWindow").asCom
+        this.contentPane = createView(HtmlWindow.CREATE_FUI_URL)
 
         this.contentPane.addRelation(GRoot.inst, RelationType.Size)
         this.loadMovieClip = this.contentPane.getController("c1")

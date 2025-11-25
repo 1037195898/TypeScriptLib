@@ -1,4 +1,3 @@
-import UIPackage = fgui.UIPackage
 import {BaseWindow} from "../core/BaseWindow"
 import {BaseGameData} from "../core/BaseGameData";
 
@@ -6,6 +5,7 @@ import {BaseGameData} from "../core/BaseGameData";
 export class ImageWindow<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
 
     private static _instance: ImageWindow
+    static CREATE_FUI_URL = "//init/ImageWindow"
 
     static get inst(): ImageWindow {
         this._instance ??= new ImageWindow
@@ -13,7 +13,7 @@ export class ImageWindow<T extends BaseGameData = BaseGameData> extends BaseWind
     }
 
     protected override onInit() {
-        this.contentPane = UIPackage.createObjectFromURL("//init/ImageWindow").asCom
+        this.contentPane = createView(ImageWindow.CREATE_FUI_URL)
         super.onInit()
     }
 

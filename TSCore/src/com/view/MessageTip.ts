@@ -29,6 +29,8 @@ export class MessageTip extends fgui.GComponent {
     /** 依附的父组件 默认 GRoot */
     rootParent: fgui.GComponent
 
+    static CREATE_FUI_URL = "//common/MessageTip"
+
     protected override constructFromXML(xml: any) {
         super.constructFromXML(xml)
         this.touchable = false
@@ -103,7 +105,7 @@ export class MessageTip extends fgui.GComponent {
     }
 
     private static createHandler() {
-        return UIPackage.createObjectFromURL("//common/MessageTip", MessageTip) as MessageTip
+        return UIPackage.createObjectFromURL(this.CREATE_FUI_URL, MessageTip) as MessageTip
     }
 
     /**

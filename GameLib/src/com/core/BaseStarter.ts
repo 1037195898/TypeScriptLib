@@ -1,4 +1,3 @@
-import UIPackage = fgui.UIPackage;
 import GRoot = fgui.GRoot;
 import EProxy = tsCore.EProxy;
 import {BaseScene} from "./BaseScene"
@@ -47,7 +46,7 @@ export class BaseStarter extends EProxy {
     protected createShowScene(url: string, cls?: new () => fgui.GObject) {
         // 部分手机太垃圾了  需要延迟点
         Laya.timer.callLater(this, () => {
-            this.baseScene = UIPackage.createObjectFromURL(url, cls) as BaseScene
+            this.baseScene = createView(url, cls) as BaseScene
             GRoot.inst.addChild(this.baseScene)
             runFun(this.callback)
         })

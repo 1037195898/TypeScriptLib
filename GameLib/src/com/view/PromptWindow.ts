@@ -1,7 +1,6 @@
 import GTextField = fgui.GTextField;
 import GButton = fgui.GButton;
 import Controller = fgui.Controller;
-import UIPackage = fgui.UIPackage;
 import {BaseWindow} from "../core/BaseWindow"
 import {ActionLib} from "../ActionLib"
 import {AppRecordManager} from "../manager/AppRecordManager"
@@ -18,6 +17,7 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
         return PromptWindow._instance
     }
 
+    static CREATE_FUI_URL = "//common/PromptWindow"
     protected titleText?: fgui.GTextField
     protected content?: GTextField
     /** 确定取消 */
@@ -49,7 +49,7 @@ export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWin
     }
 
     protected override onInit() {
-        this.contentPane = UIPackage.createObjectFromURL("//common/PromptWindow").asCom
+        this.contentPane = createView(PromptWindow.CREATE_FUI_URL)
         super.onInit()
 
         this.content = this.getChild("content")?.asTextField

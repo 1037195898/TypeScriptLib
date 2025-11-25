@@ -1,4 +1,3 @@
-import UIPackage = fgui.UIPackage;
 import GLoader = fgui.GLoader;
 import GTextField = fgui.GTextField;
 import Controller = fgui.Controller;
@@ -17,9 +16,11 @@ export class LoadingWindow extends BaseView {
      */
     static isInit = false
 
+    static CREATE_FUI_URL = "//init/LoadingWindow"
+
     static get inst() {
         if (this._instance == null && !this.isInit) {
-            this._instance = UIPackage.createObjectFromURL("//init/LoadingWindow", LoadingWindow) as LoadingWindow
+            this._instance = createView(LoadingWindow.CREATE_FUI_URL, LoadingWindow)
             this.isInit = true
         }
         return this._instance

@@ -1,10 +1,9 @@
-import GComponent = fgui.GComponent
-import UIPackage = fgui.UIPackage
-import Point = Laya.Point
-import GRoot = fgui.GRoot
+import GComponent = fgui.GComponent;
+import Point = Laya.Point;
+import GRoot = fgui.GRoot;
+import ELabel = tsCore.ELabel;
 import {LibStr} from "../LibStr"
 import {SceneManager} from "../manager/SceneManager"
-import ELabel = tsCore.ELabel;
 
 /** 文案提示 */
 export class PromptTip extends ELabel {
@@ -12,14 +11,16 @@ export class PromptTip extends ELabel {
     private target: GComponent
     private downward: any
 
+    static CREATE_FUI_URL = "//gameCommon/PromptTip"
+
     protected override onInit() {
         super.onInit();
         this.touchable = false
         this.text = getString(LibStr.CASH_GIFTS_AVAILABLE)
     }
 
-    static createPromptTip(): PromptTip {
-        return UIPackage.createObjectFromURL("//gameCommon/PromptTip", PromptTip) as PromptTip
+    static createPromptTip() {
+        return createView(this.CREATE_FUI_URL, PromptTip)
     }
 
     /**

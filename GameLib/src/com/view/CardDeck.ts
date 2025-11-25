@@ -1,6 +1,5 @@
 import GLoader = fgui.GLoader;
 import Tween = Laya.Tween;
-import UIPackage = fgui.UIPackage;
 import Handler = Laya.Handler;
 import {BaseView} from "../core/BaseView"
 
@@ -59,9 +58,7 @@ export class CardDeck extends BaseView {
     }
 
     static create() {
-        let cardDeck = UIPackage.createObject("gameCommon", "CardDeck", CardDeck) as CardDeck
-        cardDeck.setUrl("ui://jiqs6fnqd9ai29")
-        return cardDeck
+        return createView("//gameCommon/CardDeck", CardDeck)
     }
 
 }

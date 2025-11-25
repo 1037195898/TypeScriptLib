@@ -1189,6 +1189,7 @@ declare namespace gameLib {
 	     * 用来判断是否已经初始化一次了
 	     */
 	    static isInit: boolean;
+	    static CREATE_FUI_URL: string;
 	    static get inst(): LoadingWindow;
 	    static hide(): void;
 	    static show(index?: number, headText?: string): void;
@@ -1537,6 +1538,7 @@ declare namespace gameLib {
 	
 	export class HtmlWindow extends fgui.Window implements tsCore.IRecord {
 	    private static _instance;
+	    static CREATE_FUI_URL: string;
 	    static get inst(): HtmlWindow;
 	    private closeHandler;
 	    /** 页面名字 */
@@ -1603,6 +1605,7 @@ declare namespace gameLib {
 	    private message;
 	    private callback;
 	    private cancelCallback;
+	    static CREATE_FUI_URL: string;
 	    constructor();
 	    protected onInit(): void;
 	    private cancelHandler;
@@ -1625,6 +1628,7 @@ declare namespace gameLib {
 	export class PromptWindow<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
 	    protected static _instance: PromptWindow;
 	    static get inst(): PromptWindow<BaseGameData>;
+	    static CREATE_FUI_URL: string;
 	    protected titleText?: fgui.GTextField;
 	    protected content?: fgui.GTextField;
 	    /** 确定取消 */
@@ -2817,6 +2821,7 @@ declare namespace gameLib {
 	export class PromptTip extends tsCore.ELabel {
 	    private target;
 	    private downward;
+	    static CREATE_FUI_URL: string;
 	    protected onInit(): void;
 	    static createPromptTip(): PromptTip;
 	    /**
@@ -4222,6 +4227,7 @@ declare namespace gameLib {
 	/** 图片窗口 */
 	export class ImageWindow<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
 	    private static _instance;
+	    static CREATE_FUI_URL: string;
 	    static get inst(): ImageWindow;
 	    protected onInit(): void;
 	    showTip(url: string): void;
@@ -4231,6 +4237,7 @@ declare namespace gameLib {
 	export class RechargeSuccessWindow<T extends BaseGameData = BaseGameData> extends BaseWindow<T> {
 	    private static _instance;
 	    static get inst(): RechargeSuccessWindow<BaseGameData>;
+	    static CREATE_FUI_URL: string;
 	    private content;
 	    private callback;
 	    /** 确定 */
