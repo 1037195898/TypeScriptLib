@@ -2551,11 +2551,11 @@ class RandomTimerSingle extends RandomTimer {
 	        return this._t;
 	    }
 	    set t(value) {
+	        var _a;
 	        if (value < 0)
 	            return;
 	        this._t = value;
-	        // @ts-ignore
-	        this.setXY(this.getX(), this.getY());
+	        (_a = this.target) === null || _a === void 0 ? void 0 : _a.setXY(this.getX(), this.getY());
 	    }
 	    getX() {
 	        return Math.pow((1 - this._t), 3) * this.p1.x
@@ -2584,11 +2584,11 @@ class RandomTimerSingle extends RandomTimer {
 	        this.p4 = Laya.Point.create().setTo(x, y);
 	    }
 	    /**
-	     * 释放数据
-	     * 这里回收了所有坐标信息 Point.recover()
+	     * 释放曲线数据
 	     */
 	    recover() {
 	        var _a, _b, _c, _d;
+	        this.target = null;
 	        this._t = -1;
 	        (_a = this.p1) === null || _a === void 0 ? void 0 : _a.recover();
 	        (_b = this.p2) === null || _b === void 0 ? void 0 : _b.recover();

@@ -1062,6 +1062,7 @@ declare namespace tsCore {
 	    private p2;
 	    private p3;
 	    private p4;
+	    target: fgui.GObject;
 	    get t(): number;
 	    set t(value: number);
 	    getX(): number;
@@ -1071,8 +1072,7 @@ declare namespace tsCore {
 	    setMiddlePoint2(x1: number, y1: number, x2: number, y2: number): void;
 	    setEndPoint(x: number, y: number): void;
 	    /**
-	     * 释放数据
-	     * 这里回收了所有坐标信息 Point.recover()
+	     * 释放曲线数据
 	     */
 	    recover(): void;
 	}

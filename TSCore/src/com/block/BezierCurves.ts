@@ -1,3 +1,5 @@
+import GObject = fgui.GObject;
+
 export class BezierCurves {
 
     /** 经过时间 */
@@ -7,6 +9,8 @@ export class BezierCurves {
     private p3: Laya.Point
     private p4: Laya.Point
 
+    target: GObject
+
     get t() {
 
         return this._t
@@ -15,8 +19,7 @@ export class BezierCurves {
     set t(value: number) {
         if (value < 0) return
         this._t = value
-        // @ts-ignore
-        this.setXY(this.getX(), this.getY())
+        this.target?.setXY(this.getX(), this.getY())
     }
 
     getX() {
@@ -52,10 +55,10 @@ export class BezierCurves {
     }
 
     /**
-     * 释放数据
-     * 这里回收了所有坐标信息 Point.recover()
+     * 释放曲线数据
      */
     recover() {
+        this.target = null
         this._t = -1
         this.p1?.recover()
         this.p2?.recover()
