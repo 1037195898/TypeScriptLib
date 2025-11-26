@@ -10,7 +10,6 @@ import GRoot = fgui.GRoot;
 import {GGraphicsAni} from "./view/GGraphicsAni"
 import {GSkeleton} from "./view/GSkeleton"
 import {EDrawTextureCmd} from "./extends/EDrawTextureCmd"
-import {StringUtil} from "./utils/StringUtil";
 import {SoundUtils} from "./utils/SoundUtils";
 import {Log} from "./Log";
 
@@ -177,67 +176,6 @@ export class DefineConfig {
                     args.name = this.boneSlotName || ""
                 }
                 return this.tempSaveToCmd.call(this, fun, args)
-            }
-        })
-
-        Object.defineProperties(Laya.HttpRequest.prototype, {
-            async: {
-                value: true,
-                writable: true
-            }
-        })
-        Object.defineProperty(Laya.HttpRequest.prototype, "send", {
-            value: function (url: string, data: any = null, method: string = "get", responseType: string = "text", headers: any[] | null = null) {
-                this._responseType = responseType
-                this._data = null
-
-                if (Laya.Browser.onVVMiniGame || Laya.Browser.onQGMiniGame || Laya.Browser.onQQMiniGame || Laya.Browser.onAlipayMiniGame || Laya.Browser.onBLMiniGame || Laya.Browser.onHWMiniGame || Laya.Browser.onTTMiniGame || Laya.Browser.onTBMiniGame) {
-                    // @ts-ignore
-                    url = Laya.HttpRequest._urlEncode(url);
-                }
-                this._url = url;
-                var _this: Laya.HttpRequest = this
-                var http = this._http;
-                //临时，因为微信不支持以下文件格式
-                // this.async ? console.log(`httpAsync_${method}: ${url}`) : console.log(`httpSync_${method}: ${url}`)
-                http.open(method, url, this.async)
-                let isJson = false;
-                if (headers) {
-                    for (var i: number = 0; i < headers.length; i++) {
-                        http.setRequestHeader(headers[i++], headers[i]);
-                    }
-                } else if (!(((<any>window)).conch)) {
-                    if (!data || typeof (data) == 'string') http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                    else {
-                        http.setRequestHeader("Content-Type", "application/json");
-                        if (!(data instanceof ArrayBuffer) && typeof data !== "string") {
-                            isJson = true;
-                        }
-                    }
-                }
-                let restype: XMLHttpRequestResponseType = responseType !== "arraybuffer" ? "text" : "arraybuffer";
-                this.async && (http.responseType = restype);
-                if (this.async && (http as any).dataType) {//for Ali
-                    (http as any).dataType = restype;
-                }
-                http.onerror = function (e: any): void {
-                    // @ts-ignore
-                    _this._onError(e);
-                }
-                http.onabort = function (e: any): void {
-                    // @ts-ignore
-                    _this._onAbort(e);
-                }
-                http.onprogress = function (e: any): void {
-                    // @ts-ignore
-                    _this._onProgress(e);
-                }
-                http.onload = function (e: any): void {
-                    // @ts-ignore
-                    _this._onLoad(e);
-                }
-                if (Laya.Browser.onBLMiniGame && Laya.Browser.onAndroid && !data) data = {};
-                http.send(isJson ? JSON.stringify(data) : data);
             }
         })
 
@@ -824,11 +762,11 @@ export class DefineConfig {
                 let bones: string[] = []
                 for (const key in events) {
                     if (key.startsWith(GSkeleton.UPDATE_BONE_SLOT)) {
-                        slot.push(StringUtil.remove(key, GSkeleton.UPDATE_BONE_SLOT))
+                        slot.push(key.removeAll(GSkeleton.UPDATE_BONE_SLOT))
                     } else if (key.startsWith(GSkeleton.UPDATE_BONE_RENDER)) {
-                        bones.push(StringUtil.remove(key, GSkeleton.UPDATE_BONE_RENDER))
+                        bones.push(key.removeAll(GSkeleton.UPDATE_BONE_RENDER))
                     } else if (key.startsWith(GSkeleton.UPDATE_SLOT_RENDER)) {
-                        slots.push(StringUtil.remove(key, GSkeleton.UPDATE_SLOT_RENDER))
+                        slots.push(key.removeAll(GSkeleton.UPDATE_SLOT_RENDER))
                     }
                 }
                 let skeleton: spine.Skeleton = this.skeleton

@@ -683,8 +683,7 @@ declare namespace tsCore {
 	     * @param input 要被处理的字符串
 	     * @param replace 要被替换掉的字符串
 	     * @param replaceWith 用来替换的新字符串
-	     * @deprecated
-	     * @see String.replaceAll
+	     * @see String.replace 正则处理
 	     */
 	    static replace(input: string, replace: string, replaceWith: string): string;
 	    /**
@@ -2060,26 +2059,16 @@ declare namespace tsCore {
 	        value: any;
 	    };
 	    /**
-	     * @deprecated
-	     * @see findFirstGreaterOrEqual
-	     */
-	    static getGreater: typeof MathKit.findFirstGreaterOrEqual;
-	    /**
 	     * 在给定的数字数组中，从后向前查找第一个小于等于指定值的元素。
 	     * @param nums 数字数组，作为查找范围。
 	     * @param value 指定的值，用于与数组元素进行比较。
 	     * @param includeEqual 是否包括等于指定值的元素，默认为true。
 	     * @returns 返回一个对象，包含找到的元素的索引和值。如果没有找到符合条件的元素，则索引为-1，值为undefined。
 	     */
-	    static findFirstLessOrEqual(nums: number[], value: number, includeEqual?: boolean): {
+	    static findLastLessOrEqual(nums: number[], value: number, includeEqual?: boolean): {
 	        index: number;
 	        value: any;
 	    };
-	    /**
-	     * @deprecated
-	     * @see findFirstLessOrEqual
-	     */
-	    static getLess: typeof MathKit.findFirstLessOrEqual;
 	    /**
 	     * 比较两个值  获得返回值   用于数组排序   从小到大
 	     * @param aPrice 第一个值
@@ -2393,6 +2382,8 @@ declare namespace tsCore {
 	    private errorHandler;
 	    /** 超时 */
 	    private timerOutHandler;
+	    /** 设置是否异步请求 默认true */
+	    async: boolean;
 	    /**
 	     * 创建一个请求
 	     */
@@ -3704,11 +3695,6 @@ declare module Laya {
          * @default null */
         removeLineColor: string
 
-    }
-
-    interface HttpRequest {
-        /** 设置是否异步请求 默认true */
-        async: boolean
     }
 
     interface Stage {

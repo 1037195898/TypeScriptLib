@@ -13,6 +13,8 @@ export class AjaxRequest extends Laya.HttpRequest {
     private errorHandler: ParamHandler
     /** 超时 */
     private timerOutHandler: ParamHandler
+    /** 设置是否异步请求 默认true */
+    async = true
 
     /**
      * 创建一个请求
@@ -54,7 +56,7 @@ export class AjaxRequest extends Laya.HttpRequest {
             url = HttpRequest._urlEncode(url);
         }
         this._url = url;
-        var http = this._http;
+        const http = this._http;
         //临时，因为微信不支持以下文件格式
         http.open(method, url, this.async || true);
         let isJson = false;

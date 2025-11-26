@@ -376,7 +376,9 @@ String.prototype.remove = function (value) {
     return this === null || this === void 0 ? void 0 : this.replace(value, "");
 };
 String.prototype.removeAll = function (value) {
-    return this.replaceAll(value, "");
+    // 转义特殊字符
+    const escapedSearch = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return this.replace(new RegExp(escapedSearch, 'g'), "");
 };
 String.prototype.removeAllWhitespace = function () {
     return this === null || this === void 0 ? void 0 : this.replace(/\s/g, "");
@@ -1663,8 +1665,7 @@ class RandomTimerSingle extends RandomTimer {
 	     * @param input 要被处理的字符串
 	     * @param replace 要被替换掉的字符串
 	     * @param replaceWith 用来替换的新字符串
-	     * @deprecated
-	     * @see String.replaceAll
+	     * @see String.replace 正则处理
 	     */
 	    static replace(input, replace, replaceWith) {
 	        return input.split(replace).join(replaceWith);
@@ -2439,7 +2440,7 @@ class RandomTimerSingle extends RandomTimer {
 	    }
 	    _load(resInfo = null) {
 	        ELoader.loader.formatURL(resInfo);
-	        const url = StringUtil.replace(resInfo.url, "{host}", window.location.host);
+	        const url = resInfo.url.replace(/\{host}/g, window.location.host);
 	        if (resInfo.createCache) {
 	            Laya.loader.create(url, Laya.Handler.create(this, this.onSingleComplete, [resInfo]), resInfo.progress, resInfo.type, resInfo.createConstructParams, resInfo.createPropertyParams, resInfo.priority, resInfo.cache);
 	        }
@@ -2483,7 +2484,7 @@ class RandomTimerSingle extends RandomTimer {
 	                }
 	            }
 	        }
-	        url = StringUtil.replace(url, "{host}", window.location.host);
+	        url = url.replace(/\{host}/g, window.location.host);
 	        return Laya.Loader.getRes(url);
 	    }
 	    /**
@@ -3818,68 +3819,6 @@ class RandomTimerSingle extends RandomTimer {
 	                return this.tempSaveToCmd.call(this, fun, args);
 	            }
 	        });
-	        Object.defineProperties(Laya.HttpRequest.prototype, {
-	            async: {
-	                value: true,
-	                writable: true
-	            }
-	        });
-	        Object.defineProperty(Laya.HttpRequest.prototype, "send", {
-	            value: function (url, data = null, method = "get", responseType = "text", headers = null) {
-	                this._responseType = responseType;
-	                this._data = null;
-	                if (Laya.Browser.onVVMiniGame || Laya.Browser.onQGMiniGame || Laya.Browser.onQQMiniGame || Laya.Browser.onAlipayMiniGame || Laya.Browser.onBLMiniGame || Laya.Browser.onHWMiniGame || Laya.Browser.onTTMiniGame || Laya.Browser.onTBMiniGame) {
-	                    // @ts-ignore
-	                    url = Laya.HttpRequest._urlEncode(url);
-	                }
-	                this._url = url;
-	                var _this = this;
-	                var http = this._http;
-	                //临时，因为微信不支持以下文件格式
-	                // this.async ? console.log(`httpAsync_${method}: ${url}`) : console.log(`httpSync_${method}: ${url}`)
-	                http.open(method, url, this.async);
-	                let isJson = false;
-	                if (headers) {
-	                    for (var i = 0; i < headers.length; i++) {
-	                        http.setRequestHeader(headers[i++], headers[i]);
-	                    }
-	                }
-	                else if (!(window.conch)) {
-	                    if (!data || typeof (data) == 'string')
-	                        http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	                    else {
-	                        http.setRequestHeader("Content-Type", "application/json");
-	                        if (!(data instanceof ArrayBuffer) && typeof data !== "string") {
-	                            isJson = true;
-	                        }
-	                    }
-	                }
-	                let restype = responseType !== "arraybuffer" ? "text" : "arraybuffer";
-	                this.async && (http.responseType = restype);
-	                if (this.async && http.dataType) { //for Ali
-	                    http.dataType = restype;
-	                }
-	                http.onerror = function (e) {
-	                    // @ts-ignore
-	                    _this._onError(e);
-	                };
-	                http.onabort = function (e) {
-	                    // @ts-ignore
-	                    _this._onAbort(e);
-	                };
-	                http.onprogress = function (e) {
-	                    // @ts-ignore
-	                    _this._onProgress(e);
-	                };
-	                http.onload = function (e) {
-	                    // @ts-ignore
-	                    _this._onLoad(e);
-	                };
-	                if (Laya.Browser.onBLMiniGame && Laya.Browser.onAndroid && !data)
-	                    data = {};
-	                http.send(isJson ? JSON.stringify(data) : data);
-	            }
-	        });
 	        Object.defineProperties(Laya.Event, {
 	            SPINE_PLAY: {
 	                value: true,
@@ -4436,13 +4375,13 @@ class RandomTimerSingle extends RandomTimer {
 	                let bones = [];
 	                for (const key in events) {
 	                    if (key.startsWith(GSkeleton.UPDATE_BONE_SLOT)) {
-	                        slot.push(StringUtil.remove(key, GSkeleton.UPDATE_BONE_SLOT));
+	                        slot.push(key.removeAll(GSkeleton.UPDATE_BONE_SLOT));
 	                    }
 	                    else if (key.startsWith(GSkeleton.UPDATE_BONE_RENDER)) {
-	                        bones.push(StringUtil.remove(key, GSkeleton.UPDATE_BONE_RENDER));
+	                        bones.push(key.removeAll(GSkeleton.UPDATE_BONE_RENDER));
 	                    }
 	                    else if (key.startsWith(GSkeleton.UPDATE_SLOT_RENDER)) {
-	                        slots.push(StringUtil.remove(key, GSkeleton.UPDATE_SLOT_RENDER));
+	                        slots.push(key.removeAll(GSkeleton.UPDATE_SLOT_RENDER));
 	                    }
 	                }
 	                let skeleton = this.skeleton;
@@ -5444,19 +5383,18 @@ class RandomTimerSingle extends RandomTimer {
 	     * @param includeEqual 是否包括等于指定值的元素，默认为true。
 	     * @returns 返回一个对象，包含找到的元素的索引和值。如果没有找到符合条件的元素，则索引为-1，值为undefined。
 	     */
-	    static findFirstLessOrEqual(nums, value, includeEqual = true) {
+	    static findLastLessOrEqual(nums, value, includeEqual = true) {
 	        let index = -1; // 初始化索引为-1，表示未找到
 	        let result = undefined; // 初始化结果为undefined
 	        // 从数组末尾开始向前遍历
 	        for (let i = nums.length - 1; i >= 0; i--) {
 	            const num = nums[i]; // 当前遍历的元素
-	            // 如果元素大于指定值，或者等于指定值且equal参数为true
-	            if (num > value || (includeEqual && num === value)) {
+	            // 如果元素小于等于指定值
+	            if (num < value || (includeEqual && num === value)) {
 	                index = i; // 更新索引
 	                result = num; // 更新结果
+	                break; // 找到第一个匹配项后立即退出循环
 	            }
-	            else
-	                break; // 如果找到不满足条件的元素，则终止循环
 	        }
 	        return { index, value: result }; // 返回结果对象
 	    }
@@ -5524,16 +5462,6 @@ class RandomTimerSingle extends RandomTimer {
 	MathKit.RAD_TO_DEG = 180 / Math.PI;
 	/** 计算弧度的公式  Math.PI / 180 */
 	MathKit.DEG_TO_RAD = Math.PI / 180;
-	/**
-	 * @deprecated
-	 * @see findFirstGreaterOrEqual
-	 */
-	MathKit.getGreater = MathKit.findFirstGreaterOrEqual;
-	/**
-	 * @deprecated
-	 * @see findFirstLessOrEqual
-	 */
-	MathKit.getLess = MathKit.findFirstLessOrEqual;
 	/**
 	 * @deprecated
 	 * @see MathKit
@@ -6163,6 +6091,8 @@ class RandomTimerSingle extends RandomTimer {
 	     */
 	    constructor() {
 	        super();
+	        /** 设置是否异步请求 默认true */
+	        this.async = true;
 	        this.once(Laya.Event.COMPLETE, this, this.onResult);
 	        this.once(Laya.Event.ERROR, this, this.onHttpError);
 	        this.http.ontimeout = this.timeOut.bind(this);
@@ -6193,7 +6123,7 @@ class RandomTimerSingle extends RandomTimer {
 	            url = Laya.HttpRequest._urlEncode(url);
 	        }
 	        this._url = url;
-	        var http = this._http;
+	        const http = this._http;
 	        //临时，因为微信不支持以下文件格式
 	        http.open(method, url, this.async || true);
 	        let isJson = false;
@@ -7520,7 +7450,7 @@ class RandomTimerSingle extends RandomTimer {
 	            this.errorHandler(data);
 	            return;
 	        }
-	        HTTPUtils.parseDate(data);
+	        HTTPUtils.syncServerTime(data);
 	        HTTPUtils.filter && (data = HTTPUtils.filter.filterResultData(this.url, data, this.http));
 	        if (typeof data === "number") { // 如果是数字 将被阻止返回结果
 	            Log.info(data);
@@ -8262,7 +8192,7 @@ class RandomTimerSingle extends RandomTimer {
 	        }
 	    }
 	    onChangeText(charData, txt) {
-	        if (StringUtil.trimAll(txt).length == 0) {
+	        if (txt.removeAllWhitespace().length == 0) {
 	            txt = this._defaultText;
 	        }
 	        let index = Math.floor(charData.count);
@@ -9056,7 +8986,7 @@ class RandomTimerSingle extends RandomTimer {
 	        // super.update(newValue);
 	        var _a, _b, _c, _d;
 	        // @ts-ignore
-	        var percent = fgui.ToolSet.clamp01((newValue - this._min) / (this._max - this._min));
+	        const percent = fgui.ToolSet.clamp01((newValue - this._min) / (this._max - this._min));
 	        // @ts-ignore
 	        const titleObject = this._titleObject;
 	        // @ts-ignore
@@ -9105,9 +9035,9 @@ class RandomTimerSingle extends RandomTimer {
 	            }
 	        }
 	        // @ts-ignore
-	        var fullWidth = this.width - this._barMaxWidthDelta;
+	        const fullWidth = this.width - this._barMaxWidthDelta;
 	        // @ts-ignore
-	        var fullHeight = this.height - this._barMaxHeightDelta;
+	        const fullHeight = this.height - this._barMaxHeightDelta;
 	        // @ts-ignore
 	        if (!this._reverse) {
 	            // @ts-ignore

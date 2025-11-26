@@ -32,7 +32,7 @@ export class ProgressBar extends mixinExt(ActionEvent, ViewBlock, GProgressBar) 
         // super.update(newValue);
 
         // @ts-ignore
-        var percent = ToolSet.clamp01((newValue - this._min) / (this._max - this._min));
+        const percent = ToolSet.clamp01((newValue - this._min) / (this._max - this._min));
         // @ts-ignore
         const titleObject: GTextField = this._titleObject
         // @ts-ignore
@@ -81,9 +81,9 @@ export class ProgressBar extends mixinExt(ActionEvent, ViewBlock, GProgressBar) 
         }
 
         // @ts-ignore
-        var fullWidth: number = this.width - this._barMaxWidthDelta;
+        const fullWidth: number = this.width - this._barMaxWidthDelta;
         // @ts-ignore
-        var fullHeight: number = this.height - this._barMaxHeightDelta;
+        const fullHeight: number = this.height - this._barMaxHeightDelta;
         // @ts-ignore
         if (!this._reverse) {
             // @ts-ignore

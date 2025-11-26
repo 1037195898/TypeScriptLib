@@ -330,8 +330,7 @@ export class StringUtil {
      * @param input 要被处理的字符串
      * @param replace 要被替换掉的字符串
      * @param replaceWith 用来替换的新字符串
-     * @deprecated
-     * @see String.replaceAll
+     * @see String.replace 正则处理
      */
     static replace(input: string, replace: string, replaceWith: string) {
         return input.split(replace).join(replaceWith)

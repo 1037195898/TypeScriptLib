@@ -209,41 +209,29 @@ export class MathKit {
     }
 
     /**
-     * @deprecated
-     * @see findFirstGreaterOrEqual
-     */
-    static getGreater = MathKit.findFirstGreaterOrEqual
-
-    /**
      * 在给定的数字数组中，从后向前查找第一个小于等于指定值的元素。
      * @param nums 数字数组，作为查找范围。
      * @param value 指定的值，用于与数组元素进行比较。
      * @param includeEqual 是否包括等于指定值的元素，默认为true。
      * @returns 返回一个对象，包含找到的元素的索引和值。如果没有找到符合条件的元素，则索引为-1，值为undefined。
      */
-    static findFirstLessOrEqual(nums: number[], value: number, includeEqual = true) {
+    static findLastLessOrEqual(nums: number[], value: number, includeEqual = true) {
         let index = -1 // 初始化索引为-1，表示未找到
         let result = undefined // 初始化结果为undefined
 
         // 从数组末尾开始向前遍历
         for (let i = nums.length - 1; i >= 0; i--) {
             const num = nums[i] // 当前遍历的元素
-
-            // 如果元素大于指定值，或者等于指定值且equal参数为true
-            if (num > value || (includeEqual && num === value)) {
+            // 如果元素小于等于指定值
+            if (num < value || (includeEqual && num === value)) {
                 index = i // 更新索引
                 result = num // 更新结果
-            } else break // 如果找到不满足条件的元素，则终止循环
+                break // 找到第一个匹配项后立即退出循环
+            }
         }
 
         return {index, value: result} // 返回结果对象
     }
-
-    /**
-     * @deprecated
-     * @see findFirstLessOrEqual
-     */
-    static getLess = MathKit.findFirstLessOrEqual
 
     /**
      * 比较两个值  获得返回值   用于数组排序   从小到大

@@ -147,7 +147,7 @@ export class ELoader {
 
     private _load(resInfo: ResInfo = null) {
         ELoader.loader.formatURL(resInfo)
-        const url = StringUtil.replace(resInfo.url, "{host}", window.location.host)
+        const url = resInfo.url.replace(/\{host}/g, window.location.host)
         if (resInfo.createCache) {
             Laya.loader.create(url, Handler.create(this, this.onSingleComplete, [resInfo]), resInfo.progress, resInfo.type, resInfo.createConstructParams, resInfo.createPropertyParams, resInfo.priority, resInfo.cache)
         } else Laya.loader.load(url, Handler.create(this, this.onSingleComplete, [resInfo]), resInfo.progress, resInfo.type, resInfo.priority, resInfo.cache, resInfo.group, resInfo.ignoreCache, resInfo.useWorkerLoader)
@@ -188,7 +188,7 @@ export class ELoader {
                 }
             }
         }
-        url = StringUtil.replace(url, "{host}", window.location.host)
+        url = url.replace(/\{host}/g, window.location.host)
         return Loader.getRes(url)
     }
 

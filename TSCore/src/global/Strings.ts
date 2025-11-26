@@ -112,7 +112,9 @@ String.prototype.remove = function (value: string) {
 }
 
 String.prototype.removeAll = function (value: string) {
-    return this.replaceAll(value, "")
+    // 转义特殊字符
+    const escapedSearch = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return this.replace(new RegExp(escapedSearch, 'g'), "")
 }
 
 String.prototype.removeAllWhitespace = function () {

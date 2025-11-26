@@ -221,7 +221,7 @@ export class HTTPUtils {
             this.errorHandler(data)
             return
         }
-        HTTPUtils.parseDate(data)
+        HTTPUtils.syncServerTime(data)
         HTTPUtils.filter && (data = HTTPUtils.filter.filterResultData(this.url, data, this.http))
         if (typeof data === "number") {// 如果是数字 将被阻止返回结果
             Log.info(data)

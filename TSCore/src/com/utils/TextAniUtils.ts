@@ -193,7 +193,7 @@ export class TextAniUtils {
     }
 
     private onChangeText(charData: any, txt: string) {
-        if (StringUtil.trimAll(txt).length == 0) {
+        if (txt.removeAllWhitespace().length == 0) {
             txt = this._defaultText
         }
         let index = Math.floor(charData.count)
