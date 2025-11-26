@@ -1828,10 +1828,10 @@ function _FguiBindView(classTarget, url) {
 	 * @returns {boolean}
 	 */
 	BaseScene.inviteRealMoneyNeed = () => {
-	    var _a, _b;
+	    var _a, _b, _c;
 	    let gameData = Player.inst.gameData;
 	    let winLimit = ((_a = gameData === null || gameData === void 0 ? void 0 : gameData.getTotalBetMoney()) !== null && _a !== void 0 ? _a : 0) * 3;
-	    return Player.inst.isGuest && Player.inst.guestModel.guestPlayCount >= CommonCmd.GUEST_MAX_PLAY_COUNT && (gameData != null && !gameData.isRecommend && winLimit <= ((_b = gameData === null || gameData === void 0 ? void 0 : gameData.totalWinMoney) !== null && _b !== void 0 ? _b : 100));
+	    return Player.inst.isGuest && ((_b = Player.inst.guestModel) === null || _b === void 0 ? void 0 : _b.guestPlayCount) >= CommonCmd.GUEST_MAX_PLAY_COUNT && (gameData != null && !gameData.isRecommend && winLimit <= ((_c = gameData === null || gameData === void 0 ? void 0 : gameData.totalWinMoney) !== null && _c !== void 0 ? _c : 100));
 	};
 	
 	gameLib.BaseScene = BaseScene
@@ -3056,10 +3056,10 @@ function _FguiBindView(classTarget, url) {
 	            .setOvertime(overtime)
 	            .setHeaders(headers)
 	            .onComplete((data, request) => {
-	            var _a;
+	            var _a, _b;
 	            if (Player.inst.gameId == ((_a = this.gameModel) === null || _a === void 0 ? void 0 : _a.gameCode)) {
 	                if (Player.inst.isGuest && (data === null || data === void 0 ? void 0 : data.code) == HttpCode.OK) {
-	                    Player.inst.guestModel.playAdd(url, data.data);
+	                    (_b = Player.inst.guestModel) === null || _b === void 0 ? void 0 : _b.playAdd(url, data.data);
 	                }
 	                if (!data)
 	                    runFun(error, "data is null", request);
@@ -3298,7 +3298,7 @@ function _FguiBindView(classTarget, url) {
 	            if (data.code == HttpCode.OK) {
 	                Player.inst.gameData.playCount++;
 	                Player.inst.playCount++;
-	                if (Player.inst.isGuest)
+	                if (Player.inst.isGuest && Player.inst.guestModel)
 	                    Player.inst.guestModel.guestPlayCount++;
 	            }
 	            runFun(callback, data, request);
@@ -4632,11 +4632,12 @@ function _FguiBindView(classTarget, url) {
 	     * @param code 游戏id
 	     */
 	    openGame(config, code = -1) {
+	        var _a;
 	        tsCore.Log.info("openGame -> " + config + " " + code);
 	        Laya.stage.pauseUpdateTimer = false;
 	        this.visibles.length = 0;
 	        this.removeGroup(tsCore.App.GAME_GROUP);
-	        Player.inst.guestModel.clearData();
+	        (_a = Player.inst.guestModel) === null || _a === void 0 ? void 0 : _a.clearData();
 	        HtmlWindow.inst.hide();
 	        // 处理房间名字
 	        if (code > 0 || !config)
@@ -4759,6 +4760,7 @@ function _FguiBindView(classTarget, url) {
 	    }
 	    /** 检查游戏状态 */
 	    checkGameState(data) {
+	        var _a, _b;
 	        if ((data === null || data === void 0 ? void 0 : data.code) == -1) {
 	            LoadingWindow.hide();
 	            JSUtils.alert(StateCode.getShowMessage(data));
@@ -4776,7 +4778,7 @@ function _FguiBindView(classTarget, url) {
 	        // 如果是游客模式
 	        if (Player.inst.isGuest) {
 	            Player.inst.cacheMoney = Player.inst.money;
-	            Player.inst.money = Player.inst.guestModel.guestInitMoney;
+	            Player.inst.money = (_b = (_a = Player.inst.guestModel) === null || _a === void 0 ? void 0 : _a.guestInitMoney) !== null && _b !== void 0 ? _b : 0;
 	        }
 	        this.sendAction(ActionLib.GAME_CHECK_STATE, Laya.Handler.create(this, this.checkComplete));
 	    }
@@ -4818,7 +4820,8 @@ function _FguiBindView(classTarget, url) {
 	            Laya.TouchManager.I.enable = Laya.MouseManager.enabled = Laya.KeyBoardManager.enabled = true;
 	            // 放到下一帧去播放  不然 进入需要旋转的游戏 渲染跟不上
 	            Laya.timer.callLater(this, function () {
-	                Player.inst.guestModel.guestPlayCount = 0;
+	                if (Player.inst.guestModel)
+	                    Player.inst.guestModel.guestPlayCount = 0;
 	                tsCore.Log.debug("call close loading");
 	                if (GameConfigKit.autoSendOnLoadEnd) {
 	                    LoadingWindow.hide();

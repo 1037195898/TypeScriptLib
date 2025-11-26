@@ -158,7 +158,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
             .onComplete((data, request) => {
                 if (Player.inst.gameId == this.gameModel?.gameCode) {
                     if (Player.inst.isGuest && data?.code == HttpCode.OK) {
-                        Player.inst.guestModel.playAdd(url, data.data)
+                        Player.inst.guestModel?.playAdd(url, data.data)
                     }
                     if (!data) runFun(error, "data is null", request)
                     else runFun(callback, data, request)
@@ -406,7 +406,7 @@ export abstract class GameServlet<T extends BaseGameData = BaseGameData> extends
             if (data.code == HttpCode.OK) {
                 Player.inst.gameData.playCount++
                 Player.inst.playCount++
-                if (Player.inst.isGuest) Player.inst.guestModel.guestPlayCount++
+                if (Player.inst.isGuest && Player.inst.guestModel) Player.inst.guestModel.guestPlayCount++
             }
             runFun(callback, data, request)
         }, this.onSendBetError.bind(this))

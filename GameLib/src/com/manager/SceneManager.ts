@@ -213,7 +213,7 @@ export class SceneManager extends EProxy {
         Laya.stage.pauseUpdateTimer = false
         this.visibles.length = 0
         this.removeGroup(App.GAME_GROUP)
-        Player.inst.guestModel.clearData()
+        Player.inst.guestModel?.clearData()
         HtmlWindow.inst.hide()
         // 处理房间名字
         if (code > 0 || !config) config = GameConfigKit.gameNameCanonical(code, "")
@@ -362,7 +362,7 @@ export class SceneManager extends EProxy {
         // 如果是游客模式
         if (Player.inst.isGuest) {
             Player.inst.cacheMoney = Player.inst.money
-            Player.inst.money = Player.inst.guestModel.guestInitMoney
+            Player.inst.money = Player.inst.guestModel?.guestInitMoney ?? 0
         }
         this.sendAction(ActionLib.GAME_CHECK_STATE, Handler.create(this, this.checkComplete))
     }
@@ -409,7 +409,7 @@ export class SceneManager extends EProxy {
             TouchManager.I.enable = MouseManager.enabled = KeyBoardManager.enabled = true
             // 放到下一帧去播放  不然 进入需要旋转的游戏 渲染跟不上
             Laya.timer.callLater(this, function () {
-                Player.inst.guestModel.guestPlayCount = 0
+                if (Player.inst.guestModel) Player.inst.guestModel.guestPlayCount = 0
                 Log.debug("call close loading")
                 if (GameConfigKit.autoSendOnLoadEnd) {
                     LoadingWindow.hide()
