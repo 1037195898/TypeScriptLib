@@ -24,8 +24,10 @@ const generics = require("./rollup-plugin-generics");
 
 const ts = require('typescript')
 
+const {InputPluginOption} = require('rollup')
 const glsl = require('rollup-plugin-glsl')
 const typescriptRollup = require('@rollup/plugin-typescript')
+const {PartialCompilerOptions} = require('@rollup/plugin-typescript')
 const rollupTerser = require("@rollup/plugin-terser")
 const {Options} = require("@rollup/plugin-terser")
 const {SrcOptions} = require("vinyl-fs")
@@ -427,10 +429,11 @@ const outSource = function (outName) {
  * @typedef {Object} RollupOptions
  * @property {string} [outDir] - 输出目录路径
  * @property {string|false} [tsconfig="tsconfig.json"] - TypeScript 配置文件路径 当设置为 false 时，忽略配置文件中指定的任何选项。如果设置为与文件路径相对应的字符串，则指定的文件将用作配置文件。
+ * @property {PartialCompilerOptions} [compilerOptions] - 将额外的编译器选项传递给插件
  * @property {string|false} [filterRoot="false"] - 设置编译的根目录
  * @property {boolean | 'inline' | 'hidden'} [sourcemap=false] - 是否生成 sourcemap 文件
  * @property {boolean|Options} [minify=false] - 是否压缩代码，若为对象则作为 terser 压缩配置
- * @property {rollup.InputPluginOption} [plugins=[]] - rollup 插件
+ * @property {InputPluginOption} [plugins=[]] - rollup 插件
  * @property {ReadonlyArray<string | RegExp> | string | RegExp | null} [include=undefined] - include 包括的文件 默认是 {,**\/*}.(cts|mts|ts|tsx)
  * @property {ReadonlyArray<string | RegExp> | string | RegExp | null} [exclude=undefined] - exclude 排除的文件
  */
@@ -453,6 +456,14 @@ function rollupPack(inputFile, outName, options) {
     })
     const localPath = process.cwd()
     const outDir = path.resolve(localPath, options.outDir || "")
+    let file = outName + `${options.minify ? ".min" : ""}.js`
+    file = path.relative(localPath, path.join(outDir, file))
+    /**
+     *
+     * @type {PartialCompilerOptions | CompilerOptions}
+     */
+    const compilerOptions = options.compilerOptions || {}
+    compilerOptions.outDir ??= outDir
 
     const plugins = [
         generics(options),
@@ -471,6 +482,7 @@ function rollupPack(inputFile, outName, options) {
                     createNamespaceTransformer()
                 ]
             },
+            compilerOptions,
             // cacheDir: "D:/WorkSpace/.rollup.cache",
             tsconfig: options.tsconfig
         }),
@@ -515,7 +527,8 @@ function rollupPack(inputFile, outName, options) {
         output: {
             // compact: true, // 去除多余缩进
             format: 'iife',
-            file: outName + `${options.minify ? ".min" : ""}.js`,
+            // 给出完整路径
+            file: file,
             name: outName,
             extend: true,
             sourcemap: options.sourcemap, // rollup不处理sourcemap映射

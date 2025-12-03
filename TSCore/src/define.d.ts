@@ -1,3 +1,4 @@
+// global
 declare module Laya {
 
 // @ts-ignore

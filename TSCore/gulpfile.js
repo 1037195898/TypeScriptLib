@@ -1,6 +1,6 @@
 'use strict'
 
-const {clean, buildLibrary} = require("../index")
+const {clean, buildLibrary, rollupPack} = require("../index")
 
 const path = require("path")
 const gulp = require("gulp")
@@ -26,14 +26,18 @@ function buildLib(done) {
             globs: ["src/**/*.ts"],
         },
         outName: project,
-        dist: "./bin",
-        namespace: project,
-        js: {isMinify: true},
-        dts: {
-            globalDtsFile: ["./src/define.d.ts", "./src/entity.d.ts"]
-        }
+        dist: "./bin"
     }, function () {
         done()
+    }, {
+        js: {
+            namespace: project,
+            isMinify: true
+        },
+        dts: {
+            namespace: project,
+            globalDtsFile: ["./src/define.d.ts", "./src/entity.d.ts"]
+        }
     })
 }
 

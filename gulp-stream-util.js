@@ -1,4 +1,5 @@
 const rollup = require('rollup')
+const {RollupOptions} = require('rollup')
 const log = require("gulplog")
 const streamNode = require("stream")
 const through2 = require("through2")
@@ -45,10 +46,16 @@ function run(func, end, ...args) {
 
 /**
  * 创建一个 Rollup 构建流，用于处理多个构建选项并生成对应的文件流
- * @param {...rollup.RollupOptions} options - Rollup 构建选项数组，每个选项包含输入和输出配置
+ * @param {...RollupOptions} options - Rollup 构建选项数组，每个选项包含输入和输出配置
  * @returns {streamNode.Readable} 返回一个可读流，包含构建生成的文件
  */
 function rollupStream(...options) {
+
+    /**
+     *
+     * @param options {RollupOptions}
+     * @param stream {streamNode.Readable}
+     */
     const build = async (options, stream) => {
         const bundle = await rollup.rollup(options);
         stream.emit('bundle', bundle);

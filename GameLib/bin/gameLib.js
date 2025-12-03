@@ -397,6 +397,9 @@ const lazyInitBindView = [];
 	            bindView(data[0], data[1], true);
 	        }
 	    }
+	    constructor() {
+	        tsCore.App["appRunListeners"].push(this);
+	    }
 	}
 	
 	/** 公用信息处理 */

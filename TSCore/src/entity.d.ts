@@ -1,3 +1,6 @@
+// global
+
+
 // 通用装饰器类型定义
 // type PropertyDecorator = (target: any, propertyKey: string) => PropertyDescriptor | void;
 // type ClassDecorator = <T extends Function>(constructor: T) => T | void;

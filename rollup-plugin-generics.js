@@ -34,64 +34,68 @@ function parseGenerics(options) {
                 readFile: ts.sys.readFile
             }, path.resolve(path.dirname(options.tsconfig)))
             compilerOptions = parsed.options
-            console.log("buildStart")
+            // console.log("buildStart")
         },
         async resolveId(source, importer, options) {
+            let resolved
             if (importer) {
-                const resolved = await this.resolve(source, importer, options)
-                if (!resolved) {
-                    source
-                }
-                source = resolved.id
+                resolved = await this.resolve(source, importer, options)
+            } else {
+                resolved = await this.resolve(source)
             }
+            source = resolved.id
             // console.log("resolveId", source)
             // 计算这个节点是否有泛型依赖
             const generics = getGenerics.call(this, source)
             if (generics.length > 0) {
                 const my = this
-                const result = []
-                await Promise.all(
-                    generics.map(async value => {
-                        const info = this.getModuleInfo(value)
-                        result.push(value)
-                    })
-                )
+                const result = [...generics]
+                // await Promise.all(
+                //     generics.map(async value => {
+                //         const info = this.getModuleInfo(value)
+                //         result.push(value)
+                //     })
+                // )
                 if (result.length > 0) {
+                    const duplicates = result.filter(value => !loadFile.has(value))
                     result.forEach(value => loadFile.add(value))
                     mapMoule.set(source, result)
-                    const duplicates = result.filter(value => !loadFile.has(value))
-                    if (duplicates.length > 0) {
-                        return {
-                            id: source,
-                            meta: {
-                                additionalDeps: duplicates
-                            },
-                            moduleSideEffects: true
-                        }
-                    }
+                    // if (duplicates.length > 0) {
+                    //     return {
+                    //         id: source,
+                    //         meta: {
+                    //             additionalDeps: duplicates
+                    //         },
+                    //         moduleSideEffects: true
+                    //     }
+                    // }
                 }
             }
         },
         async transform(code, id) {
             if (mapMoule.has(id)) {
-                /**
-                 * @type string[]
-                 */
+
                 const duplicates = mapMoule.get(id)
                 const addImport = []
                 for (const duplicate of duplicates) {
-                    let name = path.relative(path.dirname(id), duplicate).replace(/\\/g, "/").replace(".ts", "")
+                    const file = duplicate.path
+                    const elementName = duplicate.elementName
+
+                    let name = path.relative(path.dirname(id), file).replace(/\\/g, "/").replace(".ts", "")
                     if (!name.startsWith(".")) {
                         name = "./" + name
                     }
-                    const className = name.substring(name.lastIndexOf("/") + 1)
-                    const a = new RegExp("import\\s*\\{\\s*" + className + "\\s*}\\s*from")
+                    const a = new RegExp("import\\s*\\{[^}]*\\b" + elementName + "\\b[^}]*\\}\\s*from")
                     if (!a.test(code)) {
-                        const imports = "import { " + className + " } from \"" + name + "\";"
+                        const imports = "import { " + elementName + " } from \"" + name + "\";"
                         addImport.push(imports)
                     }
                 }
                 if (addImport.length > 0) {
+                    const index = id.lastIndexOf(path.sep)
+                    const name = id.substring(index)
+
+                    console.log("强制添加 被遗弃的对象-> " + name + ": " + addImport.join(" "))
                     code = addImport.join("\n") + "\n" + code
                     return {
                         code,
@@ -127,71 +131,44 @@ function getGenerics(id) {
     //  比如 class TestA<TestB> 这种 如果存在 那么在ast中添加依赖信息
     //  让rollup知道TestA依赖TestB 即便没有实际引用的代码
 
-    let hasClass = false;
-    let classGenericParams = [];
+    const dependencies = [];
     // 遍历AST查找类声明
     ts.forEachChild(sourceFile, function visit(node) {
-        if (ts.isClassDeclaration(node)) {
-            hasClass = true;
-            // 检查类是否有泛型参数
-            if (node.typeParameters && node.typeParameters.length > 0) {
-                // 收集泛型参数名称
-                node.typeParameters.forEach(param => {
-                    if (param.name && param.name.text) {
-                        classGenericParams.push(param.name.text);
-                    }
-                });
-            }
-            // 检查是否有继承且父类使用了泛型
-            if (node.heritageClauses) {
-                node.heritageClauses.forEach(clause => {
-                    clause.types.forEach(type => {
-                        if (type.typeArguments) {
-                            type.typeArguments.forEach(arg => {
-                                if (ts.isTypeReferenceNode(arg) && ts.isIdentifier(arg.typeName)) {
-                                    classGenericParams.push(arg.typeName.text);
-                                }
-                            });
+        if (ts.isImportDeclaration(node)) {
+            // 获取完整的importClause数据
+            const importClause = node.importClause;
+            // 获取导入模块的相对路径
+            let importPath = node.moduleSpecifier.text
+
+            // 只处理相对路径导入（本地模块）
+            if (importPath.includes('/')) {
+                // 基于当前文件位置进行解析
+                importPath = getImportPath(importPath, id);
+                // 忽略以 I 开头的接口类（约定接口类以 I 开头）
+                if (importPath.includes('interfaces')) {
+                    return; // 跳过此循环迭代
+                }
+                // 处理命名导入 - 多个导入分别处理
+                if (importClause && importClause.namedBindings && ts.isNamedImports(importClause.namedBindings)) {
+                    importClause.namedBindings.elements.forEach(element => {
+                        const elementName = element.name.text;
+                        const dependencyInfo = {
+                            path: importPath,
+                            elementName: elementName,
+                            importClause: importClause,
+                            moduleSpecifier: node.moduleSpecifier
+                        };
+                        // 确保不会重复添加相同的依赖项
+                        if (!dependencies.some(dep => dep.path === importPath && dep.elementName === elementName)) {
+                            dependencies.push(dependencyInfo);
                         }
                     });
-                });
+                }
             }
         }
         ts.forEachChild(node, visit);
     });
 
-
-    const dependencies = [];
-    // 如果找到了带有泛型的类，将泛型参数作为依赖添加到模块信息中
-    if (hasClass && classGenericParams.length > 0) {
-        // 添加依赖信息到模块中
-        classGenericParams.forEach(param => {
-            // 查找泛型参数对应的导入声明
-            const importDeclaration = sourceFile.statements.find(statement =>
-                ts.isImportDeclaration(statement) &&
-                statement.importClause &&
-                statement.importClause.namedBindings &&
-                ts.isNamedImports(statement.importClause.namedBindings) &&
-                statement.importClause.namedBindings.elements.some(element =>
-                    element.name.text === param)
-            );
-
-            if (importDeclaration) {
-                // 如果找到导入声明，添加到依赖中
-                // 根据tsconfig配置解析路径
-                let importPath = importDeclaration.moduleSpecifier.text;
-                if (!path.isAbsolute(importPath)) {
-                    importPath = getImportPath(importPath, id)
-                }
-                if (this.getModuleInfo(importPath)) {
-                    return;
-                }
-                if (!dependencies.includes(importPath)) {
-                    dependencies.push(importPath);
-                }
-            }
-        });
-    }
     return dependencies
 }
 

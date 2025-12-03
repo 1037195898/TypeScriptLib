@@ -9,7 +9,7 @@ const gulp = require("gulp")
 
 const AdmZip = require('adm-zip')
 const {reserved} = require("./reserved")
-const {createDirectory, cleanStream, mJs, buildJs, buildDts} = require("./index")
+const {createDirectory, cleanStream, mJs, buildJs, buildDts, rollupPack} = require("./index")
 const {SourceMapConsumer, SourceNode} = require('source-map');
 
 gulp.task("resetSource", (f) => {
@@ -126,7 +126,6 @@ gulp.task("buildDtsTest", () => {
         globs: ["TSCore/src/com/*.ts", "./TsCore/bin/*.d.ts"]
     }, "testApp", "bin/test", undefined, "tscore")
 })
-
 
 gulp.task('default', gulp.series("build"))
 

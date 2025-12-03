@@ -6,3 +6,4 @@ dist
 /TSCore/bin/temp/
 /GameLib/bin/temp/
 *.tgz
+demo

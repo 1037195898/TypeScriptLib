@@ -1,4 +1,5 @@
 import IAppRunListener = tsCore.IAppRunListener;
+import App = tsCore.App;
 
 /**
  * @internal
@@ -24,6 +25,10 @@ export class Activation implements IAppRunListener {
 
 
 
+    }
+
+    constructor() {
+        App["appRunListeners"].push(this)
     }
 
 
