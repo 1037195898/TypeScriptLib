@@ -445,7 +445,7 @@ const outSource = function (outName) {
  * @param {string} inputFile - 需要打包的入口文件路径
  * @param {string} outName - 输出模块的全局变量名（用于 IIFE 格式）
  * @param {RollupOptions?} options - 打包配置选项
- * @returns {NodeJS.ReadWriteStream} 返回一个 Gulp 流，用于后续处理或写入文件
+ * @returns {Promise<NodeJS.ReadWriteStream>} 返回一个 Gulp 流，用于后续处理或写入文件
  */
 async function rollupPack(inputFile, outName, options) {
     options = defaults(options, {
@@ -553,30 +553,34 @@ async function rollupPack(inputFile, outName, options) {
         ...options.plugins
     ]
 
-    return rollupStream({
-        input: inputFile,
-        treeshake: false,// 删除无调用代码
-        external: ["tslib"],// 排除 tslib，不将其打包进最终文件
-        output: {
-            // compact: true, // 去除多余缩进
-            format: 'iife',
-            // 给出完整路径
-            file: file,
-            name: outName,
-            extend: true,
-            sourcemap: options.sourcemap, // rollup不处理sourcemap映射
-            globals: {
-                tslib: "window"  // 告诉 Rollup 将 tslib 视为全局变量
-            }
-        },
-        plugins: plugins
-    })
-        .pipe(gulp.dest(outDir))
-        .on('end', () => {
-            if (fs.existsSync(inputFile)) {
-                // fs.unlinkSync(inputFile); // 构建完成后删除临时文件
-            }
+    return new Promise((resolve, reject) => {
+        rollupStream({
+            input: inputFile,
+            treeshake: false,// 删除无调用代码
+            external: ["tslib"],// 排除 tslib，不将其打包进最终文件
+            output: {
+                // compact: true, // 去除多余缩进
+                format: 'iife',
+                // 给出完整路径
+                file: file,
+                name: outName,
+                extend: true,
+                sourcemap: options.sourcemap, // rollup不处理sourcemap映射
+                globals: {
+                    tslib: "window"  // 告诉 Rollup 将 tslib 视为全局变量
+                }
+            },
+            plugins: plugins
         })
+            .pipe(gulp.dest(outDir))
+            .on('end', () => {
+                resolve()
+                if (fs.existsSync(inputFile)) {
+                    // fs.unlinkSync(inputFile); // 构建完成后删除临时文件
+                }
+            })
+            .on("error", reject)
+    })
 
 
 }
