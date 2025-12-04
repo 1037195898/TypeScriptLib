@@ -497,11 +497,7 @@ async function rollupPack(inputFile, outName, options) {
                     const code = ts.transpile(inputCode, parsedCompilerOptions)
                     return code
                 }
-            },
-            transform(code, id) {
-
             }
-
         },
         generics(options),
         glsl({

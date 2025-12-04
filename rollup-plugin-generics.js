@@ -33,7 +33,7 @@ function parseGenerics(options) {
             } else {
                 const tsConfig = ts.readConfigFile(options.tsconfig, ts.sys.readFile)
                 if (tsConfig.error) {
-                    console.log(tsConfig.error.messageText);
+                    console.error("error", tsConfig.error.messageText);
                 }
                 const parsed = ts.parseJsonConfigFileContent(tsConfig.config, {
                     useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
@@ -46,7 +46,7 @@ function parseGenerics(options) {
             // console.log("buildStart")
         },
         async resolveId(source, importer, options) {
-            console.log(source)
+            // console.log("", source)
             let resolved
             if (importer) {
                 resolved = await this.resolve(source, importer, options)
@@ -116,12 +116,12 @@ function getImportPath(moduleName, importPath) {
     return importPath
 }
 
-cacheParseGenerics = []
+cacheParseGenerics = new Map()
 
 function getGenerics(id) {
-    if (cacheParseGenerics.includes(id)) {
-        console.warn("重复解析数据", id)
-    } else cacheParseGenerics.push(cacheParseGenerics)
+    if (cacheParseGenerics.has(id)) {
+        return cacheParseGenerics.get(id)
+    }
     const code = fs.readFileSync(id).toString()
     const sourceFile = ts.createSourceFile(id, code, compilerOptions.target, true)
 
@@ -175,7 +175,7 @@ function getGenerics(id) {
         }
         ts.forEachChild(node, visit);
     });
-
+    cacheParseGenerics.set(id, dependencies)
     return dependencies
 }
 
