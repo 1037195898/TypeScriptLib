@@ -19,7 +19,6 @@ const mapMoule = new Map()
  * @returns {{id: *, meta: {additionalDeps: T[]}, moduleSideEffects: boolean}|{code: string, map: null}|{name: string, buildStart(): void, resolveId(*, *, *): Promise<{id: *, meta: {additionalDeps: T[]}, moduleSideEffects: boolean}|undefined>, transform(*, *): Promise<{code: string, map: null}|undefined>}}
  */
 function parseGenerics(options) {
-
     return {
         name: 'inject',
         buildStart() {
@@ -37,6 +36,7 @@ function parseGenerics(options) {
             // console.log("buildStart")
         },
         async resolveId(source, importer, options) {
+            console.log(source)
             let resolved
             if (importer) {
                 resolved = await this.resolve(source, importer, options)
@@ -48,27 +48,10 @@ function parseGenerics(options) {
             // 计算这个节点是否有泛型依赖
             const generics = getGenerics.call(this, source)
             if (generics.length > 0) {
-                const my = this
                 const result = [...generics]
-                // await Promise.all(
-                //     generics.map(async value => {
-                //         const info = this.getModuleInfo(value)
-                //         result.push(value)
-                //     })
-                // )
                 if (result.length > 0) {
-                    const duplicates = result.filter(value => !loadFile.has(value))
                     result.forEach(value => loadFile.add(value))
                     mapMoule.set(source, result)
-                    // if (duplicates.length > 0) {
-                    //     return {
-                    //         id: source,
-                    //         meta: {
-                    //             additionalDeps: duplicates
-                    //         },
-                    //         moduleSideEffects: true
-                    //     }
-                    // }
                 }
             }
         },
@@ -123,7 +106,12 @@ function getImportPath(moduleName, importPath) {
     return importPath
 }
 
+cacheParseGenerics = []
+
 function getGenerics(id) {
+    if (cacheParseGenerics.includes(id)) {
+        console.warn("重复解析数据", id)
+    } else cacheParseGenerics.push(cacheParseGenerics)
     const code = fs.readFileSync(id).toString()
     const sourceFile = ts.createSourceFile(id, code, compilerOptions.target, true)
 
@@ -138,14 +126,23 @@ function getGenerics(id) {
             // 获取完整的importClause数据
             const importClause = node.importClause;
             // 获取导入模块的相对路径
+            /**
+             * @type string
+             */
             let importPath = node.moduleSpecifier.text
 
             // 只处理相对路径导入（本地模块）
             if (importPath.includes('/')) {
                 // 基于当前文件位置进行解析
                 importPath = getImportPath(importPath, id);
+                let className = importPath
+                const index = importPath.lastIndexOf(path.sep)
+                if (index > -1) {
+                    className = importPath.substring(index + 1)
+                }
                 // 忽略以 I 开头的接口类（约定接口类以 I 开头）
-                if (importPath.includes('interfaces')) {
+                if (importPath.includes('interfaces') ||
+                    (className.charAt(0) === 'I' && className.charAt(1) >= 'A' && className.charAt(1) <= 'Z')) {
                     return; // 跳过此循环迭代
                 }
                 // 处理命名导入 - 多个导入分别处理

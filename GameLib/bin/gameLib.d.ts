@@ -1633,7 +1633,7 @@ declare namespace gameLib {
 	    /**
 	     * post请求 返回数据  可以在这里对返回数据进行修改
 	     * @param url 访问网址
-	     * @param data 押注额度
+	     * @param data 发送的数据
 	     */
 	    playAdd(url: string, data: HttpData): void;
 	}
