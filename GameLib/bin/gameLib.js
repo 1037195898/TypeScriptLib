@@ -4411,7 +4411,13 @@ const lazyInitBindView = [];
 	    /** 当前游戏的方向 */
 	    updateScreenOrientation() {
 	    }
-	    /** 创建并显示一个舞台 */
+	    /**
+	     *  创建并显示一个舞台
+	     *
+	     * @param url 如果url不带/符号 则自动转成 gameName/url
+	     * @param cls
+	     * @protected
+	     */
 	    createShowScene(url, cls) {
 	        // 部分手机太垃圾了  需要延迟点
 	        Laya.timer.callLater(this, () => {

@@ -106,11 +106,11 @@ function Fgui(name: string): any {
  * }
  */
 function fguiFindChild(target: fgui.GComponent, childs: string[]) {
-    let obj: fgui.GObject
+    let obj: fgui.GObject = target
     // 遍历子对象名称数组，逐层查找子对象
     for (const child of childs) {
-        if (target instanceof fgui.GComponent) {
-            obj = target.getChild(child)
+        if (obj instanceof fgui.GComponent) {
+            obj = obj.getChild(child)
         } else {
             obj = null
             break

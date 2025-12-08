@@ -1320,11 +1320,11 @@ function Fgui(name) {
  * }
  */
 function fguiFindChild(target, childs) {
-    let obj;
+    let obj = target;
     // 遍历子对象名称数组，逐层查找子对象
     for (const child of childs) {
-        if (target instanceof fgui.GComponent) {
-            obj = target.getChild(child);
+        if (obj instanceof fgui.GComponent) {
+            obj = obj.getChild(child);
         }
         else {
             obj = null;

@@ -2101,7 +2101,7 @@ declare namespace gameLib {
 	     * @param [closeGame=true] 是否关闭游戏
 	     * @param request
 	     */
-	    protected showNotResult(data: any, closeGame?: boolean, request?: tsCore.AjaxRequest): void;
+	    protected showNotResult(data?: HttpResponse, closeGame?: boolean, request?: tsCore.AjaxRequest): void;
 	    get gameModel(): IGameModel;
 	    set gameModel(value: IGameModel);
 	    dispose(): void;
@@ -2504,7 +2504,13 @@ declare namespace gameLib {
 	    protected createSceneShow(handler: ParamHandler): void;
 	    /** 当前游戏的方向 */
 	    updateScreenOrientation(): void;
-	    /** 创建并显示一个舞台 */
+	    /**
+	     *  创建并显示一个舞台
+	     *
+	     * @param url 如果url不带/符号 则自动转成 gameName/url
+	     * @param cls
+	     * @protected
+	     */
 	    protected createShowScene(url: string, cls?: new () => fgui.GObject): void;
 	}
 	

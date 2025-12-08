@@ -42,7 +42,13 @@ export class BaseStarter extends EProxy {
     updateScreenOrientation() {
     }
 
-    /** 创建并显示一个舞台 */
+    /**
+     *  创建并显示一个舞台
+     *
+     * @param url 如果url不带/符号 则自动转成 gameName/url
+     * @param cls
+     * @protected
+     */
     protected createShowScene(url: string, cls?: new () => fgui.GObject) {
         // 部分手机太垃圾了  需要延迟点
         Laya.timer.callLater(this, () => {
