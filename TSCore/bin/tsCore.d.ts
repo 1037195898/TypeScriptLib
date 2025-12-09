@@ -3838,37 +3838,109 @@ declare namespace tsCore {
 	    static PlatformClass: ICPlatformClass;
 	}
 	
+	/**
+	 * Socket 客户端类，用于建立 WebSocket 连接并与服务器通信
+	 * 支持原生平台自定义 Socket 实现及标准 Laya.Socket 实现
+	 */
 	export class SocketClient extends Laya.EventDispatcher {
+	    /**
+	     * 原生平台 Socket 类路径配置
+	     * 如果为空则使用默认 Laya.Socket 实现
+	     */
 	    static SOCKET_CLASS_PATH: string;
-	    protected MAX_CONNECT_TIME: number;
-	    protected DELAY: number;
+	    /**
+	     * 最大重连次数限制
+	     */
+	    MAX_CONNECT_TIMES: number;
+	    /**
+	     * 初始重连延迟时间（毫秒）
+	     */
+	    RECONNECT_DELAY: number;
+	    /**
+	     * 心跳包发送间隔（毫秒）
+	     */
+	    HEARTBEAT_INTERVAL: number;
+	    protected connectTimes: number;
+	    protected reconnectDelay: number;
+	    /**
+	     * Socket 对象实例
+	     */
 	    protected socket: any;
+	    /**
+	     * 连接配置选项
+	     */
 	    protected options: {
 	        url: string;
-	        notify: Function;
+	        notify: (data: any) => void;
 	        auth: any;
 	    };
-	    protected auth: boolean;
-	    alive: boolean;
 	    /**
-	     * 创建一个socket
-	     * @param options 参数 url 连接地址 notify 回调方法 auth 认证
+	     * 是否已认证标志
+	     */
+	    protected isAuthenticated: boolean;
+	    /**
+	     * 客户端是否存活状态
+	     */
+	    isActive: boolean;
+	    /**
+	     * 创建一个socket连接客户端
+	     * @param options 连接参数对象
 	     */
 	    constructor(options: {
 	        url: string;
-	        notify: Function;
+	        notify: (data: any) => void;
 	        auth: any;
 	    });
+	    /**
+	     * 尝试创建连接（检查最大重连次数限制）
+	     */
 	    createConnect(): void;
+	    /**
+	     * 建立实际的 Socket 连接
+	     * 根据运行环境选择原生实现或标准实现
+	     */
 	    protected connect(): void;
-	    closeHandler(msg?: any): void;
-	    messageHandler(evt: any): void;
-	    errorHandler(e: any): void;
-	    openHandler(): void;
-	    protected reConnect(): void;
+	    /**
+	     * 连接关闭事件处理器
+	     * @param msg 关闭消息
+	     */
+	    onClose(msg?: any): void;
+	    /**
+	     * 接收消息事件处理器
+	     * 处理认证、心跳响应以及业务数据分发
+	     * @param evt 接收到的消息事件
+	     */
+	    onMessage(evt: any): void;
+	    /**
+	     * 错误事件处理器
+	     * @param e 错误信息
+	     */
+	    onError(e: any): void;
+	    /**
+	     * 连接打开事件处理器
+	     */
+	    onOpen(): void;
+	    /**
+	     * 执行重连逻辑
+	     * 减少剩余重连次数并增加下次重连延迟
+	     */
+	    protected reconnect(): void;
+	    /**
+	     * 发送心跳包维持连接
+	     */
 	    protected heartbeat(): void;
-	    protected getAuth(): void;
+	    /**
+	     * 获取认证信息
+	     */
+	    protected auth(): void;
+	    /**
+	     * 发送数据到服务器
+	     * @param data 要发送的数据对象
+	     */
 	    send(data: any): void;
+	    /**
+	     * 主动关闭连接
+	     */
 	    close(): void;
 	}
 	

@@ -974,7 +974,7 @@ declare namespace gameLib {
 	     *
 	     * })
 	     */
-	    customUrl: ParamHandler;
+	    customUrl: ((url: string) => string) | Laya.Handler;
 	    /**
 	     * 链接服务器socket
 	     * @param roomId 房间号

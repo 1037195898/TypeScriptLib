@@ -1148,7 +1148,7 @@ const lazyInitBindView = [];
 	        Laya.timer.clear(this, this.sendData);
 	        this._roomId = -1;
 	        if (this._client)
-	            this._client.alive = false;
+	            this._client.isActive = false;
 	        if (this._client)
 	            this._client.close();
 	        this._client = null;
@@ -1164,19 +1164,19 @@ const lazyInitBindView = [];
 	    }
 	    closeHandler(msg = null) {
 	        var _a;
-	        (_a = this._client) === null || _a === void 0 ? void 0 : _a.closeHandler(msg);
+	        (_a = this._client) === null || _a === void 0 ? void 0 : _a.onClose(msg);
 	    }
 	    messageHandler(evt) {
 	        var _a;
-	        (_a = this._client) === null || _a === void 0 ? void 0 : _a.messageHandler(evt);
+	        (_a = this._client) === null || _a === void 0 ? void 0 : _a.onMessage(evt);
 	    }
 	    errorHandler(e) {
 	        var _a;
-	        (_a = this._client) === null || _a === void 0 ? void 0 : _a.errorHandler(e);
+	        (_a = this._client) === null || _a === void 0 ? void 0 : _a.onError(e);
 	    }
 	    openHandler() {
 	        var _a;
-	        (_a = this._client) === null || _a === void 0 ? void 0 : _a.openHandler();
+	        (_a = this._client) === null || _a === void 0 ? void 0 : _a.onOpen();
 	    }
 	    get roomId() {
 	        return this._roomId;

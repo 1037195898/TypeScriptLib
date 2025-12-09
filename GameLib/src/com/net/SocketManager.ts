@@ -34,7 +34,7 @@ export class SocketManager extends ESocket {
      *
      * })
      */
-    customUrl: ParamHandler
+    customUrl: ((url: string) => string) | Laya.Handler
 
     /**
      * 链接服务器socket
@@ -88,7 +88,7 @@ export class SocketManager extends ESocket {
         Log.debug("close socket")
         Laya.timer.clear(this, this.sendData)
         this._roomId = -1
-        if (this._client) this._client.alive = false
+        if (this._client) this._client.isActive = false
         if (this._client) this._client.close()
         this._client = null
         this.receiveData.splice(0, this.receiveData.length)
@@ -104,19 +104,19 @@ export class SocketManager extends ESocket {
     }
 
     closeHandler(msg = null) {
-        this._client?.closeHandler(msg)
+        this._client?.onClose(msg)
     }
 
     messageHandler(evt) {
-        this._client?.messageHandler(evt)
+        this._client?.onMessage(evt)
     }
 
     errorHandler(e) {
-        this._client?.errorHandler(e)
+        this._client?.onError(e)
     }
 
     openHandler() {
-        this._client?.openHandler()
+        this._client?.onOpen()
     }
 
     get roomId() {
