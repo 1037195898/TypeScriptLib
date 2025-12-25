@@ -113,12 +113,12 @@ function AppMain(value: { new(...args: any[]): IRunApplication }) {
 /**
  * 组件装饰器函数，用于创建和配置组件类
  * @template T 限制为构造函数类型
- * @param {string | T | ComponentData} value - 组件标识符或目标构造函数。默认使用类名 首字母大小写都有.值如果是`null`或`{isJoinBean:false}`,将不会自动初始化和添加到依赖管理器中.
+ * @param {string | T | ComponentData} value - 组件标识符或目标构造函数。默认使用类名 首字母大小写都有.值如果是`null`、`false`或`{isJoinBean:false}`,将不会自动初始化和添加到依赖管理器中.
  * @returns any 返回装饰后的类。
  */
-function Component<T extends { new(...args: any[]): {} }>(value: string | T | ComponentData = "") {
+function Component<T extends { new(...args: any[]): {} }>(value: string | false | T | ComponentData = "") {
     let decorator: any = function (classTarget: T) {
-        if (value == null) {
+        if (value == null || value == false) {
             return proxyClass(classTarget)
         }
         let data: ComponentData = {}
