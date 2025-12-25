@@ -402,7 +402,7 @@ const lazyInitBindView = [];
 	        }
 	    }
 	    constructor() {
-	        tsCore.App["appRunListeners"].push(this);
+	        addAppRunListeners(this);
 	    }
 	}
 	

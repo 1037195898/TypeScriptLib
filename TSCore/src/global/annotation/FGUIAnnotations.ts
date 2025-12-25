@@ -122,6 +122,9 @@ function fguiFindChild(target: fgui.GComponent, childs: string[]) {
 /**
  * 定时循环执行装饰器
  * 用于装饰类方法，使其按照指定间隔循环执行
+ *
+ * 该装饰器只能用在被 `@Component` 注解管理的类中。
+ *
  * @param interval - 执行间隔时间(毫秒)
  * @param custom - 自定义执行条件函数，当该函数返回 true 时任务会无视默认的可见性检查而强制执行
  * @returns function - 装饰器函数
@@ -157,7 +160,11 @@ function TimerLoop(interval: number, custom?: () => boolean) {
 }
 
 /**
+ *
+ * 该装饰器只能用在被 `@Component` 注解管理的类中。
+ *
  * @borrows TimerLoop as TimerFrameLoop
+ *
  */
 function TimerFrameLoop(frame: number, custom?: () => boolean) {
     return function (targetProperty: any, propertyKey: string, descriptor: PropertyDescriptor) {

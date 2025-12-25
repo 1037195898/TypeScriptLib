@@ -28,8 +28,7 @@ export class Activation implements IAppRunListener {
     }
 
     constructor() {
-        App["appRunListeners"].push(this)
+        addAppRunListeners(this)
     }
-
 
 }

@@ -255,10 +255,46 @@ declare function Ready(target: any, propertyKey: string, descriptor: PropertyDes
  */
 declare function Bean(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
 /**
- * 注册事件
- * @param {number | string} action 事件名字
- * @param {string} group 分组集合
- * @param {number} order 值越大 越后执行 默认 100
+ * 注册事件监听方法
+ *
+ * 该装饰器用于将方法注册为事件监听器，当指定事件触发时会调用被装饰的方法
+ * 事件处理方法会被添加到全局事件函数列表中，并根据配置的分组和优先级执行
+ *
+ * ### 支持以下写法：
+ * - `@Actions("eventName")`                    // 使用事件名称注册监听器
+ * - `@Actions("eventName", "groupName")`       // 指定事件名称和分组
+ * - `@Actions("eventName", "groupName", 200)`  // 指定事件名称、分组和执行优先级
+ *
+ * ### 使用说明：
+ * - 该装饰器只能用在被 `@Component` 注解管理的类中。
+ * - 该装饰器只能用在方法上，被装饰的方法会作为事件处理函数
+ * - [order](file://D:\WorkSpace\LayaBox\TypeScriptLib\bin\tsCore.d.ts#L2267-L2267) 参数控制执行顺序，值越大越后执行，默认值为 100
+ * - 事件监听器会在组件初始化时自动注册到应用事件系统中
+ *
+ * ### 注意事项：
+ * - 被装饰的必须是方法，不能是属性或其他类型
+ * - 方法的参数类型信息通过反射获取，需要在 tsconfig.json 中启用 emitDecoratorMetadata
+ *
+ * ### 示例代码：
+ * ```
+ * @Component
+ * class MyComponent {
+ *   // 注册事件监听器，监听自定义事件
+ *   @Actions("myCustomEvent")
+ *   onMyEvent(data: any) {
+ *     console.log("事件触发，数据:", data);
+ *   }
+ *
+ *   // 带分组和优先级的事件监听器
+ *   @Actions("gameStart", "game", 150)
+ *   onGameStart() {
+ *     console.log("游戏开始处理逻辑");
+ *   }
+ * }
+ * ```
+ * @param {number | string} action 事件名称或标识符，用于指定监听的事件类型
+ * @param {string} group 可选参数，事件分组名称，用于对事件处理进行分组管理
+ * @param {number} order 可选参数，执行优先级，数值越大越晚执行，默认为 100
  */
 declare function Actions(action: number | string, group?: string, order?: number): (targetPrototype: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
 /**
@@ -283,6 +319,7 @@ declare function ClickOn(childName?: string | any, args?: string | any[]): any;
  * @param args 附加参数，可选
  */
 declare function EventOn(eventName: string, childName?: string, args?: any[]): any;
+declare function addAppRunListeners(...args: tsCore.IAppRunListener[]): void;
 /**
  * 运行应用程序，并初始化所有Bean实例。
  * @param classTarget - 应用程序主类的构造函数。
@@ -340,6 +377,9 @@ declare function Fgui(name: string): any;
 /**
  * 定时循环执行装饰器
  * 用于装饰类方法，使其按照指定间隔循环执行
+ *
+ * 该装饰器只能用在被 `@Component` 注解管理的类中。
+ *
  * @param interval - 执行间隔时间(毫秒)
  * @param custom - 自定义执行条件函数，当该函数返回 true 时任务会无视默认的可见性检查而强制执行
  * @returns function - 装饰器函数
@@ -364,7 +404,11 @@ declare function Fgui(name: string): any;
  */
 declare function TimerLoop(interval: number, custom?: () => boolean): (targetProperty: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
 /**
+ *
+ * 该装饰器只能用在被 `@Component` 注解管理的类中。
+ *
  * @borrows TimerLoop as TimerFrameLoop
+ *
  */
 declare function TimerFrameLoop(frame: number, custom?: () => boolean): (targetProperty: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
 declare class RandomTimer {
@@ -2417,57 +2461,6 @@ declare namespace tsCore {
 	    copy(): TaskHandler;
 	}
 	
-	/**
-	 * 应用运行监听器接口，用于监听应用启动过程中的各个阶段
-	 */
-	export interface IAppRunListener {
-	    /**
-	     * 当开始初始化应用时调用
-	     *
-	     * @see onProxyComponentComplete
-	     */
-	    onStartInitialize?(): void;
-	    /**
-	     * 对与需要代理处理的类初始化完成
-	     *
-	     * @see onCreateMain
-	     */
-	    onProxyComponentComplete?(): void;
-	    /**
-	     * 创建主应用类后调用
-	     * 此刻只是创建，尚未给主应用类属性赋值 但已加入bean池
-	     * @param mainContext 已经创建好的主类
-	     *
-	     * @see onBeanFuncInitializing
-	     */
-	    onCreateMain?(mainContext: any): void;
-	    /**
-	     * 即将初始化被 @Bean 标记的函数
-	     * @see onComponentInitializing
-	     */
-	    onBeanFuncInitializing?(): void;
-	    /**
-	     * 即将初始化被 @Component 标记的类
-	     * @see onComponentProgress
-	     */
-	    onComponentInitializing?(): void;
-	    /**
-	     * @Component 初始化过程
-	     * @param target 已经初始化好的类
-	     * @see onMainAppInitializing
-	     */
-	    onComponentProgress?(target: any): void;
-	    /**
-	     * 即将初始化主应用类时调用
-	     * @see onComplete
-	     */
-	    onMainAppInitializing?(): void;
-	    /**
-	     * 应用完全初始化完成时调用
-	     */
-	    onComplete?(): void;
-	}
-	
 	export class ActionEvent implements IAction {
 	    regAction(action: string | number, caller: any, method: Function, group?: string, order?: number): void;
 	    regActionHandler(action: string | number, handler: Laya.Handler, group?: string, order?: number): void;
@@ -3365,6 +3358,57 @@ declare namespace tsCore {
 	    hideRecord(): void;
 	    showRecord(): void;
 	    dispose(): void;
+	}
+	
+	/**
+	 * 应用运行监听器接口，用于监听应用启动过程中的各个阶段
+	 */
+	export interface IAppRunListener {
+	    /**
+	     * 当开始初始化应用时调用
+	     *
+	     * @see onProxyComponentComplete
+	     */
+	    onStartInitialize?(): void;
+	    /**
+	     * 对与需要代理处理的类初始化完成
+	     *
+	     * @see onCreateMain
+	     */
+	    onProxyComponentComplete?(): void;
+	    /**
+	     * 创建主应用类后调用
+	     * 此刻只是创建，尚未给主应用类属性赋值 但已加入bean池
+	     * @param mainContext 已经创建好的主类
+	     *
+	     * @see onBeanFuncInitializing
+	     */
+	    onCreateMain?(mainContext: any): void;
+	    /**
+	     * 即将初始化被 @Bean 标记的函数
+	     * @see onComponentInitializing
+	     */
+	    onBeanFuncInitializing?(): void;
+	    /**
+	     * 即将初始化被 @Component 标记的类
+	     * @see onComponentProgress
+	     */
+	    onComponentInitializing?(): void;
+	    /**
+	     * @Component 初始化过程
+	     * @param target 已经初始化好的类
+	     * @see onMainAppInitializing
+	     */
+	    onComponentProgress?(target: any): void;
+	    /**
+	     * 即将初始化主应用类时调用
+	     * @see onComplete
+	     */
+	    onMainAppInitializing?(): void;
+	    /**
+	     * 应用完全初始化完成时调用
+	     */
+	    onComplete?(): void;
 	}
 	
 	/**

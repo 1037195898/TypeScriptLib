@@ -6,11 +6,10 @@ import {ConfigKit, EnvType} from "./kit/ConfigKit";
 import {Log} from "./Log";
 import {IKey, IProxy} from "./interfaces/ICommon";
 import {Path} from "./Path";
-import Handler = Laya.Handler;
 import {TimerKit} from "./kit/TimerKit";
 import {IController} from "./interfaces/IController";
 import {IView} from "./interfaces/IView";
-import {IAppRunListener} from "./interfaces/IAppRunListener";
+import Handler = Laya.Handler;
 
 export class App implements IAction {
 
@@ -44,34 +43,6 @@ export class App implements IAction {
      * @internal
      */
     private _controller: IController
-    /**
-     * 绑定的类
-     * 类名 -> 类 class
-     *
-     * @internal
-     */
-    static beanClassComponent: ComponentData[] = []
-    /**
-     * 绑定的方法
-     * 类名 -> 生成方法
-     * @internal
-     */
-    static beanClassFunction = new Map<string, Function>()
-    /**
-     * 绑定事件处理方法
-     * @internal
-     */
-    static beanActionsFunction: ActionsData[] = []
-    /**
-     * 绑定监听事件处理方法
-     * @internal
-     */
-    static beanEventFunction: EventData[] = []
-    /**
-     * 监听依赖注入整个生命周期
-     * @internal
-     */
-    static appRunListeners: IAppRunListener[] = []
     /**
      * 启动历史记录监听
      */

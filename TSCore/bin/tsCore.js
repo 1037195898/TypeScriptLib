@@ -807,8 +807,7 @@ function Component(value = "") {
         if (!data.autoInit) {
             return proxyClass(classTarget, typeof value === "string" ? value : data.key);
         }
-        // @ts-ignore
-        tsCore.App.beanClassComponent.push(data);
+        beanClassComponent.push(data);
         return classTarget;
     };
     if (value && typeof value == "function") {
@@ -933,6 +932,35 @@ function BindThis(targetPrototype, propertyKey, descriptor) {
     };
 }
 /**
+ * 绑定的类
+ * 类名 -> 类 class
+ *
+ * @internal
+ */
+let beanClassComponent = [];
+/**
+ * 绑定的方法
+ * 类名 -> 生成方法
+ * @internal
+ */
+let beanClassFunction = new Map();
+/**
+ * 绑定事件处理方法
+ * @internal
+ */
+let beanActionsFunction = [];
+/**
+ * 绑定监听事件处理方法
+ * @internal
+ */
+let beanEventFunction = [];
+/**
+ * 监听依赖注入整个生命周期
+ * @internal
+ */
+// @ts-ignore
+let appRunListeners = [];
+/**
  * 资源准备好后立即执行
  */
 let readyFunction;
@@ -961,17 +989,52 @@ function Bean(target, propertyKey, descriptor) {
     }
     const returnTarget = Reflect.getMetadata("design:returntype", target, propertyKey);
     if (returnTarget) {
-        // @ts-ignore
-        tsCore.App.beanClassFunction.set(propertyKey, descriptor.value);
+        beanClassFunction.set(propertyKey, descriptor.value);
     }
     else
         throw Error("class type null");
 }
 /**
- * 注册事件
- * @param {number | string} action 事件名字
- * @param {string} group 分组集合
- * @param {number} order 值越大 越后执行 默认 100
+ * 注册事件监听方法
+ *
+ * 该装饰器用于将方法注册为事件监听器，当指定事件触发时会调用被装饰的方法
+ * 事件处理方法会被添加到全局事件函数列表中，并根据配置的分组和优先级执行
+ *
+ * ### 支持以下写法：
+ * - `@Actions("eventName")`                    // 使用事件名称注册监听器
+ * - `@Actions("eventName", "groupName")`       // 指定事件名称和分组
+ * - `@Actions("eventName", "groupName", 200)`  // 指定事件名称、分组和执行优先级
+ *
+ * ### 使用说明：
+ * - 该装饰器只能用在被 `@Component` 注解管理的类中。
+ * - 该装饰器只能用在方法上，被装饰的方法会作为事件处理函数
+ * - [order](file://D:\WorkSpace\LayaBox\TypeScriptLib\bin\tsCore.d.ts#L2267-L2267) 参数控制执行顺序，值越大越后执行，默认值为 100
+ * - 事件监听器会在组件初始化时自动注册到应用事件系统中
+ *
+ * ### 注意事项：
+ * - 被装饰的必须是方法，不能是属性或其他类型
+ * - 方法的参数类型信息通过反射获取，需要在 tsconfig.json 中启用 emitDecoratorMetadata
+ *
+ * ### 示例代码：
+ * ```
+ * @Component
+ * class MyComponent {
+ *   // 注册事件监听器，监听自定义事件
+ *   @Actions("myCustomEvent")
+ *   onMyEvent(data: any) {
+ *     console.log("事件触发，数据:", data);
+ *   }
+ *
+ *   // 带分组和优先级的事件监听器
+ *   @Actions("gameStart", "game", 150)
+ *   onGameStart() {
+ *     console.log("游戏开始处理逻辑");
+ *   }
+ * }
+ * ```
+ * @param {number | string} action 事件名称或标识符，用于指定监听的事件类型
+ * @param {string} group 可选参数，事件分组名称，用于对事件处理进行分组管理
+ * @param {number} order 可选参数，执行优先级，数值越大越晚执行，默认为 100
  */
 function Actions(action, group, order) {
     return function (targetPrototype, propertyKey, descriptor) {
@@ -981,8 +1044,7 @@ function Actions(action, group, order) {
         const className = targetPrototype.constructor.name;
         const paramtypes = Reflect.getMetadata("design:paramtypes", targetPrototype, propertyKey);
         const fun = descriptor.value;
-        // @ts-ignore
-        tsCore.App.beanActionsFunction.push({ className, fun, action, group, order });
+        beanActionsFunction.push({ className, fun, action, group, order });
     };
 }
 /**
@@ -1035,8 +1097,7 @@ function _eventOn(targetPrototype, propertyKey, descriptor, eventName, childName
         const paramtypes = Reflect.getMetadata("design:paramtypes", targetPrototype, propertyKey);
         const fun = descriptor.value;
         // 将事件处理信息推送到全局列表中
-        // @ts-ignore
-        tsCore.App.beanEventFunction.push({ target: targetPrototype, className, fun, eventName, childName, args });
+        beanEventFunction.push({ target: targetPrototype, className, fun, eventName, childName, args });
     }
     else {
         // 如果目标不是FGUI的GObject实例，输出调试日志
@@ -1048,8 +1109,7 @@ function _eventOn(targetPrototype, propertyKey, descriptor, eventName, childName
  * @internal
  */
 function initBean(target, name) {
-    // @ts-ignore
-    tsCore.App.beanActionsFunction
+    beanActionsFunction
         .filter((actionData) => name == actionData.className)
         .forEach((actionData) => {
         // @ts-ignore
@@ -1132,18 +1192,19 @@ function proxyClass(classTarget, beanName) {
     });
     return classTemp;
 }
+function addAppRunListeners(
+// @ts-ignore
+...args) {
+    appRunListeners.push(...args);
+}
 /**
  * 运行应用程序，并初始化所有Bean实例。
  * @param classTarget - 应用程序主类的构造函数。
  */
 function runApplication(classTarget) {
-    // @ts-ignore
-    const appRunListeners = tsCore.App.appRunListeners;
     // 通知开始初始化
     appRunListeners.forEach(listener => { var _a; return (_a = listener.onStartInitialize) === null || _a === void 0 ? void 0 : _a.call(listener); });
-    // @ts-ignore
-    const events = tsCore.App.beanEventFunction;
-    const eventMap = events.groupBy(value => value.target);
+    const eventMap = beanEventFunction.groupBy(value => value.target);
     eventMap.forEach((value, key) => {
         if (fgui.Window.prototype.isPrototypeOf(key)) { // 特殊处理window 因为他不走 constructFromResource
             const onInit = key.onInit;
@@ -1181,8 +1242,7 @@ function runApplication(classTarget) {
     }
     appRunListeners.forEach(listener => { var _a; return (_a = listener.onCreateMain) === null || _a === void 0 ? void 0 : _a.call(listener, app); });
     appRunListeners.forEach(listener => { var _a; return (_a = listener.onBeanFuncInitializing) === null || _a === void 0 ? void 0 : _a.call(listener); });
-    // @ts-ignore
-    tsCore.App.beanClassFunction.forEach((value, key) => {
+    beanClassFunction.forEach((value, key) => {
         // @ts-ignore
         if (!tsCore.App.inst.hasBean(key)) {
             const target = value();
@@ -1191,8 +1251,7 @@ function runApplication(classTarget) {
         }
     });
     appRunListeners.forEach(listener => { var _a; return (_a = listener.onComponentInitializing) === null || _a === void 0 ? void 0 : _a.call(listener); });
-    // @ts-ignore
-    tsCore.App.beanClassComponent.sort((a, b) => a.order || 0 - b.order || 0).forEach((value) => {
+    beanClassComponent.sort((a, b) => a.order || 0 - b.order || 0).forEach((value) => {
         // @ts-ignore
         if (!tsCore.App.inst.hasBean(value.key)) {
             const classTargetName = value.classTarget.name;
@@ -1362,6 +1421,9 @@ function fguiFindChild(target, childs) {
 /**
  * 定时循环执行装饰器
  * 用于装饰类方法，使其按照指定间隔循环执行
+ *
+ * 该装饰器只能用在被 `@Component` 注解管理的类中。
+ *
  * @param interval - 执行间隔时间(毫秒)
  * @param custom - 自定义执行条件函数，当该函数返回 true 时任务会无视默认的可见性检查而强制执行
  * @returns function - 装饰器函数
@@ -1391,7 +1453,11 @@ function TimerLoop(interval, custom) {
     };
 }
 /**
+ *
+ * 该装饰器只能用在被 `@Component` 注解管理的类中。
+ *
  * @borrows TimerLoop as TimerFrameLoop
+ *
  */
 function TimerFrameLoop(frame, custom) {
     return function (targetProperty, propertyKey, descriptor) {
@@ -4726,34 +4792,6 @@ class RandomTimerSingle extends RandomTimer {
 	 *  游戏公用组
 	 */
 	App.GAME_GROUP = "game_group";
-	/**
-	 * 绑定的类
-	 * 类名 -> 类 class
-	 *
-	 * @internal
-	 */
-	App.beanClassComponent = [];
-	/**
-	 * 绑定的方法
-	 * 类名 -> 生成方法
-	 * @internal
-	 */
-	App.beanClassFunction = new Map();
-	/**
-	 * 绑定事件处理方法
-	 * @internal
-	 */
-	App.beanActionsFunction = [];
-	/**
-	 * 绑定监听事件处理方法
-	 * @internal
-	 */
-	App.beanEventFunction = [];
-	/**
-	 * 监听依赖注入整个生命周期
-	 * @internal
-	 */
-	App.appRunListeners = [];
 	/**
 	 * 启动历史记录监听
 	 */
