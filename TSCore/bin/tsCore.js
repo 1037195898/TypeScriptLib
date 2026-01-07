@@ -472,7 +472,7 @@ function defaults(args, defs, croak = false, append = false) {
     if (croak)
         for (const i in ret) {
             if (has(ret, i) && !has(defs, i)) {
-                throw new Error("`" + i + "` is not a supported option", defs);
+                throw new Error("`" + i + "` is not a supported option, " + defs);
             }
         }
     for (const key in defs) {
@@ -3138,6 +3138,9 @@ class RandomTimerSingle extends RandomTimer {
 	    removeTarget(groupObj, caller) {
 	        App.inst.removeTarget(groupObj, caller);
 	    }
+	    hasAction(action) {
+	        return App.inst.hasAction(action);
+	    }
 	    sendAction(action, ...args) {
 	        args.unshift(action);
 	        App.inst.sendAction.apply(App.inst, args);
@@ -4707,6 +4710,9 @@ class RandomTimerSingle extends RandomTimer {
 	    removeTarget(groupObj, caller) {
 	        this._controller.removeTarget(groupObj, caller);
 	    }
+	    hasAction(action) {
+	        return this._controller.hasAction(action);
+	    }
 	    sendAction(action, ...args) {
 	        args.unshift(action);
 	        this._controller.sendAction.apply(this._controller, args);
@@ -4802,6 +4808,10 @@ class RandomTimerSingle extends RandomTimer {
 	 */
 	App.initStop = false;
 	
+	/**
+	 * 事件控制器，用于管理事件的注册、分发和移除，同时提供对象缓存功能
+	 * 支持事件分组管理、事件处理器的生命周期管理以及对象的注册和获取
+	 */
 	class EventController {
 	    constructor() {
 	        /** 事件缓存的所有组 组名字->组object */
@@ -4820,17 +4830,6 @@ class RandomTimerSingle extends RandomTimer {
 	        let groupObj = this.getGroup(group);
 	        // 获取此分组下  action 的执行函数存储数组
 	        groupObj.getOrPut(action, () => []).push(handler);
-	    }
-	    /**
-	     * 分组存储对象
-	     * @param groupKey 分组key
-	     * @return
-	     */
-	    getGroup(groupKey) {
-	        if (StringUtil.isEmpty(groupKey)) {
-	            groupKey = App.DEFAULT_GROUP;
-	        }
-	        return this.eventGroup.getOrPut(groupKey, () => new Map());
 	    }
 	    regAction(action, caller, method, group, order) {
 	        const handler = new Laya.Handler(caller, method);
@@ -4899,6 +4898,16 @@ class RandomTimerSingle extends RandomTimer {
 	                groupObj.delete(key);
 	        }
 	    }
+	    hasAction(action) {
+	        const eventMap = this.eventGroup.values();
+	        for (const map of eventMap) {
+	            let arr = map.get(action);
+	            if (arr) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
 	    sendGroupAction(group, action, ...args) {
 	        let result = this.sendActionEvent.apply(this, [group, action, ...args]);
 	        if (!result) {
@@ -4915,6 +4924,13 @@ class RandomTimerSingle extends RandomTimer {
 	        if (!result)
 	            Log.debug("action [" + action + "] not exist! Call failure");
 	    }
+	    /**
+	     * 发送事件到指定分组
+	     * @param group 分组名称
+	     * @param action 事件标识
+	     * @param args 事件参数
+	     * @returns 是否成功发送
+	     */
 	    sendActionEvent(group, action, ...args) {
 	        let groupObj = this.getGroup(group);
 	        let arr = groupObj.get(action);
@@ -4943,6 +4959,10 @@ class RandomTimerSingle extends RandomTimer {
 	        }
 	        return true;
 	    }
+	    /**
+	     * 从缓存中移除Bean对象
+	     * @param key 键值或类构造函数
+	     */
 	    removeBean(key) {
 	        if (!key)
 	            return;
@@ -5013,11 +5033,27 @@ class RandomTimerSingle extends RandomTimer {
 	    getProxy(name) {
 	        return this.getBean(name);
 	    }
+	    /**
+	     * 分组存储对象
+	     * @param groupKey 分组key
+	     */
+	    getGroup(groupKey) {
+	        if (StringUtil.isEmpty(groupKey)) {
+	            groupKey = App.DEFAULT_GROUP;
+	        }
+	        return this.eventGroup.getOrPut(groupKey, () => new Map());
+	    }
+	    /**
+	     * 获取缓存映射表
+	     */
 	    getMap() {
 	        return this.cacheTarget;
 	    }
 	    /**
 	     * 返回类的唯一标识
+	     * @param cla 类构造函数
+	     * @param create 是否创建新标识
+	     * @returns 类标识字符串
 	     */
 	    _getClassSign(cla, create = true) {
 	        let className = cla["__className"] || cla["_cacheId"] || cla.name;

@@ -1405,74 +1405,80 @@ declare namespace tsCore {
 
 	export interface IAction {
 	    /**
-	     * 注册事件
-	     * @param action 事件名字
-	     * @param handler 处理事件函数
-	     * @param group 分组集合
-	     * @param order 值越大 越后执行 默认 100
+	     * 注册事件处理器
+	     * @param action 事件标识
+	     * @param handler 事件处理器
+	     * @param group 分组名称
+	     * @param order 执行顺序（数值越大执行越晚，默认值：100）
 	     */
 	    regActionHandler(action: string | number, handler: Laya.Handler, group?: string, order?: number): void;
 	    /**
 	     * 注册事件
-	     * @param action 事件名字
-	     * @param caller 执行域(this)
-	     * @param method 处理事件函数
-	     * @param group 分组集合
-	     * @param order 值越大 越后执行 默认 100
+	     * @param action 事件标识
+	     * @param caller 调用者
+	     * @param method 事件处理方法
+	     * @param group 分组名称
+	     * @param order 执行顺序（数值越大执行越晚，默认值：100）
 	     */
 	    regAction(action: string | number, caller: any, method: Function, group?: string, order?: number): void;
 	    /**
-	     * 删除所有分组中的此动作
-	     * @param args 动作名字
+	     * 移除所有事件分组中的指定事件
+	     * @param args 要移除的事件标识列表
 	     */
 	    removeAllAction(...args: string[]): void;
 	    /**
-	     * 删除一个分组
-	     * @param group 分组集合
+	     * 移除指定分组
+	     * @param groupKey 分组名称
 	     */
-	    removeGroup(group: string): void;
+	    removeGroup(groupKey: string): void;
 	    /**
-	     * 删除一个分组的所有动作
-	     * @param group 分组集合
-	     * @param args 事件名字 数组
+	     * 移除分组中的指定事件
+	     * @param groupKey 分组名称
+	     * @param args 要移除的事件标识列表
 	     */
-	    removeGroupActions(group: string, ...args: string[]): void;
+	    removeGroupActions(groupKey: string, ...args: string[]): void;
 	    /**
-	     * 删除事件
-	     * @param action 事件名字
-	     * @param method 删除指定的 Function 处理事件
-	     * @param group 分组集合
+	     * 移除事件处理器
+	     * @param action 事件标识
+	     * @param method 事件处理方法
+	     * @param group 分组名称
 	     */
 	    removeActionHandler(action: string | number, method: Function, group?: string): void;
 	    /**
-	     * 根据方法删除
-	     * @param groupObj 分组集合
-	     * @param action 事件名字
-	     * @param method 执行方法
+	     * 从分组中移除指定的函数处理器
+	     * @param groupObj 分组对象
+	     * @param action 事件标识
+	     * @param method 事件处理方法
 	     */
 	    removeFunction(groupObj: any, action: string | number, method: Function): void;
 	    /**
-	     * 删除目标所有事件
-	     * @param caller 目标
+	     * 移除指定调用者的全部事件处理器
+	     * @param caller 调用者
 	     */
 	    removeTargetAll(caller: any): void;
 	    /**
-	     * 删除目标分组所有事件
-	     * @param groupObj 分组集合
-	     * @param caller 目标
+	     * 从分组中移除指定调用者的处理器
+	     * @param groupObj 分组对象
+	     * @param caller 调用者
 	     */
 	    removeTarget(groupObj: any, caller: any): void;
 	    /**
-	     * 向一个分组集合发送事件
-	     * @param group 分组
-	     * @param action 事件名字
-	     * @param args 发送的数据
+	     * 检查是否存在指定事件
+	     * @param action 事件标识
+	     * @returns 是否存在事件
+	     */
+	    hasAction(action: string | number): boolean;
+	    /**
+	     * 向指定分组发送事件
+	     * @param group 分组名称
+	     * @param action 事件标识
+	     * @param args 事件参数
 	     */
 	    sendGroupAction(group: string, action: string | number, ...args: any[]): void;
 	    /**
-	     * 发送事件
-	     * @param action 事件名字
-	     * @param args 发送的数据
+	     * 发送事件到所有分组
+	     * @param action 事件标识
+	     * @param args 事件参数
 	     */
 	    sendAction(action: string | number, ...args: any[]): void;
 	}
@@ -2195,10 +2201,25 @@ declare namespace tsCore {
 	    getKey(): string;
 	}
 	export interface IProxy extends IAction {
-	    getProxy<T>(key: string | {
+	    /**
+	     * 获取代理对象
+	     * @param name 键值或类构造函数
+	     * @returns 代理对象
+	     */
+	    getProxy<T>(name: string | {
 	        new (): T;
 	    }): T;
+	    /**
+	     * 从缓存中移除代理对象
+	     * @param key 键值或类构造函数
+	     */
 	    removeProxy<T extends IProxy & IKey>(key: string | T): void;
+	    /**
+	     * 添加代理对象到缓存
+	     * @param key 键值或类构造函数
+	     * @param proxy 代理对象
+	     * @returns 是否添加成功
+	     */
 	    addProxy<T extends IProxy & IKey>(key: string | {
 	        new (): T;
 	    }, proxy: T): boolean;
@@ -2216,23 +2237,23 @@ declare namespace tsCore {
 	
 	export interface IView extends IAction {
 	    /**
-	     * 添加一个view对象到缓存
-	     * @param key 键
-	     * @param view 值
-	     * @return 如果存在键 不会再存入
+	     * 添加视图对象到缓存
+	     * @param key 键值或类构造函数
+	     * @param view 视图对象
+	     * @returns 是否添加成功
 	     */
 	    addView<T extends IView & IKey>(key: string | {
 	        new (): T;
 	    }, view: T): boolean;
 	    /**
-	     * 删除一个键值对
-	     * @param key 键
+	     * 从缓存中移除视图对象
+	     * @param key 键值或类构造函数
 	     */
 	    removeView<T extends IView & IKey>(key: string | T): void;
 	    /**
-	     * 获取一个值
-	     * @param key 键
-	     * @return 值
+	     * 获取视图对象
+	     * @param key 键值或类构造函数
+	     * @returns 视图对象
 	     */
 	    getView<T>(key: string | {
 	        new (): T;
@@ -2241,48 +2262,45 @@ declare namespace tsCore {
 	
 	export interface IController extends IView, IProxy {
 	    /**
-	     * 向缓存中添加一个bean实例
-	     *
-	     * @param {string | { new(): T }} key - bean的唯一标识符，可以是字符串或构造函数
-	     * @param {T} bean - 要添加的bean实例
-	     * @param {boolean} saveClassName
-	     * @returns {boolean} - 添加成功返回true，否则返回false
+	     * 添加Bean对象到缓存
+	     * @param key 键值或类构造函数
+	     * @param bean Bean对象
+	     * @param saveClassName 是否保存类名映射
+	     * @returns {boolean} 是否添加成功
 	     */
 	    addBean<T>(key: string | {
 	        new (): T;
 	    }, bean: T, saveClassName?: boolean): boolean;
 	    /**
-	     * 从缓存中移除一个bean实例
-	     *
-	     * @param {string | T} key - 要移除的bean的唯一标识符，可以是字符串或构造函数
+	     * 从缓存中移除Bean对象
+	     * @param key 键值或类构造函数
 	     */
 	    removeBean<T extends {
 	        new (...args: any[]): any;
 	    }>(key: string | T): void;
 	    /**
-	     * 从缓存中获取一个bean实例
-	     *
-	     * @param {string | { new(): T }} key - 要获取的bean的唯一标识符，可以是字符串或构造函数
-	     * @returns {T} - 返回对应的bean实例，如果找不到则返回undefined
+	     * 获取Bean对象
+	     * @param key 键值或类构造函数
+	     * @returns Bean对象
 	     */
 	    getBean<T>(key: string | {
 	        new (): T;
 	    }): T;
 	    /**
-	     * 检查指定的键是否存在于缓存中
-	     *
-	     * 此函数用于确定某个特定的键是否已经被缓存它支持传入一个字符串作为键，
-	     * 或者传入一个类的构造函数通过构造函数，它能够获取到类的标志（signature）作为键进行查询
-	     *
-	     * @param key {string | { new(): T }} - 要检查的键，可以是字符串，也可以是类的构造函数
-	     * @returns {boolean} - 如果键存在缓存中，则返回true；否则返回false
+	     * 检查是否包含指定的Bean对象
+	     * @param key 键值或类构造函数
+	     * @returns 是否包含
 	     */
 	    hasBean<T>(key: string | {
 	        new (): T;
 	    }): boolean;
-	    /** 清除所有UI缓存 */
+	    /**
+	     * 清空视图缓存
+	     */
 	    clearView(): void;
-	    /** 清除所有分组和包含的事件 */
+	    /**
+	     * 清空事件分组
+	     */
 	    clearGroup(): void;
 	}
 	
@@ -2473,6 +2491,7 @@ declare namespace tsCore {
 	    removeFunction(groupObj: any, action: string | number, method: Function): void;
 	    removeTargetAll(caller: any): void;
 	    removeTarget(groupObj: any, caller: any): void;
+	    hasAction(action: string | number): boolean;
 	    sendAction(action: string | number, ...args: any[]): void;
 	    sendGroupAction(group: string, action: string | number, ...args: any[]): void;
 	}
@@ -2736,6 +2755,7 @@ declare namespace tsCore {
 	    removeFunction(groupObj: any, action: string | number, method: Function): void;
 	    removeTargetAll(caller: any): void;
 	    removeTarget(groupObj: any, caller: any): void;
+	    hasAction(action: string | number): boolean;
 	    sendAction(action: string | number, ...args: any[]): void;
 	    sendGroupAction(group: string, action: string | number, ...args: any[]): void;
 	    addBean<T>(key: string | {
@@ -2779,6 +2799,10 @@ declare namespace tsCore {
 	    getStackTrace(): string;
 	}
 	
+	/**
+	 * 事件控制器，用于管理事件的注册、分发和移除，同时提供对象缓存功能
+	 * 支持事件分组管理、事件处理器的生命周期管理以及对象的注册和获取
+	 */
 	export class EventController implements IController {
 	    /** 事件缓存的所有组 组名字->组object */
 	    private eventGroup;
@@ -2792,12 +2816,6 @@ declare namespace tsCore {
 	    private cacheClassTarget;
 	    private static _CLSID;
 	    regActionHandler(action: string | number, handler: Laya.Handler, group?: string, order?: number): void;
-	    /**
-	     * 分组存储对象
-	     * @param groupKey 分组key
-	     * @return
-	     */
-	    getGroup(groupKey: string): Map<string | number, Laya.Handler[]>;
 	    regAction(action: string | number, caller: any, method: Function, group?: string, order?: number): void;
 	    clearView(): void;
 	    clearGroup(): void;
@@ -2808,12 +2826,24 @@ declare namespace tsCore {
 	    removeFunction(groupObj: Map<string | number, Laya.Handler[]>, action: string | number, method: Function): void;
 	    removeTargetAll(caller: any): void;
 	    removeTarget(groupObj: Map<string | number, Laya.Handler[]>, caller: any): void;
+	    hasAction(action: string | number): boolean;
 	    sendGroupAction(group: string, action: string | number, ...args: any[]): void;
 	    sendAction(action: string | number, ...args: any[]): void;
+	    /**
+	     * 发送事件到指定分组
+	     * @param group 分组名称
+	     * @param action 事件标识
+	     * @param args 事件参数
+	     * @returns 是否成功发送
+	     */
 	    sendActionEvent(group: string, action: string | number, ...args: any[]): boolean;
 	    addBean<T>(key: string | {
 	        new (): T;
 	    }, bean: T, saveClassName?: boolean): boolean;
+	    /**
+	     * 从缓存中移除Bean对象
+	     * @param key 键值或类构造函数
+	     */
 	    removeBean<T extends {
 	        new (...args: any[]): any;
 	    }>(key: string | T): void;
@@ -2837,9 +2867,20 @@ declare namespace tsCore {
 	    getProxy<T>(name: string | {
 	        new (): T;
 	    }): T;
+	    /**
+	     * 分组存储对象
+	     * @param groupKey 分组key
+	     */
+	    getGroup(groupKey: string): Map<string | number, Laya.Handler[]>;
+	    /**
+	     * 获取缓存映射表
+	     */
 	    getMap(): Map<string, any>;
 	    /**
 	     * 返回类的唯一标识
+	     * @param cla 类构造函数
+	     * @param create 是否创建新标识
+	     * @returns 类标识字符串
 	     */
 	    private _getClassSign;
 	}

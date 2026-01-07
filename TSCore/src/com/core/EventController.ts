@@ -24,13 +24,6 @@ export class EventController implements IController {
 
     private static _CLSID = 0
 
-    /**
-     * 注册事件处理器
-     * @param action 事件标识
-     * @param handler 事件处理器
-     * @param group 分组名称
-     * @param order 执行顺序
-     */
     regActionHandler(action: string | number, handler: Laya.Handler, group?: string, order?: number) {
         handler.order = order
         let groupObj = this.getGroup(group)
@@ -38,82 +31,37 @@ export class EventController implements IController {
         groupObj.getOrPut(action, () => []).push(handler)
     }
 
-    /**
-     * 分组存储对象
-     * @param groupKey 分组key
-     * @return 分组对应的Map对象
-     */
-    getGroup(groupKey: string) {
-        if (StringUtil.isEmpty(groupKey)) {
-            groupKey = App.DEFAULT_GROUP
-        }
-        return this.eventGroup.getOrPut(groupKey, () => new Map())
-    }
-
-    /**
-     * 注册事件
-     * @param action 事件标识
-     * @param caller 调用者
-     * @param method 事件处理方法
-     * @param group 分组名称
-     * @param order 执行顺序
-     */
     regAction(action: string | number, caller: any, method: Function, group?: string, order?: number) {
         const handler = new Laya.Handler(caller, method)
         this.regActionHandler(action, handler, group, order)
     }
 
-    /**
-     * 清空视图缓存
-     */
     clearView() {
         this.cacheTarget.clear()
         EventController._CLSID = 0
     }
 
-    /**
-     * 清空事件分组
-     */
     clearGroup() {
         this.eventGroup.clear()
         Log.debug("clear eventGroup")
     }
 
-    /**
-     * 移除所有事件分组中的指定事件
-     * @param args 要移除的事件标识列表
-     */
     removeAllAction(...args: string[]) {
         for (const key of this.eventGroup.keys()) {// 获取key
             this.removeGroupActions.apply(this, [key, ...args])
         }
     }
 
-    /**
-     * 移除指定分组
-     * @param groupKey 分组名称
-     */
     removeGroup(groupKey: string) {
         Log.debug(`removeGroup ${groupKey}`)
         this.eventGroup.delete(groupKey)
     }
 
-    /**
-     * 移除分组中的指定事件
-     * @param groupKey 分组名称
-     * @param args 要移除的事件标识列表
-     */
-    removeGroupActions(groupKey: string, ...args) {
+    removeGroupActions(groupKey: string, ...args: any[]) {
         let groupObj = this.getGroup(groupKey)
         args.forEach(value => groupObj.delete(value))
     }
 
-    /**
-     * 移除事件处理器
-     * @param action 事件标识
-     * @param method 事件处理方法
-     * @param group 分组名称
-     */
     removeActionHandler(action: string | number, method: Function, group?: string) {
         if (!group) {
             for (let groupKey of this.eventGroup.values()) {
@@ -125,12 +73,6 @@ export class EventController implements IController {
         this.removeFunction(groupObj, action, method)
     }
 
-    /**
-     * 从分组中移除指定的函数处理器
-     * @param groupObj 分组对象
-     * @param action 事件标识
-     * @param method 事件处理方法
-     */
     removeFunction(groupObj: Map<string | number, Laya.Handler[]>, action: string | number, method: Function) {
         let arr = groupObj.get(action)
         if (arr) {
@@ -145,21 +87,12 @@ export class EventController implements IController {
         }
     }
 
-    /**
-     * 移除指定调用者的全部事件处理器
-     * @param caller 调用者
-     */
     removeTargetAll(caller: any) {
         for (let groupObj of this.eventGroup.keys()) {
             this.removeTarget(this.eventGroup.get(groupObj), caller)
         }
     }
 
-    /**
-     * 从分组中移除指定调用者的处理器
-     * @param groupObj 分组对象
-     * @param caller 调用者
-     */
     removeTarget(groupObj: Map<string | number, Laya.Handler[]>, caller: any) {
         for (const [key, value] of groupObj.entries()) {
             for (let i = 0; i < value.length; i++) {
@@ -173,11 +106,6 @@ export class EventController implements IController {
         }
     }
 
-    /**
-     * 检查是否存在指定事件
-     * @param action 事件标识
-     * @returns 是否存在事件
-     */
     hasAction(action: string | number) {
         const eventMap = this.eventGroup.values()
         for (const map of eventMap) {
@@ -189,12 +117,6 @@ export class EventController implements IController {
         return false
     }
 
-    /**
-     * 向指定分组发送事件
-     * @param group 分组名称
-     * @param action 事件标识
-     * @param args 事件参数
-     */
     sendGroupAction(group: string, action: string | number, ...args: any[]) {
         let result: boolean = this.sendActionEvent.apply(this, [group, action, ...args])
         if (!result) {
@@ -202,11 +124,6 @@ export class EventController implements IController {
         }
     }
 
-    /**
-     * 发送事件到所有分组
-     * @param action 事件标识
-     * @param args 事件参数
-     */
     sendAction(action: string | number, ...args: any[]) {
         let result: boolean
         for (const groupName of this.eventGroup.keys()) {
@@ -237,13 +154,6 @@ export class EventController implements IController {
         return false
     }
 
-    /**
-     * 添加Bean对象到缓存
-     * @param key 键值或类构造函数
-     * @param bean Bean对象
-     * @param saveClassName 是否保存类名映射
-     * @returns 是否添加成功
-     */
     addBean<T>(key: string | { new(): T }, bean: T, saveClassName = true) {
         if (typeof key !== "string") {
             key = this._getClassSign(key)
@@ -277,11 +187,6 @@ export class EventController implements IController {
         this.cacheClassTarget.delete(key.charAt(0).toUpperCase() + key.slice(1))
     }
 
-    /**
-     * 获取Bean对象
-     * @param key 键值或类构造函数
-     * @returns Bean对象
-     */
     getBean<T>(key: string | { new(): T }): T {
         if (!key) return
         if (typeof key !== "string") {
@@ -290,11 +195,6 @@ export class EventController implements IController {
         return this.cacheTarget.get(key) ?? this.cacheClassTarget.get(key)
     }
 
-    /**
-     * 检查是否包含指定的Bean对象
-     * @param key 键值或类构造函数
-     * @returns 是否包含
-     */
     hasBean<T>(key: string | { new(): T }): boolean {
         if (typeof key !== "string") {
             key = this._getClassSign(key, false)
@@ -303,12 +203,6 @@ export class EventController implements IController {
         return this.cacheTarget.has(key) || this.cacheClassTarget.has(key)
     }
 
-    /**
-     * 添加视图对象到缓存
-     * @param key 键值或类构造函数
-     * @param view 视图对象
-     * @returns 是否添加成功
-     */
     addView<T extends IView & IKey>(key: string | { new(): T }, view: T) {
         if (this.addBean(key, view)) {
             if (typeof key !== "string") {
@@ -320,10 +214,6 @@ export class EventController implements IController {
         return false
     }
 
-    /**
-     * 从缓存中移除视图对象
-     * @param key 键值或类构造函数
-     */
     removeView<T extends IView & IKey>(key: string | T) {
         if (!key) return
         if (typeof key !== "string") {
@@ -332,21 +222,10 @@ export class EventController implements IController {
         this.removeBean(key)
     }
 
-    /**
-     * 获取视图对象
-     * @param key 键值或类构造函数
-     * @returns 视图对象
-     */
     getView<T>(key: string | { new(): T }): T {
         return this.getBean(key)
     }
 
-    /**
-     * 添加代理对象到缓存
-     * @param key 键值或类构造函数
-     * @param proxy 代理对象
-     * @returns 是否添加成功
-     */
     addProxy<T extends IProxy & IKey>(key: string | { new(): T }, proxy: T) {
         if (this.addBean(key, proxy)) {
             if (typeof key !== "string") {
@@ -358,10 +237,6 @@ export class EventController implements IController {
         return false
     }
 
-    /**
-     * 从缓存中移除代理对象
-     * @param key 键值或类构造函数
-     */
     removeProxy<T extends IProxy & IKey>(key: string | T) {
         if (!key) return
         if (typeof key !== "string") {
@@ -370,18 +245,23 @@ export class EventController implements IController {
         this.removeBean(key)
     }
 
-    /**
-     * 获取代理对象
-     * @param name 键值或类构造函数
-     * @returns 代理对象
-     */
     getProxy<T>(name: string | { new(): T }): T {
         return this.getBean(name)
     }
 
     /**
+     * 分组存储对象
+     * @param groupKey 分组key
+     */
+    getGroup(groupKey: string) {
+        if (StringUtil.isEmpty(groupKey)) {
+            groupKey = App.DEFAULT_GROUP
+        }
+        return this.eventGroup.getOrPut(groupKey, () => new Map())
+    }
+
+    /**
      * 获取缓存映射表
-     * @returns 缓存映射表
      */
     getMap() {
         return this.cacheTarget

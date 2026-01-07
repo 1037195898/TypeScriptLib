@@ -256,17 +256,20 @@ export class App implements IAction {
         this._controller.removeTarget(groupObj, caller)
     }
 
-    sendAction(action: string | number, ...args) {
+    hasAction(action: string | number): boolean {
+        return this._controller.hasAction(action)
+    }
+
+    sendAction(action: string | number, ...args: any[]) {
         args.unshift(action)
         this._controller.sendAction.apply(this._controller, args)
     }
 
-    sendGroupAction(group: string, action: string | number, ...args) {
+    sendGroupAction(group: string, action: string | number, ...args: any[]) {
         args.unshift(action)
         args.unshift(group)
         this._controller.sendGroupAction.apply(this._controller, args)
     }
-
 
     addBean<T>(key: string | { new(): T }, bean: T, saveClassName?: boolean) {
         return this._controller.addBean(key, bean, saveClassName)

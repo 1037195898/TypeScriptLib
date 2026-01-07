@@ -45,6 +45,10 @@ export class ActionEvent implements IAction {
         App.inst.removeTarget(groupObj, caller)
     }
 
+    hasAction(action: string | number): boolean {
+        return App.inst.hasAction(action)
+    }
+
     sendAction(action: string | number, ...args) {
         args.unshift(action)
         App.inst.sendAction.apply(App.inst, args)

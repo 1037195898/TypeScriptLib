@@ -2,86 +2,93 @@
 export interface IAction {
 
     /**
-     * 注册事件
-     * @param action 事件名字
-     * @param handler 处理事件函数
-     * @param group 分组集合
-     * @param order 值越大 越后执行 默认 100
+     * 注册事件处理器
+     * @param action 事件标识
+     * @param handler 事件处理器
+     * @param group 分组名称
+     * @param order 执行顺序（数值越大执行越晚，默认值：100）
      */
     regActionHandler(action: string | number, handler: Laya.Handler, group?: string, order?: number): void
 
     /**
      * 注册事件
-     * @param action 事件名字
-     * @param caller 执行域(this)
-     * @param method 处理事件函数
-     * @param group 分组集合
-     * @param order 值越大 越后执行 默认 100
+     * @param action 事件标识
+     * @param caller 调用者
+     * @param method 事件处理方法
+     * @param group 分组名称
+     * @param order 执行顺序（数值越大执行越晚，默认值：100）
      */
     regAction(action: string | number, caller: any, method: Function, group?: string, order?: number): void
 
     /**
-     * 删除所有分组中的此动作
-     * @param args 动作名字
+     * 移除所有事件分组中的指定事件
+     * @param args 要移除的事件标识列表
      */
     removeAllAction(...args: string[]): void
 
     /**
-     * 删除一个分组
-     * @param group 分组集合
+     * 移除指定分组
+     * @param groupKey 分组名称
      */
-    removeGroup(group: string): void
+    removeGroup(groupKey: string): void
 
     /**
-     * 删除一个分组的所有动作
-     * @param group 分组集合
-     * @param args 事件名字 数组
+     * 移除分组中的指定事件
+     * @param groupKey 分组名称
+     * @param args 要移除的事件标识列表
      */
-    removeGroupActions(group: string, ...args: string[]): void
+    removeGroupActions(groupKey: string, ...args: string[]): void
 
     /**
-     * 删除事件
-     * @param action 事件名字
-     * @param method 删除指定的 Function 处理事件
-     * @param group 分组集合
+     * 移除事件处理器
+     * @param action 事件标识
+     * @param method 事件处理方法
+     * @param group 分组名称
      */
     removeActionHandler(action: string | number, method: Function, group?: string): void
 
     /**
-     * 根据方法删除
-     * @param groupObj 分组集合
-     * @param action 事件名字
-     * @param method 执行方法
+     * 从分组中移除指定的函数处理器
+     * @param groupObj 分组对象
+     * @param action 事件标识
+     * @param method 事件处理方法
      */
     removeFunction(groupObj: any, action: string | number, method: Function): void
 
     /**
-     * 删除目标所有事件
-     * @param caller 目标
+     * 移除指定调用者的全部事件处理器
+     * @param caller 调用者
      */
     removeTargetAll(caller: any): void
 
     /**
-     * 删除目标分组所有事件
-     * @param groupObj 分组集合
-     * @param caller 目标
+     * 从分组中移除指定调用者的处理器
+     * @param groupObj 分组对象
+     * @param caller 调用者
      */
     removeTarget(groupObj: any, caller: any): void
 
     /**
-     * 向一个分组集合发送事件
-     * @param group 分组
-     * @param action 事件名字
-     * @param args 发送的数据
+     * 检查是否存在指定事件
+     * @param action 事件标识
+     * @returns 是否存在事件
+     */
+    hasAction(action: string | number): boolean
+
+    /**
+     * 向指定分组发送事件
+     * @param group 分组名称
+     * @param action 事件标识
+     * @param args 事件参数
      */
     sendGroupAction(group: string, action: string | number, ...args): void
 
     /**
-     * 发送事件
-     * @param action 事件名字
-     * @param args 发送的数据
+     * 发送事件到所有分组
+     * @param action 事件标识
+     * @param args 事件参数
      */
-    sendAction(action: string | number, ...args): void
+    sendAction(action: string | number, ...args: any[]): void
 
 
 }

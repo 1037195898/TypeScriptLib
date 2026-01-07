@@ -4,23 +4,23 @@ import {IKey} from "./ICommon";
 export interface IView extends IAction {
 
     /**
-     * 添加一个view对象到缓存
-     * @param key 键
-     * @param view 值
-     * @return 如果存在键 不会再存入
+     * 添加视图对象到缓存
+     * @param key 键值或类构造函数
+     * @param view 视图对象
+     * @returns 是否添加成功
      */
     addView<T extends IView & IKey>(key: string | { new(): T }, view: T): boolean
 
     /**
-     * 删除一个键值对
-     * @param key 键
+     * 从缓存中移除视图对象
+     * @param key 键值或类构造函数
      */
     removeView<T extends IView & IKey>(key: string | T): void
 
     /**
-     * 获取一个值
-     * @param key 键
-     * @return 值
+     * 获取视图对象
+     * @param key 键值或类构造函数
+     * @returns 视图对象
      */
     getView<T>(key: string | { new(): T }): T
 
