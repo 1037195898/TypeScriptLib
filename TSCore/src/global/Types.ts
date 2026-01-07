@@ -65,7 +65,7 @@ function defaults(args: any, defs: any, croak = false, append = false) {
     if (croak)
         for (const i in ret) {
             if (has(ret, i) && !has(defs, i)) {
-                throw new Error("`" + i + "` is not a supported option", defs)
+                throw new Error("`" + i + "` is not a supported option, " + defs)
             }
         }
 
