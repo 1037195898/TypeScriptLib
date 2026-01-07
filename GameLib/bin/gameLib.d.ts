@@ -219,8 +219,10 @@ declare type ExecuteData = {
     data?: number | string
     /** 打开游戏名字 */
     gameName?: string
-    /** 打开游戏id */
+    /** 打开游戏id 和 gameId一样的 */
     openGame?: number
+    /** 打开游戏id 和 openGame一样的 */
+    gameId?: number
 }
 
 /**
@@ -1655,54 +1657,102 @@ declare namespace gameLib {
 	export class BaseGameData implements IGameData {
 	    /**
 	     * 服务器返回的当前本金
+	     * @default 0
 	     */
 	    currentBalance: number;
-	    /** 最后盈利总额 */
+	    /**
+	     * 最后盈利总额
+	     * @default 0
+	     */
 	    totalWinMoneyLast: number;
-	    /** 本轮总盈利额 */
+	    /**
+	     * 本轮总盈利额
+	     * @default 0
+	     */
 	    totalWinMoney: number;
-	    /** 服务器返回当前盈利额 */
+	    /**
+	     * 服务器返回当前盈利额
+	     * @default 0
+	     */
 	    serverWinMoney: number;
 	    /**
 	     * 玩的次数
+	     * @default 0
 	     */
 	    playCount: number;
 	    /**
-	     * 推荐
+	     * 推荐标识
+	     * @default false
 	     */
 	    isRecommend: boolean;
 	    /**
 	     * 是否已启动特殊游戏模式
+	     * @default false
 	     */
 	    specialMode: boolean;
 	    /**
 	     * 游戏类型
+	     * @default GameType.NORMAL
 	     * @see GameType
 	     */
 	    gameType: GameType;
+	    /**
+	     * 调试附加数据
+	     * @default undefined
+	     */
 	    attachedDebugData: any;
-	    /** 是否快速播放 */
+	    /**
+	     * 是否快速播放模式
+	     * @default false
+	     */
 	    protected _isTurboMode: boolean;
-	    /** 缓存的下注值 */
+	    /**
+	     * 缓存的下注值
+	     * @default undefined
+	     */
 	    cacheAnte: any;
-	    /** 默认bet位置 */
+	    /**
+	     * 默认bet位置索引
+	     * @default 0
+	     */
 	    defaultBetIndex: number;
-	    /** 缓存 后端计算 当前盈利 */
+	    /**
+	     * 缓存的后端计算当前盈利
+	     * @default 0
+	     */
 	    tempServerWinMoney: number;
-	    /** 当前玩家选择的自动bet次数 */
+	    /**
+	     * 当前玩家选择的自动bet次数
+	     * @default 0
+	     */
 	    autoBetCount: number;
-	    /** 当前玩家选择的自动bet次数 (缓存) */
+	    /**
+	     * 当前玩家选择的自动bet次数（缓存）
+	     * @default 0
+	     */
 	    tempAutoBetCount: number;
-	    /** bet 额度切换值 */
+	    /**
+	     * bet 额度切换值数组
+	     * @default []
+	     */
 	    betMoney: any[];
-	    /** 当前bet值 */
+	    /**
+	     * 当前bet值
+	     * @default 0
+	     */
 	    betValue: number;
-	    /** 开奖结果 */
+	    /**
+	     * 开奖结果数组
+	     * @default []
+	     */
 	    lotteryId: any[];
-	    /** 通知数据 */
+	    /**
+	     * 通知数据数组
+	     * @default []
+	     */
 	    noticeData: any[];
 	    /**
-	     * 重置默认bet值
+	     * 重置默认bet值标识
 	     * @default false
 	     */
 	    isResetBetValue: boolean;
@@ -1722,12 +1772,12 @@ declare namespace gameLib {
 	     */
 	    convertPlaybackRate(value: number, rate?: number): number;
 	    /**
-	     * 总金额 default BaseGameData.betValue
+	     * 获取总投注金额
 	     */
 	    getTotalBetMoney(): number;
 	    /**
-	     * 获取赢钱动画 的播放时长
-	     * @param level 播放时长等级 0开始
+	     * 获取赢钱动画的播放时长
+	     * @param {number} level - 播放时长等级，从0开始
 	     */
 	    getWinMoneyAniDuration(level: number): number;
 	    /**

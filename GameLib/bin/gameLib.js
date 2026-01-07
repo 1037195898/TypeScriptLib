@@ -2007,7 +2007,7 @@ const lazyInitBindView = [];
 	        }) ? SceneManager.inst.closeGame() : ((_b = (_a = Laya.Browser.window.APP) === null || _a === void 0 ? void 0 : _a.gameClose) === null || _b === void 0 ? void 0 : _b.call(_a, type, data))
 	            || ((_e = (_d = (_c = Laya.Browser.window.parent) === null || _c === void 0 ? void 0 : _c.GameToHall) === null || _d === void 0 ? void 0 : _d.gameClose) === null || _e === void 0 ? void 0 : _e.call(_d, type, data))
 	            // 如果不是加速器 并且不是在非https下  那么直接返回大厅
-	            || (!Laya.Browser.onLayaRuntime && window.location.protocol == "https:") && (window.location.href = `//${window.location.host}`);
+	            || (!Laya.Browser.onLayaRuntime && window.location.protocol == "https:") && (window.location.href = document.referrer || `//${window.location.host}`);
 	        AppManager.showWeb({ javascript: `window.GameToHall.gameClose(${type}, ${data})` });
 	        SceneManager.inst.closeGame();
 	    }
@@ -2161,49 +2161,87 @@ const lazyInitBindView = [];
 	    constructor() {
 	        /**
 	         * 服务器返回的当前本金
+	         * @default 0
 	         */
 	        this.currentBalance = 0;
-	        /** 最后盈利总额 */
+	        /**
+	         * 最后盈利总额
+	         * @default 0
+	         */
 	        this.totalWinMoneyLast = 0;
-	        /** 本轮总盈利额 */
+	        /**
+	         * 本轮总盈利额
+	         * @default 0
+	         */
 	        this.totalWinMoney = 0;
-	        /** 服务器返回当前盈利额 */
+	        /**
+	         * 服务器返回当前盈利额
+	         * @default 0
+	         */
 	        this.serverWinMoney = 0;
 	        /**
 	         * 玩的次数
+	         * @default 0
 	         */
 	        this.playCount = 0;
 	        /**
-	         * 推荐
+	         * 推荐标识
+	         * @default false
 	         */
 	        this.isRecommend = false;
 	        /**
 	         * 是否已启动特殊游戏模式
+	         * @default false
 	         */
 	        this.specialMode = false;
 	        /**
 	         * 游戏类型
+	         * @default GameType.NORMAL
 	         * @see GameType
 	         */
 	        this.gameType = GameType.NORMAL;
-	        /** 是否快速播放 */
+	        /**
+	         * 是否快速播放模式
+	         * @default false
+	         */
 	        this._isTurboMode = false;
-	        /** 默认bet位置 */
+	        /**
+	         * 默认bet位置索引
+	         * @default 0
+	         */
 	        this.defaultBetIndex = 0;
-	        /** 缓存 后端计算 当前盈利 */
+	        /**
+	         * 缓存的后端计算当前盈利
+	         * @default 0
+	         */
 	        this.tempServerWinMoney = 0;
-	        /** 当前玩家选择的自动bet次数 */
+	        /**
+	         * 当前玩家选择的自动bet次数
+	         * @default 0
+	         */
 	        this.autoBetCount = 0;
-	        /** 当前玩家选择的自动bet次数 (缓存) */
+	        /**
+	         * 当前玩家选择的自动bet次数（缓存）
+	         * @default 0
+	         */
 	        this.tempAutoBetCount = 0;
-	        /** bet 额度切换值 */
+	        /**
+	         * bet 额度切换值数组
+	         * @default []
+	         */
 	        this.betMoney = [];
-	        /** 当前bet值 */
+	        /**
+	         * 当前bet值
+	         * @default 0
+	         */
 	        this.betValue = 0;
-	        /** 通知数据 */
+	        /**
+	         * 通知数据数组
+	         * @default []
+	         */
 	        this.noticeData = [];
 	        /**
-	         * 重置默认bet值
+	         * 重置默认bet值标识
 	         * @default false
 	         */
 	        this.isResetBetValue = false;
@@ -2244,14 +2282,14 @@ const lazyInitBindView = [];
 	        return Math.floor(value / rate);
 	    }
 	    /**
-	     * 总金额 default BaseGameData.betValue
+	     * 获取总投注金额
 	     */
 	    getTotalBetMoney() {
 	        return this.betValue;
 	    }
 	    /**
-	     * 获取赢钱动画 的播放时长
-	     * @param level 播放时长等级 0开始
+	     * 获取赢钱动画的播放时长
+	     * @param {number} level - 播放时长等级，从0开始
 	     */
 	    getWinMoneyAniDuration(level) {
 	        return this.convertPlaybackRate(1000) * (level + 1);

@@ -154,8 +154,10 @@ declare type ExecuteData = {
     data?: number | string
     /** 打开游戏名字 */
     gameName?: string
-    /** 打开游戏id */
+    /** 打开游戏id 和 gameId一样的 */
     openGame?: number
+    /** 打开游戏id 和 openGame一样的 */
+    gameId?: number
 }
 
 /**

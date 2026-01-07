@@ -66,7 +66,7 @@ export class JSUtils {
         }) ? SceneManager.inst.closeGame() : Browser.window.APP?.gameClose?.(type, data)
             || Browser.window.parent?.GameToHall?.gameClose?.(type, data)
             // 如果不是加速器 并且不是在非https下  那么直接返回大厅
-            || (!Browser.onLayaRuntime && window.location.protocol == "https:") && (window.location.href = `//${window.location.host}`)
+            || (!Browser.onLayaRuntime && window.location.protocol == "https:") && (window.location.href = document.referrer || `//${window.location.host}`)
         AppManager.showWeb({javascript: `window.GameToHall.gameClose(${type}, ${data})`})
         SceneManager.inst.closeGame()
     }
