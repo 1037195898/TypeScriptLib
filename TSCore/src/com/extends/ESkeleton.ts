@@ -48,9 +48,15 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
 
     protected onEventLabel(event: any) {
         const labelActions = this.skeletonPlay?.frameLabels?.get(event.name)
-        labelActions?.forEach(action => {
-            runFun(action)
-        })
+        if (labelActions) {
+            if (Array.isArray(labelActions)) {
+                labelActions.forEach(action => {
+                    runFun(action)
+                })
+            } else {
+                runFun(labelActions)
+            }
+        }
     }
 
     get aniPath() {

@@ -1274,7 +1274,7 @@ declare type ISkeletonPlay = {
      * 用于存储动画中的关键帧标签及其对应的回调函数列表。
      * 每个标签可以绑定多个回调函数，当动画播放到对应标签时会依次执行这些回调。
      */
-    frameLabels?: Map<string, ((() => void) | Laya.Handler)[]>
+    frameLabels?: Map<string, (() => void) | Laya.Handler | ((() => void) | Laya.Handler)[]>
     /** 加载完成调用
      * @deprecated 只能在ISkeletonData中配置
      * */

@@ -3180,9 +3180,16 @@ class RandomTimerSingle extends RandomTimer {
 	    onEventLabel(event) {
 	        var _a, _b;
 	        const labelActions = (_b = (_a = this.skeletonPlay) === null || _a === void 0 ? void 0 : _a.frameLabels) === null || _b === void 0 ? void 0 : _b.get(event.name);
-	        labelActions === null || labelActions === void 0 ? void 0 : labelActions.forEach(action => {
-	            runFun(action);
-	        });
+	        if (labelActions) {
+	            if (Array.isArray(labelActions)) {
+	                labelActions.forEach(action => {
+	                    runFun(action);
+	                });
+	            }
+	            else {
+	                runFun(labelActions);
+	            }
+	        }
 	    }
 	    get aniPath() {
 	        return this._aniPath;
