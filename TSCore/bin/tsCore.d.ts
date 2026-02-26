@@ -799,7 +799,7 @@ declare interface Array<T> {
      * @param {Function} type - 一个构造函数，用于判断数组元素是否是这个类型的实例。
      * @returns {Array} 返回一个新的数组，其中包含了原数组中所有是传入类型实例的元素。
      */
-    filterIsInstance<C>(type: { new(): C }): Array<C>
+    filterIsInstance<C>(type: { new(...args: any[]): C }): Array<C>
 
     /**
      * 通过提供一个回调函数来定义移除元素的条件。
@@ -1170,7 +1170,7 @@ declare type ISkeletonData = {
     /**
      * 当要创建一个不传入url的骨骼动画的时候,可在这里设置骨骼动画类
      */
-    classType?: { new(): tsCore.GSkeleton | tsCore.GSpineSkeleton }
+    classType?: { new(...args: any[]): tsCore.GSkeleton | tsCore.GSpineSkeleton }
 }
 
 /**
@@ -1270,7 +1270,7 @@ declare type ISkeletonPlay = {
     loopPlayIndex?: number
     /**
      * 动画帧标签映射表
-     * 
+     *
      * 用于存储动画中的关键帧标签及其对应的回调函数列表。
      * 每个标签可以绑定多个回调函数，当动画播放到对应标签时会依次执行这些回调。
      */
@@ -4365,7 +4365,7 @@ declare namespace tsCore {
 	     * @param skeletonClass 指定一个类型 GSpineSkeleton、GSkeleton
 	     */
 	    static createSpine<T extends new () => GSkeleton | GSpineSkeleton | undefined>(url: string | ISkeletonData, optional?: ISkeletonData | T, skeletonClass?: T): T extends {
-	        new (): infer R;
+	        new (...args: any[]): infer R;
 	    } ? R : GSkeleton | GSpineSkeleton;
 	    /**
 	     * 判断是否是接口 用 prototype 是否存在判断

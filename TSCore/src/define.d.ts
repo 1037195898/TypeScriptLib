@@ -373,7 +373,7 @@ declare interface Array<T> {
      * @param {Function} type - 一个构造函数，用于判断数组元素是否是这个类型的实例。
      * @returns {Array} 返回一个新的数组，其中包含了原数组中所有是传入类型实例的元素。
      */
-    filterIsInstance<C>(type: { new(): C }): Array<C>
+    filterIsInstance<C>(type: { new(...args: any[]): C }): Array<C>
 
     /**
      * 通过提供一个回调函数来定义移除元素的条件。

@@ -134,7 +134,7 @@ export class SpineUtils {
             runFun(onLoadComplete)
         }
         if (url) SpineUtils.playSpine(skeleton, url, optional.play, optional.play?.loop, optional.playComplete, _onComplete, optional.aniMode)
-        return skeleton as T extends { new(): infer R } ? R : GSkeleton | GSpineSkeleton
+        return skeleton as T extends { new(...args: any[]): infer R } ? R : GSkeleton | GSpineSkeleton
     }
 
     /**

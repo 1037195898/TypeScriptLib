@@ -292,7 +292,7 @@ declare type ISkeletonData = {
     /**
      * 当要创建一个不传入url的骨骼动画的时候,可在这里设置骨骼动画类
      */
-    classType?: { new(): tsCore.GSkeleton | tsCore.GSpineSkeleton }
+    classType?: { new(...args: any[]): tsCore.GSkeleton | tsCore.GSpineSkeleton }
 }
 
 /**
@@ -392,7 +392,7 @@ declare type ISkeletonPlay = {
     loopPlayIndex?: number
     /**
      * 动画帧标签映射表
-     * 
+     *
      * 用于存储动画中的关键帧标签及其对应的回调函数列表。
      * 每个标签可以绑定多个回调函数，当动画播放到对应标签时会依次执行这些回调。
      */

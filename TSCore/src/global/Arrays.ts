@@ -134,7 +134,7 @@ Object.defineProperty(Array.prototype, "random", {
  * @returns {Array} 返回一个新的数组，其中包含了原数组中所有是传入类型实例的元素。
  */
 Object.defineProperty(Array.prototype, "filterIsInstance", {
-    value: function <T>(type: { new(): T }) {
+    value: function <T>(type: { new(...args: any[]): T }) {
         /**
          * 使用Array的filter方法来过滤数组。
          * filter方法会创建一个新数组，其中包含了所有通过测试的元素。
