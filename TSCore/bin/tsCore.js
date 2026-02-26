@@ -3170,6 +3170,20 @@ class RandomTimerSingle extends RandomTimer {
 	         */
 	        this._loopCount = 0;
 	    }
+	    createDisplayObject() {
+	        this._displayObject["$owner"] = this;
+	        this["_touchable"] = this._displayObject.mouseEnabled = this._displayObject.mouseThrough = false;
+	        this._displayObject.on(Laya.Event.STOPPED, this, this.onPlayStopped);
+	        this._displayObject.on(Laya.Event.LABEL, this, this.onEventLabel);
+	        this._container = this._displayObject;
+	    }
+	    onEventLabel(event) {
+	        var _a, _b;
+	        const labelActions = (_b = (_a = this.skeletonPlay) === null || _a === void 0 ? void 0 : _a.frameLabels) === null || _b === void 0 ? void 0 : _b.get(event.name);
+	        labelActions === null || labelActions === void 0 ? void 0 : labelActions.forEach(action => {
+	            runFun(action);
+	        });
+	    }
 	    get aniPath() {
 	        return this._aniPath;
 	    }
@@ -3284,7 +3298,9 @@ class RandomTimerSingle extends RandomTimer {
 	        this.displayObject.event(Laya.Event.SPINE_PLAY, this.nameOrIndex);
 	    }
 	    /**
-	     * 当动画停止时的回调函数 或 使用 skeleton.stop()
+	     * 当动画停止时的回调函数 或 使用 `skeleton.stop()`
+	     *
+	     * 默认是触发 `Laya.Event.STOPPED` 事件调用方法
 	     */
 	    onPlayStopped() {
 	        var _a, _b, _c, _d, _e;
@@ -3409,12 +3425,8 @@ class RandomTimerSingle extends RandomTimer {
 	        this.aniMode = aniMode;
 	    }
 	    createDisplayObject() {
-	        // super.createDisplayObject()
 	        this._displayObject = new Laya.Skeleton(null, this.aniMode);
-	        this._displayObject["$owner"] = this;
-	        this["_touchable"] = this._displayObject.mouseEnabled = this._displayObject.mouseThrough = false;
-	        this._displayObject.on(Laya.Event.STOPPED, this, this.onPlayStopped);
-	        this._container = this._displayObject;
+	        super.createDisplayObject();
 	    }
 	    get asSkeleton() {
 	        return this._displayObject;
@@ -5072,12 +5084,8 @@ class RandomTimerSingle extends RandomTimer {
 	        this.ver = ver;
 	    }
 	    createDisplayObject() {
-	        super.createDisplayObject();
 	        this._displayObject = new Laya.SpineSkeleton();
-	        this._displayObject["$owner"] = this;
-	        this["_touchable"] = this._displayObject.mouseEnabled = this._displayObject.mouseThrough = false;
-	        this._displayObject.on(Laya.Event.STOPPED, this, this.onPlayStopped);
-	        this._container = this._displayObject;
+	        super.createDisplayObject();
 	    }
 	    get asSkeleton() {
 	        return this._displayObject;

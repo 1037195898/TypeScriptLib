@@ -61,13 +61,8 @@ export class GSkeleton extends ESkeleton {
     }
 
     protected override createDisplayObject() {
-        // super.createDisplayObject()
         this._displayObject = new Skeleton(null, this.aniMode)
-        this._displayObject["$owner"] = this
-        this["_touchable"] = this._displayObject.mouseEnabled = this._displayObject.mouseThrough = false
-        this._displayObject.on(Event.STOPPED, this, this.onPlayStopped)
-
-        this._container = this._displayObject
+        super.createDisplayObject()
     }
 
     get asSkeleton() {

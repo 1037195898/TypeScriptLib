@@ -16,15 +16,8 @@ export class GSpineSkeleton extends ESkeleton {
     }
 
     protected override createDisplayObject() {
-        super.createDisplayObject()
-
         this._displayObject = new Laya.SpineSkeleton()
-        this._displayObject["$owner"] = this
-        this["_touchable"] = this._displayObject.mouseEnabled = this._displayObject.mouseThrough = false
-        this._displayObject.on(Event.STOPPED, this, this.onPlayStopped)
-
-        this._container = this._displayObject
-
+        super.createDisplayObject()
     }
 
     get asSkeleton() {

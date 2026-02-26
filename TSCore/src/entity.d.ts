@@ -390,6 +390,13 @@ declare type ISkeletonPlay = {
      * @default -1 循环播放动画数组的下标 -1表示不循环
      */
     loopPlayIndex?: number
+    /**
+     * 动画帧标签映射表
+     * 
+     * 用于存储动画中的关键帧标签及其对应的回调函数列表。
+     * 每个标签可以绑定多个回调函数，当动画播放到对应标签时会依次执行这些回调。
+     */
+    frameLabels?: Map<string, ((() => void) | Laya.Handler)[]>
     /** 加载完成调用
      * @deprecated 只能在ISkeletonData中配置
      * */

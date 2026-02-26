@@ -36,10 +36,27 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
      */
     private _loopCount = 0
 
+    protected override createDisplayObject() {
+
+        this._displayObject["$owner"] = this
+        this["_touchable"] = this._displayObject.mouseEnabled = this._displayObject.mouseThrough = false
+        this._displayObject.on(Laya.Event.STOPPED, this, this.onPlayStopped)
+        this._displayObject.on(Laya.Event.LABEL, this, this.onEventLabel)
+
+        this._container = this._displayObject
+    }
+
+    protected onEventLabel(event: any) {
+        const labelActions = this.skeletonPlay?.frameLabels?.get(event.name)
+        labelActions?.forEach(action => {
+            runFun(action)
+        })
+    }
+
     get aniPath() {
         return this._aniPath
     }
-    
+
     get spineResPath() {
         return this._spineResPath
     }
@@ -149,7 +166,9 @@ export abstract class ESkeleton extends mixinExt(BezierCurves, ActionEvent, GCom
     }
 
     /**
-     * 当动画停止时的回调函数 或 使用 skeleton.stop()
+     * 当动画停止时的回调函数 或 使用 `skeleton.stop()`
+     *
+     * 默认是触发 `Laya.Event.STOPPED` 事件调用方法
      */
     protected onPlayStopped() {
         if (this.skeletonPlay) {
