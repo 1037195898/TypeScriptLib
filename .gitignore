@@ -1,10 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
 node_modules
 .idea/workspace.xml
-dist
 /TSCore/bin/temp/
 /GameLib/bin/temp/
 *.tgz
 demo
 .rollup.cache
-/bin/*.d.ts
