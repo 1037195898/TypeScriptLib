@@ -2513,8 +2513,8 @@ declare namespace gameLib {
 	    blurGame(): void;
 	    /** 游戏进入前台执行 */
 	    focusGame(): void;
-	    get gameScene(): import("./BaseScene").BaseScene<BaseGameData>;
-	    get gameServlet(): import("./GameServlet").GameServlet<BaseGameData>;
+	    get gameScene(): BaseScene;
+	    get gameServlet(): GameServlet;
 	    /**
 	     * 已做以下处理
 	     * @example

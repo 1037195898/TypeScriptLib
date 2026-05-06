@@ -23,6 +23,8 @@ import {LoaderConfig} from "../configs/LoaderConfig";
 import {AssetsLoader} from "../manager/AssetsLoader";
 import {IGameData} from "../Interfaces";
 import {PromptWindow} from "../view/PromptWindow";
+import {BaseScene} from "./BaseScene";
+import {GameServlet} from "./GameServlet";
 
 /**
  *
@@ -282,11 +284,11 @@ export class GameModel<T extends IGameData = BaseGameData> extends EProxy implem
         Log.debug("focusGame")
     }
 
-    get gameScene() {
+    get gameScene(): BaseScene {
         return SceneManager.inst.starter.baseScene
     }
 
-    get gameServlet() {
+    get gameServlet(): GameServlet {
         return SceneManager.inst.starter.gameServlet
     }
 
