@@ -17,18 +17,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9 # Use latest pnpm version
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '20' # Upgraded to modern Node.js LTS
           cache: 'pnpm'
           registry-url: 'https://npm.pkg.github.com'
           # Defaults to the user or organization that owns the workflow file
-          scope: '@1037195898'
+          scope: '@bogegit'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -42,3 +42,4 @@ jobs:
         run: pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
