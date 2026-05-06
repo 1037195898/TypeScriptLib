@@ -33,6 +33,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Update package version from tag
+        run: |
+          # GITHUB_REF_NAME contains the tag name, e.g., "v2.0.8"
+          # Remove the 'v' prefix
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "Setting package version to $VERSION"
+          npm version $VERSION --no-git-tag-version --allow-same-version
+
       # pnpm publish executes pre-publish scripts like build if they exist,
       # but here we run pack first to match previous workflow
       - name: Build project
