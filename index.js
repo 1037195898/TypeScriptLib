@@ -274,6 +274,8 @@ function createCompileStream(globs, opt, customTransformers) {
  * @property {boolean} [isMinify] 默认值: false - 是否压缩代码
  * @property {string} [namespace] 默认值: undefined - 命名空间名称
  * @property {JSPlugin[]} [plugs] 默认值: [] - JS插件数组
+ * @property {InitOptions} [initMapsOpt] 默认值: undefined - map初始化
+ * @property {string|WriteOptions} [writeMapsOpt] 默认值: undefined - map保存位置
  */
 
 /**
@@ -368,10 +370,10 @@ function buildJs(tsResult, outName, dist, opt) {
         }))
         .pipe(gulp.dest(dist))
         .pipe(ifelse(isMinify, [
-            sourcemaps.init(),
+            sourcemaps.init(opt?.initMapsOpt),
             gulpTerser(),
             rename({extname: '.min.js', dirname: ""}),
-            sourcemaps.write(".", {addComment: false}),
+            sourcemaps.write(opt?.writeMapsOpt || {addComment: false}),
             gulp.dest(dist)
         ]))
 }

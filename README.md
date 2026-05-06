@@ -1,115 +1,119 @@
-# TypeScriptLib
+# TypeScriptLib - LayaBox游戏开发框架
 
-TypeScript common lib    ( Laya 、 Fairygui)
+## 项目概述
 
-Enhance the functionality of native components
+TypeScriptLib是一个基于LayaAir引擎的专业游戏开发框架，包含两个核心子项目：TSCore（核心框架）和GameLib（游戏业务库）。该框架提供了完整的游戏开发解决方案，涵盖从基础工具库到高级游戏业务逻辑的全方位支持。
 
-### npm使用方式 ###
-在package.json 文件中添加命令
+## 核心特性
 
-```json
-{
-  "dependencies": {
-    "game-lib": "git+ssh://github.com/用户名/仓库名.git#标签版本号或分支名字"
-  }
-}
-```
-或查找标签或者发布版本号为1.0.2的commit
-```json
-{
-  "dependencies": {
-    "game-lib": "git+ssh://github.com/用户名/仓库名.git#semver:1.0.2"
-  }
-}
-```
-更新
-添加新的tag 在执行 
-````
-npm update game-lib
-````
+### 🎮 完整的游戏开发生态
+- **TSCore**: 提供底层核心框架和工具库
+- **GameLib**: 封装游戏业务逻辑和常用组件
+- **统一入口**: 通过npm包统一管理和使用
 
-### 使用gitee仓库 ###
+### 🔧 技术优势
+- 基于TypeScript开发，提供完整的类型安全支持
+- 深度集成LayaAir游戏引擎
+- 内置FairyGUI界面系统支持
+- 支持Spine骨骼动画
+- 提供完善的资源管理和加载机制
 
+### 📱 平台适配
+- 支持移动端和PC端多平台部署
+- 自动屏幕适配和分辨率处理
+- 刘海屏等特殊设备兼容
 
-在npm中使用gitee仓库的地址进行安装，例如：
-````
-{
-"dependencies": {
-"模板名称": "git+https://gitee.com/用户名/仓库名.git#标签版本号或分支名字"
-或ssh
-"模板名称": "git+ssh://git@gitee.com:用户名/仓库名.git#semver:标签版本号"
-}
-````
-
-~~如果您的gitee仓库中包含特定版本的代码，您可以在安装时指定版本号，例如：~~
-
-~~npm install git@gitee.com:bogegit/TypeScriptLib.git#46db9be3~~
-
-
-
-
-
-
-
-### 使用 webp ###
+## 项目结构
 
 ```
-const {webp} = require("game-lib")
-
-webp.cwebp('temp/img/a.jpg', 'temp/img/a.jpg.webp', '-q 60')
-
+TypeScriptLib/
+├── TSCore/           # 核心框架库
+├── GameLib/          # 游戏业务库
+├── libs/             # 第三方依赖库
+├── template/         # 模板和工具文件
+├── webp/             # 图片格式转换工具
+├── assets/           # 配置资源文件
+└── dist/             # 编译输出目录
 ```
 
+## 快速开始
 
-### 使用 Gulp 生成 ###
-```js
+### 安装方式
 
-const gulp = require("gulp")
-const {buildLibrary, clean} = require("game-lib")
+```bash
+# 通过npm安装
+npm install game-lib
 
-gulp.task("clean", () => {
-    return clean(["dist"])
-})
-
-function buildLib(done) {
-    buildLibrary({
-        src: {
-            globs: ["src/**/*.ts"],
-        },
-        outName: project,
-        dist: "./bin",
-        namespace: project,
-        js: {isMinify: true},
-        dts: {
-            globalDtsFile: ["./src/define.d.ts", "./src/entity.d.ts"]
-        }
-    }, function () {
-        done()
-    })
-}
-gulp.task('build', gulp.series("clean", buildLib))
-
+# 或者通过yarn安装
+yarn add game-lib
 ```
 
+### 基础使用
 
-### 使用 rollup 生成 ###
-```js
+```typescript
+import { App } from 'game-lib';
 
-const gulp = require("gulp")
-const {rollupPack, clean} = require("game-lib")
-
-gulp.task("clean", () => {
-    return clean(["dist"])
-})
-
-function buildLib(done) {
-    rollupPack("src/com/Main.ts", "main.min.js", {
-        outDir: "./dest",
-        minify: true
-    })
-}
-gulp.task('build', gulp.series("clean", buildLib))
-
-
+// 初始化应用
+App.run({
+    onRun: async () => {
+        console.log('应用启动');
+    },
+    onEngine: async () => {
+        console.log('引擎初始化完成');
+    },
+    onEnd: () => {
+        console.log('初始化完成');
+    }
+});
 ```
 
+## 子项目介绍
+
+### TSCore - 核心框架
+提供基础的框架支撑，包括：
+- 应用生命周期管理
+- 事件系统和消息机制
+- 资源加载和管理
+- 配置系统
+- 工具函数库
+
+### GameLib - 游戏业务库
+封装游戏相关业务逻辑，包括：
+- 游戏场景管理
+- 游戏数据模型
+- UI组件系统
+- 网络通信
+- 游戏特效系统
+
+## 文档目录
+
+- [📘 项目总览文档](./Documentation.md) - 完整的项目介绍和技术文档
+- [📁 TSCore文档](./TSCore-docs/) - 核心框架详细文档
+- [📁 GameLib文档](./GameLib-docs/) - 游戏业务库详细文档
+- [📁 共享资源](./Shared-Resources/) - 通用API和集成指南
+
+## 开发环境要求
+
+- Node.js >= 14.0.0
+- TypeScript >= 4.0.0
+- LayaAir Engine >= 2.0.0
+- FairyGUI >= 5.0.0
+
+## 浏览器兼容性
+
+- Chrome 60+
+- Firefox 55+
+- Safari 12+
+- Edge 79+
+
+## 许可证
+
+MIT License
+
+## 贡献指南
+
+欢迎提交Issue和Pull Request来改进这个项目。
+
+## 支持
+
+如有问题，请联系项目维护团队或查看相关文档。

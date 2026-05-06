@@ -48,6 +48,11 @@ function copyFiles(source, destination, ...files) {
         const sourcePath = path.join(source, file);
         const destPath = path.join(destination, file);
 
+        if (!fs.existsSync(sourcePath)) {
+            console.log(`警告: 源文件不存在，跳过复制: ${sourcePath}`);
+            return;
+        }
+
         const stats = fs.statSync(sourcePath);
         if (stats.isDirectory()) {
             // 递归复制子目录
