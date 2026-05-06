@@ -256,11 +256,25 @@ export class ValueSwitcher<T> {
         return this.displayLabel.text
     }
 
+    /**
+     * 获取当前值的索引位置
+     */
     get valueIndex() {
         return this._valueIndex
     }
+
+    /**
+     * 获取上一个值的索引位置
+     */
     get previousIndex() {
         return this._previousIndex
+    }
+
+    /**
+     * 获取上一个选中的值,如果值列表为空或索引无效则返回undefined
+     */
+    get previousValue() {
+        return this.values[this._previousIndex]
     }
 
     /**
