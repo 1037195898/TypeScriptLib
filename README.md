@@ -58,6 +58,11 @@ pnpm add game-lib@npm:@1037195898/game-lib
 ```
 > **💡 别名的好处**：在 JS/TS 代码中，你只需简单地 `require("game-lib")` 即可，无需书写数字前缀。
 
+> **🔄 关于库的更新：**
+> - **常规更新（小版本）**：如果库发布了新功能或修复（如 `2.0.8` -> `2.0.9`），可直接执行 `npm update game-lib`。
+> - **跨版本更新（强制最新）**：如果发布了重大更新（如 `3.0.0`），需要带上 `@latest` 标签强制拉取最新代码：
+>   `npm install game-lib@npm:@1037195898/game-lib@latest`
+
 **方式 B：标准安装**
 ```bash
 npm install @1037195898/game-lib
