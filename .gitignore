@@ -8,3 +8,5 @@ demo
 .rollup.cache
 .gemini/
 gha-creds-*.json
+bin
+dist
