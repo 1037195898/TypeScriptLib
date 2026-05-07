@@ -332,18 +332,20 @@ function analyzeDependencies(sourceFile, allFiles) {
                 // 绝对路径导入（从项目根目录开始）
                 resolvedPath = path.resolve(process.cwd(), importPath);
             }
-            resolvedPath = resolvedPath.toLowerCase();
+            
+            // 统一路径分隔符，用于在 map 中查找
+            const unifiedResolvedPath = unifyPath(resolvedPath).toLowerCase();
 
             // 查找对应的文件（尝试不同扩展名）
             const possiblePaths = [
-                resolvedPath + ".ts",
-                resolvedPath + ".tsx"
+                unifiedResolvedPath + ".ts",
+                unifiedResolvedPath + ".tsx"
             ];
 
             let finalPath = "";
             for (const possiblePath of possiblePaths) {
-                if (Object.values(allFiles).some(file => file.fileNameOriginal.toLowerCase() === possiblePath)) {
-                    finalPath = possiblePath;
+                if (pathCaseMap.has(possiblePath)) {
+                    finalPath = pathCaseMap.get(possiblePath);
                     break;
                 }
             }
@@ -601,6 +603,7 @@ function determineUsageContext(node) {
 function clearCache() {
     importMap.clear();
     dependencyDetailsMap.clear();
+    pathCaseMap.clear();
 }
 
 
