@@ -579,5 +579,14 @@ function determineUsageContext(node) {
     return 'value';
 }
 
+function clearCache() {
+    importMap.clear();
+    dependencyDetailsMap.clear();
+}
 
-module.exports = sortFilesByDependencies
+
+module.exports = function (files) {
+    const result = sortFilesByDependencies(files)
+    clearCache()
+    return result
+}

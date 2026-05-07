@@ -32,6 +32,9 @@ importers:
       '@types/through2':
         specifier: ^2.0.41
         version: 2.0.41
+      chalk:
+        specifier: ^4.1.2
+        version: 4.1.2
       concat-with-sourcemaps:
         specifier: ^1.1.0
         version: 1.1.0
