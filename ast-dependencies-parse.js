@@ -11,12 +11,31 @@ let importMap = new Map()
 // 添加全局变量存储依赖详情
 let dependencyDetailsMap = new Map();
 
+// 建立跨平台大小写无关的快速索引
+let pathCaseMap = new Map();
+
+// 统一路径分隔符为斜杠 /
+function unifyPath(p) {
+    return p ? p.replace(/\\/g, '/') : p;
+}
+
 /**
  * 基于依赖关系对文件进行排序，优先处理继承关系和值依赖
  * @param  {Map<File>} files - 所有文件信息映射
  * @returns {string[]} 按依赖顺序排序的文件名列表
  */
 function sortFilesByDependencies(files) {
+    // 初始化路径映射表，解决跨平台大小写和分隔符不一致问题
+    pathCaseMap.clear();
+    for (const fileName in files) {
+        if (!files.hasOwnProperty(fileName)) continue;
+        const file = files[fileName];
+        if (file.fileNameOriginal) {
+            pathCaseMap.set(unifyPath(file.fileNameOriginal).toLowerCase(), fileName);
+        }
+        pathCaseMap.set(unifyPath(fileName).toLowerCase(), fileName);
+    }
+
     // 为每个文件计算依赖
     const fileDependencies = {};
     const inheritanceRelations = {}; // 存储继承关系
