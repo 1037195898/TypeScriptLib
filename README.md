@@ -37,8 +37,8 @@ TypeScriptLib 是一个基于 LayaAir 引擎的专业游戏开发框架，包含
 3. 详细步骤请参考官方文档：[Managing your personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
 
 ```text
-# 告诉 npm：@1037195898 作用域的包去 GitHub 下载
-@1037195898:registry=https://npm.pkg.github.com/
+# 告诉 npm：@boge-mvp 作用域的包去 GitHub 下载
+@boge-mvp:registry=https://npm.pkg.github.com/
 
 # 配置认证信息
 //npm.pkg.github.com/:_authToken=你的_GITHUB_访问令牌
@@ -51,23 +51,23 @@ TypeScriptLib 是一个基于 LayaAir 引擎的专业游戏开发框架，包含
 **方式 A：使用 NPM 别名安装（⭐ 推荐）**
 ```bash
 # 使用 npm 安装并设置别名为 game-lib
-npm install game-lib@npm:@1037195898/game-lib
+npm install game-lib@npm:@boge-mvp/game-lib
 
 # 或使用 pnpm
-pnpm add game-lib@npm:@1037195898/game-lib
+pnpm add game-lib@npm:@boge-mvp/game-lib
 ```
 > **💡 别名的好处**：在 JS/TS 代码中，你只需简单地 `require("game-lib")` 即可，无需书写数字前缀。
 
 > **🔄 关于库的更新：**
 > - **常规更新（小版本）**：如果库发布了新功能或修复（如 `2.0.8` -> `2.0.9`），可直接执行 `npm update game-lib`。
 > - **跨版本更新（强制最新）**：如果发布了重大更新（如 `3.0.0`），需要带上 `@latest` 标签强制拉取最新代码：
->   `npm install game-lib@npm:@1037195898/game-lib@latest`
+>   `npm install game-lib@npm:@boge-mvp/game-lib@latest`
 
 **方式 B：标准安装**
 ```bash
-npm install @1037195898/game-lib
+npm install @boge-mvp/game-lib
 # 或使用 pnpm
-pnpm add @1037195898/game-lib
+pnpm add @boge-mvp/game-lib
 ```
 
 ---
@@ -78,7 +78,7 @@ pnpm add @1037195898/game-lib
 
 ```bash
 # 通过 GitHub 安装指定标签
-npm install game-lib@github:1037195898/TypeScriptLib#v2.0.8
+npm install game-lib@github:boge-mvp/TypeScriptLib#v2.0.8
 ```
 
 ⚠️ **此方法的弊端：**
@@ -95,13 +95,13 @@ npm install game-lib@github:1037195898/TypeScriptLib#v2.0.8
 {
   "dependencies": {
     "// 方式 A：使用别名指向 GitHub Packages (推荐)": "",
-    "game-lib": "npm:@1037195898/game-lib@^2.0.8",
+    "game-lib": "npm:@boge-mvp/game-lib@^2.0.8",
     
     "// 方式 B：标准声明": "",
-    "@1037195898/game-lib": "^2.0.8",
+    "@boge-mvp/game-lib": "^2.0.8",
     
     "// 方式 C：通过 Git 引用": "",
-    "game-lib": "git+https://github.com/1037195898/TypeScriptLib.git#v2.0.8"
+    "game-lib": "git+https://github.com/boge-mvp/TypeScriptLib.git#v2.0.8"
   }
 }
 ```
@@ -116,7 +116,7 @@ npm install game-lib@github:1037195898/TypeScriptLib#v2.0.8
 const { webp } = require("game-lib")
 
 // 如果你使用的是 方式B (标准安装)：
-const { webp } = require("@1037195898/game-lib")
+const { webp } = require("@boge-mvp/game-lib")
 ```
 
 *(以下示例均基于已使用 `game-lib` 作为别名安装的前提)*
